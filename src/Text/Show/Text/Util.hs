@@ -1,8 +1,8 @@
-module Text.Show.Text.Util (
-      c
-    ) where
+module Text.Show.Text.Util (s) where
 
-import Data.Text.Lazy.Builder
+import Data.Text.Lazy.Builder (Builder, singleton)
 
-c :: Char -> Builder
-c = singleton
+-- | A shorter name for 'singleton' for convenience's sake (since it tends to be used
+--   pretty often in this package).
+s :: Char -> Builder
+s = singleton
