@@ -1,12 +1,17 @@
 name:                text-show
 version:             0.1.0.0
 synopsis:            Efficient conversion of values into Text
--- description:         
+description:         @text-show@ offers a complete drop-in replacement of the @Show@
+                     typeclass, but for @Text@ instead of @String@. This package was
+                     created in the spirit of
+                     @<http://hackage.haskell.org/package/bytestring-show bytestring-show>@.
 homepage:            https://github.com/RyanGlScott/text-show
+bug-reports:         https://github.com/RyanGlScott/text-show/issues
 license:             BSD3
 license-file:        LICENSE
 author:              Ryan Scott
-maintainer:          ryan.gl.scott@ku.edu
+maintainer:          Ryan Scott <ryan.gl.scott@ku.edu>
+stability:           Experimental
 -- copyright:           
 category:            Text
 build-type:          Simple
@@ -41,3 +46,13 @@ library
   else
     cpp-options:       -DINTEGER_GMP
     build-depends:     integer-gmp >= 0.2
+
+test-suite properties
+  type:                exitcode-stdio-1.0
+  main-is:             Properties.hs
+  hs-source-dirs:      tests
+  build-depends:       base       >= 4.2 && < 5
+                     , QuickCheck >= 2.4
+                     , text       >= 0.2 && < 1.3
+                     , text-show  == 0.1.0.0
+  ghc-options:         -Wall

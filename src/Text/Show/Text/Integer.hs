@@ -40,6 +40,7 @@ ds :: Int
 (mx, ds) = until ((>mi) . (*10) . fst) (\(n,d) -> (n*10,d+1)) (10,1)
  where mi = fromIntegral (maxBound :: Int)
 
+-- | Constructs a 'Builder' from an 'Integer' value.
 showbInteger :: Integer -> Builder
 #ifdef INTEGER_SIMPLE
 #elif INTEGER_GMP
