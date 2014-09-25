@@ -1,4 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text.Char
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- Utilities for showing 'Char's and 'String's. This code is adapted from
+-- GHC.Show.
+----------------------------------------------------------------------------
 module Text.Show.Text.Char (showbLitChar, showbLitString) where
 
 import Data.Array

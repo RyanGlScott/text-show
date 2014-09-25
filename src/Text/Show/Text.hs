@@ -1,12 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- Efficiently convert from values to 'Text' via 'Builder's.
+----------------------------------------------------------------------------
 module Text.Show.Text (
-      Show(..)
+      -- * The 'Show' class
+      Show (..)
     , show
+      -- * 'Builder' construction
     , showbParen
     , showbLitChar
     , showbLitString
     , unlinesB
     , unwordsB
+      -- * Printing values
     , print
     ) where
 
@@ -30,37 +44,59 @@ import           Data.Word
 import           Prelude hiding (Show(..), print, putStrLn)
 
 import           Text.Show.Text.Char
+import           Text.Show.Text.Integer
 import           Text.Show.Text.Util
 
+-- | Conversion of values to 'Text'.
 class Show a where
+    -- |
+    -- Constructs a 'Text' via an efficient 'Builder'. The precedence is used to 
+    -- determine where to put parentheses in a shown expression involving operators.
+    -- 
+    -- 'Builder's can be efficiently combined, so the @showb@ functions are available
+    -- for showing multiple values before producing an output 'Text'.
     showbPrec :: Int -> a -> Builder
+    
+    -- |
+    -- Constructs a 'Text' via an efficient 'Builder'. 'Builder's can be efficiently
+    -- combined, so this is available building a 'Text' from multiple values.
     showb :: a -> Builder
+    
+    -- |
+    -- Allows for specialized display of lists. This is used, for example, when
+    -- showing lists of 'Char's.
     showbList :: [a] -> Builder
     
     showbPrec _ = showb
     
     showb = showbPrec 0
     
-    showbList []     = "[]"                      -- "[]"
+    showbList []     = "[]"
     showbList (x:xs) = s '[' <> showb x <> go xs -- "[..
       where
         go (y:ys) = s ',' <> showb y <> go ys    -- ..,..
         go []     = s ']'                        -- ..]"
+    {-# MINIMAL showbPrec | showb #-}
 
+-- | Constructs a 'Text' from a single value.
 show :: Show a => a -> Text
 show = toStrict . toLazyText . showb
 
+-- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 
+-- | Prints a value's 'Text' representation to the standard output.
 print :: Show a => a -> IO ()
 print = putStrLn . show
 
+-- | Merges several 'Builder's, separating them by newlines.
 unlinesB :: [Builder] -> Builder
 unlinesB (b:bs) = b <> s '\n' <> unlinesB bs
 unlinesB []     = mempty
 
+-- | Merges several 'Builder's, separating them by spaces.
 unwordsB :: [Builder] -> Builder
 unwordsB (b:bs@(_:_)) = b <> s ' ' <> unwordsB bs
 unwordsB [b]          = b
@@ -120,8 +156,8 @@ instance Show Word64 where
     showb = decimal
 
 instance Show Integer where
-    showb = decimal
-    showbPrec k i = showbParen (i < 0 && k > 0) $ decimal i
+    showb = showbInteger
+    showbPrec k i = showbParen (i < 0 && k > 0) $ showbInteger i
 
 instance Show Float where
     showb = realFloat
@@ -191,7 +227,8 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f) => Show (a, b, c, d, e
       s ',' <> showb f <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g) => Show (a, b, c, d, e, f, g) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g) =>
+  Show (a, b, c, d, e, f, g) where
     showb (a, b, c, d, e, f, g) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -202,7 +239,8 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g) => Show (a, b,
       s ',' <> showb g <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h) => Show (a, b, c, d, e, f, g, h) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h) =>
+  Show (a, b, c, d, e, f, g, h) where
     showb (a, b, c, d, e, f, g, h) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -214,7 +252,8 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h) => Sho
       s ',' <> showb h <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i) => Show (a, b, c, d, e, f, g, h, i) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i) =>
+  Show (a, b, c, d, e, f, g, h, i) where
     showb (a, b, c, d, e, f, g, h, i) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -227,7 +266,8 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb i <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j) => Show (a, b, c, d, e, f, g, h, i, j) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j) =>
+  Show (a, b, c, d, e, f, g, h, i, j) where
     showb (a, b, c, d, e, f, g, h, i, j) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -241,7 +281,9 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb j <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k) => Show (a, b, c, d, e, f, g, h, i, j, k) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f,
+          Show g, Show h, Show i, Show j, Show k) =>
+  Show (a, b, c, d, e, f, g, h, i, j, k) where
     showb (a, b, c, d, e, f, g, h, i, j, k) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -256,7 +298,9 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb k <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l) => Show (a, b, c, d, e, f, g, h, i, j, k, l) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f,
+          Show g, Show h, Show i, Show j, Show k, Show l) =>
+  Show (a, b, c, d, e, f, g, h, i, j, k, l) where
     showb (a, b, c, d, e, f, g, h, i, j, k, l) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -272,7 +316,9 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb l <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m) => Show (a, b, c, d, e, f, g, h, i, j, k, l, m) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g,
+          Show h, Show i, Show j, Show k, Show l, Show m) =>
+  Show (a, b, c, d, e, f, g, h, i, j, k, l, m) where
     showb (a, b, c, d, e, f, g, h, i, j, k, l, m) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -289,7 +335,9 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb m <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m, Show n) => Show (a, b, c, d, e, f, g, h, i, j, k, l, m, n) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g,
+          Show h, Show i, Show j, Show k, Show l, Show m, Show n) =>
+  Show (a, b, c, d, e, f, g, h, i, j, k, l, m, n) where
     showb (a, b, c, d, e, f, g, h, i, j, k, l, m, n) =
       s '(' <> showb a <>
       s ',' <> showb b <>
@@ -307,7 +355,9 @@ instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i
       s ',' <> showb n <>
       s ')'
 
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m, Show n, Show o) => Show (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) where
+instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h,
+          Show i, Show j, Show k, Show l, Show m, Show n, Show o) =>
+  Show (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) where
     showb (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) =
       s '(' <> showb a <>
       s ',' <> showb b <>
