@@ -7,7 +7,6 @@ ghc:
 
 install:
   - cabal update
-  - cabal install doctest
   - cabal install -j --only-dependencies --enable-tests
 
 script:
