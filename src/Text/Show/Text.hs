@@ -114,7 +114,7 @@ instance Show Char where
     showb '\'' = "'\\''"
     showb c    = s '\'' <> showbLitChar c <> s '\''
     {-# INLINE showb #-}
---     showbList cs = s '"' <> showbLitString cs <> s '"'
+    
     showbList = build
     {-# INLINE showbList #-}
 
@@ -127,81 +127,78 @@ instance Show a => Show [a] where
     {-# INLINE showb #-}
 
 instance Show Int where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Int8 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Int16 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Int32 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Int64 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Integer where
---     showb = showbInteger
     showb = build
     {-# INLINE showb #-}
+    
     showbPrec k i = showbParen (i < 0 && k > 0) $ build i
     {-# INLINE showbPrec #-}
 
 instance Show Word where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
 
 instance Show Word8 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
 
 instance Show Word16 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
 
 instance Show Word32 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
 
 instance Show Word64 where
---     showb = decimal
     showb = build
     {-# INLINE showb #-}
 
 instance Show Float where
     showb = realFloat
     {-# INLINE showb #-}
+    
     showbPrec k f = showbParen (f < 0 && k > 0) $ realFloat f
     {-# INLINE showbPrec #-}
 
 instance Show Double where
     showb = realFloat
     {-# INLINE showb #-}
+    
     showbPrec k f = showbParen (f < 0 && k > 0) $ realFloat f
     {-# INLINE showbPrec #-}
 
