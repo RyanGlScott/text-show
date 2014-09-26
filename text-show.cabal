@@ -22,10 +22,6 @@ source-repository head
   type:                git
   location:            git://github.com/RyanGlScott/text-show.git
 
-flag integer-simple
-  description:         Use with integer-simple build of GHC
-  default:             False
-
 library
   exposed-modules:     Text.Show.Text
   build-depends:       array       >= 0.3
