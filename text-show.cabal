@@ -28,8 +28,6 @@ flag integer-simple
 
 library
   exposed-modules:     Text.Show.Text
-  other-modules:       Text.Show.Text.Char
-                       Text.Show.Text.Util
   build-depends:       array       >= 0.3
                      , base        >= 4.2 && < 5
                      , containers            < 0.6

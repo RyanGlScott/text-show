@@ -17,37 +17,34 @@ module Text.Show.Text (
       -- * 'Builder' construction
     , showbParen
     , showbLitChar
-    , showbLitString
     , unlinesB
     , unwordsB
       -- * Printing values
     , print
     ) where
 
-import           Data.Array
-import           Data.Int
-import           Data.Complex
+import           Data.Array (Array, (!), assocs, bounds, listArray)
+import           Data.Char (ord)
+import           Data.Int (Int8, Int16, Int32, Int64)
+import           Data.Ix (Ix)
+import           Data.Complex (Complex(..))
 import qualified Data.Map as M
 import           Data.Map (Map)
-import           Data.Monoid
-import           Data.Ratio
+import           Data.Monoid (Monoid(mempty), (<>))
+import           Data.Ratio (Ratio, numerator, denominator)
 import qualified Data.Set as S
 import           Data.Set (Set)
 import           Data.Text (Text)
 import           Data.Text.Buildable (build)
-import           Data.Text.IO
+import           Data.Text.IO (putStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, toLazyText)
-import           Data.Text.Lazy.Builder.RealFloat
-import           Data.Word
+import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
+import           Data.Text.Lazy.Builder.RealFloat (realFloat)
+import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
-import           Foreign.Ptr
+import           Foreign.Ptr (Ptr, IntPtr, WordPtr)
 
 import           Prelude hiding (Show(..), print, putStrLn)
-
-import           Text.Show.Text.Char
--- import           Text.Show.Text.Integer
-import           Text.Show.Text.Util
 
 -- | Conversion of values to 'Text'.
 class Show a where
@@ -83,15 +80,18 @@ class Show a where
 -- | Constructs a 'Text' from a single value.
 show :: Show a => a -> Text
 show = toStrict . toLazyText . showb
+{-# INLINE show #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
+{-# INLINE showbParen #-}
 
 -- | Prints a value's 'Text' representation to the standard output.
 print :: Show a => a -> IO ()
 print = putStrLn . show
+{-# INLINE print #-}
 
 -- | Merges several 'Builder's, separating them by newlines.
 unlinesB :: [Builder] -> Builder
@@ -103,6 +103,38 @@ unwordsB :: [Builder] -> Builder
 unwordsB (b:bs@(_:_)) = b <> s ' ' <> unwordsB bs
 unwordsB [b]          = b
 unwordsB []           = mempty
+
+-- | A table of ASCII control characters that needs to be escaped with a backslash.
+asciiTabB :: Array Int Builder
+asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
+                              "BS",  "HT",  "LF",  "VT",  "FF",  "CR",  "SO",  "SI",
+                              "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
+                              "CAN", "EM",  "SUB", "ESC", "FS",  "GS",  "RS",  "US",
+                              "SP"]
+
+-- | Constructs a 'Builder' with one character (without single quotes).
+showbLitChar :: Char -> Builder
+showbLitChar c | c > '\DEL' = s '\\' <> showb (ord c)
+showbLitChar '\DEL'         = "\\DEL"
+showbLitChar '\\'           = "\\\\"
+showbLitChar c | c >= ' '   = s c
+showbLitChar '\a'           = "\\a"
+showbLitChar '\b'           = "\\b"
+showbLitChar '\f'           = "\\f"
+showbLitChar '\n'           = "\\n"
+showbLitChar '\r'           = "\\r"
+showbLitChar '\t'           = "\\t"
+showbLitChar '\v'           = "\\v"
+showbLitChar '\SO'          = "\\S0"
+showbLitChar c              = s '\\' <> (asciiTabB ! ord c)
+{-# INLINE showbLitChar #-}
+
+-- |
+-- A shorter name for 'singleton' for convenience's sake (since it tends to be used
+-- pretty often in @text-show@).
+s :: Char -> Builder
+s = singleton
+{-# INLINE s #-}
 
 instance Show Builder where
     showb = id
