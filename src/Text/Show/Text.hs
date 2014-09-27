@@ -37,6 +37,7 @@ import           Data.Set (Set)
 import           Data.Text (Text)
 import           Data.Text.Buildable (build)
 import           Data.Text.IO (putStrLn)
+import qualified Data.Text.Lazy as LT
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 import           Data.Text.Lazy.Builder.RealFloat (realFloat)
@@ -149,6 +150,15 @@ instance Show Char where
     
     showbList = build
     {-# INLINE showbList #-}
+
+-- Strict variant
+instance Show Text where
+    showb = build
+    {-# INLINE showb #-}
+
+instance Show LT.Text where
+    showb = build
+    {-# INLINE showb #-}
 
 instance Show Bool where
     showb True  = "True"
