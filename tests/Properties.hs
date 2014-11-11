@@ -8,8 +8,8 @@ import           Data.Map (Map)
 import           Data.Ratio (Ratio)
 import           Data.Set (Set)
 import qualified Data.Text as T
+import           Data.Text (unpack)
 import qualified Data.Text as TL
-import           Data.Text.Lazy.Builder (Builder, fromString)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
 import qualified Prelude as P
@@ -19,9 +19,10 @@ import           Test.QuickCheck
 import           Test.QuickCheck.Instances ()
 
 import qualified Text.Show.Text as T
+import           Text.Show.Text (Builder, fromString)
 
 prop_matchesShow :: (P.Show a, T.Show a, Arbitrary a) => a -> Bool
-prop_matchesShow x = P.show x == T.unpack (T.show x)
+prop_matchesShow x = P.show x == unpack (T.show x)
 
 instance Arbitrary Builder where
     arbitrary = fmap fromString arbitrary

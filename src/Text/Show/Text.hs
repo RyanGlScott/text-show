@@ -14,7 +14,9 @@ module Text.Show.Text (
       -- * The 'Show' class
       Show (..)
     , show
-      -- * 'Builder' construction
+    , showLazy
+      -- * 'Builder's
+    , module Data.Text.Lazy.Builder
     , showbParen
     , showbLitChar
     , unlinesB
@@ -39,7 +41,7 @@ import           Data.Text.Buildable (build)
 import           Data.Text.IO (putStrLn)
 import qualified Data.Text.Lazy as LT
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
+import           Data.Text.Lazy.Builder
 import           Data.Text.Lazy.Builder.RealFloat (realFloat)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
@@ -78,10 +80,15 @@ class Show a where
         go []     = s ']'                        -- ..]"
     {-# MINIMAL showbPrec | showb #-}
 
--- | Constructs a 'Text' from a single value.
+-- | Constructs a strict 'Text' from a single value.
 show :: Show a => a -> Text
-show = toStrict . toLazyText . showb
+show = toStrict . showLazy
 {-# INLINE show #-}
+
+-- | Constructs a lazy 'Text' from a single value.
+showLazy :: Show a => a -> LT.Text
+showLazy = toLazyText . showb
+{-# INLINE showLazy #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 showbParen :: Bool -> Builder -> Builder
