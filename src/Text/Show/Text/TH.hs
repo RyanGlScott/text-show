@@ -17,7 +17,7 @@ deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
     fromCons tvbs _ {- cons -} =
-        instanceD (applyCon ''Show typeNames $ reifyRoles name)
+        instanceD (applyCon ''Show typeNames $ roles name)
                   (classType `appT` instanceType)
                   [ funD 'showbPrec
                          [ 
@@ -38,6 +38,14 @@ deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
         
         instanceType :: Q Type
         instanceType = foldl' appT (conT name) $ map varT typeNames
+        
+#if MIN_VERSION_template_haskell(2,9,0)
+        roles :: Name -> Q [Role]
+        roles = reifyRoles
+#else
+        roles :: Name -> Q [a]
+        roles _ = return []
+#endif
 
 -------------------------------------------------------------------------------
 -- Utility functions
