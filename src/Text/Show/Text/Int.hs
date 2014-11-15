@@ -10,7 +10,10 @@ import           Data.Text.Lazy.Builder (Builder)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
 import           GHC.Exts (Int(I#))
-import           GHC.Prim ((<#), (>#), tagToEnum#)
+#if __GLASGOW_HASKELL__ >= 708
+import           GHC.Exts (isTrue#)
+#endif
+import           GHC.Prim (Int#, (<#), (>#))
 
 import qualified Prelude as P (show)
 import           Prelude hiding (Show)
@@ -20,8 +23,16 @@ import           Text.Show.Text.Functions (s)
 
 showbInt :: Int -> Int -> Builder
 showbInt (I# p) n'@(I# n)
-    | tagToEnum# (n <# 0#) && tagToEnum# (p ># 6#) = s '(' <> build n' <> s ')'
+    | isTrue (n <# 0#) && isTrue (p ># 6#) = s '(' <> build n' <> s ')'
     | otherwise = build n'
+  where
+#if __GLASGOW_HASKELL__ >= 708
+      isTrue :: Int# -> Bool
+      isTrue b = isTrue# b
+#else
+      isTrue :: Bool -> Bool
+      isTrue = id
+#endif
 
 showbInt64 :: Int -> Int64 -> Builder
 #if WORD_SIZE_IN_BITS < 64
