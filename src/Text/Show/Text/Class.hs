@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 module Text.Show.Text.Class where
 
 import           Data.Monoid ((<>))
@@ -38,7 +38,9 @@ class Show a where
     showb = showbPrec 0
     
     showbList = showbListDefault
+#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
+#endif
 
 -- | Constructs a strict 'Text' from a single value.
 show :: Show a => a -> Text

@@ -71,7 +71,11 @@ tvbName :: TyVarBndr -> Name
 tvbName (PlainTV  name)   = name
 tvbName (KindedTV name _) = name
 
+#if MIN_VERSION_template_haskell(2,9,0)
 applyCon :: Name -> [Name] -> Q [Role] -> Q [Pred]
+#else
+applyCon :: Name -> [Name] -> Q [a]    -> Q [Pred]
+#endif
 applyCon con typeNames roles = map apply . nonPhantomNames typeNames <$> roles
   where apply t =
 #if MIN_VERSION_template_haskell(2,10,0)
@@ -83,12 +87,13 @@ applyCon con typeNames roles = map apply . nonPhantomNames typeNames <$> roles
 -- | Filters a list of tycon names based on their type roles.
 -- 
 -- If a tycon has a phantom type role, remove it from the list.
-nonPhantomNames :: [Name] -> [Role] -> [Name]
 #if MIN_VERSION_template_haskell(2,9,0)
+nonPhantomNames :: [Name] -> [Role] -> [Name]
 nonPhantomNames (_:ns) (PhantomR:rs) = nonPhantomNames ns rs
 nonPhantomNames (n:ns) (_:rs)        = n:(nonPhantomNames ns rs)
 nonPhantomNames []     _             = []
 nonPhantomNames _      []            = []
 #else
-nonPhantomNames = map fst
+nonPhantomNames :: [Name] -> [a]    -> [Name]
+nonPhantomNames = const
 #endif

@@ -12,8 +12,9 @@ import           Data.Word (Word, Word8, Word16, Word32, Word64)
 import           GHC.Exts (Int(I#))
 #if __GLASGOW_HASKELL__ >= 708
 import           GHC.Exts (isTrue#)
+import           GHC.Prim (Int#)
 #endif
-import           GHC.Prim (Int#, (<#), (>#))
+import           GHC.Prim ((<#), (>#))
 
 import qualified Prelude as P (show)
 import           Prelude hiding (Show)
