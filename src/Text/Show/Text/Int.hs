@@ -9,8 +9,8 @@ import           Data.Text.Buildable (build)
 import           Data.Text.Lazy.Builder (Builder)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
-import           GHC.Prim ((<#), (>#))
-import           GHC.Types (Int(I#), isTrue#)
+import           GHC.Exts (Int(I#))
+import           GHC.Prim ((<#), (>#), tagToEnum#)
 
 import qualified Prelude as P (show)
 import           Prelude hiding (Show)
@@ -20,7 +20,7 @@ import           Text.Show.Text.Functions (s)
 
 showbInt :: Int -> Int -> Builder
 showbInt (I# p) n'@(I# n)
-    | isTrue# (n <# 0#) && isTrue# (p ># 6#) = s '(' <> build n' <> s ')'
+    | tagToEnum# (n <# 0#) && tagToEnum# (p ># 6#) = s '(' <> build n' <> s ')'
     | otherwise = build n'
 
 showbInt64 :: Int -> Int64 -> Builder
