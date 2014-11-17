@@ -1,4 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text.Functions
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- Miscellaneous 'Builder' utility functions.
+----------------------------------------------------------------------------
 module Text.Show.Text.Functions where
 
 import Data.Int (Int64)
@@ -15,10 +26,12 @@ s :: Char -> Builder
 s = singleton
 {-# INLINE s #-}
 
+-- | Computes the length of a 'Builder'.
 lengthB :: Builder -> Int64
 lengthB = length . toLazyText
 {-# INLINE lengthB #-}
 
+-- | @'replicateB' n b@ yields a 'Builder' containing @b@ repeated @n@ times.
 replicateB :: Int64 -> Builder -> Builder
 replicateB n = fromLazyText . replicate n . toLazyText
 {-# INLINE replicateB #-}

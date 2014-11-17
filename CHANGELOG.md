@@ -1,6 +1,7 @@
 # 0.3.0.0
+* Expose internal modules with monomorphic functions
 * `Text.Show.Text` now exports `Data.Text.Lazy.Builder` for convenience
-* Add `showLazy`, the counterpart of `show` for lazy `Text`
+* Add `showLazy`, `printLazy`, `lengthB`, and `replicateB`
 
 # 0.2.0.0
 

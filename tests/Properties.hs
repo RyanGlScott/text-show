@@ -1,15 +1,30 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Properties
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- @QuickCheck@ tests for @text-show@.
+----------------------------------------------------------------------------
 module Main (main) where
 
 import           Data.Array (Array)
 import           Data.Complex (Complex)
 import           Data.Int (Int8, Int16, Int32, Int64)
+import           Data.IntMap (IntMap)
+import           Data.IntSet (IntSet)
 import           Data.Map (Map)
 import           Data.Ratio (Ratio)
+import           Data.Sequence (Seq)
 import           Data.Set (Set)
 import qualified Data.Text as T
 import           Data.Text.Lazy (unpack)
 import qualified Data.Text as TL
+import           Data.Tree (Tree)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
@@ -27,6 +42,8 @@ import           Test.Framework.Providers.QuickCheck2 (testProperty)
 import qualified Text.Show.Text as T
 import           Text.Show.Text hiding (Show)
 
+-- | Verifies that a type's @Show@ instances coincide for both 'String's and 'Text',
+--   irrespective of precedence.
 prop_matchesShow :: (P.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
 prop_matchesShow k x = showsPrec k x "" == unpack (toLazyText $ showbPrec k x)
 
@@ -114,10 +131,18 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> (Int, Double, Char, String, T.Text) -> Bool)
             , testProperty "Array Int Text"
                 (prop_matchesShow :: Int -> Array Int T.Text -> Bool)
+            , testProperty "IntMap Text"
+                (prop_matchesShow :: Int -> IntMap T.Text -> Bool)
+            , testProperty "IntSet"
+                (prop_matchesShow :: Int -> IntSet -> Bool)
             , testProperty "Map Int Text"
                 (prop_matchesShow :: Int -> Map Int T.Text -> Bool)
+            , testProperty "Sequence Int"
+                (prop_matchesShow :: Int -> Seq Int -> Bool)
             , testProperty "Set Int"
                 (prop_matchesShow :: Int -> Set Int -> Bool)
+            , testProperty "Tree Int"
+                (prop_matchesShow :: Int -> Tree Int -> Bool)
             , testProperty "Ptr Int"
                 (prop_matchesShow :: Int -> Ptr Int -> Bool)
             , testProperty "FunPtr Int"

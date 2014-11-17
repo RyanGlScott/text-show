@@ -1,6 +1,22 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Text.Show.Text.Char where
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text.Data.Char
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- Monomorphic 'Show' functions for 'Char' and 'String'.
+----------------------------------------------------------------------------
+module Text.Show.Text.Data.Char (
+      showbChar
+    , showbLitChar
+    , showbString
+    , showbLitString
+    ) where
 
 import Data.Array (Array, (!), listArray)
 import Data.Char (isDigit, ord)
@@ -21,7 +37,13 @@ asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", 
                               "CAN", "EM",  "SUB", "ESC", "FS",  "GS",  "RS",  "US",
                               "SP"]
 
--- | Constructs a 'Builder' with one character (without single quotes).
+-- | Convert a 'Char' to a 'Builder' (surrounded by single quotes).
+showbChar :: Char -> Builder
+showbChar '\'' = "'\\''"
+showbChar c    = s '\'' <> showbLitChar c <> s '\''
+{-# INLINE showbChar #-}
+
+-- | Convert a 'Char' to a 'Builder' (without single quotes).
 showbLitChar :: Char -> Builder
 showbLitChar c | c > '\DEL' = s '\\' <> build (ord c)
 showbLitChar '\DEL'         = "\\DEL"
@@ -38,6 +60,12 @@ showbLitChar '\SO'          = "\\SO"
 showbLitChar c              = s '\\' <> (asciiTabB ! ord c)
 {-# INLINE showbLitChar #-}
 
+-- | Convert a 'String' to a 'Builder' (surrounded by double quotes).
+showbString :: String -> Builder
+showbString cs = s '"' <> showbLitString cs <> s '"'
+{-# INLINE showbString #-}
+
+-- | Convert a 'String' to a 'Builder' (without double quotes).
 showbLitString :: String -> Builder
 showbLitString []             = mempty
 showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
@@ -48,9 +76,8 @@ showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 {-# INLINE showbLitString #-}
 
 instance Show Char where
-    showb '\'' = "'\\''"
-    showb c    = s '\'' <> showbLitChar c <> s '\''
+    showb = showbChar
     {-# INLINE showb #-}
     
-    showbList cs = s '"' <> showbLitString cs <> s '"'
+    showbList = showbString
     {-# INLINE showbList #-}

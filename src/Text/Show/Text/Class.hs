@@ -1,10 +1,21 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text.Class
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- The 'Show' type class.
+----------------------------------------------------------------------------
 module Text.Show.Text.Class where
 
 import           Data.Monoid ((<>))
-import           Data.Text (Text)
-import qualified Data.Text.IO as T (putStrLn)
-import qualified Data.Text.Lazy as TL (Text)
+import           Data.Text         as TS (Text)
+import qualified Data.Text.IO      as TS (putStrLn)
+import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, toLazyText)
@@ -43,7 +54,7 @@ class Show a where
 #endif
 
 -- | Constructs a strict 'Text' from a single value.
-show :: Show a => a -> Text
+show :: Show a => a -> TS.Text
 show = toStrict . showLazy
 {-# INLINE show #-}
 
@@ -52,6 +63,10 @@ showLazy :: Show a => a -> TL.Text
 showLazy = toLazyText . showb
 {-# INLINE showLazy #-}
 
+-- |
+-- Converts a list of 'Show' values into a 'Builder' in which the values are surrounded
+-- by square brackets and each value is separated by a comma. This is the default
+-- implementation of 'showbList' save for a few special cases (e.g., 'String').
 showbListDefault :: Show a => [a] -> Builder
 showbListDefault []     = "[]"
 showbListDefault (x:xs) = s '[' <> showb x <> go xs -- "[..
@@ -66,11 +81,12 @@ showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
 
--- | Prints a value's 'Text' representation to the standard output.
+-- | Prints a value's strict 'Text' representation to the standard output.
 print :: Show a => a -> IO ()
-print = T.putStrLn . show
+print = TS.putStrLn . show
 {-# INLINE print #-}
 
+-- | Prints a value's lazy 'Text' representation to the standard output.
 printLazy :: Show a => a -> IO ()
 printLazy = TL.putStrLn . showLazy
 {-# INLINE printLazy #-}

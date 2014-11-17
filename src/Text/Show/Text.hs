@@ -31,12 +31,7 @@ import Data.Text.Lazy.Builder
 
 import Prelude hiding (Show(show), print)
 
-import Text.Show.Text.Char ()
 import Text.Show.Text.Class
-import Text.Show.Text.Containers ()
-import Text.Show.Text.Float ()
+import Text.Show.Text.Data    ()
+import Text.Show.Text.Foreign ()
 import Text.Show.Text.Functions (lengthB, replicateB, unlinesB, unwordsB)
-import Text.Show.Text.Instances ()
-import Text.Show.Text.Int ()
-import Text.Show.Text.Ptr ()
-import Text.Show.Text.Tuple ()

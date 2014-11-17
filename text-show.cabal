@@ -27,15 +27,22 @@ library
   exposed-modules:     Text.Show.Text
                        Text.Show.Text.TH
                        
-                       Text.Show.Text.Char
-                       Text.Show.Text.Containers
-                       Text.Show.Text.Float
-                       Text.Show.Text.Int
-                       Text.Show.Text.Ptr
-                       Text.Show.Text.Tuple
+                       Text.Show.Text.Data.Array
+                       Text.Show.Text.Data.Char
+                       Text.Show.Text.Data.Containers
+                       Text.Show.Text.Data.Either
+                       Text.Show.Text.Data.Enum
+                       Text.Show.Text.Data.Floating
+                       Text.Show.Text.Data.Integral
+                       Text.Show.Text.Data.List
+                       Text.Show.Text.Data.Maybe
+                       Text.Show.Text.Data.Text
+                       Text.Show.Text.Data.Tuple
+                       Text.Show.Text.Foreign.Ptr
   other-modules:       Text.Show.Text.Class
+                       Text.Show.Text.Data
+                       Text.Show.Text.Foreign
                        Text.Show.Text.Functions
-                       Text.Show.Text.Instances
   build-depends:       array            >= 0.3 && < 0.6
                      , base             >= 4.2 && < 5
                      , containers       >= 0.1 && < 0.6
