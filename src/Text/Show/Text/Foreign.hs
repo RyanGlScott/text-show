@@ -11,4 +11,5 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.Foreign () where
 
-import Text.Show.Text.Foreign.Ptr ()
+import Text.Show.Text.Foreign.C.Types ()
+import Text.Show.Text.Foreign.Ptr     ()

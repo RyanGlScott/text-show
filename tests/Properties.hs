@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Properties
@@ -27,9 +26,10 @@ import qualified Data.Text as TL
 import           Data.Tree (Tree)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
-import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
-                              castPtrToFunPtr, nullPtr, plusPtr,
-                              ptrToIntPtr, ptrToWordPtr)
+import           Foreign.C.Types
+import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
+
+import           Instances ()
 
 import qualified Prelude as P
 import           Prelude hiding (Show)
@@ -46,21 +46,6 @@ import           Text.Show.Text hiding (Show)
 --   irrespective of precedence.
 prop_matchesShow :: (P.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
 prop_matchesShow k x = showsPrec k x "" == unpack (toLazyText $ showbPrec k x)
-
-instance Arbitrary Builder where
-    arbitrary = fmap fromString arbitrary
-
-instance Arbitrary (Ptr a) where
-    arbitrary = fmap (plusPtr nullPtr) arbitrary
-
-instance Arbitrary (FunPtr a) where
-    arbitrary = fmap castPtrToFunPtr arbitrary
-
-instance Arbitrary IntPtr where
-    arbitrary = fmap ptrToIntPtr arbitrary
-
-instance Arbitrary WordPtr where
-    arbitrary = fmap ptrToWordPtr arbitrary
 
 main :: IO ()
 main = defaultMain tests
@@ -151,5 +136,11 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> IntPtr -> Bool)
             , testProperty "WordPtr"
                 (prop_matchesShow :: Int -> WordPtr -> Bool)
+            , testProperty "CChar"
+                (prop_matchesShow :: Int -> CChar -> Bool)
+            , testProperty "CSChar"
+                (prop_matchesShow :: Int -> CSChar -> Bool)
+            , testProperty "CUChar"
+                (prop_matchesShow :: Int -> CUChar -> Bool)
             ]
          ]

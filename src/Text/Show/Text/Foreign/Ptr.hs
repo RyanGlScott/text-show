@@ -54,11 +54,11 @@ showbFunPtr = showb . castFunPtrToPtr
 
 -- | Convert an 'IntPtr' into a 'Builder' with the given precedence.
 showbIntPtrPrec :: Int -> IntPtr -> Builder
-showbIntPtrPrec k ip = showbIntPrec k (unsafeCoerce# ip)
+showbIntPtrPrec k ip = showbIntPrec k $ unsafeCoerce# ip
 
 -- | Convert a 'WordPtr' into a 'Builder' with the given precedence.
 showbWordPtr :: WordPtr -> Builder
-showbWordPtr wp = showbWord (unsafeCoerce# wp)
+showbWordPtr wp = showbWord $ unsafeCoerce# wp
 
 instance Show (Ptr a) where
     showb = showbPtr

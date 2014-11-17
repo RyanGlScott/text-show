@@ -1,4 +1,6 @@
 # 0.3.0.0
+* Lots of bugfixes
+* Show instances for many other data types in `base` and `containers`
 * Expose internal modules with monomorphic functions
 * `Text.Show.Text` now exports `Data.Text.Lazy.Builder` for convenience
 * Add `showLazy`, `printLazy`, `lengthB`, and `replicateB`
