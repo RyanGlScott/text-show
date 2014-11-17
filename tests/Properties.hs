@@ -23,6 +23,10 @@ import           Data.Set (Set)
 import qualified Data.Text as T
 import           Data.Text.Lazy (unpack)
 import qualified Data.Text as TL
+import           Data.Time.Calendar (Day)
+import           Data.Time.Clock (DiffTime, UTCTime, NominalDiffTime)
+import           Data.Time.Clock.TAI (AbsoluteTime)
+import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime)
 import           Data.Tree (Tree)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 
@@ -142,5 +146,21 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> CSChar -> Bool)
             , testProperty "CUChar"
                 (prop_matchesShow :: Int -> CUChar -> Bool)
+            , testProperty "Day"
+                (prop_matchesShow :: Int -> Day -> Bool)
+            , testProperty "DiffTime"
+                (prop_matchesShow :: Int -> DiffTime -> Bool)
+            , testProperty "UTCTime"
+                (prop_matchesShow :: Int -> UTCTime -> Bool)
+            , testProperty "NominalDiffTime"
+                (prop_matchesShow :: Int -> NominalDiffTime -> Bool)
+            , testProperty "AbsoluteTime"
+                (prop_matchesShow :: Int -> AbsoluteTime -> Bool)
+            , testProperty "TimeZone"
+                (prop_matchesShow :: Int -> TimeZone -> Bool)
+            , testProperty "TimeOfDay"
+                (prop_matchesShow :: Int -> TimeOfDay -> Bool)
+            , testProperty "LocalTime"
+                (prop_matchesShow :: Int -> LocalTime -> Bool)
             ]
          ]

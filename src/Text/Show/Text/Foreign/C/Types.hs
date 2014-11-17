@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, MagicHash, NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -40,32 +40,29 @@ module Text.Show.Text.Foreign.C.Types (
 --     , showbCDoublePrec
     ) where
 
-import Data.Int
 import Data.Text.Lazy.Builder (Builder)
-import Data.Word
 
 import Foreign.C.Types
-
-import GHC.Prim (unsafeCoerce#)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral ()
 
-#include "HsBaseConfig.h"
-
 -- | Convert a 'CChar' to a 'Builder' with the given precedence.
 showbCCharPrec :: Int -> CChar -> Builder
-showbCCharPrec p cchar = showbPrec p (unsafeCoerce# cchar :: HTYPE_CHAR)
+showbCCharPrec p (CChar c) = showbPrec p c
+{-# INLINE showbCCharPrec #-}
 
 -- | Convert a 'CSChar' to a 'Builder' with the given precedence.
 showbCSCharPrec :: Int -> CSChar -> Builder
-showbCSCharPrec p cschar = showbPrec p (unsafeCoerce# cschar :: HTYPE_SIGNED_CHAR)
+showbCSCharPrec p (CSChar c) = showbPrec p c
+{-# INLINE showbCSCharPrec #-}
 
 -- | Convert a 'CUChar' to a 'Builder'.
 showbCUChar :: CUChar -> Builder
-showbCUChar cuchar = showb (unsafeCoerce# cuchar :: HTYPE_UNSIGNED_CHAR)
+showbCUChar (CUChar c) = showb c
+{-# INLINE showbCUChar #-}
 
 instance Show CChar where
     showbPrec = showbCCharPrec
