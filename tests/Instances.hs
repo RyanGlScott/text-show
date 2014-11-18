@@ -13,8 +13,11 @@
 ----------------------------------------------------------------------------
 module Instances where
 
+#if MIN_VERSION_bytestring(0,10,4)
 import Data.ByteString.Short (ShortByteString, pack)
+#endif
 import Data.Int
+import Data.Ord (Down(..))
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Word
 
@@ -26,6 +29,9 @@ import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
 import Test.QuickCheck
 
 #include "HsBaseConfig.h"
+
+instance Arbitrary a => Arbitrary (Down a) where
+    arbitrary = fmap Down arbitrary
 
 #if MIN_VERSION_bytestring(0,10,4)
 instance Arbitrary ShortByteString where

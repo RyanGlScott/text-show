@@ -28,16 +28,17 @@ library
                        Text.Show.Text.TH
                        
                        Text.Show.Text.Data.Array
+                       Text.Show.Text.Data.Bool
                        Text.Show.Text.Data.ByteString
                        Text.Show.Text.Data.Char
                        Text.Show.Text.Data.Containers
                        Text.Show.Text.Data.Either
-                       Text.Show.Text.Data.Enum
                        Text.Show.Text.Data.Floating
                        Text.Show.Text.Data.Integral
                        Text.Show.Text.Data.List
                        Text.Show.Text.Data.Maybe
                        Text.Show.Text.Data.Monoid
+                       Text.Show.Text.Data.Ord
                        Text.Show.Text.Data.Text
                        Text.Show.Text.Data.Time
                        Text.Show.Text.Data.Tuple
