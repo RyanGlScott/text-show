@@ -25,7 +25,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Class (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Tuple ()
-import Text.Show.Text.Functions (s)
+import Text.Show.Text.Utils (s)
 
 -- | Convert a 'Array' value to a 'Builder' with the given precedence.
 showbArrayPrec :: (Show i, Show e, Ix i) => Int -> Array i e -> Builder

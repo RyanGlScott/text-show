@@ -41,10 +41,10 @@ import           GHC.Show (appPrec)
 
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(..), showbParen, showbListDefault)
+import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbListDefault)
 import           Text.Show.Text.Data.Integral ()
 import           Text.Show.Text.Data.Tuple ()
-import           Text.Show.Text.Functions (s)
+import           Text.Show.Text.Utils (s)
 
 -- | Convert an 'IntMap' into a 'Builder' with the given precedence.
 showbIntMapPrec :: Show v => Int -> IntMap v -> Builder

@@ -12,6 +12,7 @@
 module Text.Show.Text.Data () where
 
 import Text.Show.Text.Data.Array      ()
+import Text.Show.Text.Data.ByteString ()
 import Text.Show.Text.Data.Char       ()
 import Text.Show.Text.Data.Containers ()
 import Text.Show.Text.Data.Either     ()
@@ -20,6 +21,7 @@ import Text.Show.Text.Data.Floating   ()
 import Text.Show.Text.Data.Integral   ()
 import Text.Show.Text.Data.List       ()
 import Text.Show.Text.Data.Maybe      ()
+import Text.Show.Text.Data.Monoid     ()
 import Text.Show.Text.Data.Text       ()
 import Text.Show.Text.Data.Time       ()
 import Text.Show.Text.Data.Tuple      ()

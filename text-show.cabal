@@ -28,6 +28,7 @@ library
                        Text.Show.Text.TH
                        
                        Text.Show.Text.Data.Array
+                       Text.Show.Text.Data.ByteString
                        Text.Show.Text.Data.Char
                        Text.Show.Text.Data.Containers
                        Text.Show.Text.Data.Either
@@ -36,17 +37,20 @@ library
                        Text.Show.Text.Data.Integral
                        Text.Show.Text.Data.List
                        Text.Show.Text.Data.Maybe
+                       Text.Show.Text.Data.Monoid
                        Text.Show.Text.Data.Text
                        Text.Show.Text.Data.Time
                        Text.Show.Text.Data.Tuple
                        Text.Show.Text.Foreign.C.Types
                        Text.Show.Text.Foreign.Ptr
+                       Text.Show.Text.Functions
   other-modules:       Text.Show.Text.Class
                        Text.Show.Text.Data
                        Text.Show.Text.Foreign
-                       Text.Show.Text.Functions
+                       Text.Show.Text.Utils
   build-depends:       array            >= 0.3 && < 0.6
                      , base             >= 4.2 && < 5
+                     , bytestring       >= 0.9 && < 0.11
                      , containers       >= 0.1 && < 0.6
                      , ghc-prim
                      , template-haskell >= 2.4 && < 2.10
@@ -63,6 +67,7 @@ test-suite text-show-properties
   hs-source-dirs:      tests
   build-depends:       array                      >= 0.3 && < 0.6
                      , base                       >= 4.2 && < 5
+                     , bytestring                 >= 0.9 && < 0.11
                      , containers                 >= 0.1 && < 0.6
                      , QuickCheck                 >= 2.4 && < 2.8
                      , quickcheck-instances       >= 0.1 && < 0.4

@@ -35,7 +35,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb))
-import Text.Show.Text.Functions (s)
+import Text.Show.Text.Utils (s)
 
 -- | Converts @()@ into a 'Builder'.
 showbUnit :: () -> Builder

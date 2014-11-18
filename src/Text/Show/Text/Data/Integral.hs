@@ -50,8 +50,8 @@ import           GHC.Real (ratioPrec, ratioPrec1)
 import qualified Prelude as P (show)
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(..), showbParen)
-import           Text.Show.Text.Functions (s)
+import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import           Text.Show.Text.Utils (s)
 
 -- | Convert an 'Int' to a 'Builder' with the given precedence.
 showbIntPrec :: Int -> Int -> Builder

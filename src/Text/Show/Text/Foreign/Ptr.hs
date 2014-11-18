@@ -30,9 +30,9 @@ import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(..))
+import Text.Show.Text.Class (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
-import Text.Show.Text.Functions (lengthB, replicateB, s)
+import Text.Show.Text.Utils (lengthB, replicateB, s)
 
 #include "MachDeps.h"
 

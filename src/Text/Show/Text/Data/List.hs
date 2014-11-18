@@ -15,7 +15,7 @@ module Text.Show.Text.Data.List (showbListDefault) where
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(..), showbListDefault)
+import Text.Show.Text.Class (Show(showb, showbList), showbListDefault)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 

@@ -26,7 +26,7 @@ import Data.Text.Lazy.Builder.RealFloat (realFloat)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showbPrec), showbParen)
-import Text.Show.Text.Functions (s)
+import Text.Show.Text.Utils (s)
 
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder

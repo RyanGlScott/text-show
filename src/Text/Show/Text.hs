@@ -25,6 +25,8 @@ module Text.Show.Text (
       -- * Printing values
     , print
     , printLazy
+    , hPrint
+    , hPrintLazy
     ) where
 
 import Data.Text.Lazy.Builder
@@ -34,4 +36,4 @@ import Prelude hiding (Show(show), print)
 import Text.Show.Text.Class
 import Text.Show.Text.Data    ()
 import Text.Show.Text.Foreign ()
-import Text.Show.Text.Functions (lengthB, replicateB, unlinesB, unwordsB)
+import Text.Show.Text.Utils (lengthB, replicateB, unlinesB, unwordsB)

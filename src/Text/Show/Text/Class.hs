@@ -14,15 +14,17 @@ module Text.Show.Text.Class where
 
 import           Data.Monoid ((<>))
 import           Data.Text         as TS (Text)
-import qualified Data.Text.IO      as TS (putStrLn)
+import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text)
-import qualified Data.Text.Lazy.IO as TL (putStrLn)
+import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, toLazyText)
 
 import           Prelude hiding (Show(show))
 
-import           Text.Show.Text.Functions (s)
+import           System.IO (Handle)
+
+import           Text.Show.Text.Utils (s)
 
 -- | Conversion of values to 'Text'.
 class Show a where
@@ -81,12 +83,26 @@ showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
 
--- | Prints a value's strict 'Text' representation to the standard output.
+-- | Writes a value's strict 'Text' representation to the standard output, followed
+--   by a newline.
 print :: Show a => a -> IO ()
 print = TS.putStrLn . show
 {-# INLINE print #-}
 
--- | Prints a value's lazy 'Text' representation to the standard output.
+-- | Writes a value's lazy 'Text' representation to the standard output, followed
+--   by a newline.
 printLazy :: Show a => a -> IO ()
 printLazy = TL.putStrLn . showLazy
 {-# INLINE printLazy #-}
+
+-- | Writes a value's strict 'Text' representation to a file handle, followed
+--   by a newline.
+hPrint :: Show a => Handle -> a -> IO ()
+hPrint h = TS.hPutStrLn h . show
+{-# INLINE hPrint #-}
+
+-- | Writes a value's lazy 'Text' representation to a file handle, followed
+--   by a newline.
+hPrintLazy :: Show a => Handle -> a -> IO ()
+hPrintLazy h = TL.hPutStrLn h . showLazy
+{-# INLINE hPrintLazy #-}

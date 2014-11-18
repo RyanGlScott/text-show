@@ -1,4 +1,5 @@
------------------------------------------------------------------------------
+{-# LANGUAGE CPP #-}
+   -----------------------------------------------------------------------------
 -- |
 -- Module      :  Properties
 -- Copyright   :  (C) 2014 Ryan Scott
@@ -12,6 +13,11 @@
 module Main (main) where
 
 import           Data.Array (Array)
+import qualified Data.ByteString      as BS (ByteString)
+import qualified Data.ByteString.Lazy as BL (ByteString)
+#if MIN_VERSION_bytestring(0,10,4)
+import           Data.ByteString.Short (ShortByteString)
+#endif
 import           Data.Complex (Complex)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.IntMap (IntMap)
@@ -43,8 +49,10 @@ import           Test.QuickCheck.Instances ()
 
 import           Test.Framework (Test, defaultMain, testGroup)
 import           Test.Framework.Providers.QuickCheck2 (testProperty)
+import           Text.Show.Functions ()
 import qualified Text.Show.Text as T
 import           Text.Show.Text hiding (Show)
+import           Text.Show.Text.Functions ()
 
 -- | Verifies that a type's @Show@ instances coincide for both 'String's and 'Text',
 --   irrespective of precedence.
@@ -108,24 +116,24 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> Complex Double -> Bool)
             , testProperty "Maybe Int"
                 (prop_matchesShow :: Int -> Maybe Int -> Bool)
-            , testProperty "Either Int Double"
-                (prop_matchesShow :: Int -> Either Int Double -> Bool)
-            , testProperty "(Int, Double)"
-                (prop_matchesShow :: Int -> (Int, Double) -> Bool)
-            , testProperty "(Int, Double, Char)"
-                (prop_matchesShow :: Int -> (Int, Double, Char) -> Bool)
-            , testProperty "(Int, Double, Char, String)"
-                (prop_matchesShow :: Int -> (Int, Double, Char, String) -> Bool)
-            , testProperty "(Int, Double, Char, String, Text)"
-                (prop_matchesShow :: Int -> (Int, Double, Char, String, T.Text) -> Bool)
-            , testProperty "Array Int Text"
-                (prop_matchesShow :: Int -> Array Int T.Text -> Bool)
-            , testProperty "IntMap Text"
-                (prop_matchesShow :: Int -> IntMap T.Text -> Bool)
+            , testProperty "Either Int Int"
+                (prop_matchesShow :: Int -> Either Int Int -> Bool)
+            , testProperty "(Int, Int)"
+                (prop_matchesShow :: Int -> (Int, Int) -> Bool)
+            , testProperty "(Int, Int, Int)"
+                (prop_matchesShow :: Int -> (Int, Int, Int) -> Bool)
+            , testProperty "(Int, Int, Int, Int)"
+                (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
+            , testProperty "(Int, Int, Int, Int, Int)"
+                (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+            , testProperty "Array Int Int"
+                (prop_matchesShow :: Int -> Array Int Int -> Bool)
+            , testProperty "IntMap Int"
+                (prop_matchesShow :: Int -> IntMap Int -> Bool)
             , testProperty "IntSet"
                 (prop_matchesShow :: Int -> IntSet -> Bool)
-            , testProperty "Map Int Text"
-                (prop_matchesShow :: Int -> Map Int T.Text -> Bool)
+            , testProperty "Map Int Int"
+                (prop_matchesShow :: Int -> Map Int Int -> Bool)
             , testProperty "Sequence Int"
                 (prop_matchesShow :: Int -> Seq Int -> Bool)
             , testProperty "Set Int"
@@ -146,6 +154,54 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> CSChar -> Bool)
             , testProperty "CUChar"
                 (prop_matchesShow :: Int -> CUChar -> Bool)
+            , testProperty "CShort"
+                (prop_matchesShow :: Int -> CShort -> Bool)
+            , testProperty "CUShort"
+                (prop_matchesShow :: Int -> CUShort -> Bool)
+            , testProperty "CInt"
+                (prop_matchesShow :: Int -> CInt -> Bool)
+            , testProperty "CUInt"
+                (prop_matchesShow :: Int -> CUInt -> Bool)
+            , testProperty "CLong"
+                (prop_matchesShow :: Int -> CLong -> Bool)
+            , testProperty "CULong"
+                (prop_matchesShow :: Int -> CULong -> Bool)
+            , testProperty "CPtrdiff"
+                (prop_matchesShow :: Int -> CPtrdiff -> Bool)
+            , testProperty "CSize"
+                (prop_matchesShow :: Int -> CSize -> Bool)
+            , testProperty "CWchar"
+                (prop_matchesShow :: Int -> CWchar -> Bool)
+            , testProperty "CSigAtomic"
+                (prop_matchesShow :: Int -> CSigAtomic -> Bool)
+            , testProperty "CLLong"
+                (prop_matchesShow :: Int -> CLLong -> Bool)
+            , testProperty "CULLong"
+                (prop_matchesShow :: Int -> CULLong -> Bool)
+            , testProperty "CIntPtr"
+                (prop_matchesShow :: Int -> CIntPtr -> Bool)
+            , testProperty "CUIntPtr"
+                (prop_matchesShow :: Int -> CUIntPtr -> Bool)
+            , testProperty "CIntMax"
+                (prop_matchesShow :: Int -> CIntMax -> Bool)
+            , testProperty "CUIntPtr"
+                (prop_matchesShow :: Int -> CUIntPtr -> Bool)
+            , testProperty "CIntMax"
+                (prop_matchesShow :: Int -> CIntMax -> Bool)
+            , testProperty "CUIntMax"
+                (prop_matchesShow :: Int -> CUIntMax -> Bool)
+            , testProperty "CClock"
+                (prop_matchesShow :: Int -> CClock -> Bool)
+            , testProperty "CTime"
+                (prop_matchesShow :: Int -> CTime -> Bool)
+            , testProperty "CUSeconds"
+                (prop_matchesShow :: Int -> CUSeconds -> Bool)
+            , testProperty "CSUSeconds"
+                (prop_matchesShow :: Int -> CSUSeconds -> Bool)
+            , testProperty "CFloat"
+                (prop_matchesShow :: Int -> CFloat -> Bool)
+            , testProperty "CDouble"
+                (prop_matchesShow :: Int -> CUChar -> Bool)
             , testProperty "Day"
                 (prop_matchesShow :: Int -> Day -> Bool)
             , testProperty "DiffTime"
@@ -162,5 +218,15 @@ tests = [ testGroup "QuickCheck Text.Show.Text"
                 (prop_matchesShow :: Int -> TimeOfDay -> Bool)
             , testProperty "LocalTime"
                 (prop_matchesShow :: Int -> LocalTime -> Bool)
+            , testProperty "strict ByteString"
+                (prop_matchesShow :: Int -> BS.ByteString -> Bool)
+            , testProperty "lazy ByteString"
+                (prop_matchesShow :: Int -> BL.ByteString -> Bool)
+#if MIN_VERSION_bytestring(0,10,4)
+            , testProperty "ShortByteString"
+                (prop_matchesShow :: Int -> ShortByteString -> Bool)
+#endif
+            , testProperty "Int -> Int"
+                (prop_matchesShow :: Int -> (Int -> Int) -> Bool)
             ]
          ]

@@ -27,7 +27,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(..))
-import Text.Show.Text.Functions (s)
+import Text.Show.Text.Utils (s)
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
 asciiTabB :: Array Int Builder
