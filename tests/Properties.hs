@@ -25,7 +25,9 @@ import           Data.IntSet (IntSet)
 import           Data.Map (Map)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
+#if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
+#endif
 import           Data.Ratio (Ratio)
 import           Data.Sequence (Seq)
 import           Data.Set (Set)
@@ -135,7 +137,9 @@ tests = [ testGroup "QuickCheck properties"
                 ]
             , testGroup "Text.Show.Text.Data.Ord"
                 [ testProperty "Ordering"                  (prop_matchesShow :: Int -> Ordering -> Bool)
+#if MIN_VERSION_base(4,6,0)
                 , testProperty "Down Int"                  (prop_matchesShow :: Int -> Down Int -> Bool)
+#endif
                 ]
             , testGroup "Text.Show.Text.Data.Text"
                 [ testProperty "Builder"                   (prop_matchesShow :: Int -> Builder -> Bool)
