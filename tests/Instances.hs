@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -9,17 +9,17 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Miscellaneous 'Arbitrary' instances.
+-- Miscellaneous typeclass instances.
 ----------------------------------------------------------------------------
 module Instances where
 
 #if MIN_VERSION_bytestring(0,10,4)
 import Data.ByteString.Short (ShortByteString, pack)
 #endif
-import Data.Int
+import Data.Monoid (All(..), Any(..), Dual(..), First(..),
+                    Last(..), Product(..), Sum(..))
 import Data.Ord (Down(..))
 import Data.Text.Lazy.Builder (Builder, fromString)
-import Data.Word
 
 import Foreign.C.Types
 import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
@@ -28,18 +28,13 @@ import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
 
 import Test.QuickCheck
 
-#include "HsBaseConfig.h"
-
-instance Arbitrary a => Arbitrary (Down a) where
-    arbitrary = fmap Down arbitrary
+instance Arbitrary Builder where
+    arbitrary = fmap fromString arbitrary
 
 #if MIN_VERSION_bytestring(0,10,4)
 instance Arbitrary ShortByteString where
     arbitrary = fmap pack arbitrary
 #endif
-
-instance Arbitrary Builder where
-    arbitrary = fmap fromString arbitrary
 
 instance Arbitrary (Ptr a) where
     arbitrary = fmap (plusPtr nullPtr) arbitrary
@@ -53,77 +48,40 @@ instance Arbitrary IntPtr where
 instance Arbitrary WordPtr where
     arbitrary = fmap ptrToWordPtr arbitrary
 
-instance Arbitrary CChar where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_CHAR)
+deriving instance Arbitrary CChar
+deriving instance Arbitrary CSChar
+deriving instance Arbitrary CUChar
+deriving instance Arbitrary CShort
+deriving instance Arbitrary CUShort
+deriving instance Arbitrary CInt
+deriving instance Arbitrary CUInt
+deriving instance Arbitrary CLong
+deriving instance Arbitrary CULong
+deriving instance Arbitrary CLLong
+deriving instance Arbitrary CULLong
+deriving instance Arbitrary CFloat
+deriving instance Arbitrary CDouble
+deriving instance Arbitrary CPtrdiff
+deriving instance Arbitrary CSize
+deriving instance Arbitrary CWchar
+deriving instance Arbitrary CSigAtomic
+deriving instance Arbitrary CClock
+deriving instance Arbitrary CTime
+deriving instance Arbitrary CUSeconds
+deriving instance Arbitrary CSUSeconds
+deriving instance Arbitrary CIntPtr
+deriving instance Arbitrary CUIntPtr
+deriving instance Arbitrary CIntMax
+deriving instance Arbitrary CUIntMax
+deriving instance Arbitrary All
+deriving instance Arbitrary Any
+deriving instance Arbitrary a => Arbitrary (Dual a)
+deriving instance Arbitrary a => Arbitrary (First a)
+deriving instance Arbitrary a => Arbitrary (Last a)
+deriving instance Arbitrary a => Arbitrary (Product a)
+deriving instance Arbitrary a => Arbitrary (Sum a)
 
-instance Arbitrary CSChar where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_SIGNED_CHAR)
-
-instance Arbitrary CUChar where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UNSIGNED_CHAR)
-
-instance Arbitrary CShort where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_SHORT)
-
-instance Arbitrary CUShort where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UNSIGNED_SHORT)
-
-instance Arbitrary CInt where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_INT)
-
-instance Arbitrary CUInt where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UNSIGNED_INT)
-
-instance Arbitrary CLong where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_LONG)
-
-instance Arbitrary CULong where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UNSIGNED_LONG)
-
-instance Arbitrary CLLong where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_LONG_LONG)
-
-instance Arbitrary CULLong where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UNSIGNED_LONG_LONG)
-
-instance Arbitrary CFloat where
-    arbitrary = fmap realToFrac (arbitrary :: Gen HTYPE_FLOAT)
-
-instance Arbitrary CDouble where
-    arbitrary = fmap realToFrac (arbitrary :: Gen HTYPE_DOUBLE)
-
-instance Arbitrary CPtrdiff where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_PTRDIFF_T)
-
-instance Arbitrary CSize where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_SIZE_T)
-
-instance Arbitrary CWchar where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_WCHAR_T)
-
-instance Arbitrary CSigAtomic where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_SIG_ATOMIC_T)
-
-instance Arbitrary CClock where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_CLOCK_T)
-
-instance Arbitrary CTime where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_TIME_T)
-
-instance Arbitrary CUSeconds where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_USECONDS_T)
-
-instance Arbitrary CSUSeconds where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_SUSECONDS_T)
-
-instance Arbitrary CIntPtr where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_INTPTR_T)
-
-instance Arbitrary CUIntPtr where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_INTMAX_T)
-
-instance Arbitrary CIntMax where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_INTMAX_T)
-
-instance Arbitrary CUIntMax where
-    arbitrary = fmap fromIntegral (arbitrary :: Gen HTYPE_UINTMAX_T)
+deriving instance Arbitrary a => Arbitrary (Down a)
+#if !MIN_VERSION_base(4,7,0)
+deriving instance Show a => Show (Down a)
+#endif

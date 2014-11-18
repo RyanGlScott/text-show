@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-   -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 -- |
 -- Module      :  Properties
 -- Copyright   :  (C) 2014 Ryan Scott
@@ -23,6 +23,8 @@ import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.IntMap (IntMap)
 import           Data.IntSet (IntSet)
 import           Data.Map (Map)
+import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
+                              Last(..), Product(..), Sum(..))
 import           Data.Ord (Down(..))
 import           Data.Ratio (Ratio)
 import           Data.Sequence (Seq)
@@ -121,6 +123,15 @@ tests = [ testGroup "QuickCheck properties"
                 ]
             , testGroup "Text.Show.Text.Data.Maybe"
                 [ testProperty "Maybe Int"                 (prop_matchesShow :: Int -> Maybe Int -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Monoid"
+                [ testProperty "All"                       (prop_matchesShow :: Int -> All -> Bool)
+                , testProperty "Any"                       (prop_matchesShow :: Int -> Any -> Bool)
+                , testProperty "Dual Int"                  (prop_matchesShow :: Int -> Dual Int -> Bool)
+                , testProperty "First (Maybe Int)"         (prop_matchesShow :: Int -> First (Maybe Int) -> Bool)
+                , testProperty "Last (Maybe Int)"          (prop_matchesShow :: Int -> Last (Maybe Int) -> Bool)
+                , testProperty "Product Int"               (prop_matchesShow :: Int -> Product Int -> Bool)
+                , testProperty "Sum Int"                   (prop_matchesShow :: Int -> Sum Int -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Ord"
                 [ testProperty "Ordering"                  (prop_matchesShow :: Int -> Ordering -> Bool)

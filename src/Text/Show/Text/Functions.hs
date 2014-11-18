@@ -17,6 +17,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 import Text.Show.Text.Class (Show(showb))
 
+-- | Convert a function to a 'Builder'.
 showbFunction :: (a -> b) -> Builder
 showbFunction = const "<function>"
 {-# INLINE showbFunction #-}
