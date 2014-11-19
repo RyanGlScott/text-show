@@ -158,7 +158,11 @@ instance Arbitrary RecSelError where
 instance Arbitrary RecUpdError where
     arbitrary = RecUpdError <$> arbitrary
 
-deriving instance Arbitrary ErrorCall
+-- deriving instance Arbitrary ErrorCall
+-- ErrorCall is a newtype starting with base-4.7.0.0, but we'll
+-- manually derive Arbitrary to support older version of GHC
+instance Arbitrary ErrorCall where
+    arbitrary = ErrorCall <$> arbitrary
 
 instance Arbitrary MaskingState where
     arbitrary = oneof $ map pure [ Unmasked

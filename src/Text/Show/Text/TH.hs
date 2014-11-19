@@ -3,21 +3,21 @@ module Text.Show.Text.TH where
 
 import           Control.Applicative
 
-import           Data.List
+import           Data.List (foldl')
 
 import           Language.Haskell.TH
 
 import qualified Prelude as P
-import           Prelude hiding (Show(..))
+import           Prelude hiding (Show)
 
-import           Text.Show.Text
+import           Text.Show.Text.Class (Show(showbPrec))
 
 deriveShow :: Name -> Q [Dec]
 deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
     fromCons tvbs _ {- cons -} =
-        instanceD (applyCon ''Show typeNames $ roles name)
+        instanceD (applyCon ''Show typeNames name)
                   (classType `appT` instanceType)
                   [ funD 'showbPrec
                          [ 
@@ -38,14 +38,6 @@ deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
         
         instanceType :: Q Type
         instanceType = foldl' appT (conT name) $ map varT typeNames
-        
-#if MIN_VERSION_template_haskell(2,9,0)
-        roles :: Name -> Q [Role]
-        roles = reifyRoles
-#else
-        roles :: Name -> Q [a]
-        roles _ = return []
-#endif
 
 -------------------------------------------------------------------------------
 -- Utility functions
@@ -79,29 +71,24 @@ tvbName :: TyVarBndr -> Name
 tvbName (PlainTV  name)   = name
 tvbName (KindedTV name _) = name
 
+applyCon :: Name -> [Name] -> Name -> Q [Pred]
 #if MIN_VERSION_template_haskell(2,9,0)
-applyCon :: Name -> [Name] -> Q [Role] -> Q [Pred]
+applyCon con typeNames targetData
+    = map apply . nonPhantomNames typeNames <$> reifyRoles targetData
 #else
-applyCon :: Name -> [Name] -> Q [a]    -> Q [Pred]
+applyCon con typeNames _
+    = return $ map apply typeNames
 #endif
-applyCon con typeNames roles = map apply . nonPhantomNames typeNames <$> roles
-  where apply t =
-#if MIN_VERSION_template_haskell(2,10,0)
-          AppT (ConT con) (VarT t)
-#else
-          ClassP con [VarT t]
-#endif
+  where
+    apply :: Name -> Pred
+    apply t = ClassP con [VarT t]
 
--- | Filters a list of tycon names based on their type roles.
--- 
--- If a tycon has a phantom type role, remove it from the list.
 #if MIN_VERSION_template_haskell(2,9,0)
-nonPhantomNames :: [Name] -> [Role] -> [Name]
-nonPhantomNames (_:ns) (PhantomR:rs) = nonPhantomNames ns rs
-nonPhantomNames (n:ns) (_:rs)        = n:(nonPhantomNames ns rs)
-nonPhantomNames []     _             = []
-nonPhantomNames _      []            = []
-#else
-nonPhantomNames :: [Name] -> [a]    -> [Name]
-nonPhantomNames = const
+    -- Filters a list of tycon names based on their type roles.
+    -- If a tycon has a phantom type role, remove it from the list.
+    nonPhantomNames :: [Name] -> [Role] -> [Name]
+    nonPhantomNames (_:ns) (PhantomR:rs) = nonPhantomNames ns rs
+    nonPhantomNames (n:ns) (_:rs)        = n:(nonPhantomNames ns rs)
+    nonPhantomNames []     _             = []
+    nonPhantomNames _      []            = []
 #endif
