@@ -28,6 +28,8 @@ import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                     castPtrToFunPtr, nullPtr, plusPtr,
                     ptrToIntPtr, ptrToWordPtr)
 
+import System.Posix.Types
+
 import Test.QuickCheck
 
 instance Arbitrary Builder where
@@ -49,6 +51,8 @@ instance Arbitrary IntPtr where
 
 instance Arbitrary WordPtr where
     arbitrary = fmap ptrToWordPtr arbitrary
+
+-- TODO: instance Arbitrary (ForeignPtr a)
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
@@ -75,6 +79,20 @@ deriving instance Arbitrary CIntPtr
 deriving instance Arbitrary CUIntPtr
 deriving instance Arbitrary CIntMax
 deriving instance Arbitrary CUIntMax
+deriving instance Arbitrary CDev
+deriving instance Arbitrary CIno
+deriving instance Arbitrary CMode
+deriving instance Arbitrary COff
+deriving instance Arbitrary CPid
+deriving instance Arbitrary CSsize
+deriving instance Arbitrary CGid
+deriving instance Arbitrary CNlink
+deriving instance Arbitrary CUid
+deriving instance Arbitrary CCc
+deriving instance Arbitrary CSpeed
+deriving instance Arbitrary CTcflag
+deriving instance Arbitrary CRLim
+deriving instance Arbitrary Fd
 deriving instance Arbitrary All
 deriving instance Arbitrary Any
 deriving instance Arbitrary a => Arbitrary (Dual a)

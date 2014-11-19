@@ -36,4 +36,5 @@ import Prelude hiding (Show(show), print)
 import Text.Show.Text.Class
 import Text.Show.Text.Data    ()
 import Text.Show.Text.Foreign ()
+import Text.Show.Text.System  ()
 import Text.Show.Text.Utils (lengthB, replicateB, unlinesB, unwordsB)

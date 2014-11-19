@@ -49,6 +49,8 @@ import           Instances ()
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
+import           System.Posix.Types
+
 import           Test.QuickCheck
 import           Test.QuickCheck.Instances ()
 
@@ -198,6 +200,22 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "FunPtr Int"                (prop_matchesShow :: Int -> FunPtr Int -> Bool)
                 , testProperty "IntPtr"                    (prop_matchesShow :: Int -> IntPtr -> Bool)
                 , testProperty "WordPtr"                   (prop_matchesShow :: Int -> WordPtr -> Bool)
+                ]
+            , testGroup "Text.Show.Text.System.Posix.Types"
+                [ testProperty "CDev"                      (prop_matchesShow :: Int -> CDev -> Bool)
+                , testProperty "CIno"                      (prop_matchesShow :: Int -> CIno -> Bool)
+                , testProperty "CMode"                     (prop_matchesShow :: Int -> CMode -> Bool)
+                , testProperty "COff"                      (prop_matchesShow :: Int -> COff -> Bool)
+                , testProperty "CPid"                      (prop_matchesShow :: Int -> CPid -> Bool)
+                , testProperty "CSsize"                    (prop_matchesShow :: Int -> CSsize -> Bool)
+                , testProperty "CGid"                      (prop_matchesShow :: Int -> CGid -> Bool)
+                , testProperty "CNlink"                    (prop_matchesShow :: Int -> CNlink -> Bool)
+                , testProperty "CUid"                      (prop_matchesShow :: Int -> CUid -> Bool)
+                , testProperty "CCc"                       (prop_matchesShow :: Int -> CCc -> Bool)
+                , testProperty "CSpeed"                    (prop_matchesShow :: Int -> CSpeed -> Bool)
+                , testProperty "CTcflag"                   (prop_matchesShow :: Int -> CTcflag -> Bool)
+                , testProperty "CRLim"                     (prop_matchesShow :: Int -> CRLim -> Bool)
+                , testProperty "Fd"                        (prop_matchesShow :: Int -> Fd -> Bool)
                 ]
             ]
          ]

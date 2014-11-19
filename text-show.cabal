@@ -44,10 +44,12 @@ library
                        Text.Show.Text.Data.Tuple
                        Text.Show.Text.Foreign.C.Types
                        Text.Show.Text.Foreign.Ptr
+                       Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Functions
   other-modules:       Text.Show.Text.Class
                        Text.Show.Text.Data
                        Text.Show.Text.Foreign
+                       Text.Show.Text.System
                        Text.Show.Text.Utils
   build-depends:       array            >= 0.3 && < 0.6
                      , base             >= 4.2 && < 5

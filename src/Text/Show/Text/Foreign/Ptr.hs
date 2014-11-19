@@ -17,11 +17,14 @@ module Text.Show.Text.Foreign.Ptr (
     , showbFunPtr
     , showbIntPtrPrec
     , showbWordPtr
+    , showbForeignPtr
     ) where
 
 import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
+import Foreign.ForeignPtr (ForeignPtr)
+import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
 import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
 import GHC.Num (wordToInteger)
@@ -36,7 +39,7 @@ import Text.Show.Text.Utils (lengthB, replicateB, s)
 
 #include "MachDeps.h"
 
--- | Convert a 'Ptr' into a 'Builder'. Note that this does not require the parameterized
+-- | Convert a 'Ptr' to a 'Builder'. Note that this does not require the parameterized
 --   type to be an instance of 'Show' itself.
 showbPtr :: Ptr a -> Builder
 showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
@@ -46,19 +49,25 @@ showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
                 <> replicateB (2*SIZEOF_HSPTR - lengthB ls) (s '0')
                 <> ls
 
--- | Convert a 'FunPtr' into a 'Builder'. Note that this does not require the
+-- | Convert a 'FunPtr' to a 'Builder'. Note that this does not require the
 --   parameterized type to be an instance of 'Show' itself.
 showbFunPtr :: FunPtr a -> Builder
 showbFunPtr = showb . castFunPtrToPtr
 {-# INLINE showbFunPtr #-}
 
--- | Convert an 'IntPtr' into a 'Builder' with the given precedence.
+-- | Convert an 'IntPtr' to a 'Builder' with the given precedence.
 showbIntPtrPrec :: Int -> IntPtr -> Builder
 showbIntPtrPrec k ip = showbIntPrec k $ unsafeCoerce# ip
 
--- | Convert a 'WordPtr' into a 'Builder' with the given precedence.
+-- | Convert a 'WordPtr' to a 'Builder'.
 showbWordPtr :: WordPtr -> Builder
 showbWordPtr wp = showbWord $ unsafeCoerce# wp
+
+-- | Convert a 'ForeignPtr' to a 'Builder'. Note that this does not require the
+--   parameterized type to be an instance of 'Show' itself.
+showbForeignPtr :: ForeignPtr a -> Builder
+showbForeignPtr = showb . unsafeForeignPtrToPtr
+{-# INLINE showbForeignPtr #-}
 
 instance Show (Ptr a) where
     showb = showbPtr
@@ -74,4 +83,8 @@ instance Show IntPtr where
 
 instance Show WordPtr where
     showb = showbWordPtr
+    {-# INLINE showb #-}
+
+instance Show (ForeignPtr a) where
+    showb = showbForeignPtr
     {-# INLINE showb #-}

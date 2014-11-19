@@ -91,7 +91,7 @@ instance Show BS.ByteString where
 
 instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
-    {-# INLINE showb #-}
+    {-# INLINE showbPrec #-}
 
 #if MIN_VERSION_bytestring(0,10,4)
 instance Show ShortByteString where
