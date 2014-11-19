@@ -14,6 +14,7 @@
 module Instances where
 
 import Control.Applicative
+import Control.Exception
 
 #if MIN_VERSION_bytestring(0,10,4)
 import Data.ByteString.Short (ShortByteString, pack)
@@ -32,6 +33,7 @@ import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                     castPtrToFunPtr, nullPtr, plusPtr,
                     ptrToIntPtr, ptrToWordPtr)
 
+import System.Exit (ExitCode(..))
 import System.Posix.Types
 
 import Test.QuickCheck
@@ -59,40 +61,108 @@ instance Arbitrary WordPtr where
 -- TODO: instance Arbitrary (ForeignPtr a)
 
 instance Arbitrary GeneralCategory where
-    arbitrary = oneof $ map return [ UppercaseLetter     
-                                   , LowercaseLetter
-                                   , TitlecaseLetter
-                                   , ModifierLetter
-                                   , OtherLetter
-                                   , NonSpacingMark
-                                   , SpacingCombiningMark
-                                   , EnclosingMark
-                                   , DecimalNumber
-                                   , LetterNumber
-                                   , OtherNumber
-                                   , ConnectorPunctuation
-                                   , DashPunctuation
-                                   , OpenPunctuation
-                                   , ClosePunctuation
-                                   , InitialQuote
-                                   , FinalQuote 
-                                   , OtherPunctuation
-                                   , MathSymbol
-                                   , CurrencySymbol
-                                   , ModifierSymbol
-                                   , OtherSymbol
-                                   , Space
-                                   , LineSeparator
-                                   , ParagraphSeparator
-                                   , Control
-                                   , Format
-                                   , Surrogate
-                                   , PrivateUse
-                                   , NotAssigned
-                                   ]
+    arbitrary = oneof $ map pure [ UppercaseLetter     
+                                 , LowercaseLetter
+                                 , TitlecaseLetter
+                                 , ModifierLetter
+                                 , OtherLetter
+                                 , NonSpacingMark
+                                 , SpacingCombiningMark
+                                 , EnclosingMark
+                                 , DecimalNumber
+                                 , LetterNumber
+                                 , OtherNumber
+                                 , ConnectorPunctuation
+                                 , DashPunctuation
+                                 , OpenPunctuation
+                                 , ClosePunctuation
+                                 , InitialQuote
+                                 , FinalQuote 
+                                 , OtherPunctuation
+                                 , MathSymbol
+                                 , CurrencySymbol
+                                 , ModifierSymbol
+                                 , OtherSymbol
+                                 , Space
+                                 , LineSeparator
+                                 , ParagraphSeparator
+                                 , Control
+                                 , Format
+                                 , Surrogate
+                                 , PrivateUse
+                                 , NotAssigned
+                                 ]
 
 instance Arbitrary Version where
     arbitrary = Version <$> arbitrary <*> arbitrary
+
+-- instance Arbitrary SomeException
+
+-- instance Arbitrary IOException
+
+instance Arbitrary ArithException where
+    arbitrary = oneof $ map pure [ Overflow
+                                 , Underflow
+                                 , LossOfPrecision
+                                 , DivideByZero
+                                 , Denormal
+#if MIN_VERSION_base(4,6,0)
+                                 , RatioZeroDenominator
+#endif
+                                 ]
+
+instance Arbitrary ArrayException where
+    arbitrary = oneof [IndexOutOfBounds <$> arbitrary, UndefinedElement <$> arbitrary]
+
+instance Arbitrary AssertionFailed where
+    arbitrary = AssertionFailed <$> arbitrary
+
+-- instance Arbitrary SomeAsyncException
+
+instance Arbitrary AsyncException where
+    arbitrary = oneof $ map pure [ StackOverflow
+                                 , HeapOverflow
+                                 , ThreadKilled
+                                 , UserInterrupt
+                                 ]
+
+instance Arbitrary NonTermination where
+    arbitrary = pure NonTermination
+
+instance Arbitrary NestedAtomically where
+    arbitrary = pure NestedAtomically
+
+instance Arbitrary BlockedIndefinitelyOnMVar where
+    arbitrary = pure BlockedIndefinitelyOnMVar
+
+instance Arbitrary BlockedIndefinitelyOnSTM where
+    arbitrary = pure BlockedIndefinitelyOnSTM
+
+instance Arbitrary Deadlock where
+    arbitrary = pure Deadlock
+
+instance Arbitrary NoMethodError where
+    arbitrary = NoMethodError <$> arbitrary
+
+instance Arbitrary PatternMatchFail where
+    arbitrary = PatternMatchFail <$> arbitrary
+
+instance Arbitrary RecConError where
+    arbitrary = RecConError <$> arbitrary
+
+instance Arbitrary RecSelError where
+    arbitrary = RecSelError <$> arbitrary
+
+instance Arbitrary RecUpdError where
+    arbitrary = RecUpdError <$> arbitrary
+
+deriving instance Arbitrary ErrorCall
+
+instance Arbitrary MaskingState where
+    arbitrary = oneof $ map pure [ Unmasked
+                                 , MaskedInterruptible
+                                 , MaskedUninterruptible
+                                 ]
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
@@ -119,6 +189,10 @@ deriving instance Arbitrary CIntPtr
 deriving instance Arbitrary CUIntPtr
 deriving instance Arbitrary CIntMax
 deriving instance Arbitrary CUIntMax
+
+instance Arbitrary ExitCode where
+    arbitrary = oneof [pure ExitSuccess, ExitFailure <$> arbitrary]
+
 deriving instance Arbitrary CDev
 deriving instance Arbitrary CIno
 deriving instance Arbitrary CMode
@@ -133,6 +207,7 @@ deriving instance Arbitrary CSpeed
 deriving instance Arbitrary CTcflag
 deriving instance Arbitrary CRLim
 deriving instance Arbitrary Fd
+
 deriving instance Arbitrary All
 deriving instance Arbitrary Any
 deriving instance Arbitrary a => Arbitrary (Dual a)

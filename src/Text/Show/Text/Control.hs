@@ -12,3 +12,4 @@
 module Text.Show.Text.Control () where 
 
 import Text.Show.Text.Control.Applicative ()
+import Text.Show.Text.Control.Exception   ()

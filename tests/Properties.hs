@@ -13,6 +13,7 @@
 module Main (main) where
 
 import           Control.Applicative (ZipList(..))
+import           Control.Exception
 
 import           Data.Array (Array)
 import qualified Data.ByteString      as BS (ByteString)
@@ -53,6 +54,7 @@ import           Instances ()
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
+import           System.Exit (ExitCode)
 import           System.Posix.Types
 
 import           Test.QuickCheck
@@ -77,6 +79,26 @@ tests :: [Test]
 tests = [ testGroup "QuickCheck properties"
             [ testGroup "Text.Show.Text.Control.Applicative"
                 [ testProperty "ZipList Int"               (prop_matchesShow :: Int -> ZipList Int -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Control.Exception"
+                [ -- testProperty "SomeException"             (prop_matchesShow :: Int -> SomeException -> Bool)
+--                 , testProperty "IOException"               (prop_matchesShow :: Int -> IOException -> Bool)
+                  testProperty "ArithException"            (prop_matchesShow :: Int -> ArithException -> Bool)
+                , testProperty "ArrayException"            (prop_matchesShow :: Int -> ArrayException -> Bool)
+                , testProperty "AssertionFailed"           (prop_matchesShow :: Int -> AssertionFailed -> Bool)
+--                 , testProperty "SomeAsyncException"        (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
+                , testProperty "AsyncException"            (prop_matchesShow :: Int -> AsyncException -> Bool)
+                , testProperty "NonTermination"            (prop_matchesShow :: Int -> NonTermination -> Bool)
+                , testProperty "NestedAtomically"          (prop_matchesShow :: Int -> NestedAtomically -> Bool)
+                , testProperty "BlockedIndefinitelyOnMVar" (prop_matchesShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
+                , testProperty "BlockedIndefinitelyOnSTM"  (prop_matchesShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
+                , testProperty "Deadlock"                  (prop_matchesShow :: Int -> Deadlock -> Bool)
+                , testProperty "NoMethodError"             (prop_matchesShow :: Int -> NoMethodError -> Bool)
+                , testProperty "PatternMatchFail"          (prop_matchesShow :: Int -> PatternMatchFail -> Bool)
+                , testProperty "RecConError"               (prop_matchesShow :: Int -> RecConError -> Bool)
+                , testProperty "RecSelError"               (prop_matchesShow :: Int -> RecSelError -> Bool)
+                , testProperty "RecUpdError"               (prop_matchesShow :: Int -> RecUpdError -> Bool)
+                , testProperty "ErrorCall"                 (prop_matchesShow :: Int -> ErrorCall -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Array"
                 [ testProperty "Array Int Int"             (prop_matchesShow :: Int -> Array Int Int -> Bool)
@@ -211,6 +233,10 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "FunPtr Int"                (prop_matchesShow :: Int -> FunPtr Int -> Bool)
                 , testProperty "IntPtr"                    (prop_matchesShow :: Int -> IntPtr -> Bool)
                 , testProperty "WordPtr"                   (prop_matchesShow :: Int -> WordPtr -> Bool)
+--                 , testProperty "ForeignPtr"                (prop_matchesShow :: Int -> ForeignPtr Int -> Bool)
+                ]
+            , testGroup "Text.Show.Text.System.Exit"
+                [ testProperty "ExitCode"                  (prop_matchesShow :: Int -> ExitCode -> Bool)
                 ]
             , testGroup "Text.Show.Text.System.Posix.Types"
                 [ testProperty "CDev"                      (prop_matchesShow :: Int -> CDev -> Bool)
