@@ -1,5 +1,16 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.Show.Text.Control.Applicative
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- Monomorphic 'Show' function for 'ZipList'.
+----------------------------------------------------------------------------
 module Text.Show.Text.Control.Applicative (showbZipListPrec) where
 
 import Control.Applicative (ZipList(..))

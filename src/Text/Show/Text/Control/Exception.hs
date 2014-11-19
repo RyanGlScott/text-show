@@ -17,7 +17,9 @@ module Text.Show.Text.Control.Exception (
   , showbArithException
   , showbArrayException
   , showbAssertionFailed
+#if MIN_VERSION_base(4,7,0)
   , showbSomeAsyncException
+#endif
   , showbAsyncException
   , showbNonTermination
   , showbNestedAtomically
@@ -81,10 +83,12 @@ showbAssertionFailed :: AssertionFailed -> Builder
 showbAssertionFailed (AssertionFailed err) = fromString err
 {-# INLINE showbAssertionFailed #-}
 
+#if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeAsyncException' value to a 'Builder'.
 showbSomeAsyncException :: SomeAsyncException -> Builder
 showbSomeAsyncException (SomeAsyncException e) = fromString $ P.show e
 {-# INLINE showbSomeAsyncException #-}
+#endif
 
 -- | Convert an 'AsyncException' to a 'Builder'.
 showbAsyncException :: AsyncException -> Builder
@@ -176,9 +180,11 @@ instance Show AssertionFailed where
     showb = showbAssertionFailed
     {-# INLINE showb #-}
 
+#if MIN_VERSION_base(4,7,0)
 instance Show SomeAsyncException where
     showb = showbSomeAsyncException
     {-# INLINE showb #-}
+#endif
 
 instance Show AsyncException where
     showb = showbAsyncException

@@ -86,7 +86,9 @@ tests = [ testGroup "QuickCheck properties"
                   testProperty "ArithException"            (prop_matchesShow :: Int -> ArithException -> Bool)
                 , testProperty "ArrayException"            (prop_matchesShow :: Int -> ArrayException -> Bool)
                 , testProperty "AssertionFailed"           (prop_matchesShow :: Int -> AssertionFailed -> Bool)
+-- #if MIN_VERSION_base(4,7,0)
 --                 , testProperty "SomeAsyncException"        (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
+-- #endif
                 , testProperty "AsyncException"            (prop_matchesShow :: Int -> AsyncException -> Bool)
                 , testProperty "NonTermination"            (prop_matchesShow :: Int -> NonTermination -> Bool)
                 , testProperty "NestedAtomically"          (prop_matchesShow :: Int -> NestedAtomically -> Bool)
@@ -254,5 +256,9 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "CRLim"                     (prop_matchesShow :: Int -> CRLim -> Bool)
                 , testProperty "Fd"                        (prop_matchesShow :: Int -> Fd -> Bool)
                 ]
+--             , testGroup "Text.Show.Text.Text.Read.Lex"
+--                 [ testProperty "Lexeme"                    (prop_matchesShow :: Int -> Lexeme -> Bool)
+--                 , testProperty "Number"                    (prop_matchesShow :: Int -> Number -> Bool)
+--                 ]
             ]
          ]

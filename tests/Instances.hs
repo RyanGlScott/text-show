@@ -117,7 +117,9 @@ instance Arbitrary ArrayException where
 instance Arbitrary AssertionFailed where
     arbitrary = AssertionFailed <$> arbitrary
 
+-- #if MIN_VERSION_base(4,7,0)
 -- instance Arbitrary SomeAsyncException
+-- #endif
 
 instance Arbitrary AsyncException where
     arbitrary = oneof $ map pure [ StackOverflow
@@ -163,6 +165,11 @@ instance Arbitrary MaskingState where
                                  , MaskedInterruptible
                                  , MaskedUninterruptible
                                  ]
+
+-- instance Arbitrary Lexeme
+-- #if MIN_VERSION_base(4,7,0)
+-- instance Arbitrary Number
+-- #endif
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
