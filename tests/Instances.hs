@@ -13,15 +13,19 @@
 ----------------------------------------------------------------------------
 module Instances where
 
+import Control.Applicative
+
 #if MIN_VERSION_bytestring(0,10,4)
 import Data.ByteString.Short (ShortByteString, pack)
 #endif
+import Data.Char (GeneralCategory(..))
 import Data.Monoid (All(..), Any(..), Dual(..), First(..),
                     Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down(..))
 #endif
 import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Version (Version(..))
 
 import Foreign.C.Types
 import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
@@ -33,26 +37,62 @@ import System.Posix.Types
 import Test.QuickCheck
 
 instance Arbitrary Builder where
-    arbitrary = fmap fromString arbitrary
+    arbitrary = fromString <$> arbitrary
 
 #if MIN_VERSION_bytestring(0,10,4)
 instance Arbitrary ShortByteString where
-    arbitrary = fmap pack arbitrary
+    arbitrary = pack <$> arbitrary
 #endif
 
 instance Arbitrary (Ptr a) where
-    arbitrary = fmap (plusPtr nullPtr) arbitrary
+    arbitrary = plusPtr nullPtr <$> arbitrary
 
 instance Arbitrary (FunPtr a) where
-    arbitrary = fmap castPtrToFunPtr arbitrary
+    arbitrary = castPtrToFunPtr <$> arbitrary
 
 instance Arbitrary IntPtr where
-    arbitrary = fmap ptrToIntPtr arbitrary
+    arbitrary = ptrToIntPtr <$> arbitrary
 
 instance Arbitrary WordPtr where
-    arbitrary = fmap ptrToWordPtr arbitrary
+    arbitrary = ptrToWordPtr <$> arbitrary
 
 -- TODO: instance Arbitrary (ForeignPtr a)
+
+instance Arbitrary GeneralCategory where
+    arbitrary = oneof $ map return [ UppercaseLetter     
+                                   , LowercaseLetter
+                                   , TitlecaseLetter
+                                   , ModifierLetter
+                                   , OtherLetter
+                                   , NonSpacingMark
+                                   , SpacingCombiningMark
+                                   , EnclosingMark
+                                   , DecimalNumber
+                                   , LetterNumber
+                                   , OtherNumber
+                                   , ConnectorPunctuation
+                                   , DashPunctuation
+                                   , OpenPunctuation
+                                   , ClosePunctuation
+                                   , InitialQuote
+                                   , FinalQuote 
+                                   , OtherPunctuation
+                                   , MathSymbol
+                                   , CurrencySymbol
+                                   , ModifierSymbol
+                                   , OtherSymbol
+                                   , Space
+                                   , LineSeparator
+                                   , ParagraphSeparator
+                                   , Control
+                                   , Format
+                                   , Surrogate
+                                   , PrivateUse
+                                   , NotAssigned
+                                   ]
+
+instance Arbitrary Version where
+    arbitrary = Version <$> arbitrary <*> arbitrary
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
@@ -100,6 +140,7 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
+deriving instance Arbitrary a => Arbitrary (ZipList a)
 
 #if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)

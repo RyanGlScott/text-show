@@ -27,6 +27,7 @@ library
   exposed-modules:     Text.Show.Text
                        Text.Show.Text.TH
                        
+                       Text.Show.Text.Control.Applicative
                        Text.Show.Text.Data.Array
                        Text.Show.Text.Data.Bool
                        Text.Show.Text.Data.ByteString
@@ -47,6 +48,7 @@ library
                        Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Functions
   other-modules:       Text.Show.Text.Class
+                       Text.Show.Text.Control
                        Text.Show.Text.Data
                        Text.Show.Text.Foreign
                        Text.Show.Text.System

@@ -12,12 +12,15 @@
 ----------------------------------------------------------------------------
 module Main (main) where
 
+import           Control.Applicative (ZipList(..))
+
 import           Data.Array (Array)
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString)
 #if MIN_VERSION_bytestring(0,10,4)
 import           Data.ByteString.Short (ShortByteString)
 #endif
+import           Data.Char (GeneralCategory)
 import           Data.Complex (Complex)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.IntMap (IntMap)
@@ -40,6 +43,7 @@ import           Data.Time.Clock.TAI (AbsoluteTime)
 import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime)
 import           Data.Tree (Tree)
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
+import           Data.Version (Version)
 
 import           Foreign.C.Types
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
@@ -71,7 +75,10 @@ main = defaultMain tests
 
 tests :: [Test]
 tests = [ testGroup "QuickCheck properties"
-            [ testGroup "Text.Show.Text.Data.Array"
+            [ testGroup "Text.Show.Text.Control.Applicative"
+                [ testProperty "ZipList Int"               (prop_matchesShow :: Int -> ZipList Int -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Array"
                 [ testProperty "Array Int Int"             (prop_matchesShow :: Int -> Array Int Int -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Bool"
@@ -86,6 +93,7 @@ tests = [ testGroup "QuickCheck properties"
                 ]
             , testGroup "Text.Show.Text.Data.Char"
                 [ testProperty "Char"                      (prop_matchesShow :: Int -> Char -> Bool)
+                , testProperty "GeneralCategory"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Containers"
                 [ testProperty "IntMap Int"                (prop_matchesShow :: Int -> IntMap Int -> Bool)
@@ -164,6 +172,9 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "(Int, Int, Int)"           (prop_matchesShow :: Int -> (Int, Int, Int) -> Bool)
                 , testProperty "(Int, Int, Int, Int)"      (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
                 , testProperty "(Int, Int, Int, Int, Int)" (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Version"
+                [ testProperty "Version"                   (prop_matchesShow :: Int -> Version -> Bool)
                 ]
             , testGroup "Text.Show.Text.Foreign.C.Types"
                 [ testProperty "CChar"

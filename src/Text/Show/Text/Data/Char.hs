@@ -16,10 +16,11 @@ module Text.Show.Text.Data.Char (
     , showbLitChar
     , showbString
     , showbLitString
+    , showbGeneralCategory
     ) where
 
 import Data.Array (Array, (!), listArray)
-import Data.Char (isDigit, ord)
+import Data.Char (GeneralCategory(..), isDigit, ord)
 import Data.Monoid (mempty, (<>))
 import Data.Text.Buildable (build)
 import Data.Text.Lazy.Builder (Builder)
@@ -75,9 +76,47 @@ showbLitString (c:d:cs)
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 {-# INLINE showbLitString #-}
 
+-- | Convert a 'GeneralCategory' to a 'Builder'.
+showbGeneralCategory :: GeneralCategory -> Builder
+showbGeneralCategory UppercaseLetter      = "UppercaseLetter"
+showbGeneralCategory LowercaseLetter      = "LowercaseLetter"
+showbGeneralCategory TitlecaseLetter      = "TitlecaseLetter"
+showbGeneralCategory ModifierLetter       = "ModifierLetter"
+showbGeneralCategory OtherLetter          = "OtherLetter"
+showbGeneralCategory NonSpacingMark       = "NonSpacingMark"
+showbGeneralCategory SpacingCombiningMark = "SpacingCombiningMark"
+showbGeneralCategory EnclosingMark        = "EnclosingMark"
+showbGeneralCategory DecimalNumber        = "DecimalNumber"
+showbGeneralCategory LetterNumber         = "LetterNumber"
+showbGeneralCategory OtherNumber          = "OtherNumber"
+showbGeneralCategory ConnectorPunctuation = "ConnectorPunctuation"
+showbGeneralCategory DashPunctuation      = "DashPunctuation"
+showbGeneralCategory OpenPunctuation      = "OpenPunctuation"
+showbGeneralCategory ClosePunctuation     = "ClosePunctuation"
+showbGeneralCategory InitialQuote         = "InitialQuote"
+showbGeneralCategory FinalQuote           = "FinalQuote"
+showbGeneralCategory OtherPunctuation     = "OtherPunctuation"
+showbGeneralCategory MathSymbol           = "MathSymbol"
+showbGeneralCategory CurrencySymbol       = "CurrencySymbol" 
+showbGeneralCategory ModifierSymbol       = "ModifierSymbol"
+showbGeneralCategory OtherSymbol          = "OtherSymbol"
+showbGeneralCategory Space                = "Space"
+showbGeneralCategory LineSeparator        = "LineSeparator"
+showbGeneralCategory ParagraphSeparator   = "ParagraphSeparator"
+showbGeneralCategory Control              = "Control"
+showbGeneralCategory Format               = "Format"
+showbGeneralCategory Surrogate            = "Surrogate"
+showbGeneralCategory PrivateUse           = "PrivateUse"
+showbGeneralCategory NotAssigned          = "NotAssigned"
+{-# INLINE showbGeneralCategory #-}
+
 instance Show Char where
     showb = showbChar
     {-# INLINE showb #-}
     
     showbList = showbString
     {-# INLINE showbList #-}
+
+instance Show GeneralCategory where
+    showb = showbGeneralCategory
+    {-# INLINE showb #-}
