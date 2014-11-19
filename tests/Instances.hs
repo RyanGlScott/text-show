@@ -18,7 +18,9 @@ import Data.ByteString.Short (ShortByteString, pack)
 #endif
 import Data.Monoid (All(..), Any(..), Dual(..), First(..),
                     Last(..), Product(..), Sum(..))
+#if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down(..))
+#endif
 import Data.Text.Lazy.Builder (Builder, fromString)
 
 import Foreign.C.Types
@@ -81,7 +83,9 @@ deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
 
+#if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)
 #if !MIN_VERSION_base(4,7,0)
 deriving instance Show a => Show (Down a)
+#endif
 #endif
