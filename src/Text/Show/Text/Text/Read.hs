@@ -33,6 +33,9 @@ import           Text.Read.Lex (Number)
 #endif
 import           Text.Show.Text.Class (Show(showbPrec), showbParen)
 import           Text.Show.Text.Data.Char (showbLitChar)
+#if !MIN_VERSION_base(4,6,0)
+import           Text.Show.Text.Data.Integral (showbIntegerPrec, showbRatioPrec)
+#endif
 
 -- | Convert a 'Lexeme' to a 'Builder' with the given precedence.
 showbLexemePrec :: Int -> Lexeme -> Builder
@@ -41,7 +44,12 @@ showbLexemePrec p (String s) = showbParen (p > appPrec) $ "String " <> fromStrin
 showbLexemePrec p (Punc pun) = showbParen (p > appPrec) $ "Punc "   <> fromString pun
 showbLexemePrec p (Ident i)  = showbParen (p > appPrec) $ "Ident "  <> fromString i
 showbLexemePrec p (Symbol s) = showbParen (p > appPrec) $ "Symbol " <> fromString s
+#if MIN_VERSION_base(4,6,0)
 showbLexemePrec p (Number n) = showbParen (p > appPrec) $ "Number " <> fromString (P.showsPrec appPrec1 n "")
+#else
+showbLexemePrec p (Int i)    = showbParen (p > appPrec) $ "Int "    <> showbIntegerPrec appPrec1 i
+showbLexemePrec p (Rat r)    = showbParen (p > appPrec) $ "Rat "    <> showbRatioPrec appPrec1 r
+#endif
 showbLexemePrec _ EOF        = "EOF"
 {-# INLINE showbLexemePrec #-}
 

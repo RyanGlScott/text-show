@@ -44,11 +44,13 @@ library
                        Text.Show.Text.Data.Text
                        Text.Show.Text.Data.Time
                        Text.Show.Text.Data.Tuple
+                       Text.Show.Text.Data.Version
                        Text.Show.Text.Foreign.C.Types
                        Text.Show.Text.Foreign.Ptr
+                       Text.Show.Text.Functions
                        Text.Show.Text.System.Exit
                        Text.Show.Text.System.Posix.Types
-                       Text.Show.Text.Functions
+                       Text.Show.Text.Text.Read
   other-modules:       Text.Show.Text.Class
                        Text.Show.Text.Control
                        Text.Show.Text.Data

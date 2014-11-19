@@ -4,6 +4,7 @@ module Text.Show.Text.TH where
 import           Control.Applicative
 
 import           Data.List (foldl')
+import           Data.Text.Lazy.Builder (fromString)
 
 import           Language.Haskell.TH
 
@@ -13,19 +14,16 @@ import           Prelude hiding (Show)
 import           Text.Show.Text.Class (Show(showbPrec))
 
 deriveShow :: Name -> Q [Dec]
-deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
+deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
-    fromCons tvbs _ {- cons -} =
+    fromCons tvbs cons =
         instanceD (applyCon ''Show typeNames name)
                   (classType `appT` instanceType)
                   [ funD 'showbPrec
                          [ 
---                            clause []
---                                   (normalB $ consToJSON opts cons)
---                                   []
                            clause []
-                                  (normalB $ varE 'undefined)
+                                  (normalB $ consToShow cons)
                                   []
                          ]
                   ]
@@ -38,6 +36,14 @@ deriveShow name = withType name $ \tvbs cons -> fmap (:[]) $ fromCons tvbs cons
         
         instanceType :: Q Type
         instanceType = foldl' appT (conT name) $ map varT typeNames
+
+consToShow :: [Con] -> Q Exp
+consToShow [] = error $ "Text.Show.Text.TH.consToShow: Not a single constructor given!"
+-- consToShow [_] = do
+consToShow _ = do
+    p     <- newName "p"
+    value <- newName "value"
+    lamE (map varP [p, value]) $ caseE (varE value) [match wildP (normalB $ [|fromString "wat is this i dont even"|]) []]
 
 -------------------------------------------------------------------------------
 -- Utility functions
