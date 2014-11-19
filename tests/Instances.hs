@@ -140,7 +140,11 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
+ 
 deriving instance Arbitrary a => Arbitrary (ZipList a)
+#if !MIN_VERSION_base(4,7,0)
+deriving instance Show a => Show (ZipList a)
+#endif
 
 #if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)
