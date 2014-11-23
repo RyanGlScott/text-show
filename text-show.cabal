@@ -28,7 +28,9 @@ library
                        Text.Show.Text.TH
                        
                        Text.Show.Text.Control.Applicative
+                       Text.Show.Text.Control.Concurrent
                        Text.Show.Text.Control.Exception
+                       Text.Show.Text.Control.Monad.ST
                        Text.Show.Text.Data.Array
                        Text.Show.Text.Data.Bool
                        Text.Show.Text.Data.ByteString

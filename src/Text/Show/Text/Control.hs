@@ -12,4 +12,6 @@
 module Text.Show.Text.Control () where 
 
 import Text.Show.Text.Control.Applicative ()
+import Text.Show.Text.Control.Concurrent  ()
 import Text.Show.Text.Control.Exception   ()
+import Text.Show.Text.Control.Monad.ST    ()

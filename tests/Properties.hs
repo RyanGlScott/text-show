@@ -17,6 +17,7 @@ module Main (main) where
 
 import           Control.Applicative (ZipList(..))
 import           Control.Exception
+import           Control.Monad.ST
 
 import           Data.Array (Array)
 import qualified Data.ByteString      as BS (ByteString)
@@ -44,7 +45,7 @@ import           Data.Proxy (Proxy)
 import           Data.Ratio (Ratio)
 import           Data.Sequence (Seq)
 import           Data.Set (Set)
-import qualified Data.Text as T
+import qualified Data.Text as TS
 import           Data.Text.Lazy (unpack)
 import qualified Data.Text as TL
 import           Data.Time.Calendar (Day)
@@ -57,13 +58,16 @@ import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (TyCon, TypeRep, Fingerprint)
+import           Data.Typeable.Internal (TyCon, TypeRep)
+import           GHC.Fingerprint.Type (Fingerprint)
 #endif
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 import           Data.Version (Version)
 
 import           Foreign.C.Types
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
+
+import           GHC.Conc (BlockReason, ThreadStatus)
 
 import           Instances ()
 
@@ -96,15 +100,20 @@ tests = [ testGroup "QuickCheck properties"
             [ testGroup "Text.Show.Text.Control.Applicative"
                 [ testProperty "ZipList Int"               (prop_matchesShow :: Int -> ZipList Int -> Bool)
                 ]
+            , testGroup "Text.Show.Text.Control.Concurrent"
+                [ testProperty "BlockReason"               (prop_matchesShow :: Int -> BlockReason -> Bool)
+--                 , testProperty "ThreadId"                  (prop_matchesShow :: Int -> ThreadId -> Bool)
+                , testProperty "ThreadStatus"              (prop_matchesShow :: Int -> ThreadStatus -> Bool)
+                ]
             , testGroup "Text.Show.Text.Control.Exception"
-                [ -- testProperty "SomeException"             (prop_matchesShow :: Int -> SomeException -> Bool)
+                [ testProperty "SomeException"             (prop_matchesShow :: Int -> SomeException -> Bool)
 --                 , testProperty "IOException"               (prop_matchesShow :: Int -> IOException -> Bool)
-                  testProperty "ArithException"            (prop_matchesShow :: Int -> ArithException -> Bool)
+                , testProperty "ArithException"            (prop_matchesShow :: Int -> ArithException -> Bool)
                 , testProperty "ArrayException"            (prop_matchesShow :: Int -> ArrayException -> Bool)
                 , testProperty "AssertionFailed"           (prop_matchesShow :: Int -> AssertionFailed -> Bool)
--- #if MIN_VERSION_base(4,7,0)
---                 , testProperty "SomeAsyncException"        (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
--- #endif
+#if MIN_VERSION_base(4,7,0)
+                , testProperty "SomeAsyncException"        (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
+#endif
                 , testProperty "AsyncException"            (prop_matchesShow :: Int -> AsyncException -> Bool)
                 , testProperty "NonTermination"            (prop_matchesShow :: Int -> NonTermination -> Bool)
                 , testProperty "NestedAtomically"          (prop_matchesShow :: Int -> NestedAtomically -> Bool)
@@ -117,6 +126,9 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "RecSelError"               (prop_matchesShow :: Int -> RecSelError -> Bool)
                 , testProperty "RecUpdError"               (prop_matchesShow :: Int -> RecUpdError -> Bool)
                 , testProperty "ErrorCall"                 (prop_matchesShow :: Int -> ErrorCall -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Control.Monad.ST"
+                [ testProperty "ST"                        (prop_matchesShow :: Int -> ST Int Int -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Array"
                 [ testProperty "Array Int Int"             (prop_matchesShow :: Int -> Array Int Int -> Bool)
@@ -212,7 +224,7 @@ tests = [ testGroup "QuickCheck properties"
                 ]
             , testGroup "Text.Show.Text.Data.Text"
                 [ testProperty "Builder"                   (prop_matchesShow :: Int -> Builder -> Bool)
-                , testProperty "strict Text"               (prop_matchesShow :: Int -> T.Text -> Bool)
+                , testProperty "strict Text"               (prop_matchesShow :: Int -> TS.Text -> Bool)
                 , testProperty "lazy Text"                 (prop_matchesShow :: Int -> TL.Text -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Time"

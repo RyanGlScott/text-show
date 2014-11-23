@@ -18,6 +18,7 @@ module Instances where
 
 import Control.Applicative
 import Control.Exception
+import Control.Monad.ST (ST, fixST)
 
 #if MIN_VERSION_bytestring(0,10,4)
 import Data.ByteString.Short (ShortByteString, pack)
@@ -57,6 +58,8 @@ import Foreign.C.Types
 import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                     castPtrToFunPtr, nullPtr, plusPtr,
                     ptrToIntPtr, ptrToWordPtr)
+
+import GHC.Conc (BlockReason(..), ThreadStatus(..))
 
 import System.Exit (ExitCode(..))
 import System.Posix.Types
@@ -121,7 +124,9 @@ instance Arbitrary GeneralCategory where
 instance Arbitrary Version where
     arbitrary = Version <$> arbitrary <*> arbitrary
 
--- instance Arbitrary SomeException
+-- TODO: Be more creative with this instance
+instance Arbitrary SomeException where
+    arbitrary = SomeException <$> (arbitrary :: Gen AssertionFailed)
 
 -- instance Arbitrary IOException
 
@@ -144,9 +149,11 @@ instance Arbitrary ArrayException where
 instance Arbitrary AssertionFailed where
     arbitrary = AssertionFailed <$> arbitrary
 
--- #if MIN_VERSION_base(4,7,0)
--- instance Arbitrary SomeAsyncException
--- #endif
+#if MIN_VERSION_base(4,7,0)
+-- TODO: Be more creative with this instance
+instance Arbitrary SomeAsyncException where
+    arbitrary = SomeAsyncException <$> (arbitrary :: Gen AsyncException)
+#endif
 
 instance Arbitrary AsyncException where
     arbitrary = oneof $ map pure [ StackOverflow
@@ -279,6 +286,27 @@ instance Coercible a b => Arbitrary (Coercion a b) where
 instance a ~ b => Arbitrary (a :~: b) where
     arbitrary = return Refl
 #endif
+
+instance Arbitrary BlockReason where
+    arbitrary = oneof $ map return [ BlockedOnMVar
+                                   , BlockedOnBlackHole
+                                   , BlockedOnException
+                                   , BlockedOnSTM
+                                   , BlockedOnForeignCall
+                                   , BlockedOnOther
+                                   ]
+
+-- instance Arbitrary ThreadId
+
+instance Arbitrary ThreadStatus where
+    arbitrary = oneof [ return ThreadRunning
+                      , return ThreadFinished
+                      , ThreadBlocked <$> arbitrary
+                      , return ThreadDied
+                      ]
+
+instance Arbitrary (ST s a) where
+    arbitrary = return $ fixST undefined
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
