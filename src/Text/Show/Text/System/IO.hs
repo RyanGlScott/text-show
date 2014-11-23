@@ -122,6 +122,7 @@ showbNewline LF   = "LF"
 showbNewline CRLF = "CRLF"
 {-# INLINE showbNewline #-}
 
+-- | Convert a 'NewlineMode' to a 'Builder' with the given precedence.
 showbNewlineModePrec :: Int -> NewlineMode -> Builder
 showbNewlineModePrec p (NewlineMode inl onl) = showbParen (p > appPrec) $
        "NewlineMode {inputNL = "

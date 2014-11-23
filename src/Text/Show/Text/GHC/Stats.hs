@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -61,8 +61,13 @@ showbGCStatsPrec p gcStats = showbParen (p > appPrec) $
     <> showbDoublePrec 0 (cpuSeconds gcStats)
     <> ", wallSeconds = "
     <> showbDoublePrec 0 (wallSeconds gcStats)
+#if MIN_VERSION_base(4,6,0)
     <> ", parTotBytesCopied = "
     <> showbInt64Prec 0 (parTotBytesCopied gcStats)
+#else
+    <> ", parAvgBytesCopied = "
+    <> showbInt64Prec 0 (parAvgBytesCopied gcStats)
+#endif
     <> ", parMaxBytesCopied = "
     <> showbInt64Prec 0 (parMaxBytesCopied gcStats)
     <> s '}'

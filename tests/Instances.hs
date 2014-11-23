@@ -417,7 +417,7 @@ instance Arbitrary Arity where
 #if !MIN_VERSION_base(4,7,0)
 deriving instance                             Show (U1 p)
 deriving instance Show p                   => Show (Par1 p)
-deriving instance Show (f p)               => Show (Rec1 p)
+deriving instance Show (f p)               => Show (Rec1 f p)
 deriving instance Show c                   => Show (K1 i c p)
 deriving instance Show (f p)               => Show (M1 i c f p)
 deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
