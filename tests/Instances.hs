@@ -256,11 +256,13 @@ instance Arbitrary DataType where
 instance Arbitrary Fixity where
     arbitrary = oneof $ map return [Prefix, Infix]
 
+#if MIN_VERSION_base(4,7,0)
 instance Coercible a b => Arbitrary (Coercion a b) where
     arbitrary = return Coercion
 
 instance a ~ b => Arbitrary (a :~: b) where
     arbitrary = return Refl
+#endif
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar

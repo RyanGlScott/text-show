@@ -29,7 +29,8 @@ import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (TyCon(..), Fingerprint(..), funTc, listTc)
+import Data.Typeable.Internal (TyCon(..), funTc, listTc)
+import GHC.Fingerprint.Type (Fingerprint(..))
 #else
 import Data.Typeable (TyCon, mkTyCon, tyConString, typeOf)
 #endif
