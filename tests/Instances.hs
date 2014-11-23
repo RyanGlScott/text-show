@@ -20,12 +20,23 @@ import Control.Exception
 import Data.ByteString.Short (ShortByteString, pack)
 #endif
 import Data.Char (GeneralCategory(..))
+import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType, Fixity(..),
+                  mkConstr, mkDataType)
+import Data.Dynamic (Dynamic, toDyn)
 import Data.Monoid (All(..), Any(..), Dual(..), First(..),
                     Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down(..))
 #endif
+#if MIN_VERSION_base(4,7,0)
+import Data.Proxy (Proxy(..))
+#endif
 import Data.Text.Lazy.Builder (Builder, fromString)
+#if MIN_VERSION_base(4,4,0)
+import Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..), Fingerprint(..),
+                               mkTyConApp, splitTyConApp, typeOf)
+import Data.Word (Word)
+#endif
 import Data.Version (Version(..))
 
 import Foreign.C.Types
@@ -112,7 +123,9 @@ instance Arbitrary ArithException where
                                  ]
 
 instance Arbitrary ArrayException where
-    arbitrary = oneof [IndexOutOfBounds <$> arbitrary, UndefinedElement <$> arbitrary]
+    arbitrary = oneof [ IndexOutOfBounds <$> arbitrary
+                      , UndefinedElement <$> arbitrary
+                      ]
 
 instance Arbitrary AssertionFailed where
     arbitrary = AssertionFailed <$> arbitrary
@@ -174,6 +187,66 @@ instance Arbitrary MaskingState where
 -- #if MIN_VERSION_base(4,7,0)
 -- instance Arbitrary Number
 -- #endif
+
+#if MIN_VERSION_base(4,7,0)
+instance Arbitrary (Proxy s) where
+    arbitrary = return Proxy
+#endif
+
+#if MIN_VERSION_base(4,4,0)
+-- Borrowed from the concrete-typerep package
+instance Arbitrary TypeRep where
+    arbitrary = do
+        nargs <- elements [0,1,2]
+        mkTyConApp <$> (genTyCon nargs) <*> (vectorOf nargs arbitrary)
+
+genTyCon :: Int -- ^ Number of arguments; must be in [0,1,2]
+         -> Gen TyCon
+genTyCon 0 = elements [tyConOf (__::Int), tyConOf (__::Word), tyConOf (__::Double), tyConOf (__::Bool)]
+genTyCon 1 = elements [tyConOf (__::Maybe Int), tyConOf (__::IO Int), tyConOf (__::[Int])]
+genTyCon 2 = elements [tyConOf (__::Either Int Int), tyConOf (__::Int -> Int)]
+genTyCon _ = genTyCon 0
+
+tyConOf :: Typeable a => a -> TyCon
+tyConOf ty = fst $ splitTyConApp (typeOf ty)
+
+__ :: t
+__ = undefined
+
+instance Arbitrary TyCon where
+    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+instance Arbitrary Fingerprint where
+    arbitrary = Fingerprint <$> arbitrary <*> arbitrary
+#endif
+
+-- TODO: Be more creative with this instance
+instance Arbitrary Dynamic where
+    arbitrary = toDyn <$> (arbitrary :: Gen Int)
+
+instance Arbitrary Constr where
+    arbitrary = mkConstr <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+instance Arbitrary ConstrRep where
+    arbitrary = oneof [ AlgConstr   <$> arbitrary
+                      , IntConstr   <$> arbitrary
+                      , FloatConstr <$> arbitrary
+                      , CharConstr  <$> arbitrary
+                      ]
+
+instance Arbitrary DataRep where
+    arbitrary = oneof [ AlgRep <$> arbitrary
+                      , return IntRep
+                      , return FloatRep
+                      , return CharRep
+                      , return NoRep
+                      ]
+
+instance Arbitrary DataType where
+    arbitrary = mkDataType <$> arbitrary <*> arbitrary
+
+instance Arbitrary Fixity where
+    arbitrary = oneof $ map return [Prefix, Infix]
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar

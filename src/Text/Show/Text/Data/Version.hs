@@ -11,10 +11,14 @@
 -- 
 -- Monomorphic 'Show' function for 'Version'.
 ----------------------------------------------------------------------------
-module Text.Show.Text.Data.Version (showbVersionPrec) where
+module Text.Show.Text.Data.Version (
+      showbVersionPrec
+    , showbVersionConcrete
+    ) where
 
-import Data.Monoid ((<>))
-import Data.Text.Lazy.Builder (Builder)
+import Data.List (intersperse)
+import Data.Monoid ((<>), mconcat)
+import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 
 import GHC.Show (appPrec)
@@ -36,6 +40,15 @@ showbVersionPrec p (Version b t) = showbParen (p > appPrec) $
      <> showb t
      <> s '}'
 {-# INLINE showbVersionPrec #-}
+
+-- | Provides one possible concrete representation for 'Version'.  For
+-- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags' 
+-- @= [\"tag1\",\"tag2\"]@, the output will be @1.2.3-tag1-tag2@.
+showbVersionConcrete :: Version -> Builder
+showbVersionConcrete (Version branch tags)
+    = mconcat (intersperse (s '.') $ map showb branch) <>
+        mconcat (map ((s '-' <>) . fromString) tags)
+{-# INLINE showbVersionConcrete #-}
 
 instance Show Version where
     showbPrec = showbVersionPrec

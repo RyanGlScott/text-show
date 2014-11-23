@@ -23,6 +23,9 @@ import           Data.ByteString.Short (ShortByteString)
 #endif
 import           Data.Char (GeneralCategory)
 import           Data.Complex (Complex)
+import           Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity)
+import           Data.Dynamic (Dynamic)
+import           Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.IntMap (IntMap)
 import           Data.IntSet (IntSet)
@@ -31,6 +34,9 @@ import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
+#endif
+#if MIN_VERSION_base(4,7,0)
+import           Data.Proxy (Proxy)
 #endif
 import           Data.Ratio (Ratio)
 import           Data.Sequence (Seq)
@@ -43,6 +49,9 @@ import           Data.Time.Clock (DiffTime, UTCTime, NominalDiffTime)
 import           Data.Time.Clock.TAI (AbsoluteTime)
 import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime)
 import           Data.Tree (Tree)
+#if MIN_VERSION_base(4,4,0)
+import           Data.Typeable.Internal (TyCon, TypeRep, Fingerprint)
+#endif
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
 import           Data.Version (Version)
 
@@ -57,7 +66,7 @@ import           Prelude hiding (Show)
 import           System.Exit (ExitCode)
 import           System.Posix.Types
 
-import           Test.QuickCheck
+import           Test.QuickCheck hiding (Fixed)
 import           Test.QuickCheck.Instances ()
 
 import           Test.Framework (Test, defaultMain, testGroup)
@@ -127,8 +136,27 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "Set Int"                   (prop_matchesShow :: Int -> Set Int -> Bool)
                 , testProperty "Tree Int"                  (prop_matchesShow :: Int -> Tree Int -> Bool)
                 ]
+            , testGroup "Text.Show.Text.Data.Data"
+                [ testProperty "Constr"                    (prop_matchesShow :: Int -> Constr -> Bool)
+                , testProperty "ConstrRep"                 (prop_matchesShow :: Int -> ConstrRep -> Bool)
+                , testProperty "DataRep"                   (prop_matchesShow :: Int -> DataRep -> Bool)
+                , testProperty "DataType"                  (prop_matchesShow :: Int -> DataType -> Bool)
+                , testProperty "Fixity"                    (prop_matchesShow :: Int -> Fixity -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Dynamic"
+                [ testProperty "Dynamic"                   (prop_matchesShow :: Int -> Dynamic -> Bool)
+                ]
             , testGroup "Text.Show.Text.Data.Either"
                 [ testProperty "Either Int Int"            (prop_matchesShow :: Int -> Either Int Int -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Fixed"
+                [ testProperty "Fixed E0"                  (prop_matchesShow :: Int -> Fixed E0 -> Bool)
+                , testProperty "Fixed E1"                  (prop_matchesShow :: Int -> Fixed E1 -> Bool)
+                , testProperty "Fixed E2"                  (prop_matchesShow :: Int -> Fixed E2 -> Bool)
+                , testProperty "Fixed E3"                  (prop_matchesShow :: Int -> Fixed E3 -> Bool)
+                , testProperty "Fixed E6"                  (prop_matchesShow :: Int -> Fixed E6 -> Bool)
+                , testProperty "Fixed E9"                  (prop_matchesShow :: Int -> Fixed E9 -> Bool)
+                , testProperty "Fixed E12"                 (prop_matchesShow :: Int -> Fixed E12 -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Floating"
                 [ testProperty "Float"                     (prop_matchesShow :: Int -> Float -> Bool)
@@ -197,6 +225,16 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "(Int, Int, Int, Int)"      (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
                 , testProperty "(Int, Int, Int, Int, Int)" (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
                 ]
+#if MIN_VERSION_base(4,4,0)
+            , testGroup "Text.Show.Text.Data.Typeable"
+                [ testProperty "TypeRep"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
+                , testProperty "TyCon"                     (prop_matchesShow :: Int -> TyCon -> Bool)
+                , testProperty "Fingerprint"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
+#if MIN_VERSION_base(4,7,0)
+                , testProperty "Proxy Int"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)
+#endif
+                ]
+#endif
             , testGroup "Text.Show.Text.Data.Version"
                 [ testProperty "Version"                   (prop_matchesShow :: Int -> Version -> Bool)
                 ]

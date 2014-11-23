@@ -34,7 +34,10 @@ library
                        Text.Show.Text.Data.ByteString
                        Text.Show.Text.Data.Char
                        Text.Show.Text.Data.Containers
+                       Text.Show.Text.Data.Data
+                       Text.Show.Text.Data.Dynamic
                        Text.Show.Text.Data.Either
+                       Text.Show.Text.Data.Fixed
                        Text.Show.Text.Data.Floating
                        Text.Show.Text.Data.Integral
                        Text.Show.Text.Data.List
@@ -44,6 +47,7 @@ library
                        Text.Show.Text.Data.Text
                        Text.Show.Text.Data.Time
                        Text.Show.Text.Data.Tuple
+                       Text.Show.Text.Data.Typeable
                        Text.Show.Text.Data.Version
                        Text.Show.Text.Foreign.C.Types
                        Text.Show.Text.Foreign.Ptr
