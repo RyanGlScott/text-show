@@ -12,4 +12,5 @@
 module Text.Show.Text.System () where 
 
 import Text.Show.Text.System.Exit        ()
+import Text.Show.Text.System.IO          ()
 import Text.Show.Text.System.Posix.Types ()

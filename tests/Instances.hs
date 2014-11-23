@@ -60,8 +60,13 @@ import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                     ptrToIntPtr, ptrToWordPtr)
 
 import GHC.Conc (BlockReason(..), ThreadStatus(..))
+#if MIN_VERSION_base(4,4,0)
+import GHC.IO.Encoding.Types (CodingProgress(..))
+#endif
 
 import System.Exit (ExitCode(..))
+import System.IO (BufferMode(..), IOMode(..), Newline(..),
+                  NewlineMode(..), SeekMode(..))
 import System.Posix.Types
 
 import Test.QuickCheck
@@ -211,7 +216,7 @@ instance Arbitrary MaskingState where
 
 #if MIN_VERSION_base(4,7,0)
 instance Arbitrary (Proxy s) where
-    arbitrary = return Proxy
+    arbitrary = pure Proxy
 #endif
 
 #if MIN_VERSION_base(4,4,0)
@@ -267,46 +272,79 @@ instance Arbitrary ConstrRep where
 
 instance Arbitrary DataRep where
     arbitrary = oneof [ AlgRep <$> arbitrary
-                      , return IntRep
-                      , return FloatRep
-                      , return CharRep
-                      , return NoRep
+                      , pure IntRep
+                      , pure FloatRep
+                      , pure CharRep
+                      , pure NoRep
                       ]
 
 instance Arbitrary DataType where
     arbitrary = mkDataType <$> arbitrary <*> arbitrary
 
 instance Arbitrary Fixity where
-    arbitrary = oneof $ map return [Prefix, Infix]
+    arbitrary = oneof $ map pure [Prefix, Infix]
 
 #if MIN_VERSION_base(4,7,0)
 instance Coercible a b => Arbitrary (Coercion a b) where
-    arbitrary = return Coercion
+    arbitrary = pure Coercion
 
 instance a ~ b => Arbitrary (a :~: b) where
-    arbitrary = return Refl
+    arbitrary = pure Refl
 #endif
 
 instance Arbitrary BlockReason where
-    arbitrary = oneof $ map return [ BlockedOnMVar
-                                   , BlockedOnBlackHole
-                                   , BlockedOnException
-                                   , BlockedOnSTM
-                                   , BlockedOnForeignCall
-                                   , BlockedOnOther
-                                   ]
+    arbitrary = oneof $ map pure [ BlockedOnMVar
+                                 , BlockedOnBlackHole
+                                 , BlockedOnException
+                                 , BlockedOnSTM
+                                 , BlockedOnForeignCall
+                                 , BlockedOnOther
+                                 ]
 
 -- instance Arbitrary ThreadId
 
 instance Arbitrary ThreadStatus where
-    arbitrary = oneof [ return ThreadRunning
-                      , return ThreadFinished
+    arbitrary = oneof [ pure ThreadRunning
+                      , pure ThreadFinished
                       , ThreadBlocked <$> arbitrary
-                      , return ThreadDied
+                      , pure ThreadDied
                       ]
 
 instance Arbitrary (ST s a) where
-    arbitrary = return $ fixST undefined
+    arbitrary = pure $ fixST undefined
+
+-- instance Arbitrary Handle
+-- instance Arbitrary HandlePosn
+
+instance Arbitrary IOMode where
+    arbitrary = oneof $ map pure [ReadMode, WriteMode, AppendMode, ReadWriteMode]
+
+instance Arbitrary BufferMode where
+    arbitrary = oneof [ pure NoBuffering
+                      , pure LineBuffering
+                      , BlockBuffering <$> arbitrary
+                      ]
+
+instance Arbitrary SeekMode where
+    arbitrary = oneof $ map pure [AbsoluteSeek, RelativeSeek, SeekFromEnd]
+
+instance Arbitrary Newline where
+    arbitrary = oneof $ map pure [LF, CRLF]
+
+instance Arbitrary NewlineMode where
+    arbitrary = NewlineMode <$> arbitrary <*> arbitrary
+
+#if MIN_VERSION_base(4,3,0)
+-- instance Arbitrary TextEncoding
+#else
+deriving instance Show Newline
+deriving instance Show NewlineMode
+#endif
+
+#if MIN_VERSION_base(4,4,0)
+instance Arbitrary CodingProgress where
+    arbitrary = oneof $ map pure [InputUnderflow, OutputUnderflow, InvalidSequence]
+#endif
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar

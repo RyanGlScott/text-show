@@ -55,6 +55,7 @@ library
                        Text.Show.Text.Foreign.Ptr
                        Text.Show.Text.Functions
                        Text.Show.Text.System.Exit
+                       Text.Show.Text.System.IO
                        Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Text.Read
   other-modules:       Text.Show.Text.Class

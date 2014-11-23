@@ -68,6 +68,9 @@ import           Foreign.C.Types
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
 
 import           GHC.Conc (BlockReason, ThreadStatus)
+#if MIN_VERSION_base(4,4,0)
+import           GHC.IO.Encoding.Types (CodingProgress)
+#endif
 
 import           Instances ()
 
@@ -75,6 +78,7 @@ import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           System.Exit (ExitCode)
+import           System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 import           System.Posix.Types
 
 import           Test.QuickCheck hiding (Fixed)
@@ -304,6 +308,21 @@ tests = [ testGroup "QuickCheck properties"
                 ]
             , testGroup "Text.Show.Text.System.Exit"
                 [ testProperty "ExitCode"                  (prop_matchesShow :: Int -> ExitCode -> Bool)
+                ]
+            , testGroup "Text.Show.Text.System.IO"
+                [ -- testProperty "Handle"                    (prop_matchesShow :: Int -> Handle -> Bool)
+                  testProperty "IOMode"                    (prop_matchesShow :: Int -> IOMode -> Bool)
+                , testProperty "BufferMode"                (prop_matchesShow :: Int -> BufferMode -> Bool)
+--                 , testProperty "HandlePosn"                (prop_matchesShow :: Int -> HandlePosn -> Bool)
+                , testProperty "SeekMode"                  (prop_matchesShow :: Int -> SeekMode -> Bool)
+-- #if MIN_VERSION_base(4,3,0)
+--                 , testProperty "TextEncoding"              (prop_matchesShow :: Int -> TextEncoding -> Bool)
+-- #endif
+#if MIN_VERSION_base(4,4,0)
+                , testProperty "CodingProgress"            (prop_matchesShow :: Int -> CodingProgress -> Bool)
+#endif
+                , testProperty "Newline"                   (prop_matchesShow :: Int -> Newline -> Bool)
+                , testProperty "NewlineMode"               (prop_matchesShow :: Int -> NewlineMode -> Bool)
                 ]
             , testGroup "Text.Show.Text.System.Posix.Types"
                 [ testProperty "CDev"                      (prop_matchesShow :: Int -> CDev -> Bool)
