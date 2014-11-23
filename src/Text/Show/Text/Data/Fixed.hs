@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE CPP, NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -24,9 +24,15 @@ import Text.Show.Text.Class (Show(showb))
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Utils (lengthB, replicateB, s)
 
+#if !MIN_VERSION_base(4,7,0)
+import Data.Fixed (showFixed)
+import Data.Text.Lazy.Builder (fromString)
+#endif
+
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
 --   whether to chop off trailing zeroes.
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
+#if MIN_VERSION_base(4,7,0)
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0
     = s '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
 showbFixed chopTrailingZeroes fa@(MkFixed a)
@@ -61,6 +67,9 @@ withDotB :: Builder -> Builder
 withDotB b | b == mempty = mempty
            | otherwise   = s '.' <> b
 {-# INLINE withDotB #-}
+#else
+showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
+#endif
 
 instance HasResolution a => Show (Fixed a) where
     showb = showbFixed False

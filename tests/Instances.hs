@@ -1,4 +1,7 @@
 {-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
+#if MIN_VERSION_base(4,7,0)
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -32,6 +35,11 @@ import Data.Ord (Down(..))
 import Data.Proxy (Proxy(..))
 #endif
 import Data.Text.Lazy.Builder (Builder, fromString)
+#if MIN_VERSION_base(4,7,0)
+import Data.Coerce (Coercible)
+import Data.Type.Coercion (Coercion(..))
+import Data.Type.Equality ((:~:)(..))
+#endif
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..), Fingerprint(..),
                                mkTyConApp, splitTyConApp, typeOf)
@@ -247,6 +255,12 @@ instance Arbitrary DataType where
 
 instance Arbitrary Fixity where
     arbitrary = oneof $ map return [Prefix, Infix]
+
+instance Coercible a b => Arbitrary (Coercion a b) where
+    arbitrary = return Coercion
+
+instance a ~ b => Arbitrary (a :~: b) where
+    arbitrary = return Refl
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar

@@ -1,4 +1,7 @@
 {-# LANGUAGE CPP #-}
+#if MIN_VERSION_base(4,7,0)
+{-# LANGUAGE TypeOperators #-}
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Properties
@@ -49,6 +52,10 @@ import           Data.Time.Clock (DiffTime, UTCTime, NominalDiffTime)
 import           Data.Time.Clock.TAI (AbsoluteTime)
 import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime)
 import           Data.Tree (Tree)
+#if MIN_VERSION_base(4,7,0)
+import           Data.Type.Coercion (Coercion)
+import           Data.Type.Equality ((:~:))
+#endif
 #if MIN_VERSION_base(4,4,0)
 import           Data.Typeable.Internal (TyCon, TypeRep, Fingerprint)
 #endif
@@ -225,6 +232,14 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "(Int, Int, Int, Int)"      (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
                 , testProperty "(Int, Int, Int, Int, Int)" (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
                 ]
+#if MIN_VERSION_base(4,7,0)
+            , testGroup "Text.Show.Text.Data.Type.Coercion"
+                [ testProperty "Coercion"                  (prop_matchesShow :: Int -> Coercion All Bool -> Bool)
+                ]
+            , testGroup "Text.Show.Text.Data.Type.Equality"
+                [ testProperty "Equality"                  (prop_matchesShow :: Int -> Int :~: Int -> Bool)
+                ]
+#endif
 #if MIN_VERSION_base(4,4,0)
             , testGroup "Text.Show.Text.Data.Typeable"
                 [ testProperty "TypeRep"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
