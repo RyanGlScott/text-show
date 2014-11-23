@@ -41,9 +41,15 @@ import Data.Type.Coercion (Coercion(..))
 import Data.Type.Equality ((:~:)(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..), Fingerprint(..),
+import Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..),
                                mkTyConApp, splitTyConApp, typeOf)
+import GHC.Fingerprint.Type (Fingerprint(..))
 import Data.Word (Word)
+
+#if !MIN_VERSION_base(4,7,0)
+import Data.Word (Word64)
+import Numeric (showHex)
+#endif
 #endif
 import Data.Version (Version(..))
 
@@ -226,6 +232,16 @@ instance Arbitrary TyCon where
 
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary
+
+#if !MIN_VERSION_base(4,7,0)
+instance Show Fingerprint where
+  show (Fingerprint w1 w2) = hex16 w1 ++ hex16 w2
+    where
+      -- | Formats a 64 bit number as 16 digits hex.
+      hex16 :: Word64 -> String
+      hex16 i = let hex = showHex i ""
+                 in replicate (16 - length hex) '0' ++ hex
+#endif
 #endif
 
 -- TODO: Be more creative with this instance
