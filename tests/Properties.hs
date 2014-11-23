@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
-#if MIN_VERSION_base(4,7,0)
-{-# LANGUAGE TypeOperators #-}
+#if MIN_VERSION_base(4,4,0)
+{-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
 -----------------------------------------------------------------------------
 -- |
@@ -27,7 +27,8 @@ import           Data.ByteString.Short (ShortByteString)
 #endif
 import           Data.Char (GeneralCategory)
 import           Data.Complex (Complex)
-import           Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity)
+import qualified Data.Data as D (Fixity)
+import           Data.Data (Constr, ConstrRep, DataRep, DataType)
 import           Data.Dynamic (Dynamic)
 import           Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12)
 import           Data.Int (Int8, Int16, Int32, Int64)
@@ -68,8 +69,15 @@ import           Foreign.C.Types
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
 
 import           GHC.Conc (BlockReason, ThreadStatus)
+import qualified GHC.Generics as G (Fixity)
+import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
+                               Associativity, Arity)
 #if MIN_VERSION_base(4,4,0)
+import           GHC.IO.Encoding.Failure (CodingFailureMode)
 import           GHC.IO.Encoding.Types (CodingProgress)
+#endif
+#if MIN_VERSION_base(4,5,0)
+import           GHC.Stats (GCStats)
 #endif
 
 import           Instances ()
@@ -164,7 +172,7 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "ConstrRep"                 (prop_matchesShow :: Int -> ConstrRep -> Bool)
                 , testProperty "DataRep"                   (prop_matchesShow :: Int -> DataRep -> Bool)
                 , testProperty "DataType"                  (prop_matchesShow :: Int -> DataType -> Bool)
-                , testProperty "Fixity"                    (prop_matchesShow :: Int -> Fixity -> Bool)
+                , testProperty "Fixity"                    (prop_matchesShow :: Int -> D.Fixity -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Dynamic"
                 [ testProperty "Dynamic"                   (prop_matchesShow :: Int -> Dynamic -> Bool)
@@ -253,7 +261,7 @@ tests = [ testGroup "QuickCheck properties"
                 [ testProperty "Coercion"                  (prop_matchesShow :: Int -> Coercion All Bool -> Bool)
                 ]
             , testGroup "Text.Show.Text.Data.Type.Equality"
-                [ testProperty "Equality"                  (prop_matchesShow :: Int -> Int :~: Int -> Bool)
+                [ testProperty "(:~:)"                     (prop_matchesShow :: Int -> Int :~: Int -> Bool)
                 ]
 #endif
 #if MIN_VERSION_base(4,4,0)
@@ -306,6 +314,28 @@ tests = [ testGroup "QuickCheck properties"
                 , testProperty "WordPtr"                   (prop_matchesShow :: Int -> WordPtr -> Bool)
 --                 , testProperty "ForeignPtr"                (prop_matchesShow :: Int -> ForeignPtr Int -> Bool)
                 ]
+-- #if MIN_VERSION_base(4,4,0)
+--             , testGroup "Text.Show.Text.GHC.Event"
+--                 [ testProperty "Event"                     (prop_matchesShow :: Int -> Event -> Bool)
+--                 , testProperty "FdKey"                     (prop_matchesShow :: Int -> FdKey -> Bool)
+--                 ]
+-- #endif
+            , testGroup "Text.Show.Text.GHC.Generics"
+                [ testProperty "U1 Int"                    (prop_matchesShow :: Int -> U1 Int -> Bool)
+                , testProperty "Par1 Int"                  (prop_matchesShow :: Int -> Par1 Int -> Bool)
+                , testProperty "Rec1 Maybe Int"            (prop_matchesShow :: Int -> Rec1 Maybe Int -> Bool)
+                , testProperty "K1 () Int ()"              (prop_matchesShow :: Int -> K1 () Int () -> Bool)
+                , testProperty "M1 () () Maybe Int"        (prop_matchesShow :: Int -> M1 () () Maybe Int -> Bool)
+                , testProperty "(Maybe :+: Maybe) Int"     (prop_matchesShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
+                , testProperty "(Maybe :*: Maybe) Int"     (prop_matchesShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
+                , testProperty "(Maybe :.: Maybe) Int"     (prop_matchesShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
+                , testProperty "Fixity"                    (prop_matchesShow :: Int -> G.Fixity -> Bool)
+                , testProperty "Associativity"             (prop_matchesShow :: Int -> Associativity -> Bool)
+                , testProperty "Arity"                     (prop_matchesShow :: Int -> Arity -> Bool)
+                ]
+            , testGroup "Text.Show.Text.GHC.Stats"
+                [ testProperty "GCStats"                   (prop_matchesShow :: Int -> GCStats -> Bool)
+                ]
             , testGroup "Text.Show.Text.System.Exit"
                 [ testProperty "ExitCode"                  (prop_matchesShow :: Int -> ExitCode -> Bool)
                 ]
@@ -320,6 +350,7 @@ tests = [ testGroup "QuickCheck properties"
 -- #endif
 #if MIN_VERSION_base(4,4,0)
                 , testProperty "CodingProgress"            (prop_matchesShow :: Int -> CodingProgress -> Bool)
+                , testProperty "CodingFailureMode"         (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
 #endif
                 , testProperty "Newline"                   (prop_matchesShow :: Int -> Newline -> Bool)
                 , testProperty "NewlineMode"               (prop_matchesShow :: Int -> NewlineMode -> Bool)

@@ -22,6 +22,7 @@ module Text.Show.Text.System.IO (
 #endif
 #if MIN_VERSION_base(4,4,0)
     , showbCodingProgress
+    , showbCodingFailureMode
 #endif
     , showbNewline
     , showbNewlineModePrec
@@ -34,6 +35,7 @@ import Data.Text.Lazy.Builder (Builder, fromString)
 import GHC.IO.Encoding.Types (TextEncoding(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
+import GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import GHC.IO.Encoding.Types (CodingProgress(..))
 #endif
 import GHC.IO.Handle (HandlePosn(..))
@@ -104,6 +106,14 @@ showbCodingProgress InputUnderflow  = "InputUnderflow"
 showbCodingProgress OutputUnderflow = "OutputUnderflow"
 showbCodingProgress InvalidSequence = "InvalidSequence"
 {-# INLINE showbCodingProgress #-}
+
+-- | Convert a 'CodingFailureMode' value to a 'Builder'.
+showbCodingFailureMode :: CodingFailureMode -> Builder
+showbCodingFailureMode ErrorOnCodingFailure       = "ErrorOnCodingFailure"
+showbCodingFailureMode IgnoreCodingFailure        = "IgnoreCodingFailure"
+showbCodingFailureMode TransliterateCodingFailure = "TransliterateCodingFailure"
+showbCodingFailureMode RoundtripFailure           = "RoundtripFailure"
+{-# INLINE showbCodingFailureMode #-}
 #endif
 
 -- | Convert a 'Newline' to a 'Builder'.
@@ -150,6 +160,10 @@ instance Show TextEncoding where
 #if MIN_VERSION_base(4,4,0)
 instance Show CodingProgress where
     showb = showbCodingProgress
+    {-# INLINE showb #-}
+
+instance Show CodingFailureMode where
+    showb = showbCodingFailureMode
     {-# INLINE showb #-}
 #endif
 

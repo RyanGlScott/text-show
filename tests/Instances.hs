@@ -1,6 +1,9 @@
 {-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
+#if MIN_VERSION_base(4,4,0)
+{-# LANGUAGE FlexibleContexts, TypeOperators #-}
+#endif
 #if MIN_VERSION_base(4,7,0)
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE TypeFamilies #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
@@ -16,60 +19,69 @@
 ----------------------------------------------------------------------------
 module Instances where
 
-import Control.Applicative
-import Control.Exception
-import Control.Monad.ST (ST, fixST)
+import           Control.Applicative
+import           Control.Exception
+import           Control.Monad.ST (ST, fixST)
 
 #if MIN_VERSION_bytestring(0,10,4)
-import Data.ByteString.Short (ShortByteString, pack)
+import           Data.ByteString.Short (ShortByteString, pack)
 #endif
-import Data.Char (GeneralCategory(..))
-import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType, Fixity(..),
-                  mkConstr, mkDataType)
-import Data.Dynamic (Dynamic, toDyn)
-import Data.Monoid (All(..), Any(..), Dual(..), First(..),
-                    Last(..), Product(..), Sum(..))
+import           Data.Char (GeneralCategory(..))
+import qualified Data.Data as D (Fixity(..))
+import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
+                            mkConstr, mkDataType)
+import           Data.Dynamic (Dynamic, toDyn)
+import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
+                              Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,6,0)
-import Data.Ord (Down(..))
+import           Data.Ord (Down(..))
 #endif
 #if MIN_VERSION_base(4,7,0)
-import Data.Proxy (Proxy(..))
+import           Data.Proxy (Proxy(..))
 #endif
-import Data.Text.Lazy.Builder (Builder, fromString)
+import           Data.Text.Lazy.Builder (Builder, fromString)
 #if MIN_VERSION_base(4,7,0)
-import Data.Coerce (Coercible)
-import Data.Type.Coercion (Coercion(..))
-import Data.Type.Equality ((:~:)(..))
+import           Data.Coerce (Coercible)
+import           Data.Type.Coercion (Coercion(..))
+import           Data.Type.Equality ((:~:)(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..),
-                               mkTyConApp, splitTyConApp, typeOf)
-import GHC.Fingerprint.Type (Fingerprint(..))
-import Data.Word (Word)
+import           Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..),
+                                        mkTyConApp, splitTyConApp, typeOf)
+import           GHC.Fingerprint.Type (Fingerprint(..))
+import           Data.Word (Word)
 
 #if !MIN_VERSION_base(4,7,0)
-import Data.Word (Word64)
-import Numeric (showHex)
+import           Data.Word (Word64)
+import           Numeric (showHex)
 #endif
 #endif
-import Data.Version (Version(..))
+import           Data.Version (Version(..))
 
-import Foreign.C.Types
-import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
-                    castPtrToFunPtr, nullPtr, plusPtr,
-                    ptrToIntPtr, ptrToWordPtr)
+import           Foreign.C.Types
+import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
+                              castPtrToFunPtr, nullPtr, plusPtr,
+                              ptrToIntPtr, ptrToWordPtr)
 
-import GHC.Conc (BlockReason(..), ThreadStatus(..))
+import           GHC.Conc (BlockReason(..), ThreadStatus(..))
 #if MIN_VERSION_base(4,4,0)
-import GHC.IO.Encoding.Types (CodingProgress(..))
+import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
+import           GHC.IO.Encoding.Types (CodingProgress(..))
+import qualified GHC.Generics as G (Fixity(..))
+import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
+                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
+                               Associativity(..), Arity(..))
+#endif
+#if MIN_VERSION_base(4,5,0)
+import           GHC.Stats (GCStats(..))
 #endif
 
-import System.Exit (ExitCode(..))
-import System.IO (BufferMode(..), IOMode(..), Newline(..),
-                  NewlineMode(..), SeekMode(..))
-import System.Posix.Types
+import           System.Exit (ExitCode(..))
+import           System.IO (BufferMode(..), IOMode(..), Newline(..),
+                            NewlineMode(..), SeekMode(..))
+import           System.Posix.Types
 
-import Test.QuickCheck
+import           Test.QuickCheck
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
@@ -281,8 +293,8 @@ instance Arbitrary DataRep where
 instance Arbitrary DataType where
     arbitrary = mkDataType <$> arbitrary <*> arbitrary
 
-instance Arbitrary Fixity where
-    arbitrary = oneof $ map pure [Prefix, Infix]
+instance Arbitrary D.Fixity where
+    arbitrary = oneof $ map pure [D.Prefix, D.Infix]
 
 #if MIN_VERSION_base(4,7,0)
 instance Coercible a b => Arbitrary (Coercion a b) where
@@ -344,6 +356,74 @@ deriving instance Show NewlineMode
 #if MIN_VERSION_base(4,4,0)
 instance Arbitrary CodingProgress where
     arbitrary = oneof $ map pure [InputUnderflow, OutputUnderflow, InvalidSequence]
+
+instance Arbitrary CodingFailureMode where
+    arbitrary = oneof $ map pure [ ErrorOnCodingFailure
+                                 , IgnoreCodingFailure
+                                 , TransliterateCodingFailure
+                                 , RoundtripFailure
+                                 ]
+#endif
+
+#if MIN_VERSION_base(4,5,0)
+instance Arbitrary GCStats where
+    arbitrary = GCStats <$> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
+
+-- #if MIN_VERSION_base(4,4,0)
+-- instance Arbitrary Event
+-- instance Arbitrary FdKey
+-- #endif
+
+#if MIN_VERSION_base(4,4,0)
+instance Arbitrary (U1 p) where
+    arbitrary = pure U1
+
+instance Arbitrary p => Arbitrary (Par1 p) where
+    arbitrary = Par1 <$> arbitrary
+
+instance Arbitrary (f p) => Arbitrary (Rec1 f p) where
+    arbitrary = Rec1 <$> arbitrary
+
+instance Arbitrary c => Arbitrary (K1 i c p) where
+    arbitrary = K1 <$> arbitrary
+
+instance Arbitrary (f p) => Arbitrary (M1 i c f p) where
+    arbitrary = M1 <$> arbitrary
+
+instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :+: g) p) where
+    arbitrary = oneof [L1 <$> arbitrary, R1 <$> arbitrary]
+
+instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :*: g) p) where
+    arbitrary = (:*:) <$> arbitrary <*> arbitrary
+
+instance Arbitrary (f (g p)) => Arbitrary ((f :.: g) p) where
+    arbitrary = Comp1 <$> arbitrary
+
+instance Arbitrary G.Fixity where
+    arbitrary = oneof [pure G.Prefix, G.Infix <$> arbitrary <*> arbitrary]
+
+instance Arbitrary Associativity where
+    arbitrary = oneof $ map pure [LeftAssociative, RightAssociative, NotAssociative]
+
+instance Arbitrary Arity where
+    arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
+
+#if !MIN_VERSION_base(4,7,0)
+deriving instance                             Show (U1 p)
+deriving instance Show p                   => Show (Par1 p)
+deriving instance Show (f p)               => Show (Rec1 p)
+deriving instance Show c                   => Show (K1 i c p)
+deriving instance Show (f p)               => Show (M1 i c f p)
+deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
+deriving instance (Show (f p), Show (g p)) => Show ((f :*: g) p)
+deriving instance Show (f (g p))           => Show ((f :.: g) p)
+#endif
 #endif
 
 deriving instance Arbitrary CChar
