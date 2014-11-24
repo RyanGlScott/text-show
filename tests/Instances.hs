@@ -421,7 +421,19 @@ deriving instance Show (f p)               => Show (Rec1 f p)
 deriving instance Show c                   => Show (K1 i c p)
 deriving instance Show (f p)               => Show (M1 i c f p)
 deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
-deriving instance (Show (f p), Show (g p)) => Show ((f :*: g) p)
+
+-- Due to a GHC bug (https://ghc.haskell.org/trac/ghc/ticket/9830), this Show
+-- instance produces output with the wrong precedence. Until this is fixed,
+-- I'll manually define the Show instance to get the correct behavior.
+-- 
+-- deriving instance (Show (f p), Show (g p)) => Show ((f :*: g) p)
+instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
+    showsPrec p (l :*: r) = showParen (p > prec) $
+          showsPrec (prec + 1) l
+        . showString " :*: "
+        . showsPrec (prec + 1) r
+      where prec = 6
+
 deriving instance Show (f (g p))           => Show ((f :.: g) p)
 #endif
 #endif

@@ -16,12 +16,15 @@ module Text.Show.Text.Data.Floating (
     , showbFloatPrec
     , showbDoublePrec
     , showbComplexPrec
+    , showbEFloat
+    , showbFFloat
+    , showbGFloat
     ) where
 
 import Data.Complex (Complex(..))
 import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
-import Data.Text.Lazy.Builder.RealFloat (realFloat)
+import Data.Text.Lazy.Builder.RealFloat (FPFormat(..), formatRealFloat, realFloat)
 
 import Prelude hiding (Show)
 
@@ -54,7 +57,37 @@ showbComplexPrec p (a :+ b) = showbParen (p > complexPrec) $
   where complexPrec = 6
 {-# INLINE showbComplexPrec #-}
 
--- TODO: showbEFloat, showbFFloat, showbGFloat
+-- | Show a signed 'RealFloat' value
+-- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
+--
+-- In the call @'showbEFloat' digs val@, if @digs@ is 'Nothing',
+-- the value is shown to full precision; if @digs@ is @'Just' d@,
+-- then at most @d@ digits after the decimal point are shown.
+showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
+showbEFloat = formatRealFloat Exponent
+{-# INLINE showbEFloat #-}
+
+-- | Show a signed 'RealFloat' value
+-- using standard decimal notation (e.g. @245000@, @0.0015@).
+--
+-- In the call @'showbFFloat' digs val@, if @digs@ is 'Nothing',
+-- the value is shown to full precision; if @digs@ is @'Just' d@,
+-- then at most @d@ digits after the decimal point are shown.
+showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
+showbFFloat = formatRealFloat Fixed
+{-# INLINE showbFFloat #-}
+
+
+-- | Show a signed 'RealFloat' value
+-- using standard decimal notation for arguments whose absolute value lies
+-- between @0.1@ and @9,999,999@, and scientific notation otherwise.
+--
+-- In the call @'showbGFloat' digs val@, if @digs@ is 'Nothing',
+-- the value is shown to full precision; if @digs@ is @'Just' d@,
+-- then at most @d@ digits after the decimal point are shown.
+showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
+showbGFloat = formatRealFloat Generic
+{-# INLINE showbGFloat #-}
 
 instance Show Float where
     showbPrec = showbFloatPrec

@@ -1,11 +1,45 @@
 name:                text-show
 version:             0.3.0.0
 synopsis:            Efficient conversion of values into Text
-description:         @text-show@ offers a replacement for the @Show@ typeclass intended for
-                     use with @Text@ instead of @String@s.
-                     
-                     This package was created in the spirit of
+description:         @text-show@ offers a replacement for the @Show@ typeclass intended
+                     for use with @Text@ instead of @String@s. This package was created
+                     in the spirit of
                      @<http://hackage.haskell.org/package/bytestring-show bytestring-show>@.
+                     .
+                     At the moment, @text-show@ provides @Show@ instances for most data
+                     types in the @<http://hackage.haskell.org/package/array array>@,
+                     @<http://hackage.haskell.org/package/base base>@,
+                     @<http://hackage.haskell.org/package/bytestring bytestring>@,
+                     @<http://hackage.haskell.org/package/containers containers>@,
+                     @<http://hackage.haskell.org/package/text text>@, and
+                     @<http://hackage.haskell.org/package/time time>@ packages.
+                     Therefore, much of the source code for @text-show@ consists of
+                     borrowed code from those packages in order to ensure that the
+                     behaviors of the two @Show@ typeclasses coincide.
+                     .
+                     For most uses, simply importing "Text.Show.Text"
+                     will suffice:
+                     .
+                     @
+                        &#123;-&#35; LANGUAGE NoImplicitPrelude &#35;-&#125;
+                        module Main where
+                        import Data.Text (Text)
+                        import Prelude hiding (Show(..), print)
+                        import Text.Show.Text
+                        .
+                        number :: Text
+                        number = show 27
+                        .
+                        main :: IO ()
+                        main = print number
+                     @
+                     .
+                     If you desire it, there are also monomorphic versions of the @show@
+                     function available in the submodules of "Text.Show.Text". A naming
+                     convention is present in which functions that show different values
+                     depending on the precedence end with @Prec@ (e.g., @showbIntPrec@),
+                     whereas functions that show the same values regardless of
+                     precedence do not end with @Prec@ (e.g., @showbBool@).
 homepage:            https://github.com/RyanGlScott/text-show
 bug-reports:         https://github.com/RyanGlScott/text-show/issues
 license:             BSD3

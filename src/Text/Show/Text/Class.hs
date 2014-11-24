@@ -26,7 +26,26 @@ import           System.IO (Handle)
 
 import           Text.Show.Text.Utils (s)
 
--- | Conversion of values to 'Text'.
+-- | 
+-- Conversion of values to 'Text'. Because there are both strict and lazy 'Text'
+-- variants, the 'Show' class deliberately avoids using 'Text' in its functions.
+-- Instead, 'showbPrec', 'showb', and 'showbList' all return 'Builder's, an
+-- efficient intermediate form that can be converted to either kind of 'Text'.
+-- 
+-- 'Builder' is a 'Monoid', so it is useful to use the 'mappend' (or '<>') function
+-- to combine 'Builder's when deriving 'Show' instances. As an example:
+-- 
+-- @
+-- import Text.Show.Text
+-- 
+-- data Example = Example Int Int
+-- instance Show Example where
+--     showb (Example i1 i2) = showb i1 <> singleton ' ' <> showb i2
+-- @
+-- 
+-- If you do not want to derive 'Show' instances manually, you can alternatively
+-- use the "Text.Show.Text.TH" module to automatically generate default 'Show'
+-- instances using Template Haskell.
 class Show a where
     -- |
     -- Constructs a 'Text' via an efficient 'Builder'. The precedence is used to 
