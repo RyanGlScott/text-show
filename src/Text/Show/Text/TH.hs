@@ -23,7 +23,7 @@ module Text.Show.Text.TH where
 --     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
 --     fromCons tvbs cons =
 --         instanceD (applyCon ''Show typeNames name)
---                   (classType `appT` instanceType)
+--                   (appT classType instanceType)
 --                   [ funD 'showbPrec
 --                          [ 
 --                            clause []
@@ -51,16 +51,16 @@ module Text.Show.Text.TH where
 -- 
 -- conToBlergh :: Name -> Con -> Q Exp
 -- conToBlergh _ (NormalC name [])    = [| fromString $(stringE $ nameBase name) |]
--- conToBlergh p (NormalC name types) = [| showbParen ($(varE p) > appPrec) $
---        $(stringE $ nameBase name)
---     <> s ' '
---     |]
+-- conToBlergh p (NormalC name types) = appE [| showbParen ($(varE p) > appPrec) |]
 -- 
 -- -------------------------------------------------------------------------------
 -- -- Utility functions
 -- -------------------------------------------------------------------------------
 -- 
--- fweep :: [Type]
+-- fweep :: Name -> [Type] -> Q Exp
+-- fweep name types = infixE (Just . stringE $ nameBase name) [| (<>) |] go
+--   where
+--     go
 -- 
 -- showbBraces :: Builder -> Builder
 -- showbBraces b = s '{' <> b <> s '}'
