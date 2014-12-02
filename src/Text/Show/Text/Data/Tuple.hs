@@ -106,7 +106,7 @@ showb7Tuple (a, b, c, d, e, f, g) =
     s ')'
 {-# INLINE showb7Tuple #-}
 
--- | Converts a 8-tuple into a 'Builder'.
+-- | Converts an 8-tuple into a 'Builder'.
 showb8Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h)
             => (a, b, c, d, e, f, g, h) -> Builder
 showb8Tuple (a, b, c, d, e, f, g, h) =

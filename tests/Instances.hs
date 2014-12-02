@@ -209,9 +209,10 @@ instance Arbitrary RecSelError where
 instance Arbitrary RecUpdError where
     arbitrary = RecUpdError <$> arbitrary
 
--- deriving instance Arbitrary ErrorCall
 -- ErrorCall is a newtype starting with base-4.7.0.0, but we'll
--- manually derive Arbitrary to support older version of GHC
+-- manually derive Arbitrary to support older versions of GHC.
+-- 
+-- deriving instance Arbitrary ErrorCall
 instance Arbitrary ErrorCall where
     arbitrary = ErrorCall <$> arbitrary
 
@@ -423,7 +424,7 @@ deriving instance Show (f p)               => Show (M1 i c f p)
 deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
 
 -- Due to a GHC bug (https://ghc.haskell.org/trac/ghc/ticket/9830), this Show
--- instance produces output with the wrong precedence. Until this is fixed,
+-- instance produces output with the wrong precedence on older versions of GHC.
 -- I'll manually define the Show instance to get the correct behavior.
 -- 
 -- deriving instance (Show (f p), Show (g p)) => Show ((f :*: g) p)
