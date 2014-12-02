@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP, NoImplicitPrelude #-}
-#if !MIN_VERSION_bytestring(0,10,0)
+#if !(MIN_VERSION_bytestring(0,10,0))
 {-# LANGUAGE OverloadedStrings #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -38,7 +38,7 @@ import           Prelude hiding (Show(show))
 import           Text.Show.Text.Class (Show(showb, showbPrec))
 
 -- Imports needed for older versions of bytestring
-#if !MIN_VERSION_bytestring(0,10,0)
+#if !(MIN_VERSION_bytestring(0,10,0))
 import qualified Data.ByteString.Lazy.Internal as BL
 import           Data.Monoid ((<>))
 

@@ -63,7 +63,7 @@ showbTypeRepPrec p tyrep =
     tys   = typeRepArgs tyrep
 {-# INLINE showbTypeRepPrec #-}
 
-#if !MIN_VERSION_base(4,4,0)
+#if !(MIN_VERSION_base(4,4,0))
 -- | The list 'TyCon'.
 listTc :: TyCon
 listTc = typeRepTyCon $ typeOf [()]

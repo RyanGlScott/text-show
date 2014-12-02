@@ -51,7 +51,7 @@ import           Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..),
 import           GHC.Fingerprint.Type (Fingerprint(..))
 import           Data.Word (Word)
 
-#if !MIN_VERSION_base(4,7,0)
+#if !(MIN_VERSION_base(4,7,0))
 import           Data.Word (Word64)
 import           Numeric (showHex)
 #endif
@@ -258,7 +258,7 @@ instance Arbitrary TyCon where
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary
 
-#if !MIN_VERSION_base(4,7,0)
+#if !(MIN_VERSION_base(4,7,0))
 instance Show Fingerprint where
   show (Fingerprint w1 w2) = hex16 w1 ++ hex16 w2
     where
@@ -415,7 +415,7 @@ instance Arbitrary Associativity where
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
 
-#if !MIN_VERSION_base(4,7,0)
+#if !(MIN_VERSION_base(4,7,0))
 deriving instance                             Show (U1 p)
 deriving instance Show p                   => Show (Par1 p)
 deriving instance Show (f p)               => Show (Rec1 f p)
@@ -492,13 +492,13 @@ deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
  
 deriving instance Arbitrary a => Arbitrary (ZipList a)
-#if !MIN_VERSION_base(4,7,0)
+#if !(MIN_VERSION_base(4,7,0))
 deriving instance Show a => Show (ZipList a)
 #endif
 
 #if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)
-#if !MIN_VERSION_base(4,7,0)
+#if !(MIN_VERSION_base(4,7,0))
 deriving instance Show a => Show (Down a)
 #endif
 #endif
