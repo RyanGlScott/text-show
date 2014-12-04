@@ -4,7 +4,6 @@ module Text.Show.Text.TH where
 -- import           Control.Applicative
 -- 
 -- import           Data.List (foldl')
--- import           Data.Monoid ((<>))
 -- import           Data.Text.Lazy.Builder (fromString)
 -- 
 -- import           GHC.Show (appPrec, appPrec1)
@@ -15,7 +14,7 @@ module Text.Show.Text.TH where
 -- import           Prelude hiding (Show)
 -- 
 -- import           Text.Show.Text.Class (Show(showbPrec), showbParen)
--- import           Text.Show.Text.Utils (s)
+-- import           Text.Show.Text.Utils ((<>), s)
 -- 
 -- deriveShow :: Name -> Q [Dec]
 -- deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons

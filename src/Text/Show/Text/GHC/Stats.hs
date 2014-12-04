@@ -13,7 +13,6 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.GHC.Stats (showbGCStatsPrec) where 
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Show (appPrec)
@@ -24,7 +23,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Class (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Integral (showbInt64Prec)
 import Text.Show.Text.Data.Floating (showbDoublePrec)
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'GCStats' value to a 'Builder' with the given precedence.
 showbGCStatsPrec :: Int -> GCStats -> Builder

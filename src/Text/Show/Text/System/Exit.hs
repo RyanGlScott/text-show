@@ -13,7 +13,6 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.System.Exit (showbExitCodePrec) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Show (appPrec, appPrec1)
@@ -24,6 +23,7 @@ import System.Exit (ExitCode(..))
 
 import Text.Show.Text.Class (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Integral (showbIntPrec)
+import Text.Show.Text.Utils ((<>))
 
 -- | Convert an 'ExitCode' to a 'Builder' with the given precedence.
 showbExitCodePrec :: Int -> ExitCode -> Builder

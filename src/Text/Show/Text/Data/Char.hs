@@ -21,14 +21,14 @@ module Text.Show.Text.Data.Char (
 
 import Data.Array (Array, (!), listArray)
 import Data.Char (GeneralCategory(..), isDigit, ord)
-import Data.Monoid (mempty, (<>))
+import Data.Monoid (mempty)
 import Data.Text.Buildable (build)
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(..))
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
 asciiTabB :: Array Int Builder

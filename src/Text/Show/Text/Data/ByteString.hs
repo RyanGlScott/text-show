@@ -40,12 +40,11 @@ import           Text.Show.Text.Class (Show(showb, showbPrec))
 -- Imports needed for older versions of bytestring
 #if !(MIN_VERSION_bytestring(0,10,0))
 import qualified Data.ByteString.Lazy.Internal as BL
-import           Data.Monoid ((<>))
 
 import           GHC.Show (appPrec, appPrec1)
 
 import           Text.Show.Text.Class (showbParen)
-import           Text.Show.Text.Utils (s)
+import           Text.Show.Text.Utils ((<>), s)
 #endif
 
 -- | Convert a strict 'ByteString' to a 'Builder'.

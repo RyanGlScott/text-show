@@ -83,6 +83,9 @@ import           GHC.Stats (GCStats)
 import           Instances ()
 
 import           Numeric (showIntAtBase, showEFloat, showFFloat, showGFloat)
+#if MIN_VERSION_base(4,7,0)
+import           Numeric (showFFloatAlt, showGFloatAlt)
+#endif
 
 import qualified Prelude as P
 import           Prelude hiding (Show)
@@ -102,6 +105,9 @@ import           Text.Show.Text hiding (Show)
 import           Text.Show.Text.Functions ()
 import           Text.Show.Text.Data.Fixed (showbFixed)
 import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
+#if MIN_VERSION_base(4,7,0)
+import           Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
+#endif
 import           Text.Show.Text.Data.Integral (showbIntAtBase)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
 
@@ -223,6 +229,10 @@ tests = testGroup "QuickCheck properties"
               , testProperty "showbEFloat output" $               prop_showXFloat showEFloat showbEFloat
               , testProperty "showbFFloat output" $               prop_showXFloat showFFloat showbFFloat
               , testProperty "showbGFloat output" $               prop_showXFloat showGFloat showbGFloat
+#if MIN_VERSION_base(4,7,0)
+              , testProperty "showbFFloatAlt output" $            prop_showXFloat showFFloatAlt showbFFloatAlt
+              , testProperty "showbGFloatAlt output" $            prop_showXFloat showGFloatAlt showbGFloatAlt
+#endif
               ]
           , testGroup "Text.Show.Text.Data.Functions"
               [ testProperty "Int -> Int instance"                (prop_matchesShow :: Int -> (Int -> Int) -> Bool)

@@ -23,7 +23,6 @@ module Text.Show.Text.Data.Containers (
     ) where
 
 import qualified Data.Foldable as F
-import           Data.Monoid ((<>))
 import           Data.Text.Lazy.Builder (Builder)
 
 import qualified Data.IntMap as IM
@@ -44,7 +43,7 @@ import           Prelude hiding (Show)
 import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbListDefault)
 import           Text.Show.Text.Data.Integral ()
 import           Text.Show.Text.Data.Tuple ()
-import           Text.Show.Text.Utils (s)
+import           Text.Show.Text.Utils ((<>), s)
 
 -- | Convert an 'IntMap' into a 'Builder' with the given precedence.
 showbIntMapPrec :: Show v => Int -> IntMap v -> Builder

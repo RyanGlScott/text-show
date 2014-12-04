@@ -22,7 +22,7 @@ module Text.Show.Text.Data.Typeable (
 #endif
     ) where
 
-import Data.Monoid ((<>), mempty)
+import Data.Monoid (mempty)
 #if MIN_VERSION_base(4,7,0)
 import Data.Proxy (Proxy(..))
 #endif
@@ -41,7 +41,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Integral (showbHex)
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils (lengthB, replicateB, s)
+import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
 showbTypeRepPrec :: Int -> TypeRep -> Builder

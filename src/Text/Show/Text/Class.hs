@@ -12,7 +12,6 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.Class where
 
-import           Data.Monoid ((<>))
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text)
@@ -24,7 +23,7 @@ import           Prelude hiding (Show(show))
 
 import           System.IO (Handle)
 
-import           Text.Show.Text.Utils (s)
+import           Text.Show.Text.Utils ((<>), s)
 
 -- | 
 -- Conversion of values to 'Text'. Because there are both strict and lazy 'Text'

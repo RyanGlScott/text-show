@@ -13,7 +13,6 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.Data.Maybe (showbMaybePrec) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Show (appPrec, appPrec1)
@@ -21,6 +20,7 @@ import GHC.Show (appPrec, appPrec1)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showbPrec), showbParen)
+import Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Maybe' value to a 'Builder' with the given precedence.
 showbMaybePrec :: Show a => Int -> Maybe a -> Builder

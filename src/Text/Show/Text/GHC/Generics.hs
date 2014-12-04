@@ -25,7 +25,6 @@ module Text.Show.Text.GHC.Generics (
     , showbArityPrec
     ) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
@@ -37,7 +36,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Integral (showbIntPrec)
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'U1' value to a 'Builder'.
 showbU1 :: U1 p -> Builder

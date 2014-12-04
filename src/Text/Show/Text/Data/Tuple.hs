@@ -29,13 +29,12 @@ module Text.Show.Text.Data.Tuple (
     , showb15Tuple
     ) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb))
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Converts @()@ into a 'Builder'.
 showbUnit :: () -> Builder

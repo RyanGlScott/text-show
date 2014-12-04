@@ -24,7 +24,6 @@ module Text.Show.Text.Data.Time (
     , showbLocalTime
     ) where
 
-import Data.Monoid ((<>))
 import Data.Text.Buildable (build)
 import Data.Text.Lazy.Builder (Builder)
 import Data.Time.Calendar (Day)
@@ -36,6 +35,7 @@ import Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime,
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb))
+import Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Day' into a 'Builder'.
 showbDay :: Day -> Builder

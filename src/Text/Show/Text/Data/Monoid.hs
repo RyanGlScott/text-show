@@ -22,7 +22,7 @@ module Text.Show.Text.Data.Monoid (
     ) where
 
 import Data.Monoid (All(..), Any(..), Dual(..), First(..),
-                    Last(..), Product(..), Sum(..), (<>))
+                    Last(..), Product(..), Sum(..))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Show (appPrec)
@@ -32,7 +32,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Bool (showbBool)
 import Text.Show.Text.Data.Maybe (showbMaybePrec)
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert an 'All' value to a 'Builder' with the given precedence.
 showbAllPrec :: Int -> All -> Builder

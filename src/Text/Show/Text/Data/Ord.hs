@@ -24,9 +24,9 @@ import Text.Show.Text.Class (Show(showb))
 
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down(..))
-import Data.Monoid ((<>))
 import GHC.Show (appPrec, appPrec1)
 import Text.Show.Text.Class (showbPrec, showbParen)
+import Text.Show.Text.Utils ((<>))
 #endif
 
 -- | Convert a 'Ordering' to a 'Builder'.

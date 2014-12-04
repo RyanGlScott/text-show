@@ -28,7 +28,6 @@ module Text.Show.Text.System.IO (
     , showbNewlineModePrec
     ) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 
 #if MIN_VERSION_base(4,3,0)
@@ -50,7 +49,7 @@ import System.IO (BufferMode(..), IOMode(..), Newline(..),
 import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe (showbMaybePrec)
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Handle' to a 'Builder'.
 showbHandle :: Handle -> Builder

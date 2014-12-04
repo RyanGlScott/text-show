@@ -17,7 +17,7 @@ module Text.Show.Text.Data.Version (
     ) where
 
 import Data.List (intersperse)
-import Data.Monoid ((<>), mconcat)
+import Data.Monoid (mconcat)
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 
@@ -29,7 +29,7 @@ import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
 showbVersionPrec :: Int -> Version -> Builder

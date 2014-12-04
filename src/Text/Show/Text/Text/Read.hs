@@ -19,7 +19,6 @@ module Text.Show.Text.Text.Read (
 #endif
     ) where
 
-import           Data.Monoid ((<>))
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           GHC.Show (appPrec, appPrec1)
@@ -36,6 +35,7 @@ import           Text.Show.Text.Data.Char (showbLitChar)
 #if !(MIN_VERSION_base(4,6,0))
 import           Text.Show.Text.Data.Integral (showbIntegerPrec, showbRatioPrec)
 #endif
+import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Lexeme' to a 'Builder' with the given precedence.
 showbLexemePrec :: Int -> Lexeme -> Builder

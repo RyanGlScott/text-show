@@ -20,7 +20,6 @@ module Text.Show.Text.Foreign.Ptr (
     , showbForeignPtr
     ) where
 
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import Foreign.ForeignPtr (ForeignPtr)
@@ -35,7 +34,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
-import Text.Show.Text.Utils (lengthB, replicateB, s)
+import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
 #include "MachDeps.h"
 

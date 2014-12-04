@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE MagicHash, NoImplicitPrelude #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.Show.Text.Utils
@@ -13,11 +13,27 @@
 module Text.Show.Text.Utils where
 
 import Data.Int (Int64)
-import Data.Monoid (Monoid(mempty), (<>))
+import Data.Monoid (Monoid(mappend, mempty))
 import Data.Text.Lazy (length, replicate)
 import Data.Text.Lazy.Builder (Builder, fromLazyText, singleton, toLazyText)
 
+import GHC.Exts (Char(C#), Int(I#))
+import GHC.Prim ((+#), chr#, ord#)
+
 import Prelude hiding (length, replicate)
+
+infixr 6 <>
+
+-- | Unsafe conversion for decimal digits.
+i2d :: Int -> Char
+i2d (I# i#) = C# (chr# (ord# '0'# +# i#))
+{-# INLINE i2d #-}
+
+-- | Infix 'mappend', defined here for backwards-compatibility with older versions
+--   of base.
+(<>) :: Monoid m => m -> m -> m
+(<>) = mappend
+{-# INLINE (<>) #-}
 
 -- |
 -- A shorter name for 'singleton' for convenience's sake (since it tends to be used

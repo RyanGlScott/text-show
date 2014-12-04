@@ -17,7 +17,6 @@ module Text.Show.Text.Control.Concurrent (
     , showbBlockReason
     ) where
 
-import           Data.Monoid ((<>))
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           GHC.Conc (BlockReason(..), ThreadId, ThreadStatus(..))
@@ -27,6 +26,7 @@ import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
 showbThreadIdPrec :: Int -> ThreadId -> Builder

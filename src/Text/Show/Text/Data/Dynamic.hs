@@ -14,13 +14,13 @@
 module Text.Show.Text.Data.Dynamic (showbDynamic) where
 
 import Data.Dynamic (Dynamic, dynTypeRep)
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb))
 import Text.Show.Text.Data.Typeable (showbTypeRepPrec)
+import Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Dynamic' value to a 'Builder'.
 showbDynamic :: Dynamic -> Builder

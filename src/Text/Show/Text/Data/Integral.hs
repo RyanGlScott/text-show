@@ -33,7 +33,7 @@ module Text.Show.Text.Data.Integral (
 
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.Monoid ((<>), mempty)
+import           Data.Monoid (mempty)
 import           Data.Ratio (Ratio, numerator, denominator)
 import           Data.Text.Buildable (build)
 import           Data.Text.Lazy.Builder (Builder)
@@ -51,7 +51,7 @@ import qualified Prelude as P (show)
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.Utils (s)
+import           Text.Show.Text.Utils ((<>), s)
 
 -- | Convert an 'Int' to a 'Builder' with the given precedence.
 showbIntPrec :: Int -> Int -> Builder

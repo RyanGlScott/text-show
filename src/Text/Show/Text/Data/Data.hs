@@ -21,7 +21,6 @@ module Text.Show.Text.Data.Data (
 
 import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType, Fixity(..),
                   dataTypeName, dataTypeRep, showConstr)
-import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 
 import GHC.Show (appPrec, appPrec1)
@@ -32,7 +31,7 @@ import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.Char (showbChar)
 import Text.Show.Text.Data.Integral (showbIntPrec, showbIntegerPrec, showbRatioPrec)
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils (s)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.
 showbDataTypePrec :: Int -> DataType -> Builder

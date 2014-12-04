@@ -36,13 +36,14 @@ module Text.Show.Text.Control.Exception (
 
 import           Control.Exception.Base
 
-import           Data.Monoid ((<>), mempty)
+import           Data.Monoid (mempty)
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
 showbSomeExceptionPrec :: Int -> SomeException -> Builder
