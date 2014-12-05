@@ -83,6 +83,16 @@ showLazy :: Show a => a -> TL.Text
 showLazy = toLazyText . showb
 {-# INLINE showLazy #-}
 
+-- | Constructs a strict 'Text' from a single value with the given precedence.
+showPrec :: Show a => Int -> a -> TS.Text
+showPrec p = toStrict . showPrecLazy p
+{-# INLINE showPrec #-}
+
+-- | Constructs a lazy 'Text' from a single value with the given precedence.
+showPrecLazy :: Show a => Int -> a -> TL.Text
+showPrecLazy p = toLazyText . showbPrec p
+{-# INLINE showPrecLazy #-}
+
 -- |
 -- Converts a list of 'Show' values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. This is the default

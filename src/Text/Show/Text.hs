@@ -15,6 +15,8 @@ module Text.Show.Text (
       Show (..)
     , show
     , showLazy
+    , showPrec
+    , showPrecLazy
     , showbParen
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
