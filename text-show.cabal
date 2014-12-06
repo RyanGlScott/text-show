@@ -1,5 +1,5 @@
 name:                text-show
-version:             0.3.0.0
+version:             0.3.1.0
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
@@ -23,12 +23,13 @@ description:         @text-show@ offers a replacement for the @Show@ typeclass i
                      @
                         &#123;-&#35; LANGUAGE NoImplicitPrelude &#35;-&#125;
                         module Main where
+                        .
                         import Data.Text (Text)
                         import Prelude hiding (Show(..), print)
                         import Text.Show.Text
                         .
                         number :: Text
-                        number = show 27
+                        number = show (Just \"Hello, World!\")
                         .
                         main :: IO ()
                         main = print number
@@ -131,6 +132,7 @@ test-suite text-show-properties
                        Instances.Derived
                        Properties.BaseAndFriends
                        Properties.Derived
+                       Properties.MkShow
                        Properties.Utils
   hs-source-dirs:      tests
   build-depends:       array                      >= 0.3 && < 0.6

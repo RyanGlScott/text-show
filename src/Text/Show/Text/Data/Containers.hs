@@ -40,39 +40,40 @@ import           GHC.Show (appPrec)
 
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbListDefault)
+import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import           Text.Show.Text.Data.Integral ()
+import           Text.Show.Text.Data.List ()
 import           Text.Show.Text.Data.Tuple ()
 import           Text.Show.Text.Utils ((<>), s)
 
 -- | Convert an 'IntMap' into a 'Builder' with the given precedence.
 showbIntMapPrec :: Show v => Int -> IntMap v -> Builder
 showbIntMapPrec p im
-    = showbParen (p > appPrec) $ "fromList " <> showbListDefault (IM.toList  im)
+    = showbParen (p > appPrec) $ "fromList " <> showb (IM.toList  im)
 {-# INLINE showbIntMapPrec #-}
 
 -- | Convert an 'IntSet' into a 'Builder' with the given precedence.
 showbIntSetPrec :: Int -> IntSet -> Builder
 showbIntSetPrec p is
-    = showbParen (p > appPrec) $ "fromList " <> showbListDefault (IS.toList  is)
+    = showbParen (p > appPrec) $ "fromList " <> showb (IS.toList  is)
 {-# INLINE showbIntSetPrec #-}
 
 -- | Convert a 'Map' into a 'Builder' with the given precedence.
 showbMapPrec :: (Show k, Show v) => Int -> Map k v -> Builder
 showbMapPrec p m
-    = showbParen (p > appPrec) $ "fromList " <> showbListDefault (M.toList    m)
+    = showbParen (p > appPrec) $ "fromList " <> showb (M.toList    m)
 {-# INLINE showbMapPrec #-}
 
 -- | Convert a 'Sequence' into a 'Builder' with the given precedence.
 showbSequencePrec :: Show a => Int -> Seq a -> Builder
 showbSequencePrec p s'
-    = showbParen (p > appPrec) $ "fromList " <> showbListDefault (F.toList   s')
+    = showbParen (p > appPrec) $ "fromList " <> showb (F.toList   s')
 {-# INLINE showbSequencePrec #-}
 
 -- | Convert a 'Set' into a 'Builder' with the given precedence.
 showbSetPrec :: Show a => Int -> Set a -> Builder
 showbSetPrec p s'
-    = showbParen (p > appPrec) $ "fromList " <> showbListDefault (Set.toList s')
+    = showbParen (p > appPrec) $ "fromList " <> showb (Set.toList s')
 {-# INLINE showbSetPrec #-}
 
 -- | Convert a 'Tree' into a 'Builder' with the given precedence.
@@ -81,7 +82,7 @@ showbTreePrec p (Node rl sf) = showbParen (p > appPrec) $
         "Node {rootLabel = "
      <> showb rl
      <> ", subForest = "
-     <> showbListDefault sf
+     <> showb sf
      <> s '}'
 {-# INLINE showbTreePrec #-}
 

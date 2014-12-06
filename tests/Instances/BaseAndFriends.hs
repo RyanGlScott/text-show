@@ -49,10 +49,8 @@ import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (Typeable, TyCon(..), TypeRep(..),
-                                        mkTyConApp, splitTyConApp, typeOf)
+import           Data.Typeable.Internal (TyCon(..))
 import           GHC.Fingerprint.Type (Fingerprint(..))
-import           Data.Word (Word)
 
 #if !(MIN_VERSION_base(4,7,0))
 import           Data.Word (Word64)
@@ -236,24 +234,8 @@ instance Arbitrary (Proxy s) where
 #endif
 
 #if MIN_VERSION_base(4,4,0)
--- Borrowed from the concrete-typerep package
-instance Arbitrary TypeRep where
-    arbitrary = do
-        nargs <- elements [0,1,2]
-        mkTyConApp <$> (genTyCon nargs) <*> (vectorOf nargs arbitrary)
-
-genTyCon :: Int -- ^ Number of arguments; must be in [0,1,2]
-         -> Gen TyCon
-genTyCon 0 = elements [tyConOf (__::Int), tyConOf (__::Word), tyConOf (__::Double), tyConOf (__::Bool)]
-genTyCon 1 = elements [tyConOf (__::Maybe Int), tyConOf (__::IO Int), tyConOf (__::[Int])]
-genTyCon 2 = elements [tyConOf (__::Either Int Int), tyConOf (__::Int -> Int)]
-genTyCon _ = genTyCon 0
-
-tyConOf :: Typeable a => a -> TyCon
-tyConOf ty = fst $ splitTyConApp (typeOf ty)
-
-__ :: t
-__ = undefined
+-- TODO: Come up with an instance of TypeRep that doesn't take forever
+-- instance Arbitrary TypeRep where
 
 instance Arbitrary TyCon where
     arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary

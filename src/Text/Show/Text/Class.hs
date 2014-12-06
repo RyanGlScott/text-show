@@ -19,7 +19,7 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, toLazyText)
 
-import           Prelude hiding (Show(show))
+import           Prelude hiding (Show(show, showList))
 
 import           System.IO (Handle)
 
@@ -68,7 +68,7 @@ class Show a where
     
     showb = showbPrec 0
     
-    showbList = showbListDefault
+    showbList = showbListDefault showb
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
 #endif
@@ -93,23 +93,33 @@ showPrecLazy :: Show a => Int -> a -> TL.Text
 showPrecLazy p = toLazyText . showbPrec p
 {-# INLINE showPrecLazy #-}
 
--- |
--- Converts a list of 'Show' values into a 'Builder' in which the values are surrounded
--- by square brackets and each value is separated by a comma. This is the default
--- implementation of 'showbList' save for a few special cases (e.g., 'String').
-showbListDefault :: Show a => [a] -> Builder
-showbListDefault []     = "[]"
-showbListDefault (x:xs) = s '[' <> showb x <> go xs -- "[..
-  where
-    go (y:ys) = s ',' <> showb y <> go ys           -- ..,..
-    go []     = s ']'                               -- ..]"
-{-# INLINE showbListDefault #-}
+-- | Construct a strict 'Text' from a list of values.
+showList :: Show a => [a] -> TS.Text
+showList = toStrict . showListLazy
+{-# INLINE showList #-}
+
+-- | Construct a lazy 'Text' from a list of values.
+showListLazy :: Show a => [a] -> TL.Text
+showListLazy = toLazyText . showbList
+{-# INLINE showListLazy #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
+
+-- |
+-- Converts a list of values into a 'Builder' in which the values are surrounded
+-- by square brackets and each value is separated by a comma. This is the default
+-- implementation of 'showbList' save for a few special cases (e.g., 'String').
+showbListDefault :: (a -> Builder) -> [a] -> Builder
+showbListDefault _      []     = "[]"
+showbListDefault showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
+  where
+    go (y:ys) = s ',' <> showbx y <> go ys                  -- ..,..
+    go []     = s ']'                                       -- ..]"
+{-# INLINE showbListDefault #-}
 
 -- | Writes a value's strict 'Text' representation to the standard output, followed
 --   by a newline.

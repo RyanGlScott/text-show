@@ -8,39 +8,38 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Exports 'deriveShow', which automatically derives a 'Show' instance for a
--- @data@ type or @newtype@. You need to enable the @TemplateHaskell@
--- language extension in order to use 'deriveShow'.
--- 
--- As an example:
--- 
--- @
--- &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
--- import Text.Show.Text.TH (deriveShow)
--- 
--- data D a = Nullary
---          | Unary Int
---          | Product String Char a
---          | Record { testOne   :: Double
---                   , testTwo   :: Bool
---                   , testThree :: D a
---                   }
--- $(deriveShow ''D)
--- @
--- 
--- @D@ now has a 'Show' instance equivalent to that which would be generated
--- by a @deriving Show@ clause. 
--- 
--- Note that at the moment, 'deriveShow' does not support data families,
--- so it is impossible to use 'deriveShow' with @data instance@s or @newtype
--- instance@s.
+-- Functions to mechanically derive 'Show' instances or splice
+-- 'show'-related expressions into Haskell source code. You need to enable
+-- the @TemplateHaskell@ language extension in order to use this module.
 ----------------------------------------------------------------------------
-module Text.Show.Text.TH (deriveShow) where
+module Text.Show.Text.TH (
+      -- * @deriveShow@
+      -- $deriveShow
+      deriveShow
+      -- * @mk@ functions
+      -- $mk
+    , mkShow
+    , mkShowLazy
+    , mkShowPrec
+    , mkShowPrecLazy
+--     , mkShowList
+--     , mkShowListLazy
+    , mkShowb
+    , mkShowbPrec
+--     , mkShowbList
+    , mkPrint
+    , mkPrintLazy
+    , mkHPrint
+    , mkHPrintLazy
+    ) where
 
 import           Control.Applicative ((<$>))
 
 import           Data.List (foldl')
-import           Data.Text.Lazy.Builder (Builder, fromString)
+import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
+import           Data.Text.Lazy (toStrict)
+import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
 import           GHC.Show (appPrec, appPrec1)
 
@@ -53,26 +52,154 @@ import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils ((<>), s)
 
+{- $deriveShow
+
+'deriveShow' automatically generates a 'Show' instance declaration for a @data@
+type or @newtype@. As an example:
+
+@
+&#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
+import Text.Show.Text.TH (deriveShow)
+
+data D a = Nullary
+         | Unary Int
+         | Product String Char a
+         | Record { testOne   :: Double
+                  , testTwo   :: Bool
+                  , testThree :: D a
+                  }
+$(deriveShow ''D)
+@
+
+@D@ now has a 'Show' instance equivalent to that which would be generated
+by a @deriving Show@ clause. 
+
+Note that at the moment, 'deriveShow' does not support data families,
+so it is impossible to use 'deriveShow' with @data instance@s or @newtype
+instance@s.
+
+-}
+
 -- | Generates a 'Show' instance declaration for the given @data@ type or @newtype@.
 deriveShow :: Name -> Q [Dec]
 deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
-    fromCons tvbs cons =
-        instanceD (applyCon ''Show typeNames name)
-                  (appT classType instanceType)
-                  [ funD 'showbPrec [ clause [] (normalB $ consToShow cons) []
-                                    ]
-                  ]
+    fromCons tvbs cons = instanceD cxt'
+                                   (appT classType type')
+                                   [ funD 'showbPrec [ clause [] (normalB $ consToShow cons) []
+                                                     ]
+                                   ]
       where
-        classType :: Q Type
-        classType = conT ''Show
-        
-        typeNames :: [Name]
-        typeNames = map tvbName tvbs
-        
-        instanceType :: Q Type
-        instanceType = foldl' appT (conT name) $ map varT typeNames
+          classType :: Q Type
+          classType = conT ''Show
+          
+          cxt'  :: Q Cxt
+          type' :: Q Type
+          (cxt', type') = instanceCtxType name tvbs
+
+{- $mk
+
+There may be scenarios in which you want to show an arbitrary @data@ type or @newtype@
+without having to make the type an instance of 'Show'. For these cases,
+"Text.Show.Text.TH" provide several functions (all prefixed with @mk@) that splice
+the appropriate lambda expression into your source code.
+
+As an example, suppose you have @data ADT = ADTCon@, which is not an instance of 'Show'.
+With @mkShow@, you can still convert it to 'Text':
+
+@
+&#123;-&#35; LANGUAGE OverloadedStrings, TemplateHaskell &#35;-&#125;
+
+whichADT :: Bool
+whichADT = $(mkShow ''ADT) ADTCon == \"ADT\"
+@
+
+Note that due the order in which Template Haskell executes splices, the above code
+may fail to compile if @ADT@ is located in the same module and @whichADT@. To get
+around this, you can use the following hack:
+
+@
+&#123;-&#35; LANGUAGE OverloadedStrings, TemplateHaskell &#35;-&#125;
+
+data ADT = ADTCon
+$(return [])
+
+whichADT :: Bool
+whichADT = $(mkShow ''ADT) ADT == \"ADT\"
+@
+
+-}
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a strict 'Text'.
+mkShow :: Name -> Q Exp
+mkShow name = [| toStrict . $(mkShowLazy name) |]
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a lazy 'Text'.
+mkShowLazy :: Name -> Q Exp
+mkShowLazy name = [| toLazyText . $(mkShowb name) |]
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a strict 'Text' with the given precedence.
+mkShowPrec :: Name -> Q Exp
+mkShowPrec name = [| \p -> toStrict . $(mkShowPrecLazy name) p |]
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a lazy 'Text' with the given precedence.
+mkShowPrecLazy :: Name -> Q Exp
+mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a 'Builder'.
+mkShowb :: Name -> Q Exp
+mkShowb name = mkShowbPrec name `appE` [| 0 |]
+
+-- |
+-- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- to a 'Builder' with the given precedence.
+mkShowbPrec :: Name -> Q Exp
+mkShowbPrec name = withType name $ \tvbs cons -> fromCons tvbs cons
+  where
+    fromCons :: [TyVarBndr] -> [Con] -> Q Exp
+    fromCons tvbs cons = sigE (consToShow cons)
+                            $ forallT tvbs
+                                      cxt'
+                                      [t| Int -> $(type') -> Builder |]
+      where
+        cxt'  :: Q Cxt
+        type' :: Q Type
+        (cxt', type') = instanceCtxType name tvbs
+
+-- |
+-- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- argument's strict 'Text' output to the standard output, followed by a newline.
+mkPrint :: Name -> Q Exp
+mkPrint name = [| TS.putStrLn . $(mkShow name) |]
+
+-- |
+-- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- argument's lazy 'Text' output to the standard output, followed by a newline.
+mkPrintLazy :: Name -> Q Exp
+mkPrintLazy name = [| TL.putStrLn . $(mkShowLazy name) |]
+
+-- |
+-- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- argument's strict 'Text' output to the given file handle, followed by a newline.
+mkHPrint :: Name -> Q Exp
+mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
+
+-- |
+-- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- argument's lazy 'Text' output to the given file handle, followed by a newline.
+mkHPrintLazy :: Name -> Q Exp
+mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
 -- | Generates code to generate the 'Show' encoding of a number of constructors.
 --   All constructors must be from the same type.
@@ -137,6 +264,15 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+instanceCtxType :: Name -> [TyVarBndr] -> (Q Cxt, Q Type)
+instanceCtxType name tvbs
+    = let typeNames :: [Name]
+          typeNames = map tvbName tvbs
+          
+          instanceType :: Q Type
+          instanceType = foldl' appT (conT name) $ map varT typeNames
+      in (applyCon ''Show typeNames name, instanceType)
 
 -- | If constructor is nullary.
 isNullary :: Con -> Bool

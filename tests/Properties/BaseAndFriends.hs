@@ -59,7 +59,7 @@ import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (TyCon, TypeRep)
+import           Data.Typeable.Internal (TyCon)
 import           GHC.Fingerprint.Type (Fingerprint)
 #endif
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
@@ -79,6 +79,7 @@ import           GHC.IO.Encoding.Types (CodingProgress)
 #if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats)
 #endif
+import           GHC.Show (showList__)
 
 import           Instances.BaseAndFriends ()
 
@@ -109,6 +110,7 @@ import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGF
 import           Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
 #endif
 import           Text.Show.Text.Data.Integral (showbIntAtBase)
+import           Text.Show.Text.Data.List (showbListDefault)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
@@ -121,6 +123,10 @@ prop_showIntAtBase = do
     base <- arbitrary `suchThat` (liftA2 (&&) (> 1) (<= 16))
     i    <- arbitrary `suchThat` (>= 0) :: Gen Int
     return $ fromString (showIntAtBase base intToDigit i "") == showbIntAtBase base intToDigit i
+
+-- | Verifies 'showList__' and 'showbListDefault' generate the same output.
+prop_showListDefault :: [Char] -> Bool
+prop_showListDefault str = fromString (showList__ shows str "") == showbListDefault showb str
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
 --   is one of E, F, or G).
@@ -184,12 +190,12 @@ baseAndFriendsTests =
         , testProperty "GeneralCategory instance"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Containers"
-        [ testProperty "IntMap Int instance"                (prop_matchesShow :: Int -> IntMap Int -> Bool)
+        [ testProperty "IntMap Char instance"               (prop_matchesShow :: Int -> IntMap Char -> Bool)
         , testProperty "IntSet instance"                    (prop_matchesShow :: Int -> IntSet -> Bool)
-        , testProperty "Map Int Int instance"               (prop_matchesShow :: Int -> Map Int Int -> Bool)
-        , testProperty "Sequence Int"                       (prop_matchesShow :: Int -> Seq Int -> Bool)
-        , testProperty "Set Int instance"                   (prop_matchesShow :: Int -> Set Int -> Bool)
-        , testProperty "Tree Int instance"                  (prop_matchesShow :: Int -> Tree Int -> Bool)
+        , testProperty "Map Char Char instance"             (prop_matchesShow :: Int -> Map Char Char -> Bool)
+        , testProperty "Sequence Char"                      (prop_matchesShow :: Int -> Seq Char -> Bool)
+        , testProperty "Set Char instance"                  (prop_matchesShow :: Int -> Set Char -> Bool)
+        , testProperty "Tree Char instance"                 (prop_matchesShow :: Int -> Tree Char -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Data"
         [ testProperty "Constr instance"                    (prop_matchesShow :: Int -> Constr -> Bool)
@@ -248,6 +254,7 @@ baseAndFriendsTests =
         [ testProperty "String instance"                    (prop_matchesShow :: Int -> String -> Bool)
         , testProperty "[String] instance"                  (prop_matchesShow :: Int -> [String] -> Bool)
         , testProperty "[Int] instance"                     (prop_matchesShow :: Int -> [Int] -> Bool)
+        , testProperty "showbListDefault output"            prop_showListDefault
         ]
     , testGroup "Text.Show.Text.Data.Maybe"
         [ testProperty "Maybe Int instance"                 (prop_matchesShow :: Int -> Maybe Int -> Bool)
@@ -299,8 +306,8 @@ baseAndFriendsTests =
 #endif
 #if MIN_VERSION_base(4,4,0)
     , testGroup "Text.Show.Text.Data.Typeable"
-        [ testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
-        , testProperty "TyCon instance"                     (prop_matchesShow :: Int -> TyCon -> Bool)
+        [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
+          testProperty "TyCon instance"                     (prop_matchesShow :: Int -> TyCon -> Bool)
         , testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
 #if MIN_VERSION_base(4,7,0)
         , testProperty "Proxy Int instance"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)

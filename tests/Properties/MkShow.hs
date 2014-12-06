@@ -1,0 +1,61 @@
+{-# LANGUAGE TemplateHaskell #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Properties.BaseAndFriends
+-- Copyright   :  (C) 2014 Ryan Scott
+-- License     :  BSD-style (see the file LICENSE)
+-- Maintainer  :  Ryan Scott
+-- Stability   :  Experimental
+-- Portability :  GHC
+-- 
+-- @QuickCheck@ properties for 'mkShow' and related functions in
+-- "Text.Show.Text.TH".
+----------------------------------------------------------------------------
+module Properties.MkShow (mkShowTests) where
+
+import qualified Data.Text      as TS (pack)
+import qualified Data.Text.Lazy as TL (pack)
+import           Data.Text.Lazy.Builder (fromString)
+
+import           Instances.Derived
+
+import           Test.QuickCheck.Modifiers (Large)
+import           Test.Tasty (TestTree, testGroup)
+import           Test.Tasty.QuickCheck (testProperty)
+
+import           Text.Show.Text.TH
+
+-- | Verifies 'mkShow' (and related functions) produce the same output as their
+--   'String' counterparts. This uses a data type that is a 'Show' instance.
+prop_mkShowIsInstance :: Int -> AllAtOnce Int Int Int Int -> Bool
+prop_mkShowIsInstance p a =
+       TS.pack    (show        a   ) == $(mkShow         ''AllAtOnce)   a
+    && TL.pack    (show        a   ) == $(mkShowLazy     ''AllAtOnce)   a
+    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''AllAtOnce) p a
+    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''AllAtOnce) p a
+    && fromString (show        a   ) == $(mkShowb        ''AllAtOnce)   a
+    && fromString (showsPrec p a "") == $(mkShowbPrec    ''AllAtOnce) p a
+
+-- | Verifies 'mkShow' (and related functions) produce the same output as their
+--   'String' counterparts. This uses a data type that is not a 'Show' instance.
+prop_mkShowIsNotInstance :: Int -> Large Int -> Bool
+prop_mkShowIsNotInstance p a =
+       TS.pack    (show        a   ) == $(mkShow         ''Large)   a
+    && TL.pack    (show        a   ) == $(mkShowLazy     ''Large)   a
+    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''Large) p a
+    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''Large) p a
+    && fromString (show        a   ) == $(mkShowb        ''Large)   a
+    && fromString (showsPrec p a "") == $(mkShowbPrec    ''Large) p a
+
+-- prop_mkPrintIsInstance
+-- prop_mkPrintIsNotInstance
+
+mkShowTests :: [TestTree]
+mkShowTests =
+    [ testGroup "mkShow and related functions"
+        [ testProperty "$(mkShow ''AllAtOnce) (a Show instance)"  prop_mkShowIsInstance
+        , testProperty "$(mkShow ''Large) (not a Show instance)"  prop_mkShowIsNotInstance
+--         , testProperty "$(mkPrint ''AllAtOnce) (a Show instance)" prop_mkPrintIsInstance
+--         , testProperty "$(mkPrint ''Large) (not a Show instance)" prop_mkPrintIsNotInstance
+        ]
+    ]

@@ -17,6 +17,8 @@ module Text.Show.Text (
     , showLazy
     , showPrec
     , showPrecLazy
+    , showList
+    , showListLazy
     , showbParen
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
@@ -33,7 +35,7 @@ module Text.Show.Text (
 
 import Data.Text.Lazy.Builder
 
-import Prelude hiding (Show(show), print)
+import Prelude hiding (Show(show, showList), print)
 
 import Text.Show.Text.Class
 import Text.Show.Text.Instances ()

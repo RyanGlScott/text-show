@@ -17,11 +17,11 @@ import Data.Array (Array, assocs, bounds)
 import Data.Ix (Ix)
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Show (appPrec, appPrec1)
+import GHC.Show (appPrec)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec), showbParen)
+import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Tuple ()
 import Text.Show.Text.Utils ((<>), s)
@@ -30,9 +30,9 @@ import Text.Show.Text.Utils ((<>), s)
 showbArrayPrec :: (Show i, Show e, Ix i) => Int -> Array i e -> Builder
 showbArrayPrec p a = showbParen (p > appPrec) $
        "array "
-    <> showbPrec appPrec1 (bounds a)
+    <> showb (bounds a)
     <> s ' '
-    <> showbPrec appPrec1 (assocs a)
+    <> showb (assocs a)
 {-# INLINE showbArrayPrec #-}
 
 instance (Show i, Show e, Ix i) => Show (Array i e) where

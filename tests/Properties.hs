@@ -12,12 +12,19 @@
 module Main (main) where
 
 import Properties.BaseAndFriends (baseAndFriendsTests)
-import Properties.Derived (derivedTests)
+import Properties.Derived        (derivedTests)
+import Properties.MkShow         (mkShowTests)
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
 
 main :: IO ()
 main = defaultMain testTree
 
+allTests :: [TestTree]
+allTests = concat [ baseAndFriendsTests
+                  , derivedTests
+                  , mkShowTests
+                  ]
+
 testTree :: TestTree
-testTree = testGroup "QuickCheck properties" $ baseAndFriendsTests ++ derivedTests
+testTree = testGroup "QuickCheck properties" allTests
