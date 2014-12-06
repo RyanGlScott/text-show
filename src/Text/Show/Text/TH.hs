@@ -9,13 +9,13 @@
 -- Portability :  GHC
 -- 
 -- Exports 'deriveShow', which automatically derives a 'Show' instance for a
--- data type. You need to enable the @TemplateHaskell@ language extension in
--- order to use 'deriveShow'.
+-- @data@ type or @newtype@. You need to enable the @TemplateHaskell@
+-- language extension in order to use 'deriveShow'.
 -- 
 -- As an example:
 -- 
 -- @
--- {-# LANGUAGE TemplateHaskell #-}
+-- &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
 -- import Text.Show.Text.TH (deriveShow)
 -- 
 -- data D a = Nullary
@@ -30,6 +30,10 @@
 -- 
 -- @D@ now has a 'Show' instance equivalent to that which would be generated
 -- by a @deriving Show@ clause. 
+-- 
+-- Note that at the moment, 'deriveShow' does not support data families,
+-- so it is impossible to use 'deriveShow' with @data instance@s or @newtype
+-- instance@s.
 ----------------------------------------------------------------------------
 module Text.Show.Text.TH (deriveShow) where
 
@@ -46,9 +50,10 @@ import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils ((<>), s)
 
--- | Generates a 'Show' instance declaration for the given data type.
+-- | Generates a 'Show' instance declaration for the given @data@ type or @newtype@.
 deriveShow :: Name -> Q [Dec]
 deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where

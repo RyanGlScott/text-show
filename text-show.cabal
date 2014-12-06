@@ -34,7 +34,7 @@ description:         @text-show@ offers a replacement for the @Show@ typeclass i
                         main = print number
                      @
                      .
-                     If you desire it, there are also monomorphic versions of the @show@
+                     If you desire it, there are also monomorphic versions of the @showb@
                      function available in the submodules of "Text.Show.Text". A naming
                      convention is present in which functions that show different values
                      depending on the precedence end with @Prec@ (e.g., @showbIntPrec@),
@@ -97,6 +97,7 @@ library
                        Text.Show.Text.Data
                        Text.Show.Text.Foreign
                        Text.Show.Text.GHC
+                       Text.Show.Text.Instances
                        Text.Show.Text.System
                        Text.Show.Text.Text
                        Text.Show.Text.Utils
@@ -126,7 +127,11 @@ library
 test-suite text-show-properties
   type:                exitcode-stdio-1.0
   main-is:             Properties.hs
-  other-modules:       Instances
+  other-modules:       Instances.BaseAndFriends
+                       Instances.Derived
+                       Properties.BaseAndFriends
+                       Properties.Derived
+                       Properties.Utils
   hs-source-dirs:      tests
   build-depends:       array                      >= 0.3 && < 0.6
                      , base                       >= 4.2 && < 5
@@ -141,5 +146,6 @@ test-suite text-show-properties
                      , time                       >= 0.1 && < 1.6
   ghc-options:         -Wall
   
+  -- Prior to GHC 7.6, GHC generics lived in ghc-prim
   if impl(ghc >= 7.2) && impl(ghc < 7.6)
     build-depends:     ghc-prim

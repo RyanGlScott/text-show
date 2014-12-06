@@ -8,18 +8,21 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Instances
+-- Module      :  Instances.BaseAndFriends
 -- Copyright   :  (C) 2014 Ryan Scott
 -- License     :  BSD-style (see the file LICENSE)
 -- Maintainer  :  Ryan Scott
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Miscellaneous typeclass instances.
+-- Provides 'Arbitrary' instances for data types located in @base@ and other
+-- common libraries. This module also defines 'Show' instances for some data
+-- types as well (e.g., those which do not derive 'Show' in older versions
+-- of GHC).
 ----------------------------------------------------------------------------
-module Instances where
+module Instances.BaseAndFriends () where
 
-import           Control.Applicative
+import           Control.Applicative (ZipList(..), (<$>), (<*>), pure)
 import           Control.Exception
 import           Control.Monad.ST (ST, fixST)
 

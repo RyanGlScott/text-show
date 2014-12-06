@@ -7,7 +7,7 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Imports 'Show' functions for @Foreign@ modules.
+-- Imports 'Show' instances for @Foreign@ modules.
 ----------------------------------------------------------------------------
 module Text.Show.Text.Foreign () where
 

@@ -8,7 +8,7 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Imports 'Show' functions for @GHC@ modules.
+-- Imports 'Show' instances for @GHC@ modules.
 ----------------------------------------------------------------------------
 module Text.Show.Text.GHC () where 
 

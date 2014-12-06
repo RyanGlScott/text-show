@@ -7,7 +7,7 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- Imports 'Show' functions for @Text@ modules.
+-- Imports 'Show' instances for @Text@ modules.
 ----------------------------------------------------------------------------
 module Text.Show.Text.Text () where
 
