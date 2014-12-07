@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP, NoImplicitPrelude #-}
 #if !(MIN_VERSION_bytestring(0,10,0))
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
@@ -37,14 +37,8 @@ import           Prelude hiding (Show(show))
 
 import           Text.Show.Text.Class (Show(showb, showbPrec))
 
--- Imports needed for older versions of bytestring
 #if !(MIN_VERSION_bytestring(0,10,0))
-import qualified Data.ByteString.Lazy.Internal as BL
-
-import           GHC.Show (appPrec, appPrec1)
-
-import           Text.Show.Text.Class (showbParen)
-import           Text.Show.Text.Utils ((<>), s)
+import           Text.Show.Text.TH.Internal (deriveShow)
 #endif
 
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
@@ -68,12 +62,7 @@ showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder
 #if MIN_VERSION_bytestring(0,10,0)
 showbByteStringLazyPrec _ = fromString . P.show
 #else
-showbByteStringLazyPrec _ BL.Empty         = "Empty"
-showbByteStringLazyPrec p (BL.Chunk bs bl) = showbParen (p > appPrec) $
-        "Chunk "
-     <> showbPrec appPrec1 bs
-     <> s ' '
-     <> showbPrec appPrec1 bl
+showbByteStringLazyPrec = showbPrec
 #endif
 {-# INLINE showbByteStringLazyPrec #-}
 
@@ -88,9 +77,13 @@ instance Show BS.ByteString where
     showb = showbByteStringStrict
     {-# INLINE showb #-}
 
+#if MIN_VERSION_bytestring(0,10,0)
 instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
     {-# INLINE showbPrec #-}
+#else
+$(deriveShow ''BL.ByteString)
+#endif
 
 #if MIN_VERSION_bytestring(0,10,4)
 instance Show ShortByteString where

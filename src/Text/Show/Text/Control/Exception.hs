@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -32,6 +32,7 @@ module Text.Show.Text.Control.Exception (
   , showbRecSelError
   , showbRecUpdError
   , showbErrorCall
+  , showbMaskingState
   ) where
 
 import           Control.Exception.Base
@@ -43,6 +44,7 @@ import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.TH.Internal (deriveShow)
 import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
@@ -156,9 +158,7 @@ showbErrorCall (ErrorCall err) = fromString err
 
 -- | Convert a 'MaskingState' to a 'Builder'.
 showbMaskingState :: MaskingState -> Builder
-showbMaskingState Unmasked              = "Unmasked"
-showbMaskingState MaskedInterruptible   = "MaskedInterruptible"
-showbMaskingState MaskedUninterruptible = "MaskedUninterruptible"
+showbMaskingState = showb
 {-# INLINE showbMaskingState #-}
 
 instance Show SomeException where
@@ -235,6 +235,4 @@ instance Show ErrorCall where
     showb = showbErrorCall
     {-# INLINE showb #-}
 
-instance Show MaskingState where
-    showb = showbMaskingState
-    {-# INLINE showb #-}
+$(deriveShow ''MaskingState)

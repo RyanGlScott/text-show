@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,23 +15,15 @@ module Text.Show.Text.System.Exit (showbExitCodePrec) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Show (appPrec, appPrec1)
+import System.Exit (ExitCode)
 
-import Prelude hiding (Show)
-
-import System.Exit (ExitCode(..))
-
-import Text.Show.Text.Class (Show(showbPrec), showbParen)
-import Text.Show.Text.Data.Integral (showbIntPrec)
-import Text.Show.Text.Utils ((<>))
+import Text.Show.Text.Class (showbPrec)
+import Text.Show.Text.Data.Integral ()
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert an 'ExitCode' to a 'Builder' with the given precedence.
 showbExitCodePrec :: Int -> ExitCode -> Builder
-showbExitCodePrec _ ExitSuccess     = "ExitSuccess"
-showbExitCodePrec p (ExitFailure c) = showbParen (p > appPrec) $
-    "ExitFailure " <> showbIntPrec appPrec1 c
+showbExitCodePrec = showbPrec
 {-# INLINE showbExitCodePrec #-}
 
-instance Show ExitCode where
-    showbPrec = showbExitCodePrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''ExitCode)

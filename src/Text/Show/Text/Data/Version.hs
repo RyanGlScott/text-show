@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -21,24 +21,16 @@ import Data.Monoid (mconcat)
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 
-import GHC.Show (appPrec)
-
-import Prelude hiding (Show)
-
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import Text.Show.Text.Class (showb, showbPrec)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
+import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
 showbVersionPrec :: Int -> Version -> Builder
-showbVersionPrec p (Version b t) = showbParen (p > appPrec) $
-        "Version {versionBranch = "
-     <> showb b
-     <> ", versionTags = "
-     <> showb t
-     <> s '}'
+showbVersionPrec = showbPrec
 {-# INLINE showbVersionPrec #-}
 
 -- | Provides one possible concrete representation for 'Version'.  For
@@ -50,6 +42,4 @@ showbVersionConcrete (Version branch tags)
         mconcat (map ((s '-' <>) . fromString) tags)
 {-# INLINE showbVersionConcrete #-}
 
-instance Show Version where
-    showbPrec = showbVersionPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Version)

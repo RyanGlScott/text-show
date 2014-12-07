@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -13,26 +13,19 @@
 ----------------------------------------------------------------------------
 module Text.Show.Text.Control.Applicative (showbZipListPrec) where
 
-import Control.Applicative (ZipList(..))
+import Control.Applicative (ZipList)
 
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Show (appPrec)
-
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import Text.Show.Text.Class (Show(showbPrec))
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'ZipList' to a 'Builder' with the given precedence.
 showbZipListPrec :: Show a => Int -> ZipList a -> Builder
-showbZipListPrec p (ZipList zl) = showbParen (p > appPrec) $
-        "ZipList {getZipList = "
-     <> showb zl
-     <> s '}'
+showbZipListPrec = showbPrec
 {-# INLINE showbZipListPrec #-}
 
-instance Show a => Show (ZipList a) where
-    showbPrec = showbZipListPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''ZipList)

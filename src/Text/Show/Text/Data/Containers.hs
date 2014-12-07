@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -34,7 +34,7 @@ import           Data.Map (Map)
 import           Data.Sequence (Seq)
 import qualified Data.Set as Set
 import           Data.Set (Set)
-import           Data.Tree (Tree(..))
+import           Data.Tree (Tree)
 
 import           GHC.Show (appPrec)
 
@@ -44,7 +44,8 @@ import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
 import           Text.Show.Text.Data.Integral ()
 import           Text.Show.Text.Data.List ()
 import           Text.Show.Text.Data.Tuple ()
-import           Text.Show.Text.Utils ((<>), s)
+import           Text.Show.Text.TH.Internal (deriveShow)
+import           Text.Show.Text.Utils ((<>))
 
 -- | Convert an 'IntMap' into a 'Builder' with the given precedence.
 showbIntMapPrec :: Show v => Int -> IntMap v -> Builder
@@ -78,12 +79,7 @@ showbSetPrec p s'
 
 -- | Convert a 'Tree' into a 'Builder' with the given precedence.
 showbTreePrec :: Show a => Int -> Tree a -> Builder
-showbTreePrec p (Node rl sf) = showbParen (p > appPrec) $
-        "Node {rootLabel = "
-     <> showb rl
-     <> ", subForest = "
-     <> showb sf
-     <> s '}'
+showbTreePrec = showbPrec
 {-# INLINE showbTreePrec #-}
 
 instance Show v => Show (IntMap v) where
@@ -106,6 +102,4 @@ instance Show a => Show (Set a) where
     showbPrec = showbSetPrec
     {-# INLINE showbPrec #-}
 
-instance Show a => Show (Tree a) where
-    showbPrec = showbTreePrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Tree)

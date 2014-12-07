@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,14 +19,13 @@ module Text.Show.Text.Control.Concurrent (
 
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
-import           GHC.Conc (BlockReason(..), ThreadId, ThreadStatus(..))
-import           GHC.Show (appPrec)
+import           GHC.Conc (BlockReason, ThreadId, ThreadStatus)
 
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.Utils ((<>))
+import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
 showbThreadIdPrec :: Int -> ThreadId -> Builder
@@ -35,31 +34,17 @@ showbThreadIdPrec p ti = fromString $ P.showsPrec p ti ""
 
 -- | Convert a 'ThreadStatus' to a 'Builder' with the given precedence.
 showbThreadStatusPrec :: Int -> ThreadStatus -> Builder
-showbThreadStatusPrec _ ThreadRunning  = "ThreadRunning"
-showbThreadStatusPrec _ ThreadFinished = "ThreadFinished"
-showbThreadStatusPrec p (ThreadBlocked br)
-    = showbParen (p > appPrec) $ "ThreadBlocked " <> showbBlockReason br
-showbThreadStatusPrec _ ThreadDied     = "ThreadDied"
+showbThreadStatusPrec = showbPrec
 {-# INLINE showbThreadStatusPrec #-}
 
 -- | Convert a 'BlockReason' to a 'Builder'.
 showbBlockReason :: BlockReason -> Builder
-showbBlockReason BlockedOnMVar        = "BlockedOnMVar"
-showbBlockReason BlockedOnBlackHole   = "BlockedOnBlackHole"
-showbBlockReason BlockedOnException   = "BlockedOnException"
-showbBlockReason BlockedOnSTM         = "BlockedOnSTM"
-showbBlockReason BlockedOnForeignCall = "BlockedOnForeignCall"
-showbBlockReason BlockedOnOther       = "BlockedOnOther"
+showbBlockReason = showb
 {-# INLINE showbBlockReason #-}
 
 instance Show ThreadId where
     showbPrec = showbThreadIdPrec
     {-# INLINE showbPrec #-}
 
-instance Show ThreadStatus where
-    showbPrec = showbThreadStatusPrec
-    {-# INLINE showbPrec #-}
-
-instance Show BlockReason where
-    showb = showbBlockReason
-    {-# INLINE showb #-}
+$(deriveShow ''ThreadStatus)
+$(deriveShow ''BlockReason)

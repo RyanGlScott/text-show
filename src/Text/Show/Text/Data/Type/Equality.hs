@@ -25,6 +25,7 @@ showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality Refl = "Refl"
 {-# INLINE showbPropEquality #-}
 
+-- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
 instance Show (a :~: b) where
     showb = showbPropEquality
     {-# INLINE showb #-}

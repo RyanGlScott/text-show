@@ -25,6 +25,7 @@ showbCoercion :: Coercion a b -> Builder
 showbCoercion Coercion = "Coercion"
 {-# INLINE showbCoercion #-}
 
+-- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
 instance Show (Coercion a b) where
     showb = showbCoercion
     {-# INLINE showb #-}

@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -20,7 +20,7 @@ module Text.Show.Text.Data.Char (
     ) where
 
 import Data.Array (Array, (!), listArray)
-import Data.Char (GeneralCategory(..), isDigit, ord)
+import Data.Char (GeneralCategory, isDigit, ord)
 import Data.Monoid (mempty)
 import Data.Text.Lazy.Builder (Builder)
 
@@ -28,6 +28,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(..))
 import Text.Show.Text.Data.Integral (showbIntPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
@@ -78,36 +79,7 @@ showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
 showbGeneralCategory :: GeneralCategory -> Builder
-showbGeneralCategory UppercaseLetter      = "UppercaseLetter"
-showbGeneralCategory LowercaseLetter      = "LowercaseLetter"
-showbGeneralCategory TitlecaseLetter      = "TitlecaseLetter"
-showbGeneralCategory ModifierLetter       = "ModifierLetter"
-showbGeneralCategory OtherLetter          = "OtherLetter"
-showbGeneralCategory NonSpacingMark       = "NonSpacingMark"
-showbGeneralCategory SpacingCombiningMark = "SpacingCombiningMark"
-showbGeneralCategory EnclosingMark        = "EnclosingMark"
-showbGeneralCategory DecimalNumber        = "DecimalNumber"
-showbGeneralCategory LetterNumber         = "LetterNumber"
-showbGeneralCategory OtherNumber          = "OtherNumber"
-showbGeneralCategory ConnectorPunctuation = "ConnectorPunctuation"
-showbGeneralCategory DashPunctuation      = "DashPunctuation"
-showbGeneralCategory OpenPunctuation      = "OpenPunctuation"
-showbGeneralCategory ClosePunctuation     = "ClosePunctuation"
-showbGeneralCategory InitialQuote         = "InitialQuote"
-showbGeneralCategory FinalQuote           = "FinalQuote"
-showbGeneralCategory OtherPunctuation     = "OtherPunctuation"
-showbGeneralCategory MathSymbol           = "MathSymbol"
-showbGeneralCategory CurrencySymbol       = "CurrencySymbol" 
-showbGeneralCategory ModifierSymbol       = "ModifierSymbol"
-showbGeneralCategory OtherSymbol          = "OtherSymbol"
-showbGeneralCategory Space                = "Space"
-showbGeneralCategory LineSeparator        = "LineSeparator"
-showbGeneralCategory ParagraphSeparator   = "ParagraphSeparator"
-showbGeneralCategory Control              = "Control"
-showbGeneralCategory Format               = "Format"
-showbGeneralCategory Surrogate            = "Surrogate"
-showbGeneralCategory PrivateUse           = "PrivateUse"
-showbGeneralCategory NotAssigned          = "NotAssigned"
+showbGeneralCategory = showb
 {-# INLINE showbGeneralCategory #-}
 
 instance Show Char where
@@ -117,6 +89,4 @@ instance Show Char where
     showbList = showbString
     {-# INLINE showbList #-}
 
-instance Show GeneralCategory where
-    showb = showbGeneralCategory
-    {-# INLINE showb #-}
+$(deriveShow ''GeneralCategory)

@@ -77,7 +77,9 @@ by a @deriving Show@ clause.
 
 Note that at the moment, 'deriveShow' does not support data families,
 so it is impossible to use 'deriveShow' with @data instance@s or @newtype
-instance@s.
+instance@s. Also, 'deriveShow' lacks the ability to properly detect data types
+with higher-kinded type parameters (e.g., @data HK f a = HK (f a)@), so it cannot
+create instances for them either.
 
 -}
 

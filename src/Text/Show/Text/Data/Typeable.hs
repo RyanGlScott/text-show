@@ -17,15 +17,11 @@ module Text.Show.Text.Data.Typeable (
 #if MIN_VERSION_base(4,4,0)
     , showbFingerprint
 #endif
-#if MIN_VERSION_base(4,7,0)
     , showbProxy
-#endif
     ) where
 
 import Data.Monoid (mempty)
-#if MIN_VERSION_base(4,7,0)
 import Data.Proxy (Proxy(..))
-#endif
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
@@ -101,12 +97,10 @@ showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConString
 {-# INLINE showbTyCon #-}
 
-#if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Proxy' type to a 'Builder'.
 showbProxy :: Proxy s -> Builder
 showbProxy _ = "Proxy"
 {-# INLINE showbProxy #-}
-#endif
 
 #if MIN_VERSION_base(4,4,0)
 -- | Convert a 'Fingerprint' to a 'Builder'.
@@ -141,8 +135,7 @@ instance Show Fingerprint where
     {-# INLINE showb #-}
 #endif
 
-#if MIN_VERSION_base(4,7,0)
+-- TODO: See why 'deriveShow' can't detect Proxy's phantom type correctly
 instance Show (Proxy s) where
     showb = showbProxy
     {-# INLINE showb #-}
-#endif

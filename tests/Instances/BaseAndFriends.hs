@@ -39,9 +39,7 @@ import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
 #endif
-#if MIN_VERSION_base(4,7,0)
 import           Data.Proxy (Proxy(..))
-#endif
 import           Data.Text.Lazy.Builder (Builder, fromString)
 #if MIN_VERSION_base(4,7,0)
 import           Data.Coerce (Coercible)
@@ -228,10 +226,8 @@ instance Arbitrary MaskingState where
 -- instance Arbitrary Number
 -- #endif
 
-#if MIN_VERSION_base(4,7,0)
 instance Arbitrary (Proxy s) where
     arbitrary = pure Proxy
-#endif
 
 #if MIN_VERSION_base(4,4,0)
 -- TODO: Come up with an instance of TypeRep that doesn't take forever

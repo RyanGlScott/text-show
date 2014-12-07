@@ -1,4 +1,5 @@
-{-# LANGUAGE FlexibleContexts, NoImplicitPrelude, OverloadedStrings, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, NoImplicitPrelude, OverloadedStrings,
+             TemplateHaskell, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -27,15 +28,16 @@ module Text.Show.Text.GHC.Generics (
 
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
+import GHC.Generics (U1(..), Par1, Rec1(..), K1(..),
                      M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                     Fixity(..), Associativity(..), Arity(..))
+                     Fixity, Associativity, Arity)
 import GHC.Show (appPrec, appPrec1)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
-import Text.Show.Text.Data.Integral (showbIntPrec)
+import Text.Show.Text.Data.Integral ()
+import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'U1' value to a 'Builder'.
@@ -45,8 +47,7 @@ showbU1 U1 = "U1"
 
 -- | Convert a 'Par1' value to a 'Builder' with the given precedence.
 showbPar1Prec :: Show p => Int -> Par1 p -> Builder
-showbPar1Prec p (Par1 up) = showbParen (p > appPrec) $
-    "Par1 {unPar1 = " <> showb up <> s '}'
+showbPar1Prec = showbPrec
 {-# INLINE showbPar1Prec #-}
 
 -- | Convert a 'Rec1' value to a 'Builder' with the given precedence.
@@ -92,33 +93,26 @@ showbCompFunctorsPrec p (Comp1 uc) = showbParen (p > appPrec) $
 
 -- | Convert a 'Fixity' value to a 'Builder' with the given precedence.
 showbFixityPrec :: Int -> Fixity -> Builder
-showbFixityPrec _ Prefix      = "Prefix"
-showbFixityPrec p (Infix a i) = showbParen (p > appPrec) $
-    "Infix " <> showbAssociativity a <> s ' ' <> showbIntPrec appPrec1 i
+showbFixityPrec = showbPrec
 {-# INLINE showbFixityPrec #-}
 
 -- | Convert an 'Associativity' value to a 'Builder'.
 showbAssociativity :: Associativity -> Builder
-showbAssociativity LeftAssociative  = "LeftAssociative"
-showbAssociativity RightAssociative = "RightAssociative"
-showbAssociativity NotAssociative   = "NotAssociative"
+showbAssociativity = showb
 {-# INLINE showbAssociativity #-}
 
 -- | Convert an 'Arity' value to a 'Builder' with the given precedence.
 showbArityPrec :: Int -> Arity -> Builder
-showbArityPrec _ NoArity   = "NoArity"
-showbArityPrec p (Arity i) = showbParen (p > appPrec) $
-    "Arity " <> showbIntPrec appPrec1 i
+showbArityPrec = showbPrec
 {-# INLINE showbArityPrec #-}
 
 instance Show (U1 p) where
     showb = showbU1
     {-# INLINE showb #-}
 
-instance Show p => Show (Par1 p) where
-    showbPrec = showbPar1Prec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Par1)
 
+-- TODO: 'deriveShow' is not smart enough to derive higher-kinded type contexts
 instance Show (f p) => Show (Rec1 f p) where
     showbPrec = showbRec1Prec
     {-# INLINE showbPrec #-}
@@ -143,14 +137,6 @@ instance Show (f (g p)) => Show ((f :.: g) p) where
     showbPrec = showbCompFunctorsPrec
     {-# INLINE showbPrec #-}
 
-instance Show Fixity where
-    showbPrec = showbFixityPrec
-    {-# INLINE showbPrec #-}
-
-instance Show Associativity where
-    showb = showbAssociativity
-    {-# INLINE showb #-}
-
-instance Show Arity where
-    showbPrec = showbArityPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Fixity)
+$(deriveShow ''Associativity)
+$(deriveShow ''Arity)

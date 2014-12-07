@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,19 +15,14 @@ module Text.Show.Text.Data.Either (showbEitherPrec) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Show (appPrec, appPrec1)
-
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec), showbParen)
-import Text.Show.Text.Utils ((<>))
+import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Either' value to a 'Builder' with the given precedence.
 showbEitherPrec :: (Show a, Show b) => Int -> Either a b -> Builder
-showbEitherPrec p (Left a)  = showbParen (p > appPrec) $ "Left "  <> showbPrec appPrec1 a
-showbEitherPrec p (Right b) = showbParen (p > appPrec) $ "Right " <> showbPrec appPrec1 b
+showbEitherPrec = showbPrec
 {-# INLINE showbEitherPrec #-}
 
-instance (Show a, Show b) => Show (Either a b) where
-    showbPrec = showbEitherPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Either)

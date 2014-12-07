@@ -168,6 +168,7 @@ baseAndFriendsTests =
         , testProperty "RecSelError instance"               (prop_matchesShow :: Int -> RecSelError -> Bool)
         , testProperty "RecUpdError instance"               (prop_matchesShow :: Int -> RecUpdError -> Bool)
         , testProperty "ErrorCall instance"                 (prop_matchesShow :: Int -> ErrorCall -> Bool)
+        , testProperty "MaskingState instance"              (prop_matchesShow :: Int -> MaskingState -> Bool)
         ]
     , testGroup "Text.Show.Text.Control.Monad.ST"
         [ testProperty "ST instance"                        (prop_matchesShow :: Int -> ST Int Int -> Bool)
@@ -310,9 +311,7 @@ baseAndFriendsTests =
         [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
           testProperty "TyCon instance"                     (prop_matchesShow :: Int -> TyCon -> Bool)
         , testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
-#if MIN_VERSION_base(4,7,0)
         , testProperty "Proxy Int instance"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)
-#endif
         ]
 #endif
     , testGroup "Text.Show.Text.Data.Version"

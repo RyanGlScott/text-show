@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,19 +15,14 @@ module Text.Show.Text.Data.Maybe (showbMaybePrec) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Show (appPrec, appPrec1)
-
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec), showbParen)
-import Text.Show.Text.Utils ((<>))
+import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Maybe' value to a 'Builder' with the given precedence.
 showbMaybePrec :: Show a => Int -> Maybe a -> Builder
-showbMaybePrec _ Nothing  = "Nothing"
-showbMaybePrec p (Just a) = showbParen (p > appPrec) $ "Just " <> showbPrec appPrec1 a
+showbMaybePrec = showbPrec
 {-# INLINE showbMaybePrec #-}
 
-instance Show a => Show (Maybe a) where
-    showbPrec = showbMaybePrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Maybe)

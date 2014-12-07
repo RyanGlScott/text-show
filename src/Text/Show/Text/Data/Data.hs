@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,37 +19,24 @@ module Text.Show.Text.Data.Data (
     , showbFixity
     ) where
 
-import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType, Fixity(..),
-                  dataTypeName, dataTypeRep, showConstr)
+import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity, showConstr)
 import Data.Text.Lazy.Builder (Builder, fromString)
-
-import GHC.Show (appPrec, appPrec1)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
-import Text.Show.Text.Data.Char (showbChar)
-import Text.Show.Text.Data.Integral (showbIntPrec, showbIntegerPrec, showbRatioPrec)
+import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.
 showbDataTypePrec :: Int -> DataType -> Builder
-showbDataTypePrec p dt = showbParen (p > appPrec) $
-       "DataType {tycon = "
-    <> showb (dataTypeName dt)
-    <> ", datarep = "
-    <> showb (dataTypeRep  dt)
-    <> s '}'
+showbDataTypePrec = showbPrec
 {-# INLINE showbDataTypePrec #-}
 
 -- | Convert a 'DataRep' to a 'Builder' with the given precedence.
 showbDataRepPrec :: Int -> DataRep -> Builder
-showbDataRepPrec p (AlgRep cs) = showbParen (p > appPrec) $ "AlgRep " <> showb cs
-showbDataRepPrec _ IntRep      = "IntRep"
-showbDataRepPrec _ FloatRep    = "FloatRep"
-showbDataRepPrec _ CharRep     = "CharRep"
-showbDataRepPrec _ NoRep       = "NoRep"
+showbDataRepPrec = showbPrec
 {-# INLINE showbDataRepPrec #-}
 
 -- | Convert a 'Constr' to a 'Builder'.
@@ -59,38 +46,19 @@ showbConstr = fromString . showConstr
 
 -- | Convert a 'Fixity' value to a 'Builder'.
 showbFixity :: Fixity -> Builder
-showbFixity Prefix = "Prefix"
-showbFixity Infix  = "Infix"
+showbFixity = showb
 {-# INLINE showbFixity #-}
 
 -- | Convert a 'ConstrRep' to a 'Builder' with the given precedence.
 showbConstrRepPrec :: Int -> ConstrRep -> Builder
-showbConstrRepPrec p (AlgConstr ci)
-    = showbParen (p > appPrec) $ "AlgConstr "   <> showbIntPrec appPrec1 ci
-showbConstrRepPrec p (IntConstr i)
-    = showbParen (p > appPrec) $ "IntConstr "   <> showbIntegerPrec appPrec1 i
-showbConstrRepPrec p (FloatConstr r)
-    = showbParen (p > appPrec) $ "FloatConstr " <> showbRatioPrec appPrec1 r
-showbConstrRepPrec p (CharConstr c)
-    = showbParen (p > appPrec) $ "CharConstr "  <> showbChar c
+showbConstrRepPrec = showbPrec
 {-# INLINE showbConstrRepPrec #-}
 
-instance Show DataType where
-    showbPrec = showbDataTypePrec
-    {-# INLINE showbPrec #-}
-
-instance Show DataRep where
-    showbPrec = showbDataRepPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''DataType)
+$(deriveShow ''DataRep)
+$(deriveShow ''ConstrRep)
+$(deriveShow ''Fixity)
 
 instance Show Constr where
     showb = showbConstr
-    {-# INLINE showb #-}
-
-instance Show ConstrRep where
-    showbPrec = showbConstrRepPrec
-    {-# INLINE showbPrec #-}
-
-instance Show Fixity where
-    showb = showbFixity
     {-# INLINE showb #-}

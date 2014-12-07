@@ -1,4 +1,7 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
+#if MIN_VERSION_base(4,6,0)
+{-# LANGUAGE NoImplicitPrelude #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,34 +22,30 @@ module Text.Show.Text.Data.Ord (
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
-import Prelude hiding (Show)
-import Text.Show.Text.Class (Show(showb))
+
+import Text.Show.Text.Class (showb)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 #if MIN_VERSION_base(4,6,0)
-import Data.Ord (Down(..))
-import GHC.Show (appPrec, appPrec1)
-import Text.Show.Text.Class (showbPrec, showbParen)
-import Text.Show.Text.Utils ((<>))
+import Data.Ord (Down)
+
+import Prelude hiding (Show)
+
+import Text.Show.Text.Class (Show(showbPrec))
 #endif
 
 -- | Convert a 'Ordering' to a 'Builder'.
 showbOrdering :: Ordering -> Builder
-showbOrdering LT = "LT"
-showbOrdering EQ = "EQ"
-showbOrdering GT = "GT"
+showbOrdering = showb
 {-# INLINE showbOrdering #-}
 
-instance Show Ordering where
-    showb = showbOrdering
-    {-# INLINE showb #-}
+$(deriveShow ''Ordering)
 
 #if MIN_VERSION_base(4,6,0)
 -- | Convert a 'Down' value to a 'Builder' with the given precedence.
 showbDownPrec :: Show a => Int -> Down a -> Builder
-showbDownPrec p (Down d) = showbParen (p > appPrec) $ "Down " <> showbPrec appPrec1 d
+showbDownPrec = showbPrec
 {-# INLINE showbDownPrec #-}
 
-instance Show a => Show (Down a) where
-    showbPrec = showbDownPrec
-    {-# INLINE showbPrec #-}
+$(deriveShow ''Down)
 #endif
