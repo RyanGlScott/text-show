@@ -47,21 +47,21 @@ import           Text.Show.Text.Class (showbParen)
 import           Text.Show.Text.Utils ((<>), s)
 #endif
 
--- | Convert a strict 'ByteString' to a 'Builder'.
+-- | Convert a strict 'BS.ByteString' to a 'Builder'.
 showbByteStringStrict :: BS.ByteString -> Builder
 showbByteStringStrict = fromString . P.show
 {-# INLINE showbByteStringStrict #-}
 
--- | Convert a lazy 'ByteString' to a 'Builder'.
+-- | Convert a lazy 'BL.ByteString' to a 'Builder'.
 showbByteStringLazy :: BL.ByteString -> Builder
 showbByteStringLazy = showbByteStringLazyPrec 0
 {-# INLINE showbByteStringLazy #-}
 
--- | Convert a lazy 'ByteString' to a 'Builder' with the given precedence.
+-- | Convert a lazy 'BL.ByteString' to a 'Builder' with the given precedence.
 -- 
 -- With @bytestring-0.10.0.0@ or later, this function ignores the precedence
--- argument, since lazy 'ByteString's are printed out identically to 'String's.
--- On earlier versions of @bytestring@, however, lazy 'ByteString's can be printed
+-- argument, since lazy 'BL.ByteString's are printed out identically to 'String's.
+-- On earlier versions of @bytestring@, however, lazy 'BL.ByteString's can be printed
 -- with parentheses (e.g., @Chunk "example" Empty@ vs. @(Chunk "example" Empty)@)
 -- depending on the precedence.
 showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder

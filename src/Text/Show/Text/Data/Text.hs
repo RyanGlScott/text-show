@@ -26,11 +26,11 @@ import Text.Show.Text.Class (Show(showb))
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.List ()
 
--- | Convert a strict 'Text' into a 'Builder'.
+-- | Convert a strict 'TS.Text' into a 'Builder'.
 showbTextStrict :: TS.Text -> Builder
 showbTextStrict = showb . TS.unpack
 
--- | Convert a lazy 'Text' into a 'Builder'.
+-- | Convert a lazy 'TL.Text' into a 'Builder'.
 showbTextLazy :: TL.Text -> Builder
 showbTextLazy = showb . TL.unpack
 

@@ -101,6 +101,7 @@ library
                        Text.Show.Text.Instances
                        Text.Show.Text.System
                        Text.Show.Text.Text
+                       Text.Show.Text.TH.Internal
                        Text.Show.Text.Utils
   build-depends:       array            >= 0.3 && < 0.6
                      , base             >= 4.2 && < 5
