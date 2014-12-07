@@ -41,9 +41,7 @@ import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
 #endif
-#if MIN_VERSION_base(4,7,0)
 import           Data.Proxy (Proxy)
-#endif
 import           Data.Ratio (Ratio)
 import           Data.Sequence (Seq)
 import           Data.Set (Set)
@@ -311,9 +309,9 @@ baseAndFriendsTests =
         [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
           testProperty "TyCon instance"                     (prop_matchesShow :: Int -> TyCon -> Bool)
         , testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
+#endif
         , testProperty "Proxy Int instance"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)
         ]
-#endif
     , testGroup "Text.Show.Text.Data.Version"
         [ testProperty "Version instance"                   (prop_matchesShow :: Int -> Version -> Bool)
         , testProperty "showbVersionConcrete output"        prop_showVersion

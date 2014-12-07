@@ -116,6 +116,7 @@ library
                      , bytestring       >= 0.9   && < 0.11
                      , containers       >= 0.1   && < 0.6
                      , ghc-prim
+                     , tagged           >= 0.4.4 && < 1
                      , template-haskell >= 2.4   && < 2.10
                      , text             >= 0.2   && < 1.3
                      , time             >= 0.1   && < 1.6
@@ -135,10 +136,6 @@ library
   
   if impl(ghc >= 7.4)
     exposed-modules:   Text.Show.Text.GHC.Stats
-  
-  -- Data.Proxy is a part of base as of GHC 7.7
-  if !impl(ghc >= 7.7)
-    build-depends:     tagged           >= 0.4.4 && < 1
   
   if impl(ghc >= 7.8)
     exposed-modules:   Text.Show.Text.Data.Type.Coercion
@@ -160,6 +157,7 @@ test-suite text-show-properties
                      , containers                 >= 0.1   && < 0.6
                      , QuickCheck                 >= 2.4   && < 2.8
                      , quickcheck-instances       >= 0.1   && < 0.4
+                     , tagged                     >= 0.4.4 && < 1
                      , tasty                      >= 0.8   && < 0.11
                      , tasty-quickcheck           >= 0.8   && < 0.9
                      , text                       >= 0.2   && < 1.3
@@ -170,7 +168,3 @@ test-suite text-show-properties
   -- Prior to GHC 7.6, GHC generics lived in ghc-prim
   if impl(ghc >= 7.2) && impl(ghc < 7.6)
     build-depends:     ghc-prim
-
-  -- Data.Proxy is a part of base as of GHC 7.7
-  if !impl(ghc >= 7.7)
-    build-depends:     tagged                     >= 0.4.4 && < 1
