@@ -1,9 +1,9 @@
 language: haskell
 
-ghc:
-  - 7.4.2
-  - 7.6.3
-  - 7.8.3
+env:
+  - GHCVER=7.4.2
+  - GHCVER=7.6.3
+  - GHCVER=7.8.3
 
 install:
   - cabal update
@@ -12,9 +12,9 @@ install:
   # the time being, I will only run tests on GHC 7.8.3 so that my builds will succeed.
   - |
     if [ $GHCVER = "7.8.3" ]; then
-      cabal install -j --only-dependencies --enable-tests
+      $CABAL install -j --only-dependencies --enable-tests
     else
-      cabal install -j --only-dependencies
+      $CABAL install -j --only-dependencies
     fi
 
 script:
@@ -23,10 +23,10 @@ script:
   # the time being, I will only run tests on GHC 7.8.3 so that my builds will succeed.
   - |
     if [ $GHCVER = "7.8.3" ]; then
-      cabal configure --enable-tests
-      cabal build
-      cabal test
+      $CABAL configure --enable-tests
+      $CABAL build
+      $CABAL test
     else
-      cabal configure
-      cabal build
+      $CABAL configure
+      $CABAL build
     fi
