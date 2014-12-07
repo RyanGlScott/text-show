@@ -12,6 +12,7 @@
 module Main (main) where
 
 import Properties.BaseAndFriends (baseAndFriendsTests)
+import Properties.Builder        (builderTests)
 import Properties.Derived        (derivedTests)
 import Properties.MkShow         (mkShowTests)
 
@@ -22,6 +23,7 @@ main = defaultMain testTree
 
 allTests :: [TestTree]
 allTests = concat [ baseAndFriendsTests
+                  , builderTests
                   , derivedTests
                   , mkShowTests
                   ]

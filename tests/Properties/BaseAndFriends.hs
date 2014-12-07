@@ -11,7 +11,7 @@
 -- Stability   :  Experimental
 -- Portability :  GHC
 -- 
--- @QuickCheck@ properties for for data types located in @base@ and other
+-- @QuickCheck@ properties for data types located in @base@ and other
 -- common libraries.
 ----------------------------------------------------------------------------
 module Properties.BaseAndFriends (baseAndFriendsTests) where
