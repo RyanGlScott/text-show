@@ -22,12 +22,12 @@ module Text.Show.Text.Data.Char (
 import Data.Array (Array, (!), listArray)
 import Data.Char (GeneralCategory(..), isDigit, ord)
 import Data.Monoid (mempty)
-import Data.Text.Buildable (build)
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(..))
+import Text.Show.Text.Data.Integral (showbIntPrec)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
@@ -46,7 +46,7 @@ showbChar c    = s '\'' <> showbLitChar c <> s '\''
 
 -- | Convert a 'Char' to a 'Builder' (without single quotes).
 showbLitChar :: Char -> Builder
-showbLitChar c | c > '\DEL' = s '\\' <> build (ord c)
+showbLitChar c | c > '\DEL' = s '\\' <> showbIntPrec 0 (ord c)
 showbLitChar '\DEL'         = "\\DEL"
 showbLitChar '\\'           = "\\\\"
 showbLitChar c | c >= ' '   = s c
@@ -72,7 +72,7 @@ showbLitString []             = mempty
 showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
 showbLitString ('"':cs)       = "\\\"" <> showbLitString cs
 showbLitString (c:d:cs)
-    | c > '\DEL' && isDigit d = s '\\' <> build (ord c) <> "\\&" <> s d <> showbLitString cs
+    | c > '\DEL' && isDigit d = s '\\' <> showbIntPrec 0 (ord c) <> "\\&" <> s d <> showbLitString cs
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 {-# INLINE showbLitString #-}
 

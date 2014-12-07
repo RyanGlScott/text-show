@@ -52,7 +52,7 @@ import qualified Data.Text as TL
 import           Data.Time.Calendar (Day)
 import           Data.Time.Clock (DiffTime, UTCTime, NominalDiffTime)
 import           Data.Time.Clock.TAI (AbsoluteTime)
-import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime)
+import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime, ZonedTime)
 import           Data.Tree (Tree)
 #if MIN_VERSION_base(4,7,0)
 import           Data.Type.Coercion (Coercion)
@@ -288,6 +288,7 @@ baseAndFriendsTests =
         , testProperty "TimeZone instance"                  (prop_matchesShow :: Int -> TimeZone -> Bool)
         , testProperty "TimeOfDay instance"                 (prop_matchesShow :: Int -> TimeOfDay -> Bool)
         , testProperty "LocalTime instance"                 (prop_matchesShow :: Int -> LocalTime -> Bool)
+        , testProperty "ZonedTime instance"                 (prop_matchesShow :: Int -> ZonedTime -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Tuple"
         [ testProperty "() instance"                        (prop_matchesShow :: Int -> () -> Bool)

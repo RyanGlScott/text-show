@@ -12,19 +12,9 @@ matrix:
 
 install:
   - cabal update
-  # There's a bug in double-conversion (https://github.com/bos/double-conversion/issues/8)
-  # that seems to occasionally break Travis-CI's builds. For the time being,
-  # I'll disable the test-suite.
-
-  #- cabal install -j --only-dependencies --enable-tests
-  - cabal install -j --only-dependencies
+  - cabal install -j --only-dependencies --enable-tests
 
 script:
-  # There's a bug in double-conversion (https://github.com/bos/double-conversion/issues/8)
-  # that seems to occasionally break Travis-CI's builds. For the time being,
-  # I'll disable the test-suite.
-  
-  #- cabal configure --enable-tests
-  - cabal configure
+  - cabal configure --enable-tests
   - cabal build
-  #- cabal test
+  - cabal test

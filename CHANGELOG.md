@@ -1,3 +1,7 @@
+# 0.4
+* Due to [GHC bug #5289](http://ghc.haskell.org/trac/ghc/ticket/5289), projects that depend on the `double-conversion` library (such as `text-format`, a dependency of `text-show`) may break due to GHC incorrectly linking against libstdc++. Therefore, `text-show` was changed so that it does not depend on `text-format` by default. This behavior can be changed by using the `-ftext-format` flag when using `cabal`.
+* Add `showbZonedTime` to `Text.Show.Text.Data.Time` (and corresponding `Show` instance for `ZonedTime`)
+
 # 0.3.1.0
 * Add `showList` and `showListLazy`
 * Don't use showbListDefault to show `containers` data types
