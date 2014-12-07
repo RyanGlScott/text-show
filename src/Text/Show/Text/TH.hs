@@ -159,7 +159,7 @@ mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
 -- Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder'.
 mkShowb :: Name -> Q Exp
-mkShowb name = mkShowbPrec name `appE` [| 0 |]
+mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 
 -- |
 -- Generates a lambda expression which converts the given @data@ type or @newtype@
