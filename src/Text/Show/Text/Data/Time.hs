@@ -49,6 +49,7 @@ import           Data.Time.LocalTime (utcToZonedTime)
 import qualified Prelude as P
 
 import           Text.Show.Text.Data.Fixed (showbFixed)
+import           Text.Show.Text.Data.Integral ()
 import           Text.Show.Text.Utils (lengthB, replicateB, s)
 #endif
 
