@@ -136,6 +136,7 @@ library
   if impl(ghc >= 7.4)
     exposed-modules:   Text.Show.Text.GHC.Stats
   
+  -- Data.Proxy is a part of base as of GHC 7.7
   if impl(ghc < 7.7)
     build-depends:     tagged           >= 0.4.4 && < 1
   
@@ -169,3 +170,7 @@ test-suite text-show-properties
   -- Prior to GHC 7.6, GHC generics lived in ghc-prim
   if impl(ghc >= 7.2) && impl(ghc < 7.6)
     build-depends:     ghc-prim
+
+  -- Data.Proxy is a part of base as of GHC 7.7
+  if impl(ghc < 7.7)
+    build-depends:     tagged           >= 0.4.4 && < 1
