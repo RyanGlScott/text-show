@@ -12,9 +12,9 @@ install:
   # the time being, I will only run tests on GHC 7.8.3 so that my builds will succeed.
   - |
     if [ $GHCVER = "7.8.3" ]; then
-      $CABAL install -j --only-dependencies --enable-tests
+      cabal install -j --only-dependencies --enable-tests
     else
-      $CABAL install -j --only-dependencies
+      cabal install -j --only-dependencies
     fi
 
 script:
@@ -23,10 +23,10 @@ script:
   # the time being, I will only run tests on GHC 7.8.3 so that my builds will succeed.
   - |
     if [ $GHCVER = "7.8.3" ]; then
-      $CABAL configure --enable-tests
-      $CABAL build
-      $CABAL test
+      cabal configure --enable-tests
+      cabal build
+      cabal test
     else
-      $CABAL configure
-      $CABAL build
+      cabal configure
+      cabal build
     fi
