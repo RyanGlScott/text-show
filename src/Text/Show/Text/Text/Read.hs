@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, TemplateHaskell #-}
+{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,33 +19,53 @@ module Text.Show.Text.Text.Read (
 #endif
     ) where
 
-import Data.Text.Lazy.Builder (Builder)
+import           Data.Text.Lazy.Builder (Builder, fromString)
 
-import Text.Read.Lex (Lexeme)
+import           GHC.Show (appPrec, appPrec1)
+
+import qualified Prelude as P
+import           Prelude hiding (Show)
+
+import           Text.Read.Lex (Lexeme(..))
 #if MIN_VERSION_base(4,7,0)
-import Text.Read.Lex (Number)
+import           Text.Read.Lex (Number)
 #endif
-
-import Text.Show.Text.Class (showbPrec)
-import Text.Show.Text.Data.Char ()
-import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Data.List ()
-import Text.Show.Text.Data.Maybe ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import           Text.Show.Text.Class (Show(showbPrec), showbParen)
+import           Text.Show.Text.Data.Char (showbLitChar)
+#if !(MIN_VERSION_base(4,6,0))
+import           Text.Show.Text.Data.Integral (showbIntegerPrec, showbRatioPrec)
+#endif
+import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Lexeme' to a 'Builder' with the given precedence.
 showbLexemePrec :: Int -> Lexeme -> Builder
-showbLexemePrec = showbPrec
+showbLexemePrec p (Char c)   = showbParen (p > appPrec) $ "Char "   <> showbLitChar c
+showbLexemePrec p (String s) = showbParen (p > appPrec) $ "String " <> fromString s
+showbLexemePrec p (Punc pun) = showbParen (p > appPrec) $ "Punc "   <> fromString pun
+showbLexemePrec p (Ident i)  = showbParen (p > appPrec) $ "Ident "  <> fromString i
+showbLexemePrec p (Symbol s) = showbParen (p > appPrec) $ "Symbol " <> fromString s
+#if MIN_VERSION_base(4,6,0)
+showbLexemePrec p (Number n) = showbParen (p > appPrec) $ "Number " <> fromString (P.showsPrec appPrec1 n "")
+#else
+showbLexemePrec p (Int i)    = showbParen (p > appPrec) $ "Int "    <> showbIntegerPrec appPrec1 i
+showbLexemePrec p (Rat r)    = showbParen (p > appPrec) $ "Rat "    <> showbRatioPrec appPrec1 r
+#endif
+showbLexemePrec _ EOF        = "EOF"
 {-# INLINE showbLexemePrec #-}
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Number' to a 'Builder' with the given precedence.
 showbNumberPrec :: Int -> Number -> Builder
-showbNumberPrec = showbPrec
+showbNumberPrec p n = fromString $ P.showsPrec p n ""
 {-# INLINE showbNumberPrec #-}
 #endif
 
-$(deriveShow ''Lexeme)
+instance Show Lexeme where
+    showbPrec = showbLexemePrec
+    {-# INLINE showbPrec #-}
+
 #if MIN_VERSION_base(4,7,0)
-$(deriveShow ''Number)
+instance Show Number where
+    showbPrec = showbNumberPrec
+    {-# INLINE showbPrec #-}
 #endif
