@@ -39,7 +39,7 @@ import           Data.List (foldl')
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import           Data.Text.Lazy.Builder (fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
@@ -50,7 +50,8 @@ import           Language.Haskell.TH
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import           Text.Show.Text.Class (Show(showb, showbPrec),
+                                       showbParen, showbSpace)
 import           Text.Show.Text.Utils ((<>), s)
 
 {- $deriveShow
@@ -97,18 +98,20 @@ deriveShow :: Name -> Q [Dec]
 deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
-    fromCons tvbs cons = instanceD cxt'
-                                   (appT classType type')
+    fromCons tvbs cons = instanceD (applyCon ''Show typeNames name)
+                                   (appT classType instanceType)
                                    [ funD 'showbPrec [ clause [] (normalB $ consToShow cons) []
                                                      ]
                                    ]
       where
+          typeNames :: [Name]
+          typeNames = map tvbName tvbs
+          
+          instanceType :: Q Type
+          instanceType = foldl' appT (conT name) $ map varT typeNames
+          
           classType :: Q Type
           classType = conT ''Show
-          
-          cxt'  :: Q Cxt
-          type' :: Q Type
-          (cxt', type') = instanceCtxType name tvbs
 
 {- $mk
 
@@ -177,17 +180,7 @@ mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 -- Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder' with the given precedence.
 mkShowbPrec :: Name -> Q Exp
-mkShowbPrec name = withType name $ \tvbs cons -> fromCons tvbs cons
-  where
-    fromCons :: [TyVarBndr] -> [Con] -> Q Exp
-    fromCons tvbs cons = sigE (consToShow cons)
-                            $ forallT tvbs
-                                      cxt'
-                                      [t| Int -> $(type') -> Builder |]
-      where
-        cxt'  :: Q Cxt
-        type' :: Q Type
-        (cxt', type') = instanceCtxType name tvbs
+mkShowbPrec name = withType name $ const consToShow
 
 -- |
 -- Generates a lambda expression which writes the given @data@ type or @newtype@
@@ -220,22 +213,22 @@ consToShow []   = error $ "Text.Show.Text.TH.consToShow: Not a single constructo
 consToShow cons = do
     p     <- newName "p"
     value <- newName "value"
-    lam1E (if all isNullary cons then wildP else varP p)
+    lam1E (varP p)
         . lam1E (varP value)
         $ caseE (varE value) [encodeArgs p con | con <- cons]
 
 -- | Generates code to generate the 'Show' encoding of a single constructor.
 encodeArgs :: Name -> Con -> Q Match
-encodeArgs _ (NormalC conName [])
+encodeArgs p (NormalC conName [])
     = match (conP conName [])
-            (normalB [| fromString $(stringE (nameBase conName)) |])
+            (normalB [| intConst (fromString $(stringE (nameBase conName))) $(varE p) |])
             []
 encodeArgs p (NormalC conName ts) = do
     args <- mapM newName ["arg" ++ P.show n | (_, n) <- zip ts [1 :: Int ..]]
     
     let showArgs    = map (appE [| showbPrec appPrec1 |] . varE) args
-        mappendArgs = foldr1 (\v q -> [| $(v) <> s ' ' <> $(q) |]) showArgs
-        namedArgs   = [| fromString $(stringE (nameBase conName)) <> s ' ' <> $(mappendArgs) |]
+        mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
+        namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
     
     match (conP conName $ map varP args)
           (normalB $ appE [| showbParen ($(varE p) > appPrec) |] namedArgs)
@@ -247,7 +240,12 @@ encodeArgs p (RecC conName ts) = do
     let showArgs    = map (\(arg, (argName, _, _)) -> [| fromString $(stringE (nameBase argName)) <> fromString " = " <> showb $(varE arg) |])
                           $ zip args ts
         mappendArgs = foldr1 (\v q -> [| $(v) <> fromString ", " <> $(q) |]) showArgs
-        namedArgs   = [| fromString $(stringE (nameBase conName)) <> s ' ' <> showbBraces $(mappendArgs) |]
+        namedArgs   = [| fromString $(stringE (nameBase conName))
+                            <> showbSpace
+                            <> s '{'
+                            <> $(mappendArgs)
+                            <> s '}'
+                       |]
     
     match (conP conName $ map varP args)
           (normalB $ appE [| showbParen ($(varE p) > appPrec) |] namedArgs)
@@ -264,9 +262,9 @@ encodeArgs p (InfixC _ conName _) = do
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
                           [| showbPrec (conPrec + 1) $(varE al)
-                          <> s ' '
+                          <> showbSpace
                           <> fromString $(stringE (nameBase conName))
-                          <> s ' '
+                          <> showbSpace
                           <> showbPrec (conPrec + 1) $(varE ar)
                           |]
           )
@@ -277,27 +275,21 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -- Utility functions
 -------------------------------------------------------------------------------
 
-instanceCtxType :: Name -> [TyVarBndr] -> (Q Cxt, Q Type)
-instanceCtxType name tvbs
-    = let typeNames :: [Name]
-          typeNames = map tvbName tvbs
-          
-          instanceType :: Q Type
-          instanceType = foldl' appT (conT name) $ map varT typeNames
-      in (applyCon ''Show typeNames name, instanceType)
-
--- | If constructor is nullary.
-isNullary :: Con -> Bool
-isNullary (NormalC _ []) = True
-isNullary (RecC    _ []) = True
-isNullary _              = False
-
--- | Surrounds a 'Builder' with braces.
-showbBraces :: Builder -> Builder
-showbBraces b = s '{' <> b <> s '}'
+-- | A type-restricted version of 'const'. This is useful when generating the lambda
+-- expression in 'mkShowbPrec' for a data type with only nullary constructors (since
+-- the expression wouldn't depend on the precedence). For example, if you had @data
+-- Nullary = Nullary@ and attempted to run @$(mkShowbPrec ''Nullary) Nullary@, simply
+-- ignoring the precedence argument would cause the type signature of @$(mkShowbPrec
+-- ''Nullary)@ to be @a -> Nullary -> Builder@, not @Int -> Nullary -> Builder@.
+-- 
+-- To avoid this problem, after computing the 'Builder' @b@, we call @intConst b p@,
+-- where @p@ is the precedence argument. This forces @p :: Int@.
+intConst :: a -> Int -> a
+intConst = const
+{-# INLINE intConst #-}
 
 -- | Boilerplate for top level splices.
---
+-- 
 -- The given 'Name' must be from a type constructor. Furthermore, the
 -- type constructor must be either a data type or a newtype. Any other
 -- value will result in an exception.

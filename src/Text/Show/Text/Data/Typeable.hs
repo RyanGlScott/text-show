@@ -34,7 +34,7 @@ import Data.Word (Word64)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.Integral (showbHex)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
@@ -52,8 +52,8 @@ showbTypeRepPrec p tyrep =
       xs | isTupleTyCon tycon -> showbTuple xs
          | otherwise          -> showbParen (p > 9) $
                                     showbPrec p tycon
-                                 <> s ' '
-                                 <> showbArgs (s ' ') tys
+                                 <> showbSpace
+                                 <> showbArgs showbSpace tys
   where
     tycon = typeRepTyCon tyrep
     tys   = typeRepArgs tyrep

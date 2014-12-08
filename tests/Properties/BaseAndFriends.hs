@@ -20,7 +20,7 @@ import           Control.Applicative (ZipList(..), liftA2)
 import           Control.Exception
 import           Control.Monad.ST
 
-import           Data.Array (Array)
+import           Data.Array (Array, elems)
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString)
 #if MIN_VERSION_bytestring(0,10,4)
@@ -77,7 +77,7 @@ import           GHC.IO.Encoding.Types (CodingProgress)
 #if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats)
 #endif
-import           GHC.Show (showList__)
+import           GHC.Show (asciiTab, showList__)
 
 import           Instances.BaseAndFriends ()
 
@@ -94,14 +94,15 @@ import           System.Exit (ExitCode)
 import           System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 import           System.Posix.Types
 
-import           Test.QuickCheck hiding (Fixed)
 import           Test.QuickCheck.Instances ()
 import           Test.Tasty (TestTree, testGroup)
-import           Test.Tasty.QuickCheck (testProperty)
+import           Test.Tasty.HUnit ((@=?), testCase)
+import           Test.Tasty.QuickCheck (Gen, arbitrary, suchThat, testProperty)
 
 import           Text.Show.Functions ()
 import           Text.Show.Text hiding (Show)
 import           Text.Show.Text.Functions ()
+import           Text.Show.Text.Data.Char (asciiTabB)
 import           Text.Show.Text.Data.Fixed (showbFixed)
 import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
 #if MIN_VERSION_base(4,7,0)
@@ -187,6 +188,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.Char"
         [ testProperty "Char instance"                      (prop_matchesShow :: Int -> Char -> Bool)
         , testProperty "GeneralCategory instance"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
+        , testCase "asciiTab = asciiTabB" $                 map fromString asciiTab @=? elems (asciiTabB)
         ]
     , testGroup "Text.Show.Text.Data.Containers"
         [ testProperty "IntMap Char instance"               (prop_matchesShow :: Int -> IntMap Char -> Bool)

@@ -17,6 +17,7 @@ module Text.Show.Text.Data.Char (
     , showbString
     , showbLitString
     , showbGeneralCategory
+    , asciiTabB
     ) where
 
 import Data.Array (Array, (!), listArray)

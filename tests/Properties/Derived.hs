@@ -63,5 +63,7 @@ derivedTests =
 --         , testProperty "LeftAssocTree Int instance"                  (prop_matchesShow :: Int -> LeftAssocTree Int -> Bool)
 --         , testProperty "RightAssocTree Int instance"                 (prop_matchesShow :: Int -> RightAssocTree Int -> Bool)
         , testProperty "Int :?: Int instance"                        (prop_matchesShow :: Int -> Int :?: Int -> Bool)
+        , testProperty "HigherKindedTypeParams Maybe Int instance"   (prop_matchesShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
+        , testProperty "RestrictedContext Int instance"              (prop_matchesShow :: Int -> RestrictedContext Int -> Bool)
         ]
     ]

@@ -39,7 +39,7 @@ import           Text.Show.Text.Utils ((<>), s)
 -- 
 -- data Example = Example Int Int
 -- instance Show Example where
---     showb (Example i1 i2) = showb i1 <> singleton ' ' <> showb i2
+--     showb (Example i1 i2) = showb i1 <> showbSpace <> showb i2
 -- @
 -- 
 -- If you do not want to create 'Show' instances manually, you can alternatively
@@ -108,6 +108,11 @@ showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
+
+-- | Construct a 'Builder' containing a single space character.
+showbSpace :: Builder
+showbSpace = s ' '
+{-# INLINE showbSpace #-}
 
 -- |
 -- Converts a list of values into a 'Builder' in which the values are surrounded

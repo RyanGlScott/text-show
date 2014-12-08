@@ -34,7 +34,7 @@ import           Data.Time.LocalTime (TimeZone(..), TimeOfDay(..), LocalTime(..)
 
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb))
+import           Text.Show.Text.Class (Show(showb), showbSpace)
 import           Text.Show.Text.Utils ((<>))
 
 #if defined(TEXT_FORMAT)
@@ -123,7 +123,7 @@ showbLocalTime :: LocalTime -> Builder
 #if defined(TEXT_FORMAT)
 showbLocalTime = build
 #else
-showbLocalTime (LocalTime d t) = showbGregorian d <> s ' ' <> showb t
+showbLocalTime (LocalTime d t) = showbGregorian d <> showbSpace <> showb t
 #endif
 {-# INLINE showbLocalTime #-}
 
@@ -132,7 +132,7 @@ showbZonedTime :: ZonedTime -> Builder
 #if defined(TEXT_FORMAT)
 showbZonedTime = build
 #else
-showbZonedTime (ZonedTime t zone) = showb t <> s ' ' <> showb zone
+showbZonedTime (ZonedTime t zone) = showb t <> showbSpace <> showb zone
 #endif
 {-# INLINE showbZonedTime #-}
 

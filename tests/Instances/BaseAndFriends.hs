@@ -80,7 +80,7 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..),
                             NewlineMode(..), SeekMode(..))
 import           System.Posix.Types
 
-import           Test.QuickCheck
+import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, oneof)
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary

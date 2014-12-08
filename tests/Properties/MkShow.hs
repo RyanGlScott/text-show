@@ -19,7 +19,7 @@ import           Data.Text.Lazy.Builder (fromString)
 
 import           Instances.Derived
 
-import           Test.QuickCheck.Modifiers (Large)
+import           Test.Tasty.QuickCheck (NonZero)
 import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.QuickCheck (testProperty)
 
@@ -38,14 +38,14 @@ prop_mkShowIsInstance p a =
 
 -- | Verifies 'mkShow' (and related functions) produce the same output as their
 --   'String' counterparts. This uses a data type that is not a 'Show' instance.
-prop_mkShowIsNotInstance :: Int -> Large Int -> Bool
+prop_mkShowIsNotInstance :: Int -> NonZero Int -> Bool
 prop_mkShowIsNotInstance p a =
-       TS.pack    (show        a   ) == $(mkShow         ''Large)   a
-    && TL.pack    (show        a   ) == $(mkShowLazy     ''Large)   a
-    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''Large) p a
-    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''Large) p a
-    && fromString (show        a   ) == $(mkShowb        ''Large)   a
-    && fromString (showsPrec p a "") == $(mkShowbPrec    ''Large) p a
+       TS.pack    (show        a   ) == $(mkShow         ''NonZero)   a
+    && TL.pack    (show        a   ) == $(mkShowLazy     ''NonZero)   a
+    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''NonZero) p a
+    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''NonZero) p a
+    && fromString (show        a   ) == $(mkShowb        ''NonZero)   a
+    && fromString (showsPrec p a "") == $(mkShowbPrec    ''NonZero) p a
 
 -- prop_mkPrintIsInstance
 -- prop_mkPrintIsNotInstance
@@ -53,9 +53,9 @@ prop_mkShowIsNotInstance p a =
 mkShowTests :: [TestTree]
 mkShowTests =
     [ testGroup "mkShow and related functions"
-        [ testProperty "$(mkShow ''AllAtOnce) (a Show instance)"  prop_mkShowIsInstance
-        , testProperty "$(mkShow ''Large) (not a Show instance)"  prop_mkShowIsNotInstance
---         , testProperty "$(mkPrint ''AllAtOnce) (a Show instance)" prop_mkPrintIsInstance
---         , testProperty "$(mkPrint ''Large) (not a Show instance)" prop_mkPrintIsNotInstance
+        [ testProperty "$(mkShow ''AllAtOnce) (a Show instance)"    prop_mkShowIsInstance
+        , testProperty "$(mkShow ''NonZero) (not a Show instance)"  prop_mkShowIsNotInstance
+--         , testProperty "$(mkPrint ''AllAtOnce) (a Show instance)"   prop_mkPrintIsInstance
+--         , testProperty "$(mkPrint ''NonZero) (not a Show instance)" prop_mkPrintIsNotInstance
         ]
     ]

@@ -20,6 +20,7 @@ module Text.Show.Text (
     , showList
     , showListLazy
     , showbParen
+    , showbSpace
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString

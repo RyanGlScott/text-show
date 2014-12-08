@@ -14,15 +14,15 @@ module Properties.Utils (prop_matchesShow) where
 
 import           Data.Text.Lazy.Builder (fromString)
 
-import qualified Prelude as P (Show)
 import           Prelude hiding (Show)
 
-import           Test.QuickCheck (Arbitrary)
+import           Test.Tasty.QuickCheck (Arbitrary)
 
+import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
 import           Text.Show.Text (showbPrec)
 
 -- | Verifies that a type's @Show@ instances coincide for both 'String's and 'Text',
 --   irrespective of precedence.
-prop_matchesShow :: (P.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
+prop_matchesShow :: (S.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
 prop_matchesShow k x = fromString (showsPrec k x "") == showbPrec k x

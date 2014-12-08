@@ -21,17 +21,17 @@ import GHC.Show (appPrec)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
+import Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Tuple ()
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'Array' value to a 'Builder' with the given precedence.
 showbArrayPrec :: (Show i, Show e, Ix i) => Int -> Array i e -> Builder
 showbArrayPrec p a = showbParen (p > appPrec) $
        "array "
     <> showb (bounds a)
-    <> s ' '
+    <> showbSpace
     <> showb (assocs a)
 {-# INLINE showbArrayPrec #-}
 
