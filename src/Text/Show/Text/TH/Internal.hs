@@ -75,11 +75,20 @@ $(deriveShow ''D)
 @D@ now has a 'Show' instance equivalent to that which would be generated
 by a @deriving Show@ clause. 
 
-Note that at the moment, 'deriveShow' does not support data families,
-so it is impossible to use 'deriveShow' with @data instance@s or @newtype
-instance@s. Also, 'deriveShow' lacks the ability to properly detect data types
-with higher-kinded type parameters (e.g., @data HK f a = HK (f a)@), so it cannot
-create instances for them either.
+Note that at the moment, there are a number of limitations to this approach:
+
+* 'deriveShow' does not support data families, so it is impossible to use
+  'deriveShow' with @data instance@s or @newtype instance@s.
+  
+* 'deriveShow' lacks the ability to properly detect data types with higher-kinded
+   type parameters (e.g., @data HK f a = HK (f a)@), so it cannot create 'Show'
+   for those data types.
+
+* Some data constructors have arguments whose 'Show' instance depends on a
+  typeclass besides 'Show'. For example, consider @newtype MyRatio a = MyRatio
+  (Ratio a)@. 'Ratio a' is a 'Show' instance only if 'a' is an instance of both
+  'Integral' and 'Show'. Unfortunately, 'deriveShow' cannot infer that 'a' must
+  be an instance of 'Integral', so it cannot create a 'Show' instance for 'MyRatio'.
 
 -}
 
