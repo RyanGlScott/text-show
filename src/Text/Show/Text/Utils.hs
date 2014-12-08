@@ -14,7 +14,8 @@ module Text.Show.Text.Utils where
 
 import Data.Int (Int64)
 import Data.Monoid (Monoid(mappend, mempty))
-import Data.Text.Lazy (length, replicate, unpack)
+import Data.Text (Text)
+import Data.Text.Lazy (length, replicate, toStrict, unpack)
 import Data.Text.Lazy.Builder (Builder, fromLazyText, singleton, toLazyText)
 
 import GHC.Exts (Char(C#), Int(I#))
@@ -52,10 +53,16 @@ replicateB :: Int64 -> Builder -> Builder
 replicateB n = fromLazyText . replicate n . toLazyText
 {-# INLINE replicateB #-}
 
--- | Convert a 'Builder' to a 'String' without surrounding it with double quotes.
+-- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
+--   as 'show' would).
 toString :: Builder -> String
 toString = unpack . toLazyText
 {-# INLINE toString #-}
+
+-- | Convert a 'Builder' to a strict 'Text'.
+toText :: Builder -> Text
+toText = toStrict . toLazyText
+{-# INLINE toText #-}
 
 -- | Merges several 'Builder's, separating them by newlines.
 unlinesB :: [Builder] -> Builder

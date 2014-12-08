@@ -16,8 +16,8 @@ import Instances.BaseAndFriends ()
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.QuickCheck (testProperty)
 
-import Text.Show.Text (Builder, fromString, lengthB, replicateB,
-                       singleton, toString, unlinesB, unwordsB)
+import Text.Show.Text (Builder, fromString, fromText, lengthB, replicateB,
+                       singleton, toString, toText, unlinesB, unwordsB)
 
 -- | Verifies 'lengthB' and 'length' produce the same output.
 prop_lengthB :: String -> Bool
@@ -26,6 +26,10 @@ prop_lengthB s = fromIntegral (lengthB $ fromString s) == length s
 -- | Verifies 'replicateB' and 'replicate' produce the same output.
 prop_replicateB :: Int -> Char -> Bool
 prop_replicateB i c = replicateB (fromIntegral i) (singleton c) == fromString (replicate i c)
+
+-- | Verifies @fromText . toText = id@.
+prop_toText :: Builder -> Bool
+prop_toText b = fromText (toText b) == b
 
 -- | Verifies @fromString . toString = id@.
 prop_toString :: Builder -> Bool
@@ -42,10 +46,11 @@ prop_unwordsB strs = unwordsB (map fromString strs) == fromString (unwords strs)
 builderTests :: [TestTree]
 builderTests =
     [ testGroup "Builder-related functions"
-        [ testProperty "lengthB output"    prop_lengthB
-        , testProperty "replicateB output" prop_replicateB
+        [ testProperty "lengthB output"             prop_lengthB
+        , testProperty "replicateB output"          prop_replicateB
         , testProperty "fromString . toString = id" prop_toString
-        , testProperty "unlinesB output"   prop_unlinesB
-        , testProperty "unwordsB output"   prop_unwordsB
+        , testProperty "fromText . toText = id"     prop_toText
+        , testProperty "unlinesB output"            prop_unlinesB
+        , testProperty "unwordsB output"            prop_unwordsB
         ]
     ]

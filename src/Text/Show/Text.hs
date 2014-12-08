@@ -23,6 +23,7 @@ module Text.Show.Text (
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString
+    , toText
     , lengthB
     , replicateB
     , unlinesB
@@ -40,4 +41,5 @@ import Prelude hiding (Show(show, showList), print)
 
 import Text.Show.Text.Class
 import Text.Show.Text.Instances ()
-import Text.Show.Text.Utils (toString, lengthB, replicateB, unlinesB, unwordsB)
+import Text.Show.Text.Utils (toString, toText, lengthB,
+                             replicateB, unlinesB, unwordsB)
