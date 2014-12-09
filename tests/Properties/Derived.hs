@@ -1,16 +1,15 @@
 {-# LANGUAGE TypeOperators #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Properties.BaseAndFriends
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- @QuickCheck@ properties for data types that have derived 'Show' instances
--- (using "Text.Show.Text.TH").
-----------------------------------------------------------------------------
+{-|
+Module:      Properties.BaseAndFriends
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+@QuickCheck@ properties for data types that have derived 'Show' instances
+(using "Text.Show.Text.TH").
+-}
 module Properties.Derived (derivedTests) where
 
 import Data.Text.Lazy.Builder (fromString)

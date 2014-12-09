@@ -1,14 +1,13 @@
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Instances
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Imports 'Show' instances for all data types covered by @text-show@.
----------------------------------------------------------------------------- 
+{-|
+Module:      Text.Show.Text.Instances
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Imports 'Show' instances for all data types covered by @text-show@.
+-}
 module Text.Show.Text.Instances () where
 
 import Text.Show.Text.Control ()

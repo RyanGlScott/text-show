@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Data
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for data types in the @Data@ module.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Data
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for data types in the "Data.Data" module.
+-}
 module Text.Show.Text.Data.Data (
       showbConstr
     , showbConstrRepPrec
@@ -25,8 +24,8 @@ import Data.Text.Lazy.Builder (Builder, fromString)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Class (Show(showb, showbPrec))
-import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
+import Text.Show.Text.Data.Ratio ()
 import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.

@@ -1,17 +1,16 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, TemplateHaskell #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.TH.Internal
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Functions to mechanically derive 'Show' instances or splice
--- 'show'-related expressions into Haskell source code. You need to enable
--- the @TemplateHaskell@ language extension in order to use this module.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.TH.Internal
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Functions to mechanically derive 'Show' instances or splice
+@show@-related expressions into Haskell source code. You need to enable
+the @TemplateHaskell@ language extension in order to use this module.
+-}
 module Text.Show.Text.TH.Internal (
       -- * @deriveShow@
       -- $deriveShow
@@ -35,7 +34,7 @@ module Text.Show.Text.TH.Internal (
 
 import           Control.Applicative ((<$>))
 
-import           Data.List (foldl')
+import           Data.List (foldl', isPrefixOf)
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -146,68 +145,58 @@ whichADT = $(mkShow ''ADT) ADTCon == \"ADT\"
 
 -}
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a strict 'TS.Text'.
 mkShow :: Name -> Q Exp
 mkShow name = [| toStrict . $(mkShowLazy name) |]
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a lazy 'TL.Text'.
 mkShowLazy :: Name -> Q Exp
 mkShowLazy name = [| toLazyText . $(mkShowb name) |]
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a strict 'TS.Text' with the given precedence.
 mkShowPrec :: Name -> Q Exp
 mkShowPrec name = [| \p -> toStrict . $(mkShowPrecLazy name) p |]
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a lazy 'TL.Text' with the given precedence.
 mkShowPrecLazy :: Name -> Q Exp
 mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder'.
 mkShowb :: Name -> Q Exp
 mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 
--- |
--- Generates a lambda expression which converts the given @data@ type or @newtype@
+-- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder' with the given precedence.
 mkShowbPrec :: Name -> Q Exp
 mkShowbPrec name = withType name $ const consToShow
 
--- |
--- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's strict 'TS.Text' output to the standard output, followed by a newline.
 mkPrint :: Name -> Q Exp
 mkPrint name = [| TS.putStrLn . $(mkShow name) |]
 
--- |
--- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's lazy 'TL.Text' output to the standard output, followed by a newline.
 mkPrintLazy :: Name -> Q Exp
 mkPrintLazy name = [| TL.putStrLn . $(mkShowLazy name) |]
 
--- |
--- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's strict 'TS.Text' output to the given file handle, followed by a newline.
 mkHPrint :: Name -> Q Exp
 mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 
--- |
--- Generates a lambda expression which writes the given @data@ type or @newtype@
+-- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's lazy 'TL.Text' output to the given file handle, followed by a newline.
 mkHPrintLazy :: Name -> Q Exp
 mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
 -- | Generates code to generate the 'Show' encoding of a number of constructors.
---   All constructors must be from the same type.
+-- All constructors must be from the same type.
 consToShow :: [Con] -> Q Exp
 consToShow []   = error $ "Text.Show.Text.TH.consToShow: Not a single constructor given!"
 consToShow cons = do
@@ -215,7 +204,8 @@ consToShow cons = do
     value <- newName "value"
     lam1E (varP p)
         . lam1E (varP value)
-        $ caseE (varE value) [encodeArgs p con | con <- cons]
+        . caseE (varE value)
+        $ map (encodeArgs p) cons
 
 -- | Generates code to generate the 'Show' encoding of a single constructor.
 encodeArgs :: Name -> Con -> Q Match
@@ -223,16 +213,35 @@ encodeArgs p (NormalC conName [])
     = match (conP conName [])
             (normalB [| intConst (fromString $(stringE (nameBase conName))) $(varE p) |])
             []
+encodeArgs p (NormalC conName [_]) = do
+    arg <- newName "arg"
+    
+    let showArg  = [| showbPrec appPrec1 $(varE arg) |]
+        namedArg = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(showArg) |] 
+    
+    match (conP conName [varP arg])
+          (normalB [| showbParen ($(varE p) > appPrec) $(namedArg) |])
+          []
 encodeArgs p (NormalC conName ts) = do
     args <- mapM newName ["arg" ++ P.show n | (_, n) <- zip ts [1 :: Int ..]]
     
-    let showArgs    = map (appE [| showbPrec appPrec1 |] . varE) args
-        mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
-        namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
-    
-    match (conP conName $ map varP args)
-          (normalB $ appE [| showbParen ($(varE p) > appPrec) |] namedArgs)
-          []
+    if isNonUnitTuple conName
+       then do
+           let showArgs    = map (appE [| showb |] . varE) args
+               mappendArgs = foldr1 (\v q -> [| $(v) <> s ',' <> $(q) |]) showArgs
+               parenArgs   = [| s '(' <> $(mappendArgs) <> s ')' |]
+           
+           match (conP conName $ map varP args)
+                 (normalB [| intConst $(parenArgs) $(varE p) |])
+                 []
+       else do
+           let showArgs = map (appE [| showbPrec appPrec1 |] . varE) args
+               mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
+               namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
+           
+           match (conP conName $ map varP args)
+                 (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
+                 []
 encodeArgs p (RecC conName []) = encodeArgs p $ NormalC conName []
 encodeArgs p (RecC conName ts) = do
     args <- mapM newName ["arg" ++ P.show n | (_, n) <- zip ts [1 :: Int ..]]
@@ -248,7 +257,7 @@ encodeArgs p (RecC conName ts) = do
                        |]
     
     match (conP conName $ map varP args)
-          (normalB $ appE [| showbParen ($(varE p) > appPrec) |] namedArgs)
+          (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
           []
 encodeArgs p (InfixC _ conName _) = do
     al   <- newName "argL"
@@ -274,6 +283,11 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+-- TODO: There's got to be a better way of doing this.
+-- | Checks if a 'Name' represents a tuple type constructor (other than '()')/
+isNonUnitTuple :: Name -> Bool
+isNonUnitTuple = isPrefixOf "GHC.Tuple.(," . P.show
 
 -- | A type-restricted version of 'const'. This is useful when generating the lambda
 -- expression in 'mkShowbPrec' for a data type with only nullary constructors (since
@@ -316,11 +330,10 @@ tvbName :: TyVarBndr -> Name
 tvbName (PlainTV  name)   = name
 tvbName (KindedTV name _) = name
 
--- |
--- Applies a typeclass to several type parameters to produce the type predicate of an
--- instance declaration. If a recent version of Template Haskell is used, this function
--- will filter type parameters that have phantom roles (since they have no effect on
--- the instance declaration.
+-- | Applies a typeclass to several type parameters to produce the type predicate of
+-- an instance declaration. If a recent version of Template Haskell is used, this
+-- function will filter type parameters that have phantom roles (since they have no
+-- effect on the instance declaration.
 applyCon :: Name -> [Name] -> Name -> Q [Pred]
 #if MIN_VERSION_template_haskell(2,9,0)
 applyCon con typeNames targetData

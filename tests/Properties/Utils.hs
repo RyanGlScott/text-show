@@ -1,15 +1,14 @@
 {-# LANGUAGE NoImplicitPrelude #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Properties.Utils
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- @QuickCheck@ property-related utility functions.
-----------------------------------------------------------------------------
+{-|
+Module:      Properties.Utils
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+@QuickCheck@ property-related utility functions.
+-}
 module Properties.Utils (prop_matchesShow) where
 
 import           Data.Text.Lazy.Builder (fromString)

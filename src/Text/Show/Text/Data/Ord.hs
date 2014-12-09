@@ -3,17 +3,16 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Ord
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for 'Ordering' and 'Down'.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Ord
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for 'Ordering' and 'Down'.
+-}
 module Text.Show.Text.Data.Ord (
       showbOrdering
 #if MIN_VERSION_base(4,6,0)

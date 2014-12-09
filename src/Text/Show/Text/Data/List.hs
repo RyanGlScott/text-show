@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.List
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Exports 'showbListDefault'.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.List
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Exports 'showbListDefault'.
+-}
 module Text.Show.Text.Data.List (showbListDefault) where
 
 import Prelude hiding (Show)

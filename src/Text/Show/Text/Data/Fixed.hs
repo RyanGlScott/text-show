@@ -1,16 +1,15 @@
 {-# LANGUAGE CPP, NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Fixed
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' function for 'Fixed' values.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Fixed
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' function for 'Fixed' values.
+-}
 module Text.Show.Text.Data.Fixed (showbFixed) where
 
 import Data.Fixed (HasResolution(..))
@@ -33,7 +32,7 @@ import Data.Text.Lazy.Builder (fromString)
 #endif
 
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
---   whether to chop off trailing zeroes.
+-- whether to chop off trailing zeroes.
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
 #if MIN_VERSION_base(4,7,0)
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0

@@ -1,15 +1,14 @@
 {-# LANGUAGE MagicHash, NoImplicitPrelude #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Utils
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Miscellaneous 'Builder' utility functions.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Utils
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Miscellaneous utility functions.
+-}
 module Text.Show.Text.Utils where
 
 import Data.Int (Int64)
@@ -23,21 +22,19 @@ import GHC.Prim ((+#), chr#, ord#)
 
 import Prelude hiding (length, replicate)
 
-infixr 6 <>
-
 -- | Unsafe conversion for decimal digits.
 i2d :: Int -> Char
 i2d (I# i#) = C# (chr# (ord# '0'# +# i#))
 {-# INLINE i2d #-}
 
+infixr 6 <>
 -- | Infix 'mappend', defined here for backwards-compatibility with older versions
---   of base.
+-- of @base@.
 (<>) :: Monoid m => m -> m -> m
 (<>) = mappend
 {-# INLINE (<>) #-}
 
--- |
--- A shorter name for 'singleton' for convenience's sake (since it tends to be used
+-- | A shorter name for 'singleton' for convenience's sake (since it tends to be used
 -- pretty often in @text-show@).
 s :: Char -> Builder
 s = singleton
@@ -54,7 +51,7 @@ replicateB n = fromLazyText . replicate n . toLazyText
 {-# INLINE replicateB #-}
 
 -- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
---   as 'show' would).
+-- as 'show' would).
 toString :: Builder -> String
 toString = unpack . toLazyText
 {-# INLINE toString #-}

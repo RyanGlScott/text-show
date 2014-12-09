@@ -1,16 +1,15 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Monoid
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for 'Exception's.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Control.Exception
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for 'Exception's.
+-}
 module Text.Show.Text.Control.Exception (
     showbSomeExceptionPrec
   , showbIOException

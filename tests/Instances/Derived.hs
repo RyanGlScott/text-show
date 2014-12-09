@@ -1,19 +1,17 @@
 {-# LANGUAGE FlexibleContexts, GADTs, GeneralizedNewtypeDeriving,
              NoImplicitPrelude, TemplateHaskell, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Instances.Derived
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- This module defines data types that have derived 'Show' instances (using
--- "Text.Show.Text.TH") for testing purposes, including 'Arbitrary'
--- instances.
-----------------------------------------------------------------------------
+{-|
+Module:      Instances.Derived
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Defines data types with derived 'Show' instances (using "Text.Show.Text.TH")
+for testing purposes, including 'Arbitrary' instances.
+-}
 module Instances.Derived (
       Nullary(..)
     , PhantomNullary(..)

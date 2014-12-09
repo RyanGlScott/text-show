@@ -1,17 +1,16 @@
 {-# LANGUAGE CPP, MagicHash, NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Foreign.Ptr
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for pointer types used in the Haskell
--- Foreign Function Interface (FFI).
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Foreign.Ptr
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for pointer types used in the Haskell
+Foreign Function Interface (FFI).
+-}
 module Text.Show.Text.Foreign.Ptr (
       showbPtr
     , showbFunPtr
@@ -39,7 +38,7 @@ import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 #include "MachDeps.h"
 
 -- | Convert a 'Ptr' to a 'Builder'. Note that this does not require the parameterized
---   type to be an instance of 'Show' itself.
+-- type to be an instance of 'Show' itself.
 showbPtr :: Ptr a -> Builder
 showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
   where
@@ -49,7 +48,7 @@ showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
                 <> ls
 
 -- | Convert a 'FunPtr' to a 'Builder'. Note that this does not require the
---   parameterized type to be an instance of 'Show' itself.
+-- parameterized type to be an instance of 'Show' itself.
 showbFunPtr :: FunPtr a -> Builder
 showbFunPtr = showb . castFunPtrToPtr
 {-# INLINE showbFunPtr #-}
@@ -63,7 +62,7 @@ showbWordPtr :: WordPtr -> Builder
 showbWordPtr wp = showbWord $ unsafeCoerce# wp
 
 -- | Convert a 'ForeignPtr' to a 'Builder'. Note that this does not require the
---   parameterized type to be an instance of 'Show' itself.
+-- parameterized type to be an instance of 'Show' itself.
 showbForeignPtr :: ForeignPtr a -> Builder
 showbForeignPtr = showb . unsafeForeignPtrToPtr
 {-# INLINE showbForeignPtr #-}

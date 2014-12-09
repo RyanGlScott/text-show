@@ -3,19 +3,16 @@
 {-# LANGUAGE TemplateHaskell #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Foreign.Data.ByteString
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for data types in the @bytestring@ library.
--- These are included for convenience (and because @bytestring@ is a
--- dependency of this library).
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.ByteString
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for data types in the @bytestring@ library.
+-}
 module Text.Show.Text.Data.ByteString (
       showbByteStringStrict
     , showbByteStringLazy

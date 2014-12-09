@@ -2,18 +2,17 @@
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
------------------------------------------------------------------------------
--- |
--- Module      :  Properties.BaseAndFriends
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- @QuickCheck@ properties for data types located in @base@ and other
--- common libraries.
-----------------------------------------------------------------------------
+{-|
+Module:      Properties.BaseAndFriends
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+@QuickCheck@ properties for data types located in @base@ and other
+common libraries.
+-}
 module Properties.BaseAndFriends (baseAndFriendsTests) where
 
 import           Control.Applicative (ZipList(..), liftA2)
@@ -33,9 +32,6 @@ import           Data.Data (Constr, ConstrRep, DataRep, DataType)
 import           Data.Dynamic (Dynamic)
 import           Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
 import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.IntMap (IntMap)
-import           Data.IntSet (IntSet)
-import           Data.Map (Map)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,6,0)
@@ -43,15 +39,8 @@ import           Data.Ord (Down(..))
 #endif
 import           Data.Proxy (Proxy)
 import           Data.Ratio (Ratio)
-import           Data.Sequence (Seq)
-import           Data.Set (Set)
 import qualified Data.Text as TS
 import qualified Data.Text as TL
-import           Data.Time.Calendar (Day)
-import           Data.Time.Clock (DiffTime, UTCTime, NominalDiffTime)
-import           Data.Time.Clock.TAI (AbsoluteTime)
-import           Data.Time.LocalTime (TimeZone, TimeOfDay, LocalTime, ZonedTime)
-import           Data.Tree (Tree)
 #if MIN_VERSION_base(4,7,0)
 import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
@@ -128,7 +117,7 @@ prop_showListDefault :: [Char] -> Bool
 prop_showListDefault str = fromString (showList__ shows str "") == showbListDefault showb str
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
---   is one of E, F, or G).
+-- is one of E, F, or G).
 prop_showXFloat :: (Maybe Int -> Double -> ShowS) -> (Maybe Int -> Double -> Builder) -> Maybe Int -> Double -> Bool
 prop_showXFloat f1 f2 digs val = fromString (f1 digs val "") == f2 digs val
 
@@ -189,14 +178,6 @@ baseAndFriendsTests =
         [ testProperty "Char instance"                      (prop_matchesShow :: Int -> Char -> Bool)
         , testProperty "GeneralCategory instance"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
         , testCase "asciiTab = asciiTabB" $                 map fromString asciiTab @=? elems (asciiTabB)
-        ]
-    , testGroup "Text.Show.Text.Data.Containers"
-        [ testProperty "IntMap Char instance"               (prop_matchesShow :: Int -> IntMap Char -> Bool)
-        , testProperty "IntSet instance"                    (prop_matchesShow :: Int -> IntSet -> Bool)
-        , testProperty "Map Char Char instance"             (prop_matchesShow :: Int -> Map Char Char -> Bool)
-        , testProperty "Sequence Char"                      (prop_matchesShow :: Int -> Seq Char -> Bool)
-        , testProperty "Set Char instance"                  (prop_matchesShow :: Int -> Set Char -> Bool)
-        , testProperty "Tree Char instance"                 (prop_matchesShow :: Int -> Tree Char -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Data"
         [ testProperty "Constr instance"                    (prop_matchesShow :: Int -> Constr -> Bool)
@@ -279,17 +260,6 @@ baseAndFriendsTests =
         [ testProperty "Builder instance"                   (prop_matchesShow :: Int -> Builder -> Bool)
         , testProperty "strict Text instance"               (prop_matchesShow :: Int -> TS.Text -> Bool)
         , testProperty "lazy Text instance"                 (prop_matchesShow :: Int -> TL.Text -> Bool)
-        ]
-    , testGroup "Text.Show.Text.Data.Time"
-        [ testProperty "Day instance"                       (prop_matchesShow :: Int -> Day -> Bool)
-        , testProperty "DiffTime instance"                  (prop_matchesShow :: Int -> DiffTime -> Bool)
-        , testProperty "UTCTime instance"                   (prop_matchesShow :: Int -> UTCTime -> Bool)
-        , testProperty "NominalDiffTime instance"           (prop_matchesShow :: Int -> NominalDiffTime -> Bool)
-        , testProperty "AbsoluteTime instance"              (prop_matchesShow :: Int -> AbsoluteTime -> Bool)
-        , testProperty "TimeZone instance"                  (prop_matchesShow :: Int -> TimeZone -> Bool)
-        , testProperty "TimeOfDay instance"                 (prop_matchesShow :: Int -> TimeOfDay -> Bool)
-        , testProperty "LocalTime instance"                 (prop_matchesShow :: Int -> LocalTime -> Bool)
-        , testProperty "ZonedTime instance"                 (prop_matchesShow :: Int -> ZonedTime -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Tuple"
         [ testProperty "() instance"                        (prop_matchesShow :: Int -> () -> Bool)

@@ -1,15 +1,14 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Class
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- The 'Show' type class.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Class
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+The 'Show' type class.
+-}
 module Text.Show.Text.Class where
 
 import           Data.Text         as TS (Text)

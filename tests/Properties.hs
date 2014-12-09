@@ -1,14 +1,13 @@
------------------------------------------------------------------------------
--- |
--- Module      :  Properties
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- @QuickCheck@ tests for @text-show@.
-----------------------------------------------------------------------------
+{-|
+Module:      Properties
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+@QuickCheck@ tests for @text-show@.
+-}
 module Main (main) where
 
 import Properties.BaseAndFriends (baseAndFriendsTests)

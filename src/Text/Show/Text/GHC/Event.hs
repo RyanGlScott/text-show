@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.GHC.Stats
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for data types in the @Event@ module.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.GHC.Event
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for data types in the @Event@ module.
+-}
 module Text.Show.Text.GHC.Event (showbEvent, showbFdKeyPrec) where 
 
 import           Data.Text.Lazy.Builder (Builder, fromString)

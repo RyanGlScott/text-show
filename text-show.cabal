@@ -1,5 +1,5 @@
 name:                text-show
-version:             0.4.2
+version:             0.5
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
@@ -9,10 +9,8 @@ description:         @text-show@ offers a replacement for the @Show@ typeclass i
                      At the moment, @text-show@ provides @Show@ instances for most data
                      types in the @<http://hackage.haskell.org/package/array array>@,
                      @<http://hackage.haskell.org/package/base base>@,
-                     @<http://hackage.haskell.org/package/bytestring bytestring>@,
-                     @<http://hackage.haskell.org/package/containers containers>@,
-                     @<http://hackage.haskell.org/package/text text>@, and
-                     @<http://hackage.haskell.org/package/time time>@ packages.
+                     @<http://hackage.haskell.org/package/bytestring bytestring>@, and
+                     @<http://hackage.haskell.org/package/text text>@ packages.
                      Therefore, much of the source code for @text-show@ consists of
                      borrowed code from those packages in order to ensure that the
                      behaviors of the two @Show@ typeclasses coincide.
@@ -48,7 +46,7 @@ license-file:        LICENSE
 author:              Ryan Scott
 maintainer:          Ryan Scott <ryan.gl.scott@ku.edu>
 stability:           Experimental
--- copyright:           
+copyright:           (C) 2014 Ryan Scott
 category:            Text
 build-type:          Simple
 extra-source-files:  CHANGELOG.md, README.md
@@ -59,9 +57,9 @@ source-repository head
   location:            git://github.com/RyanGlScott/text-show.git
 
 flag text-format
-  description:         Do not use text-format, since it may require double-conversion
-                       and thus linking of libstdc++, which may break compilation
-                       due to GHC bug #5289:
+  description:         Do not use @text-format@, since it may require
+                       @double-conversion@ and thus linking @libstdc++@, which may
+                       break compilation due to GHC bug #5289:
                        .
                        http://ghc.haskell.org/trac/ghc/ticket/5289
   default:             False
@@ -78,7 +76,7 @@ library
                        Text.Show.Text.Data.Bool
                        Text.Show.Text.Data.ByteString
                        Text.Show.Text.Data.Char
-                       Text.Show.Text.Data.Containers
+                       Text.Show.Text.Data.Complex
                        Text.Show.Text.Data.Data
                        Text.Show.Text.Data.Dynamic
                        Text.Show.Text.Data.Either
@@ -89,8 +87,8 @@ library
                        Text.Show.Text.Data.Maybe
                        Text.Show.Text.Data.Monoid
                        Text.Show.Text.Data.Ord
+                       Text.Show.Text.Data.Ratio
                        Text.Show.Text.Data.Text
-                       Text.Show.Text.Data.Time
                        Text.Show.Text.Data.Tuple
                        Text.Show.Text.Data.Typeable
                        Text.Show.Text.Data.Version
@@ -114,11 +112,9 @@ library
   build-depends:       array            >= 0.3   && < 0.6
                      , base             >= 4.2   && < 5
                      , bytestring       >= 0.9   && < 0.11
-                     , containers       >= 0.1   && < 0.6
                      , ghc-prim
                      , template-haskell >= 2.4   && < 2.10
                      , text             >= 0.2   && < 1.3
-                     , time             >= 0.1   && < 1.6
   hs-source-dirs:      src
   ghc-options:         -Wall
   
@@ -158,14 +154,12 @@ test-suite text-show-properties
   build-depends:       array                      >= 0.3   && < 0.6
                      , base                       >= 4.2   && < 5
                      , bytestring                 >= 0.9   && < 0.11
-                     , containers                 >= 0.1   && < 0.6
                      , quickcheck-instances       >= 0.1   && < 0.4
                      , tasty                      >= 0.8   && < 0.11
                      , tasty-hunit                >= 0.8   && < 0.10
                      , tasty-quickcheck           >= 0.8   && < 0.9
                      , text                       >= 0.2   && < 1.3
-                     , text-show                  == 0.4.2
-                     , time                       >= 0.1   && < 1.6
+                     , text-show                  == 0.5
   ghc-options:         -Wall
   
   -- Prior to GHC 7.6, GHC generics lived in ghc-prim

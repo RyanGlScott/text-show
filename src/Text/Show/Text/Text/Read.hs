@@ -1,17 +1,16 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Text.Read
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' function for 'Lexeme' (and 'Number', if using a
--- recent-enough version of @base@).
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Text.Read
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' function for 'Lexeme' (and 'Number', if using a
+recent-enough version of @base@).
+-}
 module Text.Show.Text.Text.Read (
       showbLexemePrec
 #if MIN_VERSION_base(4,7,0)

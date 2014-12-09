@@ -3,17 +3,16 @@
 {-# LANGUAGE BangPatterns, UnboxedTuples #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Integral
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for integral types.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Integral
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for integral types.
+-}
 module Text.Show.Text.Data.Integral (
       showbIntPrec
     , showbInt8Prec
@@ -26,7 +25,6 @@ module Text.Show.Text.Data.Integral (
     , showbBin
     , showbHex
     , showbOct
-    , showbRatioPrec
     , showbWord
     , showbWord8
     , showbWord16
@@ -34,35 +32,32 @@ module Text.Show.Text.Data.Integral (
     , showbWord64
     ) where
 
-import           Data.Char (intToDigit)
-import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.Monoid (mempty)
-import           Data.Ratio (Ratio, numerator, denominator)
-import           Data.Text.Lazy.Builder (Builder)
-import           Data.Word (Word, Word8, Word16, Word32, Word64)
+import Data.Char (intToDigit)
+import Data.Int (Int8, Int16, Int32, Int64)
+import Data.Monoid (mempty)
+import Data.Text.Lazy.Builder (Builder)
+import Data.Word (Word, Word8, Word16, Word32, Word64)
 
-import           GHC.Exts (Int(I#))
+import GHC.Exts (Int(I#))
 #if __GLASGOW_HASKELL__ >= 708
-import           GHC.Exts (isTrue#)
-import           GHC.Prim (Int#)
+import GHC.Exts (isTrue#)
+import GHC.Prim (Int#)
 #endif
-import           GHC.Prim ((<#), (>#))
-import           GHC.Real (ratioPrec, ratioPrec1)
+import GHC.Prim ((<#), (>#))
 
-import qualified Prelude as P (show)
-import           Prelude hiding (Show)
+import Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Utils ((<>), s, toString)
 
 #if defined(TEXT_FORMAT)
-import           Data.Text.Buildable (build)
+import Data.Text.Buildable (build)
 #else
-import           GHC.Base (quotInt, remInt)
-import           GHC.Integer.GMP.Internals (Integer(..))
-import           GHC.Num (quotRemInteger)
+import GHC.Base (quotInt, remInt)
+import GHC.Integer.GMP.Internals (Integer(..))
+import GHC.Num (quotRemInteger)
 
-import           Text.Show.Text.Utils (i2d)
+import Text.Show.Text.Utils (i2d)
 #endif
 
 -- | Convert an 'Int' to a 'Builder' with the given precedence.
@@ -116,11 +111,11 @@ showbIntegralPrec p = showbIntegerPrec p . toInteger
 {-# INLINE showbIntegralPrec #-}
 
 -- | Shows a /non-negative/ 'Integral' number using the base specified by the
---   first argument, and the character representation specified by the second.
+-- first argument, and the character representation specified by the second.
 showbIntAtBase :: (Integral a, Show a) => a -> (Int -> Char) -> a -> Builder
 showbIntAtBase base toChr n0
-    | base <= 1 = error . P.show $ "Text.Show.Text.Int.showbIntAtBase: applied to unsupported base" <> showb base
-    | n0 < 0    = error . P.show $ "Text.Show.Text.Int.showbIntAtBase: applied to negative number " <> showb n0
+    | base <= 1 = error . toString $ "Text.Show.Text.Int.showbIntAtBase: applied to unsupported base" <> showb base
+    | n0 < 0    = error . toString $ "Text.Show.Text.Int.showbIntAtBase: applied to negative number " <> showb n0
     | otherwise = showbIt (quotRem n0 base) mempty
   where
     showbIt (n, d) b = seq c $ -- stricter than necessary
@@ -149,14 +144,6 @@ showbHex = showbIntAtBase 16 intToDigit
 showbOct :: (Integral a, Show a) => a -> Builder
 showbOct = showbIntAtBase 8 intToDigit
 {-# INLINE showbOct #-}
-
--- | Convert a 'Ratio' to a 'Builder' with the given precedence.
-showbRatioPrec :: (Show a, Integral a) => Int -> Ratio a -> Builder
-showbRatioPrec p q = showbParen (p > ratioPrec) $
-       showbPrec ratioPrec1 (numerator q)
-    <> " % "
-    <> showbPrec ratioPrec1 (denominator q)
-{-# INLINE showbRatioPrec #-}
 
 -- | Convert a 'Word' to a 'Builder' with the given precedence.
 showbWord :: Word -> Builder
@@ -330,11 +317,6 @@ instance Show Int64 where
 
 instance Show Integer where
     showbPrec = showbIntegerPrec
-    {-# INLINE showbPrec #-}
-
-instance (Show a, Integral a) => Show (Ratio a) where
-    {-# SPECIALIZE instance Show Rational #-}
-    showbPrec = showbRatioPrec
     {-# INLINE showbPrec #-}
 
 instance Show Word where

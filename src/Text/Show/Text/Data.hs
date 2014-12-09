@@ -1,22 +1,21 @@
 {-# LANGUAGE CPP #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Imports 'Show' instances for @Data@ modules.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Imports 'Show' instances for @Data@ modules.
+-}
 module Text.Show.Text.Data () where
 
 import Text.Show.Text.Data.Array         ()
 import Text.Show.Text.Data.Bool          ()
 import Text.Show.Text.Data.ByteString    ()
 import Text.Show.Text.Data.Char          ()
-import Text.Show.Text.Data.Containers    ()
+import Text.Show.Text.Data.Complex       ()
 import Text.Show.Text.Data.Data          ()
 import Text.Show.Text.Data.Dynamic       ()
 import Text.Show.Text.Data.Either        ()
@@ -27,8 +26,8 @@ import Text.Show.Text.Data.List          ()
 import Text.Show.Text.Data.Maybe         ()
 import Text.Show.Text.Data.Monoid        ()
 import Text.Show.Text.Data.Ord           ()
+import Text.Show.Text.Data.Ratio         ()
 import Text.Show.Text.Data.Text          ()
-import Text.Show.Text.Data.Time          ()
 import Text.Show.Text.Data.Tuple         ()
 #if MIN_VERSION_base(4,7,0)
 import Text.Show.Text.Data.Type.Coercion ()

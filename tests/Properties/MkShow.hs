@@ -1,16 +1,14 @@
 {-# LANGUAGE TemplateHaskell #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Properties.BaseAndFriends
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- @QuickCheck@ properties for 'mkShow' and related functions in
--- "Text.Show.Text.TH".
-----------------------------------------------------------------------------
+{-|
+Module:      Properties.MkShow
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+@QuickCheck@ properties for 'mkShow' and related functions in "Text.Show.Text.TH".
+-}
 module Properties.MkShow (mkShowTests) where
 
 import qualified Data.Text      as TS (pack)

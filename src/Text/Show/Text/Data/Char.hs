@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Char
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for 'Char' and 'String'.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Char
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for 'Char' and 'String'.
+-}
 module Text.Show.Text.Data.Char (
       showbChar
     , showbLitChar

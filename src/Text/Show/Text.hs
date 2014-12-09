@@ -1,15 +1,14 @@
 {-# LANGUAGE NoImplicitPrelude #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Efficiently convert from values to 'Text' via 'Builder's.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Efficiently convert from values to 'Text' via 'Builder's.
+-}
 module Text.Show.Text (
       -- * The 'Show' class
       Show (..)

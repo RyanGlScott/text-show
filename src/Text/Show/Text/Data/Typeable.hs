@@ -1,16 +1,15 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Typeable
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for data types in the @Typeable@ module.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Typeable
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for data types in the @Typeable@ module.
+-}
 module Text.Show.Text.Data.Typeable (
       showbTypeRepPrec
     , showbTyCon
@@ -80,7 +79,7 @@ isTupleTyCon tycon = case tyconStr of
 {-# INLINE isTupleTyCon #-}
 
 -- | Helper function for showing a list of arguments, each separated by the given
---  'Builder'.
+-- 'Builder'.
 showbArgs :: Show a => Builder -> [a] -> Builder
 showbArgs _   []     = mempty
 showbArgs _   [a]    = showbPrec 10 a
@@ -115,7 +114,7 @@ showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
 
 #if MIN_VERSION_base(4,4,0)
 -- | Identical to 'tyConName'. Defined to avoid using excessive amounts of pragmas
---   with base-4.3 and earlier, which use 'tyConString'.
+-- with base-4.3 and earlier, which use 'tyConString'.
 tyConString :: TyCon -> String
 tyConString = tyConName
 {-# INLINE tyConString #-}

@@ -1,16 +1,15 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.System.IO
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for 'IO'-related data types.
----------------------------------------------------------------------------- 
+{-|
+Module:      Text.Show.Text.System.IO
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' function for 'IO'-related data types.
+-}
 module Text.Show.Text.System.IO (
       showbHandle
     , showbIOMode

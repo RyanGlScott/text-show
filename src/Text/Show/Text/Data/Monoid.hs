@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Monoid
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for 'Monoid'-related newtypes.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Monoid
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for 'Monoid'-related newtypes.
+-}
 module Text.Show.Text.Data.Monoid (
       showbAllPrec
     , showbAnyPrec

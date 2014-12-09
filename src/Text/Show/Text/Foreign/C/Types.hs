@@ -1,17 +1,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, NoImplicitPrelude, StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Foreign.C.Types
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for Haskell newtypes corresponding to C
--- types in the Foreign Function Interface (FFI).
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Foreign.C.Types
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for Haskell newtypes corresponding to C
+types in the Foreign Function Interface (FFI).
+-}
 module Text.Show.Text.Foreign.C.Types (
       showbCCharPrec
     , showbCSCharPrec

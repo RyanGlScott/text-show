@@ -1,21 +1,19 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Floating
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' functions for floating-point types.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Floating
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' functions for floating-point types.
+-}
 module Text.Show.Text.Data.Floating (
       showbRealFloatPrec
     , showbFloatPrec
     , showbDoublePrec
-    , showbComplexPrec
     , showbEFloat
     , showbFFloat
     , showbGFloat
@@ -25,7 +23,6 @@ module Text.Show.Text.Data.Floating (
 
 import           Data.Array.Base (unsafeAt)
 import           Data.Array.IArray (Array, array)
-import           Data.Complex (Complex(..))
 import qualified Data.Text as T (replicate)
 import           Data.Text.Lazy.Builder (Builder, fromString, fromText)
 import           Data.Text.Lazy.Builder.Int (decimal)
@@ -53,18 +50,9 @@ showbDoublePrec :: Int -> Double -> Builder
 showbDoublePrec = showbRealFloatPrec
 {-# INLINE showbDoublePrec #-}
 
--- | Convert a 'Complex' value to a 'Builder' with the given precedence.
-showbComplexPrec :: (RealFloat a, Show a) => Int -> Complex a -> Builder
-showbComplexPrec p (a :+ b) = showbParen (p > complexPrec) $
-        showbPrec (complexPrec+1) a
-     <> " :+ "
-     <> showbPrec (complexPrec+1) b
-  where complexPrec = 6
-{-# INLINE showbComplexPrec #-}
-
 -- | Show a signed 'RealFloat' value
 -- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
---
+-- 
 -- In the call @'showbEFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
@@ -74,7 +62,7 @@ showbEFloat = formatRealFloat Exponent
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
---
+-- 
 -- In the call @'showbFFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
@@ -85,7 +73,7 @@ showbFFloat = formatRealFloat Fixed
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
---
+-- 
 -- In the call @'showbGFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
@@ -95,7 +83,7 @@ showbGFloat = formatRealFloat Generic
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
---
+-- 
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
@@ -105,7 +93,7 @@ showbFFloatAlt d x = formatRealFloatAlt Fixed d True x
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
---
+-- 
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
@@ -120,18 +108,12 @@ instance Show Double where
     showbPrec = showbDoublePrec
     {-# INLINE showbPrec #-}
 
-instance (RealFloat a, Show a) => Show (Complex a) where
-    {-# SPECIALIZE instance Show (Complex Float) #-}
-    {-# SPECIALIZE instance Show (Complex Double) #-}
-    showbPrec = showbComplexPrec
-    {-# INLINE showbPrec #-}
-
 -------------------------------------------------------------------------------
 -- GHC.Float internal functions, adapted for Builders
 -------------------------------------------------------------------------------
 
 -- | Like 'formatRealFloatAlt', except that the decimal is only shown for arguments
---   whose absolute value is between @0.1@ and @9,999,999@.
+-- whose absolute value is between @0.1@ and @9,999,999@.
 formatRealFloat :: RealFloat a
                 => FPFormat  -- ^ What notation to use.
                 -> Maybe Int -- ^ Number of decimal places to render.
@@ -318,7 +300,6 @@ floatToDigits x =
  in
  (map fromIntegral (reverse rds), k)
 
--- |
 roundTo :: Int -> [Int] -> (Int,[Int])
 roundTo d is =
   case f d True is of

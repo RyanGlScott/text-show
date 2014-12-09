@@ -1,16 +1,15 @@
 {-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.Show.Text.Data.Dynamic
--- Copyright   :  (C) 2014 Ryan Scott
--- License     :  BSD-style (see the file LICENSE)
--- Maintainer  :  Ryan Scott
--- Stability   :  Experimental
--- Portability :  GHC
--- 
--- Monomorphic 'Show' function for 'Dynamic'.
-----------------------------------------------------------------------------
+{-|
+Module:      Text.Show.Text.Data.Dynamic
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Monomorphic 'Show' function for 'Dynamic'.
+-}
 module Text.Show.Text.Data.Dynamic (showbDynamic) where
 
 import Data.Dynamic (Dynamic, dynTypeRep)
