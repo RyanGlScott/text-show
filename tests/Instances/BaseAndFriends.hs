@@ -79,7 +79,8 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..),
                             NewlineMode(..), SeekMode(..))
 import           System.Posix.Types
 
-import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, oneof)
+import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
+                                        arbitraryBoundedEnum, oneof)
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
@@ -104,37 +105,7 @@ instance Arbitrary WordPtr where
 -- TODO: instance Arbitrary (ForeignPtr a)
 
 instance Arbitrary GeneralCategory where
-    arbitrary = oneof $ map pure [ UppercaseLetter     
-                                 , LowercaseLetter
-                                 , TitlecaseLetter
-                                 , ModifierLetter
-                                 , OtherLetter
-                                 , NonSpacingMark
-                                 , SpacingCombiningMark
-                                 , EnclosingMark
-                                 , DecimalNumber
-                                 , LetterNumber
-                                 , OtherNumber
-                                 , ConnectorPunctuation
-                                 , DashPunctuation
-                                 , OpenPunctuation
-                                 , ClosePunctuation
-                                 , InitialQuote
-                                 , FinalQuote 
-                                 , OtherPunctuation
-                                 , MathSymbol
-                                 , CurrencySymbol
-                                 , ModifierSymbol
-                                 , OtherSymbol
-                                 , Space
-                                 , LineSeparator
-                                 , ParagraphSeparator
-                                 , Control
-                                 , Format
-                                 , Surrogate
-                                 , PrivateUse
-                                 , NotAssigned
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Version where
     arbitrary = Version <$> arbitrary <*> arbitrary

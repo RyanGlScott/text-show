@@ -127,10 +127,10 @@ data AllAtOnce a b c d = AAONullary
 $(deriveShow ''AllAtOnce)
 instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d) where
     arbitrary = oneof [ pure AAONullary
-                      , AAOUnary <$> arbitrary
+                      , AAOUnary   <$> arbitrary
                       , AAOProduct <$> arbitrary <*> arbitrary <*> arbitrary
-                      , AAORecord <$> arbitrary <*> arbitrary <*> arbitrary
-                      , (:/\:) <$> arbitrary <*> arbitrary
+                      , AAORecord  <$> arbitrary <*> arbitrary <*> arbitrary
+                      , (:/\:)     <$> arbitrary <*> arbitrary
                       ]
 
 data GADT a b where
