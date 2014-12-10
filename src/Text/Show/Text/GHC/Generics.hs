@@ -32,7 +32,7 @@ import GHC.Generics (U1(..), Par1, Rec1(..), K1(..),
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.TH.Internal (deriveShow, mkShowbPrec)
 
@@ -95,7 +95,15 @@ instance Show (U1 p) where
     showbPrec = $(mkShowbPrec ''U1)
     {-# INLINE showb #-}
 
+instance Show1 U1 where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
 $(deriveShow ''Par1)
+
+instance Show1 Par1 where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
 
 instance Show (f p) => Show (Rec1 f p) where
     showbPrec = $(mkShowbPrec ''Rec1)
@@ -104,6 +112,10 @@ instance Show (f p) => Show (Rec1 f p) where
 instance Show c => Show (K1 i c p) where
     showbPrec = $(mkShowbPrec ''K1)
     {-# INLINE showbPrec #-}
+
+instance Show c => Show1 (K1 i c) where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
 
 instance Show (f p) => Show (M1 i c f p) where
     showbPrec = $(mkShowbPrec ''M1)

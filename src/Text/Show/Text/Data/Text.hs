@@ -21,7 +21,7 @@ import Data.Text.Lazy.Builder (Builder, toLazyText)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb))
+import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.List ()
 

@@ -25,7 +25,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Bool ()
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal
@@ -72,3 +72,23 @@ $(deriveShow ''First)
 $(deriveShow ''Last)
 $(deriveShow ''Product)
 $(deriveShow ''Sum)
+
+instance Show1 Dual where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
+instance Show1 First where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
+instance Show1 Last where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
+instance Show1 Product where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
+instance Show1 Sum where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

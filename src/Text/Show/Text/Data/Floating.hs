@@ -30,7 +30,7 @@ import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showbPrec), showbParen)
+import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.Utils ((<>), i2d, s)
 
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.

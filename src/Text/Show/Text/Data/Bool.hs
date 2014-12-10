@@ -14,7 +14,7 @@ module Text.Show.Text.Data.Bool (showbBool) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import Text.Show.Text.Class (showb)
+import Text.Show.Text.Classes (showb)
 import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Bool' to a 'Builder'.

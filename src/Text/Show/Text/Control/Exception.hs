@@ -42,7 +42,7 @@ import           Data.Text.Lazy.Builder (Builder, fromString)
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShow)
 import           Text.Show.Text.Utils ((<>))
 

@@ -43,7 +43,7 @@ import Prelude hiding (Show)
 
 import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShow)

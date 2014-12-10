@@ -19,7 +19,7 @@ import GHC.Real (ratioPrec, ratioPrec1)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec), showbParen)
+import Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Utils ((<>))
 

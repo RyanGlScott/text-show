@@ -14,7 +14,8 @@ module Text.Show.Text.Data.List (showbListDefault) where
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbList), showbListDefault)
+import Text.Show.Text.Classes (Show(showb, showbPrec, showbList),
+                               Show1(showbPrec1), showbListDefault)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 
@@ -24,3 +25,7 @@ instance Show a => Show [a] where
     {-# SPECIALIZE instance Show [Int]    #-}
     showb = showbList
     {-# INLINE showb #-}
+
+instance Show1 [] where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

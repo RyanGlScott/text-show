@@ -33,7 +33,8 @@ import Data.Word (Word64)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec), showbParen, showbSpace)
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1),
+                               showbParen, showbSpace)
 import Text.Show.Text.Data.Integral (showbHex)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
@@ -138,3 +139,7 @@ instance Show Fingerprint where
 instance Show (Proxy s) where
     showb = showbProxy
     {-# INLINE showb #-}
+
+instance Show1 Proxy where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

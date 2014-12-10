@@ -15,7 +15,7 @@ module Text.Show.Text.Control.Monad.ST (showbST) where
 import Control.Monad.ST (ST)
 import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
-import Text.Show.Text.Class (Show(showb))
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 
 -- | Convert a strict 'ST' value to a 'Builder'.
 showbST :: ST s a -> Builder
@@ -25,3 +25,7 @@ showbST _ = "<<ST action>>"
 instance Show (ST s a) where
     showb = showbST
     {-# INLINE showb #-}
+
+instance Show1 (ST s) where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

@@ -29,7 +29,7 @@ import           Text.Read.Lex (Lexeme(..))
 #if MIN_VERSION_base(4,7,0)
 import           Text.Read.Lex (Number)
 #endif
-import           Text.Show.Text.Class (Show(showbPrec), showbParen)
+import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.Data.Char (showbLitChar)
 #if !(MIN_VERSION_base(4,6,0))
 import           Text.Show.Text.Data.Integral (showbIntegerPrec, showbRatioPrec)

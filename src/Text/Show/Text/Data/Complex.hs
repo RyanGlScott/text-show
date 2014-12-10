@@ -17,17 +17,24 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec))
-import Text.Show.Text.Data.Floating ()
-import Text.Show.Text.TH.Internal (mkShowbPrec)
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Complex' value to a 'Builder' with the given precedence.
-showbComplexPrec :: (RealFloat a, Show a) => Int -> Complex a -> Builder
+showbComplexPrec :: Show a => Int -> Complex a -> Builder
 showbComplexPrec = showbPrec
 {-# INLINE showbComplexPrec #-}
 
-instance (RealFloat a, Show a) => Show (Complex a) where
-    {-# SPECIALIZE instance Show (Complex Float) #-}
-    {-# SPECIALIZE instance Show (Complex Double) #-}
-    showbPrec = $(mkShowbPrec ''Complex)
-    {-# INLINE showbPrec #-}
+{-
+TODO: Get these:
+
+{-# SPECIALIZE instance Show (Complex Float) #-}
+{-# SPECIALIZE instance Show (Complex Double) #-}
+
+embedded via TH somehow
+-}
+$(deriveShow ''Complex)
+
+instance Show1 Complex where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

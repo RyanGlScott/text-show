@@ -16,7 +16,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Stats (GCStats)
 
-import Text.Show.Text.Class (showbPrec)
+import Text.Show.Text.Classes (showbPrec)
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Floating ()
 import Text.Show.Text.TH.Internal (deriveShow)

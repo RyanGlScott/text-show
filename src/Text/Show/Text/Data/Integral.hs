@@ -47,7 +47,7 @@ import GHC.Prim ((<#), (>#))
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Utils ((<>), s, toString)
 
 #if defined(TEXT_FORMAT)

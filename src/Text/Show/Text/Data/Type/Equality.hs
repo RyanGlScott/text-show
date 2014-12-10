@@ -17,7 +17,7 @@ import Data.Type.Equality ((:~:)(..))
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
 -- | Convert a propositional equality value to a 'Builder'.
@@ -29,3 +29,7 @@ showbPropEquality = showb
 instance Show (a :~: b) where
     showbPrec = $(mkShowbPrec ''(:~:))
     {-# INLINE showb #-}
+
+instance Show1 ((:~:) a)
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

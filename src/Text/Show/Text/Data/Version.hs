@@ -20,7 +20,7 @@ import Data.Monoid (mconcat)
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 
-import Text.Show.Text.Class (showb, showbPrec)
+import Text.Show.Text.Classes (showb, showbPrec)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()

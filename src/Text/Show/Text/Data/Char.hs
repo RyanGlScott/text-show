@@ -26,7 +26,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(..))
+import Text.Show.Text.Classes (Show(..))
 import Text.Show.Text.Data.Integral (showbIntPrec)
 import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils ((<>), s)

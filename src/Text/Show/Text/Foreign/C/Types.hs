@@ -45,7 +45,7 @@ import Foreign.C.Types
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Floating ()
 

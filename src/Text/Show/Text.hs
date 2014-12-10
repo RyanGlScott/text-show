@@ -11,7 +11,7 @@ Efficiently convert from values to 'Text' via 'Builder's.
 -}
 module Text.Show.Text (
       -- * The 'Show' class
-      Show (..)
+      Show(..)
     , show
     , showLazy
     , showPrec
@@ -20,6 +20,7 @@ module Text.Show.Text (
     , showListLazy
     , showbParen
     , showbSpace
+    , Show1(..)
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString
@@ -39,7 +40,7 @@ import Data.Text.Lazy.Builder
 
 import Prelude hiding (Show(show, showList), print)
 
-import Text.Show.Text.Class
+import Text.Show.Text.Classes
 import Text.Show.Text.Instances ()
 import Text.Show.Text.Utils (toString, toText, lengthB,
                              replicateB, unlinesB, unwordsB)

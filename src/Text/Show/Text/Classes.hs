@@ -1,15 +1,15 @@
 {-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-|
-Module:      Text.Show.Text.Class
+Module:      Text.Show.Text.Classes
 Copyright:   (C) 2014 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-The 'Show' type class.
+The 'Show' and 'Show1' typeclasses.
 -}
-module Text.Show.Text.Class where
+module Text.Show.Text.Classes where
 
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
@@ -24,8 +24,7 @@ import           System.IO (Handle)
 
 import           Text.Show.Text.Utils ((<>), s)
 
--- | 
--- Conversion of values to @Text@. Because there are both strict and lazy @Text@
+-- | Conversion of values to @Text@. Because there are both strict and lazy @Text@
 -- variants, the 'Show' class deliberately avoids using @Text@ in its functions.
 -- Instead, 'showbPrec', 'showb', and 'showbList' all return 'Builder', an
 -- efficient intermediate form that can be converted to either kind of @Text@.
@@ -45,21 +44,16 @@ import           Text.Show.Text.Utils ((<>), s)
 -- use the "Text.Show.Text.TH" module to automatically generate default 'Show'
 -- instances using Template Haskell.
 class Show a where
-    -- |
-    -- Constructs a @Text@ via an efficient 'Builder'. The precedence is used to 
-    -- determine where to put parentheses in a shown expression involving operators.
-    -- 
-    -- 'Builder's can be efficiently combined, so the @showb@ functions are available
-    -- for showing multiple values before producing an output @Text@.
-    showbPrec :: Int -> a -> Builder
+    -- | Convert a value to a 'Builder' with the given predence.
+    showbPrec :: Int -- ^ The operator precedence of the enclosing context (a number
+                     -- from @0@ to @11@). Function application has precedence @10@.
+              -> a   -- ^ The value to be converted to a 'String'.
+              -> Builder
     
-    -- |
-    -- Constructs a @Text@ via an efficient 'Builder'. 'Builder's can be efficiently
-    -- combined, so this is available building a 'Text' from multiple values.
+    -- | A specialized variant of 'showbPrec' using precedence context zero.
     showb :: a -> Builder
     
-    -- |
-    -- Allows for specialized display of lists. This is used, for example, when
+    -- | Allows for specialized display of lists. This is used, for example, when
     -- showing lists of 'Char's.
     showbList :: [a] -> Builder
     
@@ -71,6 +65,11 @@ class Show a where
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
 #endif
+
+-- | Lifting of the 'Show' class to unary type constructors.
+class Show1 f where
+    -- | 'Builder' conversion for values of a type that has a unary type constructor.
+    showbPrec1 :: Show a => Int -> f a -> Builder
 
 -- | Constructs a strict 'TS.Text' from a single value.
 show :: Show a => a -> TS.Text

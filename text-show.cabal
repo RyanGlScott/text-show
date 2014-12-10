@@ -99,7 +99,7 @@ library
                        Text.Show.Text.System.IO
                        Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Text.Read
-  other-modules:       Text.Show.Text.Class
+  other-modules:       Text.Show.Text.Classes
                        Text.Show.Text.Control
                        Text.Show.Text.Data
                        Text.Show.Text.Foreign

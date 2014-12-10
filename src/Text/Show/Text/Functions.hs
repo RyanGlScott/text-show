@@ -8,13 +8,13 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Optional 'Show' instance for functions.
+Optional 'Show' and 'Show1' instances for functions.
 -}
 module Text.Show.Text.Functions (showbFunction) where
 
 import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
-import Text.Show.Text.Class (Show(showb))
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 
 -- | Convert a function to a 'Builder'.
 showbFunction :: (a -> b) -> Builder
@@ -24,3 +24,7 @@ showbFunction _ = "<function>"
 instance Show (a -> b) where
     showb = showbFunction
     {-# INLINE showb #-}
+
+instance Show1 ((->) a) where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

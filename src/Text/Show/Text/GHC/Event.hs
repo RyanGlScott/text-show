@@ -19,7 +19,7 @@ import           GHC.Event (Event, FdKey)
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.Classes (Show(showb, showbPrec))
 
 -- | Convert an 'Event' to a 'Builder'.
 showbEvent :: Event -> Builder

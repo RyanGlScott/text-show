@@ -31,7 +31,7 @@ import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
@@ -71,9 +71,17 @@ instance Show (Ptr a) where
     showb = showbPtr
     {-# INLINE showb #-}
 
+instance Show1 Ptr where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
+
 instance Show (FunPtr a) where
     showb = showbFunPtr
     {-# INLINE showb #-}
+
+instance Show1 FunPtr where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
 
 instance Show IntPtr where
     showbPrec = showbIntPtrPrec
@@ -86,3 +94,7 @@ instance Show WordPtr where
 instance Show (ForeignPtr a) where
     showb = showbForeignPtr
     {-# INLINE showb #-}
+
+instance Show1 ForeignPtr where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

@@ -32,7 +32,7 @@ import           Data.Text.Lazy.Builder (Builder, fromString)
 import qualified Prelude as P
 import           Prelude hiding (Show(show))
 
-import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.Classes (Show(showb, showbPrec))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
 import           Text.Show.Text.TH.Internal (deriveShow)

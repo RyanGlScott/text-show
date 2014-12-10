@@ -23,7 +23,7 @@ import           GHC.Conc (BlockReason, ThreadId, ThreadStatus)
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec))
+import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.

@@ -49,8 +49,8 @@ import           Language.Haskell.TH
 import qualified Prelude as P
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Class (Show(showb, showbPrec),
-                                       showbParen, showbSpace)
+import           Text.Show.Text.Classes (Show(showb, showbPrec),
+                                         showbParen, showbSpace)
 import           Text.Show.Text.Utils ((<>), s)
 
 {- $deriveShow

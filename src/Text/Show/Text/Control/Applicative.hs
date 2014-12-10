@@ -18,7 +18,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.TH.Internal (deriveShow)
 
@@ -28,3 +28,7 @@ showbZipListPrec = showbPrec
 {-# INLINE showbZipListPrec #-}
 
 $(deriveShow ''ZipList)
+
+instance Show1 ZipList where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

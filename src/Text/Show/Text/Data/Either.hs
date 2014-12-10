@@ -16,7 +16,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Either' value to a 'Builder' with the given precedence.
@@ -25,3 +25,7 @@ showbEitherPrec = showbPrec
 {-# INLINE showbEitherPrec #-}
 
 $(deriveShow ''Either)
+
+instance Show a => Show1 (Either a) where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}

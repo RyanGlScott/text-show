@@ -22,7 +22,7 @@ module Text.Show.Text.Data.Ord (
 
 import Data.Text.Lazy.Builder (Builder)
 
-import Text.Show.Text.Class (showb)
+import Text.Show.Text.Classes (showb)
 import Text.Show.Text.TH.Internal (deriveShow)
 
 #if MIN_VERSION_base(4,6,0)
@@ -30,7 +30,7 @@ import Data.Ord (Down)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Class (Show(showbPrec))
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 #endif
 
 -- | Convert a 'Ordering' to a 'Builder'.
@@ -47,4 +47,8 @@ showbDownPrec = showbPrec
 {-# INLINE showbDownPrec #-}
 
 $(deriveShow ''Down)
+
+instance Show1 Down where
+    showbPrec1 = showbPrec
+    {-# INLINE showbPrec1 #-}
 #endif
