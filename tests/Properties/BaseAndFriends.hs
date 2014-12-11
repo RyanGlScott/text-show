@@ -2,6 +2,7 @@
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 {-|
 Module:      Properties.BaseAndFriends
 Copyright:   (C) 2014 Ryan Scott
@@ -45,8 +46,11 @@ import qualified Data.Text as TL
 import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
 #endif
+#if MIN_VERSION_base(4,7,0)
+import qualified Data.OldTypeable as OldT (TyCon)
+#endif
 #if MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (TyCon)
+import qualified Data.Typeable as NewT (TyCon)
 import           GHC.Fingerprint.Type (Fingerprint)
 #endif
 import           Data.Word (Word, Word8, Word16, Word32, Word64)
@@ -179,6 +183,9 @@ baseAndFriendsTests =
         , testProperty "GeneralCategory instance"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
         , testCase "asciiTab = asciiTabB" $                 map fromString asciiTab @=? elems (asciiTabB)
         ]
+    , testGroup "Text.Show.Text.Data.Complex"
+        [ testProperty "Complex Double instance"            (prop_matchesShow :: Int -> Complex Double -> Bool)
+        ]
     , testGroup "Text.Show.Text.Data.Data"
         [ testProperty "Constr instance"                    (prop_matchesShow :: Int -> Constr -> Bool)
         , testProperty "ConstrRep instance"                 (prop_matchesShow :: Int -> ConstrRep -> Bool)
@@ -205,7 +212,6 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.Floating"
         [ testProperty "Float instance"                     (prop_matchesShow :: Int -> Float -> Bool)
         , testProperty "Double instance"                    (prop_matchesShow :: Int -> Double -> Bool)
-        , testProperty "Complex Double instance"            (prop_matchesShow :: Int -> Complex Double -> Bool)
         , testProperty "showbEFloat output" $               prop_showXFloat showEFloat showbEFloat
         , testProperty "showbFFloat output" $               prop_showXFloat showFFloat showbFFloat
         , testProperty "showbGFloat output" $               prop_showXFloat showGFloat showbGFloat
@@ -229,7 +235,6 @@ baseAndFriendsTests =
         , testProperty "Word16 instance"                    (prop_matchesShow :: Int -> Word16 -> Bool)
         , testProperty "Word32 instance"                    (prop_matchesShow :: Int -> Word32 -> Bool)
         , testProperty "Word64 instance"                    (prop_matchesShow :: Int -> Word64 -> Bool)
-        , testProperty "Ratio Int instance"                 (prop_matchesShow :: Int -> Ratio Int -> Bool)
         , testProperty "showbIntAtBase output"              prop_showIntAtBase
         ]
     , testGroup "Text.Show.Text.Data.List"
@@ -250,11 +255,23 @@ baseAndFriendsTests =
         , testProperty "Product Int instance"               (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                   (prop_matchesShow :: Int -> Sum Int -> Bool)
         ]
+#if MIN_VERSION_base(4,4,0)
+    , testGroup "Text.Show.Text.Data.OldTypeable"
+        [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> OldT.TypeRep -> Bool)
+          testProperty "TyCon instance"                     (prop_matchesShow :: Int -> OldT.TyCon -> Bool)
+        ]
+#endif
     , testGroup "Text.Show.Text.Data.Ord"
         [ testProperty "Ordering instance"                  (prop_matchesShow :: Int -> Ordering -> Bool)
 #if MIN_VERSION_base(4,6,0)
         , testProperty "Down Int instance"                  (prop_matchesShow :: Int -> Down Int -> Bool)
 #endif
+        ]
+    , testGroup "Text.Show.Text.Data.Proxy"
+        [ testProperty "Proxy Int instance"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)
+        ]
+    , testGroup "Text.Show.Text.Data.Ratio"
+        [ testProperty "Ratio Int instance"                 (prop_matchesShow :: Int -> Ratio Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Text"
         [ testProperty "Builder instance"                   (prop_matchesShow :: Int -> Builder -> Bool)
@@ -278,12 +295,10 @@ baseAndFriendsTests =
 #endif
 #if MIN_VERSION_base(4,4,0)
     , testGroup "Text.Show.Text.Data.Typeable"
-        [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> TypeRep -> Bool)
-          testProperty "TyCon instance"                     (prop_matchesShow :: Int -> TyCon -> Bool)
-        , testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
-#endif
-        , testProperty "Proxy Int instance"                 (prop_matchesShow :: Int -> Proxy Int -> Bool)
+        [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> NewT.TypeRep -> Bool)
+          testProperty "TyCon instance"                     (prop_matchesShow :: Int -> NewT.TyCon -> Bool)
         ]
+#endif
     , testGroup "Text.Show.Text.Data.Version"
         [ testProperty "Version instance"                   (prop_matchesShow :: Int -> Version -> Bool)
         , testProperty "showbVersionConcrete output"        prop_showVersion
@@ -330,6 +345,11 @@ baseAndFriendsTests =
 --         , testProperty "FdKey instance"                     (prop_matchesShow :: Int -> FdKey -> Bool)
 --         ]
 -- #endif
+#if MIN_VERSION_base(4,4,0)
+    , testGroup "Text.Show.Text.GHC.Fingerprint"
+        [ testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)
+        ]
+#endif
     , testGroup "Text.Show.Text.GHC.Generics"
         [ testProperty "U1 Int instance"                    (prop_matchesShow :: Int -> U1 Int -> Bool)
         , testProperty "Par1 Int instance"                  (prop_matchesShow :: Int -> Par1 Int -> Bool)

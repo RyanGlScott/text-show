@@ -46,7 +46,7 @@ import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH
 
-import qualified Prelude as P
+import qualified Prelude as P (show)
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec),
@@ -287,7 +287,7 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -- TODO: There's got to be a better way of doing this.
 -- | Checks if a 'Name' represents a tuple type constructor (other than '()')/
 isNonUnitTuple :: Name -> Bool
-isNonUnitTuple = isPrefixOf "GHC.Tuple.(," . P.show
+isNonUnitTuple = isPrefixOf "(," . nameBase
 
 -- | A type-restricted version of 'const'. This is useful when generating the lambda
 -- expression in 'mkShowbPrec' for a data type with only nullary constructors (since
@@ -324,6 +324,23 @@ withType name f = do
           other -> error $ "Text.Show.Text.TH.withType: Unsupported type: "
                           ++ P.show other
       _ -> error "Text.Show.Text.TH.withType: I need the name of a type."
+
+-- fweep :: Name -> a
+-- fweep conName = do
+--     info <- reify conName
+--     case info of
+--          TyConI dec ->
+--             case dec of
+--                  DataD    _ _ _ cons _ -> frerf cons
+--                  NewtypeD _ _ _ con  _ -> frerf cons
+--                  _ -> error "SQEUUUUUERPS"
+--          _ -> error "SQUEEEEEEEEEEEEEEEEPS"
+-- 
+-- frerf :: Con -> [Type]
+-- frerf (NormalC _ strictTys) = undefined
+-- frerf (RecC _ varStrictTys) = undefined
+-- frerf (InfixC lTy _ rTy) = undefined
+-- frerf (ForallC )
 
 -- | Extracts the name from a type variable binder.
 tvbName :: TyVarBndr -> Name

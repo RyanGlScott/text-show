@@ -87,6 +87,7 @@ library
                        Text.Show.Text.Data.Maybe
                        Text.Show.Text.Data.Monoid
                        Text.Show.Text.Data.Ord
+                       Text.Show.Text.Data.Proxy
                        Text.Show.Text.Data.Ratio
                        Text.Show.Text.Data.Text
                        Text.Show.Text.Data.Tuple
@@ -102,6 +103,7 @@ library
   other-modules:       Text.Show.Text.Classes
                        Text.Show.Text.Control
                        Text.Show.Text.Data
+                       Text.Show.Text.Data.Typeable.Utils
                        Text.Show.Text.Foreign
                        Text.Show.Text.GHC
                        Text.Show.Text.Instances
@@ -127,6 +129,7 @@ library
   
   if impl(ghc >= 7.2)
     exposed-modules:   Text.Show.Text.GHC.Event
+                       Text.Show.Text.GHC.Fingerprint
                        Text.Show.Text.GHC.Generics
   
   if impl(ghc >= 7.4)
@@ -137,7 +140,8 @@ library
     build-depends:     tagged           >= 0.4.4 && < 1
   
   if impl(ghc >= 7.8)
-    exposed-modules:   Text.Show.Text.Data.Type.Coercion
+    exposed-modules:   Text.Show.Text.Data.OldTypeable
+                       Text.Show.Text.Data.Type.Coercion
                        Text.Show.Text.Data.Type.Equality
 
 test-suite text-show-properties

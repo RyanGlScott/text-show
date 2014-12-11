@@ -5,7 +5,7 @@
 #if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE TypeFamilies #-}
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
 {-|
 Module:      Instances.BaseAndFriends
 Copyright:   (C) 2014 Ryan Scott
@@ -45,8 +45,11 @@ import           Data.Coerce (Coercible)
 import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
+#if MIN_VERSION_base(4,7,0)
+import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
+#endif
 #if MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (TyCon(..))
+import qualified Data.Typeable.Internal as NewT (TyCon(..))
 import           GHC.Fingerprint.Type (Fingerprint(..))
 
 #if !(MIN_VERSION_base(4,7,0))
@@ -199,12 +202,20 @@ instance Arbitrary MaskingState where
 instance Arbitrary (Proxy s) where
     arbitrary = pure Proxy
 
+#if MIN_VERSION_base(4,7,0)
+-- TODO: Come up with an instance of TypeRep that doesn't take forever
+-- instance Arbitrary OldT.TypeRep where
+
+instance Arbitrary OldT.TyCon where
+    arbitrary = OldT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
+
 #if MIN_VERSION_base(4,4,0)
 -- TODO: Come up with an instance of TypeRep that doesn't take forever
--- instance Arbitrary TypeRep where
+-- instance Arbitrary NewT.TypeRep where
 
-instance Arbitrary TyCon where
-    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+instance Arbitrary NewT.TyCon where
+    arbitrary = NewT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary

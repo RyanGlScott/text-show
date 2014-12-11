@@ -30,6 +30,6 @@ instance Show (a :~: b) where
     showbPrec = $(mkShowbPrec ''(:~:))
     {-# INLINE showb #-}
 
-instance Show1 ((:~:) a)
+instance Show1 ((:~:) a) where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}

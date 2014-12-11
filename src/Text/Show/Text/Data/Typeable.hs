@@ -10,34 +10,22 @@ Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Typeable@ module.
 -}
-module Text.Show.Text.Data.Typeable (
-      showbTypeRepPrec
-    , showbTyCon
-#if MIN_VERSION_base(4,4,0)
-    , showbFingerprint
-#endif
-    , showbProxy
-    ) where
+module Text.Show.Text.Data.Typeable (showbTyCon, showbTypeRepPrec) where
 
-import Data.Monoid (mempty)
-import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (TyCon(..), funTc, listTc)
-import GHC.Fingerprint.Type (Fingerprint(..))
 #else
 import Data.Typeable (TyCon, mkTyCon, tyConString, typeOf)
 #endif
-import Data.Word (Word64)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1),
-                               showbParen, showbSpace)
-import Text.Show.Text.Data.Integral (showbHex)
+import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
+import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
+import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
 showbTypeRepPrec :: Int -> TypeRep -> Builder
@@ -79,39 +67,10 @@ isTupleTyCon tycon = case tyconStr of
     tyconStr = tyConString tycon
 {-# INLINE isTupleTyCon #-}
 
--- | Helper function for showing a list of arguments, each separated by the given
--- 'Builder'.
-showbArgs :: Show a => Builder -> [a] -> Builder
-showbArgs _   []     = mempty
-showbArgs _   [a]    = showbPrec 10 a
-showbArgs sep (a:as) = showbPrec 10 a <> sep <> showbArgs sep as
-{-# INLINE showbArgs #-}
-
--- | Helper function for showing a list of 'TypeRep's in a tuple.
-showbTuple :: [TypeRep] -> Builder
-showbTuple args = s '(' <> showbArgs (s ',') args <> s ')'
-{-# INLINE showbTuple #-}
-
 -- | Convert a 'TyCon' to a 'Builder'.
 showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConString
 {-# INLINE showbTyCon #-}
-
--- | Convert a 'Proxy' type to a 'Builder'.
-showbProxy :: Proxy s -> Builder
-showbProxy _ = "Proxy"
-{-# INLINE showbProxy #-}
-
-#if MIN_VERSION_base(4,4,0)
--- | Convert a 'Fingerprint' to a 'Builder'.
-showbFingerprint :: Fingerprint -> Builder
-showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
-  where
-    hex16 :: Word64 -> Builder
-    hex16 i = let hex = showbHex i
-               in replicateB (16 - lengthB hex) (s '0') <> hex
-{-# INLINE showbFingerprint #-}
-#endif
 
 #if MIN_VERSION_base(4,4,0)
 -- | Identical to 'tyConName'. Defined to avoid using excessive amounts of pragmas
@@ -128,18 +87,3 @@ instance Show TypeRep where
 instance Show TyCon where
     showb = showbTyCon
     {-# INLINE showb #-}
-
-#if MIN_VERSION_base(4,4,0)
-instance Show Fingerprint where
-    showb = showbFingerprint
-    {-# INLINE showb #-}
-#endif
-
--- TODO: See why 'deriveShow' can't detect Proxy's phantom type correctly
-instance Show (Proxy s) where
-    showb = showbProxy
-    {-# INLINE showb #-}
-
-instance Show1 Proxy where
-    showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
