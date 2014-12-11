@@ -2,7 +2,9 @@
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
+#if MIN_VERSION_base(4,7,0)
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
+#endif
 {-|
 Module:      Properties.BaseAndFriends
 Copyright:   (C) 2014 Ryan Scott
@@ -35,6 +37,9 @@ import           Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
+#if MIN_VERSION_base(4,7,0)
+import qualified Data.OldTypeable as OldT (TyCon)
+#endif
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
 #endif
@@ -45,9 +50,6 @@ import qualified Data.Text as TL
 #if MIN_VERSION_base(4,7,0)
 import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
-#endif
-#if MIN_VERSION_base(4,7,0)
-import qualified Data.OldTypeable as OldT (TyCon)
 #endif
 #if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable as NewT (TyCon)
@@ -255,7 +257,7 @@ baseAndFriendsTests =
         , testProperty "Product Int instance"               (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                   (prop_matchesShow :: Int -> Sum Int -> Bool)
         ]
-#if MIN_VERSION_base(4,4,0)
+#if MIN_VERSION_base(4,7,0)
     , testGroup "Text.Show.Text.Data.OldTypeable"
         [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> OldT.TypeRep -> Bool)
           testProperty "TyCon instance"                     (prop_matchesShow :: Int -> OldT.TyCon -> Bool)

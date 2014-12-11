@@ -4,8 +4,9 @@
 #endif
 #if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Instances.BaseAndFriends
 Copyright:   (C) 2014 Ryan Scott
@@ -35,6 +36,9 @@ import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
 import           Data.Dynamic (Dynamic, toDyn)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
+#if MIN_VERSION_base(4,7,0)
+import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
+#endif
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
 #endif
@@ -44,9 +48,6 @@ import           Data.Text.Lazy.Builder (Builder, fromString)
 import           Data.Coerce (Coercible)
 import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
-#endif
-#if MIN_VERSION_base(4,7,0)
-import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable.Internal as NewT (TyCon(..))
