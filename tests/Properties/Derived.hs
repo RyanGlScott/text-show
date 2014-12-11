@@ -56,6 +56,8 @@ derivedTests =
         , testProperty "PolymorphicRecord Int Int Int Int instance"  (prop_matchesShow :: Int -> PolymorphicRecord Int Int Int Int -> Bool)
         , testProperty "MonomorphicInfix instance"                   (prop_matchesShow :: Int -> MonomorphicInfix -> Bool)
         , testProperty "PolymorphicInfix Int Int Int instance"       (prop_matchesShow :: Int -> PolymorphicInfix Int Int Int -> Bool)
+        , testProperty "MonomorphicForall instance"                  (prop_matchesShow :: Int -> MonomorphicForall -> Bool)
+        , testProperty "PolymorphicForall Int Int instance"          (prop_matchesShow :: Int -> PolymorphicForall Int Int -> Bool)
         , testProperty "AllAtOnce Int Int Int Int instance"          (prop_matchesShow :: Int -> AllAtOnce Int Int Int Int -> Bool)
         , testProperty "GADT instance"                               prop_showGADT
 -- TODO: These tests take forever. Look at quickcheck-instances (specifically, at the Tree instance) to see how to fix this.
@@ -64,5 +66,6 @@ derivedTests =
         , testProperty "Int :?: Int instance"                        (prop_matchesShow :: Int -> Int :?: Int -> Bool)
         , testProperty "HigherKindedTypeParams Maybe Int instance"   (prop_matchesShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
         , testProperty "RestrictedContext Int instance"              (prop_matchesShow :: Int -> RestrictedContext Int -> Bool)
+        , testProperty "Fix Maybe instance"                          (prop_matchesShow :: Int -> Fix Maybe -> Bool)
         ]
     ]

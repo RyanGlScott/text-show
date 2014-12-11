@@ -5,6 +5,7 @@
 * Moved `showbRatioPrec` to `Text.Show.Text.Data.Ratio`, `showbComplexPrec` to `Text.Show.Text.Data.Complex`, `showbProxy` to `Text.Show.Text.Data.Proxy`, and `showbFingerprint` to `Text.Show.Text.GHC.Fingerprint`
 * Added `showbSpace` to `Text.Show.Text`
 * Added the `Text.Show.Text.Data.OldTypeable` module for base >= 4.7
+* Added `Text.Show.Text.Debug.Trace`, which provides `Text` equivalents for functions in `Debug.Trace`
 * Added the `Show1` class and corresponding instances for unary type constructors.
 * Exported `asciiTabB` in `Text.Show.Text.Data.Char`
 

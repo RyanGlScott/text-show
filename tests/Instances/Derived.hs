@@ -1,5 +1,6 @@
-{-# LANGUAGE FlexibleContexts, GADTs, GeneralizedNewtypeDeriving,
-             NoImplicitPrelude, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE ExistentialQuantification, FlexibleContexts, GADTs,
+             GeneralizedNewtypeDeriving, NoImplicitPrelude, StandaloneDeriving,
+             TemplateHaskell, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Instances.Derived
@@ -25,6 +26,8 @@ module Instances.Derived (
     , PolymorphicRecord(..)
     , MonomorphicInfix(..)
     , PolymorphicInfix(..)
+    , MonomorphicForall(..)
+    , PolymorphicForall(..)
     , AllAtOnce(..)
     , GADT(..)
     , LeftAssocTree(..)
@@ -32,6 +35,7 @@ module Instances.Derived (
     , (:?:)(..)
     , HigherKindedTypeParams(..)
     , RestrictedContext(..)
+    , Fix(..)
     ) where
 
 import           Control.Applicative ((<$>), (<*>), pure)
@@ -40,7 +44,7 @@ import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude hiding (Show)
 
-import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), oneof)
+import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, oneof)
 
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
@@ -113,6 +117,18 @@ $(deriveShow ''PolymorphicInfix)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (PolymorphicInfix a b c) where
     arbitrary = (:\:) <$> arbitrary <*> arbitrary
 
+data MonomorphicForall = forall a. (Arbitrary a, S.Show a, T.Show a) => MonomorphicForall a
+deriving instance S.Show MonomorphicForall
+$(deriveShow ''MonomorphicForall)
+instance Arbitrary MonomorphicForall where
+    arbitrary = MonomorphicForall <$> (arbitrary :: Gen Int)
+
+data PolymorphicForall a b = forall c. (Arbitrary c, S.Show c, T.Show c) => PolymorphicForall a c
+deriving instance S.Show a => S.Show (PolymorphicForall a b)
+$(deriveShow ''PolymorphicForall)
+instance Arbitrary a => Arbitrary (PolymorphicForall a b) where
+    arbitrary = PolymorphicForall <$> arbitrary <*> (arbitrary :: Gen Int)
+
 infix 3 :/\:
 data AllAtOnce a b c d = AAONullary
                        | AAOUnary a
@@ -123,7 +139,9 @@ data AllAtOnce a b c d = AAONullary
                          , aaoRecord3 :: c
                        }
                        | a :/\: b
-  deriving S.Show
+                       | forall e. (Arbitrary e, S.Show e, T.Show e) => AAOForall a c e
+deriving instance (S.Show a, S.Show b, S.Show c) => S.Show (AllAtOnce a b c d)
+    
 $(deriveShow ''AllAtOnce)
 instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d) where
     arbitrary = oneof [ pure AAONullary
@@ -131,18 +149,14 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       , AAOProduct <$> arbitrary <*> arbitrary <*> arbitrary
                       , AAORecord  <$> arbitrary <*> arbitrary <*> arbitrary
                       , (:/\:)     <$> arbitrary <*> arbitrary
+                      , AAOForall  <$> arbitrary <*> arbitrary <*> (arbitrary :: Gen Int)
                       ]
 
 data GADT a b where
     GADTCon1 ::           GADT Char b
     GADTCon2 :: Double -> GADT Double Double
     GADTCon3 :: Int    -> GADT Int String
-instance S.Show a => S.Show (GADT a b) where
-    showsPrec _ GADTCon1     = showString "GADTCon1"
-    showsPrec p (GADTCon2 d)
-        = showParen (p > appPrec) $ showString "GADTCon2 " . showsPrec appPrec1 d
-    showsPrec p (GADTCon3 i)
-        = showParen (p > appPrec) $ showString "GADTCon3 " . showsPrec appPrec1 i
+deriving instance S.Show a => S.Show (GADT a b)
 $(deriveShow ''GADT)
 
 infixl 5 :<:
@@ -194,6 +208,13 @@ instance (Read a, T.Show a) => T.Show (RestrictedContext a) where
     showbPrec = $(mkShowbPrec ''RestrictedContext)
 instance Arbitrary a => Arbitrary (RestrictedContext a) where
     arbitrary = RestrictedContext <$> arbitrary
+
+newtype Fix f = Fix (f (Fix f))
+$(return []) -- Hack to make Fix available in the type environment at the time of reification
+deriving instance S.Show (f (Fix f)) => S.Show (Fix f)
+instance T.Show (f (Fix f)) => T.Show (Fix f) where
+    showbPrec = $(mkShowbPrec ''Fix)
+deriving instance Arbitrary (f (Fix f)) => Arbitrary (Fix f)
 
 -- TODO: Test data family instances, once they're supported
 -- 

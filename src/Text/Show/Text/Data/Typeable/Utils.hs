@@ -1,4 +1,14 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-|
+Module:      Text.Show.Text.Data.Typeable.Utils
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Utility functions for showing data types in the @Typeable@ (or @OldTypeable@) module.
+-}
 module Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple) where
 
 import Data.Monoid (mempty)
