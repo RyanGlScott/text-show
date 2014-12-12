@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Floating
@@ -302,15 +302,25 @@ floatToDigits x =
 
 roundTo :: Int -> [Int] -> (Int,[Int])
 roundTo d is =
+#if MIN_VERSION_base(4,6,0)
   case f d True is of
+#else
+  case f d is of
+#endif
     x@(0,_) -> x
     (1,xs)  -> (1, 1:xs)
     _       -> error "roundTo: bad Value"
  where
+#if MIN_VERSION_base(4,6,0)
   f n _ []     = (0, replicate n 0)
   f 0 e (x:xs) | x == 5 && e && all (== 0) xs = (0, [])   -- Round to even when at exactly half the base
                | otherwise = (if x >= 5 then 1 else 0, [])
   f n _ (i:xs)
+#else
+  f n []     = (0, replicate n 0)
+  f 0 (x:_)  = (if x >= 5 then 1 else 0, [])
+  f n (i:xs)
+#endif
      | i' == 10 = (1,0:ds)
      | otherwise  = (0,i':ds)
       where
