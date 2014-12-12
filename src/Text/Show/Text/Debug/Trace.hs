@@ -47,7 +47,7 @@ import qualified Debug.Trace as S
 
 import           Prelude hiding (Show(show))
 
-import           Text.Show.Text.Classes (Show, show)
+import           Text.Show.Text.Classes (Show, showLazy)
 import           Text.Show.Text.Instances ()
 
 -- | The 'traceIO' function outputs the trace message from the IO monad.
@@ -115,12 +115,12 @@ variables @x@ and @z@:
 >     ...
 -}
 traceShow :: Show a => a -> b -> b
-traceShow = trace . show
+traceShow = traceLazy . showLazy
 {-# INLINE traceShow #-}
 
 -- | Like 'traceShow' but returns the shown value instead of a third value.
 traceShowId :: Show a => a -> a
-traceShowId a = trace (show a) a
+traceShowId a = traceLazy (showLazy a) a
 {-# INLINE traceShowId #-}
 
 {-|
@@ -153,7 +153,7 @@ Like 'traceM', but uses 'show' on the argument to convert it to a 'TS.Text'.
 >   traceMShow $ x + y
 -}
 traceShowM :: (Show a, Monad m) => a -> m ()
-traceShowM = traceM . show
+traceShowM = traceMLazy . showLazy
 {-# INLINE traceShowM #-}
 
 #if MIN_VERSION_base(4,5,0)
@@ -208,7 +208,7 @@ traceEventIOLazy = S.traceEventIO . TL.unpack
 {-# INLINE traceEventIOLazy #-}
 #endif
 
-#if MIN_VERSION_base(4,5,0)
+#if MIN_VERSION_base(4,7,0)
 -- | The 'traceMarker' function emits a marker to the eventlog, if eventlog
 -- profiling is available and enabled at runtime. The 'TS.Text' is the name of
 -- the marker. The name is just used in the profiling tools to help you keep
