@@ -21,11 +21,11 @@ module Text.Show.Text.TH.Internal (
     , mkShowLazy
     , mkShowPrec
     , mkShowPrecLazy
---     , mkShowList
---     , mkShowListLazy
+    , mkShowList
+    , mkShowListLazy
     , mkShowb
     , mkShowbPrec
---     , mkShowbList
+    , mkShowbList
     , mkPrint
     , mkPrintLazy
     , mkHPrint
@@ -49,7 +49,7 @@ import           Language.Haskell.TH
 import qualified Prelude as P (show)
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Classes (Show(showb, showbPrec),
+import           Text.Show.Text.Classes (Show(showb, showbPrec), showbListDefault,
                                          showbParen, showbSpace)
 import           Text.Show.Text.Utils ((<>), s)
 
@@ -165,6 +165,18 @@ mkShowPrec name = [| \p -> toStrict . $(mkShowPrecLazy name) p |]
 mkShowPrecLazy :: Name -> Q Exp
 mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
 
+-- | Generates a lambda expression which converts the given list of @data@ types or
+-- @newtype@s to a strict 'TS.Text' in which the values are surrounded by square
+-- brackets and each value is separated by a comma.
+mkShowList :: Name -> Q Exp
+mkShowList name = [| toStrict . $(mkShowListLazy name) |]
+
+-- | Generates a lambda expression which converts the given list of @data@ types or
+-- @newtype@s to a lazy 'TL.Text' in which the values are surrounded by square
+-- brackets and each value is separated by a comma.
+mkShowListLazy :: Name -> Q Exp
+mkShowListLazy name = [| toLazyText . $(mkShowbList name) |]
+
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder'.
 mkShowb :: Name -> Q Exp
@@ -174,6 +186,12 @@ mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 -- to a 'Builder' with the given precedence.
 mkShowbPrec :: Name -> Q Exp
 mkShowbPrec name = withType name $ const consToShow
+
+-- | Generates a lambda expression which converts the given list of @data@ types or
+-- @newtype@s to a 'Builder' in which the values are surrounded by square brackets
+-- and each value is separated by a comma.
+mkShowbList :: Name -> Q Exp
+mkShowbList name = [| showbListDefault $(mkShowb name) |]
 
 -- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's strict 'TS.Text' output to the standard output, followed by a newline.

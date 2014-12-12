@@ -7,9 +7,9 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Functions that splice traces into source code whic take 'Show' instances as arguments.
-You need to enable the @TemplateHaskell@ language extension in order to use this
-module.
+Functions that splice traces into source code which take arbitrary @data@ types or
+@newtypes@ as arguments (even if they are not instances of @Show@). You need to
+enable the @TemplateHaskell@ language extension in order to use this module.
 -}
 module Text.Show.Text.Debug.Trace.TH (
       mkTraceShow
