@@ -43,7 +43,7 @@ import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
-import           Text.Show.Text.TH.Internal (deriveShow)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
@@ -234,4 +234,4 @@ instance Show ErrorCall where
     showb = showbErrorCall
     {-# INLINE showb #-}
 
-$(deriveShow ''MaskingState)
+$(deriveShowPragmas defaultInlineShowb ''MaskingState)

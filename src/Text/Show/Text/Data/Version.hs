@@ -24,7 +24,7 @@ import Text.Show.Text.Classes (showb, showbPrec)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
@@ -41,4 +41,4 @@ showbVersionConcrete (Version branch tags)
         mconcat (map ((s '-' <>) . fromString) tags)
 {-# INLINE showbVersionConcrete #-}
 
-$(deriveShow ''Version)
+$(deriveShowPragmas defaultInlineShowbPrec ''Version)

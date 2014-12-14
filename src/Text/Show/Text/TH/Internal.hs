@@ -7,7 +7,7 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Functions to mechanically derive 'Show' instances or splice
+Functions to mechanically derive 'T.Show' instances or splice
 @show@-related expressions into Haskell source code. You need to enable
 the @TemplateHaskell@ language extension in order to use this module.
 -}
@@ -15,6 +15,7 @@ module Text.Show.Text.TH.Internal (
       -- * @deriveShow@
       -- $deriveShow
       deriveShow
+    , deriveShowPragmas
       -- * @mk@ functions
       -- $mk
     , mkShow
@@ -30,11 +31,17 @@ module Text.Show.Text.TH.Internal (
     , mkPrintLazy
     , mkHPrint
     , mkHPrintLazy
+      -- * Advanced pragma options
+    , PragmaOptions(..)
+    , defaultPragmaOptions
+    , defaultInlineShowbPrec
+    , defaultInlineShowb
+    , defaultInlineShowbList
     ) where
 
-import           Control.Applicative ((<$>))
+import           Control.Applicative ((<$>), pure)
 
-import           Data.List (foldl', isPrefixOf)
+import           Data.List (foldl', intersperse, isPrefixOf)
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -46,16 +53,17 @@ import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH
 
-import qualified Prelude as P (show)
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Classes (Show(showb, showbPrec), showbListDefault,
-                                         showbParen, showbSpace)
+import qualified Text.Show as S (Show(show))
+import qualified Text.Show.Text.Classes as T (Show)
+import           Text.Show.Text.Classes (showb, showbPrec, showbList,
+                                         showbListDefault, showbParen, showbSpace)
 import           Text.Show.Text.Utils ((<>), s)
 
 {- $deriveShow
 
-'deriveShow' automatically generates a 'Show' instance declaration for a @data@
+'deriveShow' automatically generates a 'T.Show' instance declaration for a @data@
 type or @newtype@. As an example:
 
 @
@@ -69,10 +77,10 @@ data D a = Nullary
                   , testTwo   :: Bool
                   , testThree :: D a
                   }
-$(deriveShow ''D)
+$('deriveShow' 'defaultOptions' ''D)
 @
 
-@D@ now has a 'Show' instance equivalent to that which would be generated
+@D@ now has a 'T.Show' instance equivalent to that which would be generated
 by a @deriving Show@ clause. 
 
 Note that at the moment, there are a number of limitations to this approach:
@@ -81,45 +89,118 @@ Note that at the moment, there are a number of limitations to this approach:
   'deriveShow' with @data instance@s or @newtype instance@s.
   
 * 'deriveShow' lacks the ability to properly detect data types with higher-kinded
-   type parameters (e.g., @data HK f a = HK (f a)@), so it cannot create 'Show'
+   type parameters (e.g., @data HK f a = HK (f a)@), so it cannot create 'T.Show'
    for those data types.
 
-* Some data constructors have arguments whose 'Show' instance depends on a
-  typeclass besides 'Show'. For example, consider @newtype MyRatio a = MyRatio
-  (Ratio a)@. 'Ratio a' is a 'Show' instance only if 'a' is an instance of both
-  'Integral' and 'Show'. Unfortunately, 'deriveShow' cannot infer that 'a' must
-  be an instance of 'Integral', so it cannot create a 'Show' instance for 'MyRatio'.
+* Some data constructors have arguments whose 'T.Show' instance depends on a
+  typeclass besides 'T.Show'. For example, consider @newtype MyRatio a = MyRatio
+  (Ratio a)@. @'Ratio' a@ is a 'T.Show' instance only if @a@ is an instance of both
+  'Integral' and 'T.Show'. Unfortunately, 'deriveShow' cannot infer that 'a' must
+  be an instance of 'Integral', so it cannot create a 'T.Show' instance for @MyRatio@.
 
 -}
 
--- | Generates a 'Show' instance declaration for the given @data@ type or @newtype@.
-deriveShow :: Name -> Q [Dec]
-deriveShow name = withType name $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
+-- | Generates a 'T.Show' instance declaration for the given @data@ type or @newtype@.
+deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
+           -> Q [Dec]
+deriveShow = deriveShowPragmas defaultPragmaOptions
+
+-- | Generates a 'T.Show' instance declaration for the given @data@ type or @newtype@.
+-- You shouldn't need to use this function unless you know what you are doing.
+-- 
+-- Unlike 'deriveShow', this function allows configuration of whether to inline
+-- 'showbPrec', 'showb', or 'showbList'. It also allows for specializing instances
+-- certain types. For example:
+-- 
+-- @
+-- data ADT a = ADT a
+-- $(deriveShowPragmas 'defaultInlineShowbPrec' {
+--                         specializeTypes = [t| Int |]
+--                      }
+--                      ''ADT)
+-- @
+-- 
+-- This declararation would produce code like this:
+-- 
+-- @
+-- instance Show a => Show (ADT a) where
+--     {-# INLINE showbPrec #-}
+--     {-# SPECIALIZE instance Show (ADT Int) #-}
+--     showbPrec = ...
+-- @
+deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
+                  -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
+                  -> Q [Dec]
+deriveShowPragmas opts dataName =
+    withType dataName $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec
-    fromCons tvbs cons = instanceD (applyCon ''Show typeNames name)
-                                   (appT classType instanceType)
-                                   [ funD 'showbPrec [ clause [] (normalB $ consToShow cons) []
-                                                     ]
-                                   ]
+    fromCons tvbs cons =
+        instanceD (applyCon ''T.Show typeNames dataName)
+                  (appT classType instanceType)
+                  ([ funD 'showbPrec [ clause []
+                                              (normalB $ consToShow cons)
+                                              []
+                                     ]
+                   ] ++ inlineShowbPrecDec
+                     ++ inlineShowbDec
+                     ++ inlineShowbListDec
+                     ++ specializeDecs
+                  )
+        
       where
           typeNames :: [Name]
           typeNames = map tvbName tvbs
           
           instanceType :: Q Type
-          instanceType = foldl' appT (conT name) $ map varT typeNames
+          instanceType = foldl' appT (conT dataName) $ map varT typeNames
           
           classType :: Q Type
-          classType = conT ''Show
+          classType = conT ''T.Show
+          
+          inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
+          inline isInlining funName
+              | isInlining opts = [ pure
+                                    . PragmaD
+                                    $ InlineP funName
+#if MIN_VERSION_template_haskell(2,8,0)
+                                              Inline FunLike AllPhases
+#else
+                                              (InlineSpec True False Nothing)
+#endif
+                                  ]
+              | otherwise       = []
+          
+          inlineShowbPrecDec :: [Q Dec]
+          inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
+          
+          inlineShowbDec :: [Q Dec]
+          inlineShowbDec = inline inlineShowb 'showb
+
+          inlineShowbListDec :: [Q Dec]
+          inlineShowbListDec = inline inlineShowbList 'showbList
+          
+          specializeDecs :: [Q Dec]
+#if MIN_VERSION_template_haskell(2,8,0)
+          specializeDecs = (fmap . fmap) (PragmaD
+                                             . SpecialiseInstP
+                                             . AppT (ConT ''T.Show)
+                                         )
+                                         (specializeTypes opts)
+#else
+          -- There doesn't appear to be an equivalent of SpecialiseInstP in early
+          -- versions Template Haskell.
+          specializeDecs = []
+#endif
 
 {- $mk
 
 There may be scenarios in which you want to show an arbitrary @data@ type or @newtype@
-without having to make the type an instance of 'Show'. For these cases,
+without having to make the type an instance of 'T.Show'. For these cases,
 "Text.Show.Text.TH" provide several functions (all prefixed with @mk@) that splice
 the appropriate lambda expression into your source code.
 
-As an example, suppose you have @data ADT = ADTCon@, which is not an instance of 'Show'.
+As an example, suppose you have @data ADT = ADTCon@, which is not an instance of 'T.Show'.
 With @mkShow@, you can still convert it to 'Text':
 
 @
@@ -213,7 +294,32 @@ mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 mkHPrintLazy :: Name -> Q Exp
 mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
--- | Generates code to generate the 'Show' encoding of a number of constructors.
+-- | Options that specify what @INLINE@ or @SPECIALIZE@ pragmas to generate with
+-- a 'T.Show' instance.
+data PragmaOptions = PragmaOptions {
+    inlineShowbPrec  :: Bool    -- ^ Whether to inline 'showbPrec'
+  , inlineShowb      :: Bool    -- ^ Whether to inline 'showb'
+  , inlineShowbList  :: Bool    -- ^ Whether to inline 'showbList'
+  , specializeTypes :: [Q Type] -- ^ Types for which to create specialized instance declarations
+}
+
+-- | Do not generate any pragmas with a 'T.Show' instance.
+defaultPragmaOptions :: PragmaOptions
+defaultPragmaOptions = PragmaOptions False False False []
+
+-- | Inline the 'showbPrec' function in a 'T.Show' instance.
+defaultInlineShowbPrec :: PragmaOptions
+defaultInlineShowbPrec = defaultPragmaOptions { inlineShowbPrec = True }
+
+-- | Inline the 'showb' function in a 'T.Show' instance
+defaultInlineShowb :: PragmaOptions
+defaultInlineShowb = defaultPragmaOptions { inlineShowb = True }
+
+-- | Inline the 'showbList' function in a 'T.Show' instance.
+defaultInlineShowbList :: PragmaOptions
+defaultInlineShowbList = defaultPragmaOptions { inlineShowbList = True }
+
+-- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
 consToShow :: [Con] -> Q Exp
 consToShow []   = error $ "Text.Show.Text.TH.consToShow: Not a single constructor given!"
@@ -225,7 +331,7 @@ consToShow cons = do
         . caseE (varE value)
         $ map (encodeArgs p) cons
 
--- | Generates code to generate the 'Show' encoding of a single constructor.
+-- | Generates code to generate the 'T.Show' encoding of a single constructor.
 encodeArgs :: Name -> Con -> Q Match
 encodeArgs p (NormalC conName [])
     = match (conP conName [])
@@ -241,16 +347,18 @@ encodeArgs p (NormalC conName [_]) = do
           (normalB [| showbParen ($(varE p) > appPrec) $(namedArg) |])
           []
 encodeArgs p (NormalC conName ts) = do
-    args <- mapM newName ["arg" ++ P.show n | (_, n) <- zip ts [1 :: Int ..]]
+    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
     
     if isNonUnitTuple conName
        then do
-           let showArgs    = map (appE [| showb |] . varE) args
-               mappendArgs = foldr1 (\v q -> [| $(v) <> s ',' <> $(q) |]) showArgs
-               parenArgs   = [| s '(' <> $(mappendArgs) <> s ')' |]
+           let showArgs       = map (appE [| showb |] . varE) args
+               parenCommaArgs = [| s '(' |] : intersperse [| s ',' |] showArgs
+               mappendArgs    = foldr (flip infixApp [| (<>) |])
+                                      [| s ')' |]
+                                      parenCommaArgs
            
            match (conP conName $ map varP args)
-                 (normalB [| intConst $(parenArgs) $(varE p) |])
+                 (normalB [| intConst $(mappendArgs) $(varE p) |])
                  []
        else do
            let showArgs = map (appE [| showbPrec appPrec1 |] . varE) args
@@ -262,17 +370,21 @@ encodeArgs p (NormalC conName ts) = do
                  []
 encodeArgs p (RecC conName []) = encodeArgs p $ NormalC conName []
 encodeArgs p (RecC conName ts) = do
-    args <- mapM newName ["arg" ++ P.show n | (_, n) <- zip ts [1 :: Int ..]]
+    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
     
-    let showArgs    = map (\(arg, (argName, _, _)) -> [| fromString $(stringE (nameBase argName)) <> fromString " = " <> showb $(varE arg) |])
-                          $ zip args ts
-        mappendArgs = foldr1 (\v q -> [| $(v) <> fromString ", " <> $(q) |]) showArgs
-        namedArgs   = [| fromString $(stringE (nameBase conName))
-                            <> showbSpace
-                            <> s '{'
-                            <> $(mappendArgs)
-                            <> s '}'
-                       |]
+    let showArgs       = concatMap (\(arg, (argName, _, _))
+                                      -> [ [| fromString $(stringE (nameBase argName)) |]
+                                         , [| fromString " = "                         |]
+                                         , [| showb $(varE arg)                        |]
+                                         , [| fromString ", "                          |]
+                                         ]
+                                   )
+                            (zip args ts)
+        braceCommaArgs = [| s '{' |] : take (length showArgs - 1) showArgs
+        mappendArgs    = foldr (flip infixApp [| (<>) |])
+                           [| s '}' |]
+                           braceCommaArgs
+        namedArgs      = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
     
     match (conP conName $ map varP args)
           (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
@@ -284,7 +396,7 @@ encodeArgs p (InfixC _ conName _) = do
     
     let conPrec = case info of
                        DataConI _ _ _ (Fixity prec _) -> prec
-                       other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ P.show other
+                       other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
@@ -339,9 +451,14 @@ withType name f = do
         case dec of
           DataD    _ _ tvbs cons _ -> f tvbs cons
           NewtypeD _ _ tvbs con  _ -> f tvbs [con]
-          other -> error $ "Text.Show.Text.TH.withType: Unsupported type: "
-                          ++ P.show other
-      _ -> error "Text.Show.Text.TH.withType: I need the name of a type."
+          other -> error $ "Text.Show.Text.TH.withType: Unsupported type "
+                          ++ S.show other ++ ". Must be a data type or newtype."
+      ClassI{} -> error "Text.Show.Text.TH.withType: Cannot use a typeclass name."
+      FamilyI (FamilyD DataFam _ _ _) _ ->
+        error "Text.Show.Text.TH.withType: Data families are not supported as of now."
+      FamilyI (FamilyD TypeFam _ _ _) _ ->
+        error "Text.Show.Text.TH.withType: Cannot use a type family name."
+      _ -> error "Text.Show.Text.TH.withType: I need the name of a plain type constructor."
 
 -- fweep :: Name -> a
 -- fweep conName = do
@@ -375,7 +492,7 @@ applyCon con typeNames targetData
     = map apply . nonPhantomNames typeNames <$> reifyRoles targetData
 #else
 applyCon con typeNames _
-    = return $ map apply typeNames
+    = pure $ map apply typeNames
 #endif
   where
     apply :: Name -> Pred

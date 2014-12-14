@@ -28,7 +28,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Bool ()
 import Text.Show.Text.Data.Maybe ()
-import Text.Show.Text.TH.Internal
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert an 'All' value to a 'Builder' with the given precedence.
 showbAllPrec :: Int -> All -> Builder
@@ -65,13 +65,13 @@ showbSumPrec :: Show a => Int -> Sum a -> Builder
 showbSumPrec = showbPrec
 {-# INLINE showbSumPrec #-}
 
-$(deriveShow ''All)
-$(deriveShow ''Any)
-$(deriveShow ''Dual)
-$(deriveShow ''First)
-$(deriveShow ''Last)
-$(deriveShow ''Product)
-$(deriveShow ''Sum)
+$(deriveShowPragmas defaultInlineShowbPrec ''All)
+$(deriveShowPragmas defaultInlineShowbPrec ''Any)
+$(deriveShowPragmas defaultInlineShowbPrec ''Dual)
+$(deriveShowPragmas defaultInlineShowbPrec ''First)
+$(deriveShowPragmas defaultInlineShowbPrec ''Last)
+$(deriveShowPragmas defaultInlineShowbPrec ''Product)
+$(deriveShowPragmas defaultInlineShowbPrec ''Sum)
 
 instance Show1 Dual where
     showbPrec1 = showbPrec

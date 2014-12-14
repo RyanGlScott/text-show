@@ -34,7 +34,8 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.TH.Internal (deriveShow, mkShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
+                                   defaultInlineShowbPrec, mkShowbPrec)
 
 -- | Convert a 'U1' value to a 'Builder'.
 showbU1 :: U1 p -> Builder
@@ -99,7 +100,7 @@ instance Show1 U1 where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}
 
-$(deriveShow ''Par1)
+$(deriveShowPragmas defaultInlineShowbPrec ''Par1)
 
 instance Show1 Par1 where
     showbPrec1 = showbPrec
@@ -133,6 +134,6 @@ instance Show (f (g p)) => Show ((f :.: g) p) where
     showbPrec = $(mkShowbPrec ''(:.:))
     {-# INLINE showbPrec #-}
 
-$(deriveShow ''Fixity)
-$(deriveShow ''Associativity)
-$(deriveShow ''Arity)
+$(deriveShowPragmas defaultInlineShowbPrec ''Fixity)
+$(deriveShowPragmas defaultInlineShowb     ''Associativity)
+$(deriveShowPragmas defaultInlineShowbPrec ''Arity)

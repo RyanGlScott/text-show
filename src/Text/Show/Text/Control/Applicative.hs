@@ -20,14 +20,14 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert a 'ZipList' to a 'Builder' with the given precedence.
 showbZipListPrec :: Show a => Int -> ZipList a -> Builder
 showbZipListPrec = showbPrec
 {-# INLINE showbZipListPrec #-}
 
-$(deriveShow ''ZipList)
+$(deriveShowPragmas defaultInlineShowbPrec ''ZipList)
 
 instance Show1 ZipList where
     showbPrec1 = showbPrec

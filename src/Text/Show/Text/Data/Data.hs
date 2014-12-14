@@ -26,7 +26,8 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Ratio ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
+                                   defaultInlineShowb)
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.
 showbDataTypePrec :: Int -> DataType -> Builder
@@ -53,10 +54,10 @@ showbConstrRepPrec :: Int -> ConstrRep -> Builder
 showbConstrRepPrec = showbPrec
 {-# INLINE showbConstrRepPrec #-}
 
-$(deriveShow ''DataType)
-$(deriveShow ''DataRep)
-$(deriveShow ''ConstrRep)
-$(deriveShow ''Fixity)
+$(deriveShowPragmas defaultInlineShowbPrec ''DataType)
+$(deriveShowPragmas defaultInlineShowbPrec ''DataRep)
+$(deriveShowPragmas defaultInlineShowbPrec ''ConstrRep)
+$(deriveShowPragmas defaultInlineShowb     ''Fixity)
 
 instance Show Constr where
     showb = showbConstr

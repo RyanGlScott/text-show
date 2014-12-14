@@ -301,31 +301,42 @@ floatToDigits x =
  (map fromIntegral (reverse rds), k)
 
 roundTo :: Int -> [Int] -> (Int,[Int])
-roundTo d is =
 #if MIN_VERSION_base(4,6,0)
+roundTo d is =
   case f d True is of
-#else
-  case f d is of
-#endif
     x@(0,_) -> x
     (1,xs)  -> (1, 1:xs)
     _       -> error "roundTo: bad Value"
  where
-#if MIN_VERSION_base(4,6,0)
+  b2 = base `quot` 2
+
   f n _ []     = (0, replicate n 0)
-  f 0 e (x:xs) | x == 5 && e && all (== 0) xs = (0, [])   -- Round to even when at exactly half the base
-               | otherwise = (if x >= 5 then 1 else 0, [])
+  f 0 e (x:xs) | x == b2 && e && all (== 0) xs = (0, [])   -- Round to even when at exactly half the base
+               | otherwise = (if x >= b2 then 1 else 0, [])
   f n _ (i:xs)
-#else
-  f n []     = (0, replicate n 0)
-  f 0 (x:_)  = (if x >= 5 then 1 else 0, [])
-  f n (i:xs)
-#endif
-     | i' == 10 = (1,0:ds)
+     | i' == base = (1,0:ds)
      | otherwise  = (0,i':ds)
       where
        (c,ds) = f (n-1) (even i) xs
        i'     = c + i
+  base = 10
+#else
+roundTo d is =
+  case f d is of
+    x@(0,_) -> x
+    (1,xs)  -> (1, 1:xs)
+    _       -> error "roundTo: bad Value"
+ where
+  f n []     = (0, replicate n 0)
+  f 0 (x:_)  = (if x >= 5 then 1 else 0, [])
+  f n (i:xs)
+     | i' == 10  = (1,0:ds)
+     | otherwise = (0,i':ds)
+      where
+       (c,ds) = f (n-1) xs
+       i'     = c + i
+#endif
+
 
 -- Exponentiation with a cache for the most common numbers.
 

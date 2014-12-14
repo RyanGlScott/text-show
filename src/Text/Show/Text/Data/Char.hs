@@ -28,7 +28,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(..))
 import Text.Show.Text.Data.Integral (showbIntPrec)
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
@@ -89,4 +89,4 @@ instance Show Char where
     showbList = showbString
     {-# INLINE showbList #-}
 
-$(deriveShow ''GeneralCategory)
+$(deriveShowPragmas defaultInlineShowb ''GeneralCategory)

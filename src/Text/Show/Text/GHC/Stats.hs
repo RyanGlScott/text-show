@@ -19,11 +19,11 @@ import GHC.Stats (GCStats)
 import Text.Show.Text.Classes (showbPrec)
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Floating ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert a 'GCStats' value to a 'Builder' with the given precedence.
 showbGCStatsPrec :: Int -> GCStats -> Builder
 showbGCStatsPrec = showbPrec
 {-# INLINE showbGCStatsPrec #-}
 
-$(deriveShow ''GCStats)
+$(deriveShowPragmas defaultInlineShowbPrec ''GCStats)

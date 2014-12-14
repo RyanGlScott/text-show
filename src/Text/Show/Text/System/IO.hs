@@ -46,7 +46,8 @@ import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
+                                   defaultInlineShowbPrec)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Handle' to a 'Builder'.
@@ -114,14 +115,14 @@ instance Show Handle where
     showb = showbHandle
     {-# INLINE showb #-}
 
-$(deriveShow ''IOMode)
-$(deriveShow ''BufferMode)
+$(deriveShowPragmas defaultInlineShowb     ''IOMode)
+$(deriveShowPragmas defaultInlineShowbPrec ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn
     {-# INLINE showb #-}
 
-$(deriveShow ''SeekMode)
+$(deriveShowPragmas defaultInlineShowb     ''SeekMode)
 
 #if MIN_VERSION_base(4,3,0)
 instance Show TextEncoding where
@@ -130,9 +131,9 @@ instance Show TextEncoding where
 #endif
 
 #if MIN_VERSION_base(4,4,0)
-$(deriveShow ''CodingProgress)
-$(deriveShow ''CodingFailureMode)
+$(deriveShowPragmas defaultInlineShowb     ''CodingProgress)
+$(deriveShowPragmas defaultInlineShowb     ''CodingFailureMode)
 #endif
 
-$(deriveShow ''Newline)
-$(deriveShow ''NewlineMode)
+$(deriveShowPragmas defaultInlineShowb     ''Newline)
+$(deriveShowPragmas defaultInlineShowbPrec ''NewlineMode)

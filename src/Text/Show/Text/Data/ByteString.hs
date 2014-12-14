@@ -35,7 +35,7 @@ import           Prelude hiding (Show(show))
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
-import           Text.Show.Text.TH.Internal (deriveShow)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 #endif
 
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
@@ -79,7 +79,7 @@ instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
     {-# INLINE showbPrec #-}
 #else
-$(deriveShow ''BL.ByteString)
+$(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #endif
 
 #if MIN_VERSION_bytestring(0,10,4)
