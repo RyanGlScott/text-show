@@ -38,6 +38,8 @@ import           Text.Show.Text.Data.Ratio (showbRatioPrec)
 #endif
 import           Text.Show.Text.Utils ((<>))
 
+#include "inline.h"
+
 -- | Convert a 'Lexeme' to a 'Builder' with the given precedence.
 showbLexemePrec :: Int -> Lexeme -> Builder
 showbLexemePrec p (Char c)   = showbParen (p > appPrec) $ "Char "   <> showbLitChar c
@@ -63,10 +65,10 @@ showbNumberPrec p n = fromString $ S.showsPrec p n ""
 
 instance Show Lexeme where
     showbPrec = showbLexemePrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 #if MIN_VERSION_base(4,7,0)
 instance Show Number where
     showbPrec = showbNumberPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 #endif

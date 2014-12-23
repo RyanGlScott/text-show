@@ -29,6 +29,8 @@ module Text.Show.Text.System.IO (
 
 import Data.Text.Lazy.Builder (Builder, fromString)
 
+#include "inline.h"
+
 #if MIN_VERSION_base(4,3,0)
 import GHC.IO.Encoding.Types (TextEncoding(textEncodingName))
 #endif
@@ -113,21 +115,21 @@ showbNewlineModePrec = showbPrec
 
 instance Show Handle where
     showb = showbHandle
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 $(deriveShowPragmas defaultInlineShowb     ''IOMode)
 $(deriveShowPragmas defaultInlineShowbPrec ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 $(deriveShowPragmas defaultInlineShowb     ''SeekMode)
 
 #if MIN_VERSION_base(4,3,0)
 instance Show TextEncoding where
     showb = showbTextEncoding
-    {-# INLINE showb #-}
+    INLINE(showb)
 #endif
 
 #if MIN_VERSION_base(4,4,0)

@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Data
@@ -28,6 +28,8 @@ import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Ratio ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
                                    defaultInlineShowb)
+
+#include "inline.h"
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.
 showbDataTypePrec :: Int -> DataType -> Builder
@@ -61,4 +63,4 @@ $(deriveShowPragmas defaultInlineShowb     ''Fixity)
 
 instance Show Constr where
     showb = showbConstr
-    {-# INLINE showb #-}
+    INLINE(showb)

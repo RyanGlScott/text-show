@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE CPP, FlexibleContexts, TemplateHaskell, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.GHC.Generics
@@ -36,6 +36,8 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
                                    defaultInlineShowbPrec, mkShowbPrec)
+
+#include "inline.h"
 
 -- | Convert a 'U1' value to a 'Builder'.
 showbU1 :: U1 p -> Builder
@@ -94,45 +96,45 @@ showbArityPrec = showbPrec
 
 instance Show (U1 p) where
     showbPrec = $(mkShowbPrec ''U1)
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 U1 where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 $(deriveShowPragmas defaultInlineShowbPrec ''Par1)
 
 instance Show1 Par1 where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show (f p) => Show (Rec1 f p) where
     showbPrec = $(mkShowbPrec ''Rec1)
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show c => Show (K1 i c p) where
     showbPrec = $(mkShowbPrec ''K1)
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show c => Show1 (K1 i c) where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show (f p) => Show (M1 i c f p) where
     showbPrec = $(mkShowbPrec ''M1)
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance (Show (f p), Show (g p)) => Show ((f :+: g) p) where
     showbPrec = $(mkShowbPrec ''(:+:))
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
     showbPrec = $(mkShowbPrec ''(:*:))
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show (f (g p)) => Show ((f :.: g) p) where
     showbPrec = $(mkShowbPrec ''(:.:))
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 $(deriveShowPragmas defaultInlineShowbPrec ''Fixity)
 $(deriveShowPragmas defaultInlineShowb     ''Associativity)

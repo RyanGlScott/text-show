@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Proxy
@@ -20,6 +20,8 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
+#include "inline.h"
+
 -- | Convert a 'Proxy' type to a 'Builder'.
 showbProxy :: Proxy s -> Builder
 showbProxy = showb
@@ -28,8 +30,8 @@ showbProxy = showb
 -- TODO: See why 'deriveShow' can't detect Proxy's phantom type correctly
 instance Show (Proxy s) where
     showbPrec = $(mkShowbPrec ''Proxy)
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 Proxy where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

@@ -31,6 +31,8 @@ import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (defaultInlineShowbPrec)
 #endif
 
+#include "inline.h"
+
 -- | Convert a 'Ordering' to a 'Builder'.
 showbOrdering :: Ordering -> Builder
 showbOrdering = showb
@@ -48,5 +50,5 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Down)
 
 instance Show1 Down where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 #endif

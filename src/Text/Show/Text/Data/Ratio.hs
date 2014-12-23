@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Ratio
@@ -23,6 +23,8 @@ import Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Utils ((<>))
 
+#include "inline.h"
+
 -- | Convert a 'Ratio' to a 'Builder' with the given precedence.
 showbRatioPrec :: (Show a, Integral a) => Int -> Ratio a -> Builder
 showbRatioPrec p q = showbParen (p > ratioPrec) $
@@ -34,4 +36,4 @@ showbRatioPrec p q = showbParen (p > ratioPrec) $
 instance (Show a, Integral a) => Show (Ratio a) where
     {-# SPECIALIZE instance Show Rational #-}
     showbPrec = showbRatioPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)

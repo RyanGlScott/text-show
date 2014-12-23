@@ -33,6 +33,8 @@ import           Prelude hiding (Show)
 import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.Utils ((<>), i2d, s)
 
+#include "inline.h"
+
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder
 showbRealFloatPrec p x
@@ -102,11 +104,11 @@ showbGFloatAlt d x = formatRealFloatAlt Generic d True x
 
 instance Show Float where
     showbPrec = showbFloatPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Double where
     showbPrec = showbDoublePrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 -------------------------------------------------------------------------------
 -- GHC.Float internal functions, adapted for Builders

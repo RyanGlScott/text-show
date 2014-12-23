@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Char
@@ -30,6 +30,8 @@ import Text.Show.Text.Classes (Show(..))
 import Text.Show.Text.Data.Integral (showbIntPrec)
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import Text.Show.Text.Utils ((<>), s)
+
+#include "inline.h"
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
 asciiTabB :: Array Int Builder
@@ -84,9 +86,9 @@ showbGeneralCategory = showb
 
 instance Show Char where
     showb = showbChar
-    {-# INLINE showb #-}
+    INLINE(showb)
     
     showbList = showbString
-    {-# INLINE showbList #-}
+    INLINE(showbList)
 
 $(deriveShowPragmas defaultInlineShowb ''GeneralCategory)

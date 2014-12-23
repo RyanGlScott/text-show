@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
 {-|
 Module:      Text.Show.Text.Data.OldTypeable
@@ -21,6 +21,8 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
 import Text.Show.Text.Utils ((<>), s)
+
+#include "inline.h"
 
 -- | Convert a 'TyCon' to a 'Builder'.
 showbTyCon :: TyCon -> Builder
@@ -51,8 +53,8 @@ isTupleTyCon _                         = False
 
 instance Show TyCon where
     showb = showbTyCon
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show TypeRep where
     showbPrec = showbTypeRepPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)

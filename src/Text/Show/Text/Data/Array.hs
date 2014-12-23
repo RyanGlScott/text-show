@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Array
@@ -25,6 +25,8 @@ import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Tuple ()
 import Text.Show.Text.Utils ((<>))
 
+#include "inline.h"
+
 -- | Convert a 'Array' value to a 'Builder' with the given precedence.
 showbArrayPrec :: (Show i, Show e, Ix i) => Int -> Array i e -> Builder
 showbArrayPrec p a = showbParen (p > appPrec) $
@@ -36,4 +38,4 @@ showbArrayPrec p a = showbParen (p > appPrec) $
 
 instance (Show i, Show e, Ix i) => Show (Array i e) where
     showbPrec = showbArrayPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)

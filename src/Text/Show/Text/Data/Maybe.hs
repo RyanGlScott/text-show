@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Maybe
@@ -19,6 +19,8 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
+#include "inline.h"
+
 -- | Convert a 'Maybe' value to a 'Builder' with the given precedence.
 showbMaybePrec :: Show a => Int -> Maybe a -> Builder
 showbMaybePrec = showbPrec
@@ -28,4 +30,4 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Maybe)
 
 instance Show1 Maybe where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

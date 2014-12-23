@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Functions
@@ -16,6 +16,8 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 
+#include "inline.h"
+
 -- | Convert a function to a 'Builder'.
 showbFunction :: (a -> b) -> Builder
 showbFunction _ = "<function>"
@@ -23,8 +25,8 @@ showbFunction _ = "<function>"
 
 instance Show (a -> b) where
     showb = showbFunction
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 ((->) a) where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

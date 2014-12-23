@@ -24,6 +24,7 @@ import           Data.Text.Lazy.Builder (Builder)
 import           Foreign.ForeignPtr (ForeignPtr)
 import           Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
+import           GHC.ForeignPtr (unsafeForeignPtrToPtr)
 import           GHC.Num (wordToInteger)
 import           GHC.Ptr (Ptr(..))
 import           GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
@@ -34,14 +35,8 @@ import           Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec
 import           Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
 import           Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
-#if MIN_VERSION_base(4,4,0)
-import           Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
-#else
-import           Data.Text.Lazy.Builder (fromString)
-import qualified Text.Show as S (show)
-#endif
-
 #include "MachDeps.h"
+#include "inline.h"
 
 -- | Convert a 'Ptr' to a 'Builder'. Note that this does not require the parameterized
 -- type to be an instance of 'Show' itself.
@@ -70,41 +65,37 @@ showbWordPtr wp = showbWord $ unsafeCoerce# wp
 -- | Convert a 'ForeignPtr' to a 'Builder'. Note that this does not require the
 -- parameterized type to be an instance of 'Show' itself.
 showbForeignPtr :: ForeignPtr a -> Builder
-#if MIN_VERSION_base(4,4,0)
 showbForeignPtr = showb . unsafeForeignPtrToPtr
-#else
-showbForeignPtr = fromString . S.show
-#endif
 {-# INLINE showbForeignPtr #-}
 
 instance Show (Ptr a) where
     showb = showbPtr
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 Ptr where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show (FunPtr a) where
     showb = showbFunPtr
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 FunPtr where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show IntPtr where
     showbPrec = showbIntPtrPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show WordPtr where
     showb = showbWordPtr
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show (ForeignPtr a) where
     showb = showbForeignPtr
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 ForeignPtr where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

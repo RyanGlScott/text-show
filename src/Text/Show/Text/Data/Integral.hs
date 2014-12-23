@@ -67,6 +67,8 @@ import           GHC.Num (quotRemInteger)
 import           Text.Show.Text.Utils (i2d)
 #endif
 
+#include "inline.h"
+
 -- | Convert an 'Int' to a 'Builder' with the given precedence.
 showbIntPrec :: Int -> Int -> Builder
 showbIntPrec (I# p) n'@(I# n)
@@ -391,44 +393,44 @@ integer base i
 
 instance Show Int where
     showbPrec = showbIntPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Int8 where
     showbPrec = showbInt8Prec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Int16 where
     showbPrec = showbInt16Prec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Int32 where
     showbPrec = showbInt32Prec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Int64 where
     showbPrec = showbInt64Prec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Integer where
     showbPrec = showbIntegerPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show Word where
     showb = showbWord
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show Word8 where
     showb = showbWord8
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show Word16 where
     showb = showbWord16
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show Word32 where
     showb = showbWord32
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show Word64 where
     showb = showbWord64
-    {-# INLINE showb #-}
+    INLINE(showb)

@@ -31,6 +31,8 @@ import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)
 #endif
 
+#include "inline.h"
+
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
 -- whether to chop off trailing zeroes.
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
@@ -77,4 +79,4 @@ withDotB b | b == mempty = mempty
 
 instance HasResolution a => Show (Fixed a) where
     showb = showbFixed False
-    {-# INLINE showb #-}
+    INLINE(showb)

@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Text
@@ -24,6 +25,8 @@ import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.List ()
 
+#include "inline.h"
+
 -- | Convert a strict 'TS.Text' into a 'Builder'.
 showbTextStrict :: TS.Text -> Builder
 showbTextStrict = showb . TS.unpack
@@ -34,14 +37,14 @@ showbTextLazy = showb . TL.unpack
 
 instance Show Builder where
     showb = showb . toLazyText
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 -- Strict variant
 instance Show TS.Text where
     showb = showbTextStrict
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 -- Lazy variant
 instance Show TL.Text where
     showb = showbTextLazy
-    {-# INLINE showb #-}
+    INLINE(showb)

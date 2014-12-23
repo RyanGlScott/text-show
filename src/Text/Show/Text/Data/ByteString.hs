@@ -38,6 +38,8 @@ import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 #endif
 
+#include "inline.h"
+
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
 showbByteStringStrict :: BS.ByteString -> Builder
 showbByteStringStrict = fromString . S.show
@@ -72,12 +74,12 @@ showbShortByteString = fromString . S.show
 
 instance Show BS.ByteString where
     showb = showbByteStringStrict
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 #if MIN_VERSION_bytestring(0,10,0)
 instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 #else
 $(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #endif
@@ -85,5 +87,5 @@ $(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #if MIN_VERSION_bytestring(0,10,4)
 instance Show ShortByteString where
     showb = showbShortByteString
-    {-# INLINE showb #-}
+    INLINE(showb)
 #endif

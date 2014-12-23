@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Dynamic
@@ -21,6 +21,8 @@ import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Typeable (showbTypeRepPrec)
 import Text.Show.Text.Utils ((<>))
 
+#include "inline.h"
+
 -- | Convert a 'Dynamic' value to a 'Builder'.
 showbDynamic :: Dynamic -> Builder
 showbDynamic dyn = "<<" <> showbTypeRepPrec 0 (dynTypeRep dyn) <> ">>"
@@ -28,4 +30,4 @@ showbDynamic dyn = "<<" <> showbTypeRepPrec 0 (dynTypeRep dyn) <> ">>"
 
 instance Show Dynamic where
     showb = showbDynamic
-    {-# INLINE showb #-}
+    INLINE(showb)

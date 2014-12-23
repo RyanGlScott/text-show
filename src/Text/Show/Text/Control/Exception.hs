@@ -46,6 +46,8 @@ import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import           Text.Show.Text.Utils ((<>))
 
+#include "inline.h"
+
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
 showbSomeExceptionPrec :: Int -> SomeException -> Builder
 showbSomeExceptionPrec p (SomeException e) = fromString $ S.showsPrec p e ""
@@ -162,76 +164,76 @@ showbMaskingState = showb
 
 instance Show SomeException where
     showbPrec = showbSomeExceptionPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show IOException where
     showb = showbIOException
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show ArithException where
     showb = showbArithException
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show ArrayException where
     showb = showbArrayException
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show AssertionFailed where
     showb = showbAssertionFailed
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 #if MIN_VERSION_base(4,7,0)
 instance Show SomeAsyncException where
     showb = showbSomeAsyncException
-    {-# INLINE showb #-}
+    INLINE(showb)
 #endif
 
 instance Show AsyncException where
     showb = showbAsyncException
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show NonTermination where
     showb = showbNonTermination
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show NestedAtomically where
     showb = showbNestedAtomically
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show BlockedIndefinitelyOnMVar where
     showb = showbBlockedIndefinitelyOnMVar
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show BlockedIndefinitelyOnSTM where
     showb = showbBlockedIndefinitelyOnSTM
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show Deadlock where
     showb = showbDeadlock
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show NoMethodError where
     showb = showbNoMethodError
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show PatternMatchFail where
     showb = showbPatternMatchFail
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show RecConError where
     showb = showbRecConError
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show RecSelError where
     showb = showbRecSelError
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show RecUpdError where
     showb = showbRecUpdError
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show ErrorCall where
     showb = showbErrorCall
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 $(deriveShowPragmas defaultInlineShowb ''MaskingState)

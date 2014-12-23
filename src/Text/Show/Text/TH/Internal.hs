@@ -161,17 +161,6 @@ deriveShowPragmas opts dataName =
           classType :: Q Type
           classType = conT ''T.Show
           
-          inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
-          inline isInlining funName
-              | isInlining opts = [ pragInlD funName
-#if MIN_VERSION_template_haskell(2,8,0)
-                                             Inline FunLike AllPhases
-#else
-                                             (inlineSpecNoPhase True False)
-#endif
-                                  ]
-              | otherwise       = []
-          
           inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
 #if __GLASGOW_HASKELL__ >= 702
           inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
@@ -181,6 +170,19 @@ deriveShowPragmas opts dataName =
           inlineShowbPrecDec = []
           inlineShowbDec     = []
           inlineShowbListDec = []
+#endif
+          
+#if __GLASGOW_HASKELL__ >= 702
+          inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
+          inline isInlining funName
+              | isInlining opts = [ pragInlD funName
+# if MIN_VERSION_template_haskell(2,8,0)
+                                             Inline FunLike AllPhases
+# else
+                                             (inlineSpecNoPhase True False)
+# endif
+                                  ]
+              | otherwise       = []
 #endif
           
           specializeDecs :: [Q Dec]

@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.List
@@ -18,13 +19,15 @@ import Text.Show.Text.Classes (Show(showb, showbPrec, showbList),
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 
+#include "inline.h"
+
 instance Show a => Show [a] where
     {-# SPECIALIZE instance Show [String] #-}
     {-# SPECIALIZE instance Show [Char]   #-}
     {-# SPECIALIZE instance Show [Int]    #-}
     showb = showbList
-    {-# INLINE showb #-}
+    INLINE(showb)
 
 instance Show1 [] where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Monoid
@@ -29,6 +29,8 @@ import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
 import Text.Show.Text.Data.Bool ()
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+
+#include "inline.h"
 
 -- | Convert an 'All' value to a 'Builder' with the given precedence.
 showbAllPrec :: Int -> All -> Builder
@@ -75,20 +77,20 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Sum)
 
 instance Show1 Dual where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show1 First where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show1 Last where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show1 Product where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)
 
 instance Show1 Sum where
     showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    INLINE(showbPrec1)

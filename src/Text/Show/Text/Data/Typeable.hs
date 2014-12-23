@@ -27,6 +27,8 @@ import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
 import Text.Show.Text.Utils ((<>), s)
 
+#include "inline.h"
+
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
 showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p tyrep =
@@ -82,8 +84,8 @@ tyConString = tyConName
 
 instance Show TypeRep where
     showbPrec = showbTypeRepPrec
-    {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 instance Show TyCon where
     showb = showbTyCon
-    {-# INLINE showb #-}
+    INLINE(showb)
