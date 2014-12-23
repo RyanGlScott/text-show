@@ -39,7 +39,7 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
-import           Control.Applicative ((<$>))
+import           Control.Applicative
 
 import           Data.List (foldl', intersperse, isPrefixOf)
 import qualified Data.Text    as TS ()
