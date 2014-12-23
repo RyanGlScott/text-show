@@ -9,14 +9,14 @@ ghc:
 install:
   - cabal update
   - |
-    if [ $GHCVER = "7.0.4" ]; then
+    if [ `ghc --numeric-version` = "7.0.4" ]; then
       cabal install -j --only-dependencies
     else
       cabal install -j --only-dependencies --enable-tests
 
 script:
   - |
-    if [ $GHCVER = "7.0.4" ]; then
+    if [ `ghc --numeric-version` = "7.0.4" ]; then
       cabal configure
       cabal build
     else
