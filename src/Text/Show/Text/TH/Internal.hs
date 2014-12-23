@@ -169,14 +169,16 @@ deriveShowPragmas opts dataName =
                                   ]
               | otherwise       = []
           
-          inlineShowbPrecDec :: [Q Dec]
+          inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
+#if __GLASGOW_HASKELL__ >= 702
           inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
-          
-          inlineShowbDec :: [Q Dec]
-          inlineShowbDec = inline inlineShowb 'showb
-
-          inlineShowbListDec :: [Q Dec]
+          inlineShowbDec     = inline inlineShowb 'showb
           inlineShowbListDec = inline inlineShowbList 'showbList
+#else
+          inlineShowbPrecDec = []
+          inlineShowbDec     = []
+          inlineShowbListDec = []
+#endif
           
           specializeDecs :: [Q Dec]
 #if MIN_VERSION_template_haskell(2,8,0)

@@ -49,7 +49,7 @@ stability:           Experimental
 copyright:           (C) 2014 Ryan Scott
 category:            Text
 build-type:          Simple
-extra-source-files:  CHANGELOG.md, README.md
+extra-source-files:  CHANGELOG.md, README.md, include/inline.h
 cabal-version:       >=1.8
 
 source-repository head
@@ -118,6 +118,9 @@ library
                      , template-haskell >= 2.4     && < 2.10
   hs-source-dirs:      src
   ghc-options:         -Wall
+  include-dirs:        include
+  includes:            inline.h
+  install-includes:    inline.h
   
   if flag(recent-text)
     cpp-options:       -DRECENT_TEXT

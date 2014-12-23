@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Control.Concurrent
@@ -27,6 +27,8 @@ import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
                                              defaultInlineShowbPrec)
 
+#include "inline.h"
+
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
 showbThreadIdPrec :: Int -> ThreadId -> Builder
 showbThreadIdPrec p ti = fromString $ S.showsPrec p ti ""
@@ -44,7 +46,7 @@ showbBlockReason = showb
 
 instance Show ThreadId where
     showbPrec = showbThreadIdPrec
---     {-# INLINE showbPrec #-}
+    INLINE(showbPrec)
 
 $(deriveShowPragmas defaultInlineShowbPrec ''ThreadStatus)
 $(deriveShowPragmas defaultInlineShowb     ''BlockReason)
