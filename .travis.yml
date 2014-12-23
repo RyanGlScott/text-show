@@ -6,20 +6,25 @@ ghc:
   - 7.6.3
   - 7.8.3
 
+before_install:
+  - export GHCVER=`ghc --numeric-version`
+
 install:
   - cabal update
   - |
-    if [ `ghc --numeric-version` = "7.0.4" ]; then
+    if [ $GHCVER = "7.0.4" ]; then
       cabal install -j --only-dependencies
     else
       cabal install -j --only-dependencies --enable-tests
+    fi
 
 script:
   - |
-    if [ `ghc --numeric-version` = "7.0.4" ]; then
+    if [ $GHCVER = "7.0.4" ]; then
       cabal configure
       cabal build
     else
       cabal configure --enable-tests
       cabal build
       cabal test
+    fi
