@@ -39,7 +39,7 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
-import           Control.Applicative
+import           Control.Applicative ((<$>))
 
 import           Data.List (foldl', intersperse, isPrefixOf)
 import qualified Data.Text    as TS ()
@@ -475,7 +475,7 @@ applyCon con typeNames targetData
     = map apply . nonPhantomNames typeNames <$> reifyRoles targetData
 #else
 applyCon con typeNames _
-    = pure $ map apply typeNames
+    = return $ map apply typeNames
 #endif
   where
     apply :: Name -> Pred

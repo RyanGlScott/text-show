@@ -1,4 +1,9 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
+#if __GLASGOW_HASKELL__ < 706
+-- Template Haskell's name generation didn't name-mangle very well prior to GHC
+-- 7.6 and can cause name shadowing warnings, so suppress them.
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+#endif
 {-|
 Module:      Properties.MkShow
 Copyright:   (C) 2014 Ryan Scott

@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP, MagicHash, OverloadedStrings #-}
-#if !defined(TEXT_FORMAT)
+#if !defined(RECENT_TEXT)
 {-# LANGUAGE BangPatterns, RankNTypes, ScopedTypeVariables, UnboxedTuples #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
