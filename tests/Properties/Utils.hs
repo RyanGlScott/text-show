@@ -23,4 +23,4 @@ import           Text.Show.Text (showbPrec)
 -- | Verifies that a type's @Show@ instances coincide for both 'String's and 'Text',
 --   irrespective of precedence.
 prop_matchesShow :: (S.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
-prop_matchesShow k x = fromString (showsPrec k x "") == showbPrec k x
+prop_matchesShow p x = fromString (showsPrec p x "") == showbPrec p x
