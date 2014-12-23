@@ -178,7 +178,7 @@ showbCWcharPrec :: Int -> CWchar -> Builder
 showbCWcharPrec = showbPrec
 {-# INLINE showbCWcharPrec #-}
 #else
-showbCPtrdiffPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCWcharPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CSigAtomic' to a 'Builder' with the given precedence.
@@ -413,6 +413,7 @@ instance Show CTime where
     showbPrec = showbCTimePrec
     INLINE(showbPrec)
 
+# if MIN_VERSION_base(4,4,0)
 instance Show CUSeconds where
     showb = showbCUSeconds
     INLINE(showb)
@@ -420,6 +421,7 @@ instance Show CUSeconds where
 instance Show CSUSeconds where
     showbPrec = showbCSUSecondsPrec
     INLINE(showbPrec)
+# endif
 
 instance Show CFloat where
     showbPrec = showbCFloatPrec
