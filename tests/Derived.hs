@@ -1,7 +1,9 @@
 {-# LANGUAGE CPP, ExistentialQuantification, FlexibleContexts,
              GADTs, GeneralizedNewtypeDeriving, StandaloneDeriving,
              TypeOperators, UndecidableInstances #-}
-#if __GLASGOW_HASKELL__ >= 704
+#if __GLASGOW_HASKELL__ >= 706
+-- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
+-- nicely with it for some reason.
 {-# LANGUAGE PolyKinds #-}
 #endif
 {-|

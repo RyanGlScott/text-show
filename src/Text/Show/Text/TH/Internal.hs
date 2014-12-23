@@ -452,10 +452,12 @@ withType name f = do
           other -> error $ "Text.Show.Text.TH.withType: Unsupported type "
                           ++ S.show other ++ ". Must be a data type or newtype."
       ClassI{} -> error "Text.Show.Text.TH.withType: Cannot use a typeclass name."
+#if MIN_VERSION_template_haskell(2,7,0)
       FamilyI (FamilyD DataFam _ _ _) _ ->
         error "Text.Show.Text.TH.withType: Data families are not supported as of now."
       FamilyI (FamilyD TypeFam _ _ _) _ ->
         error "Text.Show.Text.TH.withType: Cannot use a type family name."
+#endif
       _ -> error "Text.Show.Text.TH.withType: I need the name of a plain type constructor."
 
 -- | Extracts the name from a type variable binder.
