@@ -86,6 +86,8 @@ import           System.Posix.Types
 import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
                                         arbitraryBoundedEnum, oneof)
 
+#include "HsBaseConfig.h"
+
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
 
@@ -431,19 +433,45 @@ deriving instance Arbitrary CUIntMax
 instance Arbitrary ExitCode where
     arbitrary = oneof [pure ExitSuccess, ExitFailure <$> arbitrary]
 
+#if defined(HTYPE_DEV_T)
 deriving instance Arbitrary CDev
+#endif
+#if defined(HTYPE_INO_T)
 deriving instance Arbitrary CIno
+#endif
+#if defined(HTYPE_MODE_T)
 deriving instance Arbitrary CMode
+#endif
+#if defined(HTYPE_OFF_T)
 deriving instance Arbitrary COff
+#endif
+#if defined(HTYPE_PID_T)
 deriving instance Arbitrary CPid
+#endif
+#if defined(HTYPE_SSIZE_T)
 deriving instance Arbitrary CSsize
+#endif
+#if defined(HTYPE_GID_T)
 deriving instance Arbitrary CGid
+#endif
+#if defined(HTYPE_NLINK_T)
 deriving instance Arbitrary CNlink
+#endif
+#if defined(HTYPE_UID_T)
 deriving instance Arbitrary CUid
+#endif
+#if defined(HTYPE_CC_T)
 deriving instance Arbitrary CCc
+#endif
+#if defined(HTYPE_SPEED_T)
 deriving instance Arbitrary CSpeed
+#endif
+#if defined(HTYPE_TCFLAG_T)
 deriving instance Arbitrary CTcflag
+#endif
+#if defined(HTYPE_RLIM_T)
 deriving instance Arbitrary CRLim
+#endif
 deriving instance Arbitrary Fd
 
 deriving instance Arbitrary All
