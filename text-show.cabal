@@ -148,7 +148,8 @@ library
 test-suite text-show-properties
   type:                exitcode-stdio-1.0
   main-is:             Properties.hs
-  other-modules:       Instances.BaseAndFriends
+  other-modules:       Derived
+                       Instances.BaseAndFriends
                        Instances.Derived
                        Properties.BaseAndFriends
                        Properties.Builder

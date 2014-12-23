@@ -39,21 +39,21 @@ import           Control.Exception.Base
 import           Data.Monoid (mempty)
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
-import qualified Prelude as P
 import           Prelude hiding (Show)
 
+import qualified Text.Show as S (show, showsPrec)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import           Text.Show.Text.Utils ((<>))
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
 showbSomeExceptionPrec :: Int -> SomeException -> Builder
-showbSomeExceptionPrec p (SomeException e) = fromString $ P.showsPrec p e ""
+showbSomeExceptionPrec p (SomeException e) = fromString $ S.showsPrec p e ""
 {-# INLINE showbSomeExceptionPrec #-}
 
 -- | Convert an 'IOException' to a 'Builder'.
 showbIOException :: IOException -> Builder
-showbIOException = fromString . show
+showbIOException = fromString . S.show
 {-# INLINE showbIOException #-}
 
 -- | Convert an 'ArithException' to a 'Builder'.
@@ -88,7 +88,7 @@ showbAssertionFailed (AssertionFailed err) = fromString err
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeAsyncException' value to a 'Builder'.
 showbSomeAsyncException :: SomeAsyncException -> Builder
-showbSomeAsyncException (SomeAsyncException e) = fromString $ P.show e
+showbSomeAsyncException (SomeAsyncException e) = fromString $ S.show e
 {-# INLINE showbSomeAsyncException #-}
 #endif
 

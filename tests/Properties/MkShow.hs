@@ -15,7 +15,9 @@ import qualified Data.Text      as TS (pack)
 import qualified Data.Text.Lazy as TL (pack)
 import           Data.Text.Lazy.Builder (fromString)
 
-import           Instances.Derived
+import           Derived
+
+import           Instances.Derived ()
 
 import           Test.Tasty.QuickCheck (NonZero)
 import           Test.Tasty (TestTree, testGroup)

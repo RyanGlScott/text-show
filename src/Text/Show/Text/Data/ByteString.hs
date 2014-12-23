@@ -29,9 +29,9 @@ import           Data.ByteString.Short (ShortByteString)
 #endif
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
-import qualified Prelude as P
 import           Prelude hiding (Show(show))
 
+import qualified Text.Show as S (show)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
@@ -40,7 +40,7 @@ import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineSho
 
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
 showbByteStringStrict :: BS.ByteString -> Builder
-showbByteStringStrict = fromString . P.show
+showbByteStringStrict = fromString . S.show
 {-# INLINE showbByteStringStrict #-}
 
 -- | Convert a lazy 'BL.ByteString' to a 'Builder'.
@@ -57,7 +57,7 @@ showbByteStringLazy = showbByteStringLazyPrec 0
 -- depending on the precedence.
 showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder
 #if MIN_VERSION_bytestring(0,10,0)
-showbByteStringLazyPrec _ = fromString . P.show
+showbByteStringLazyPrec _ = fromString . S.show
 #else
 showbByteStringLazyPrec = showbPrec
 #endif
@@ -66,7 +66,7 @@ showbByteStringLazyPrec = showbPrec
 #if MIN_VERSION_bytestring(0,10,4)
 -- | Convert a 'ShortByteString' to a 'Builder'.
 showbShortByteString :: ShortByteString -> Builder
-showbShortByteString = fromString . P.show
+showbShortByteString = fromString . S.show
 {-# INLINE showbShortByteString #-}
 #endif
 

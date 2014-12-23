@@ -20,16 +20,16 @@ import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           GHC.Conc (BlockReason, ThreadId, ThreadStatus)
 
-import qualified Prelude as P
 import           Prelude hiding (Show)
 
+import qualified Text.Show as S (showsPrec)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
                                              defaultInlineShowbPrec)
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
 showbThreadIdPrec :: Int -> ThreadId -> Builder
-showbThreadIdPrec p ti = fromString $ P.showsPrec p ti ""
+showbThreadIdPrec p ti = fromString $ S.showsPrec p ti ""
 {-# INLINE showbThreadIdPrec #-}
 
 -- | Convert a 'ThreadStatus' to a 'Builder' with the given precedence.

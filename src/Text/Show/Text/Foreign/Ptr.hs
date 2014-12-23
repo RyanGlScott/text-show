@@ -19,21 +19,27 @@ module Text.Show.Text.Foreign.Ptr (
     , showbForeignPtr
     ) where
 
-import Data.Text.Lazy.Builder (Builder)
+import           Data.Text.Lazy.Builder (Builder)
 
-import Foreign.ForeignPtr (ForeignPtr)
-import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
-import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
+import           Foreign.ForeignPtr (ForeignPtr)
+import           Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
-import GHC.Num (wordToInteger)
-import GHC.Ptr (Ptr(..))
-import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
+import           GHC.Num (wordToInteger)
+import           GHC.Ptr (Ptr(..))
+import           GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
-import Prelude hiding (Show)
+import           Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
-import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
-import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
+import           Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import           Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
+import           Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
+
+#if MIN_VERSION_base(4,4,0)
+import           Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
+#else
+import           Data.Text.Lazy.Builder (fromString)
+import qualified Text.Show as S (show)
+#endif
 
 #include "MachDeps.h"
 
@@ -64,7 +70,11 @@ showbWordPtr wp = showbWord $ unsafeCoerce# wp
 -- | Convert a 'ForeignPtr' to a 'Builder'. Note that this does not require the
 -- parameterized type to be an instance of 'Show' itself.
 showbForeignPtr :: ForeignPtr a -> Builder
+#if MIN_VERSION_base(4,4,0)
 showbForeignPtr = showb . unsafeForeignPtrToPtr
+#else
+showbForeignPtr = fromString . S.show
+#endif
 {-# INLINE showbForeignPtr #-}
 
 instance Show (Ptr a) where

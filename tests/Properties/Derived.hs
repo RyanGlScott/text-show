@@ -14,7 +14,9 @@ module Properties.Derived (derivedTests) where
 
 import Data.Text.Lazy.Builder (fromString)
 
-import Instances.Derived
+import Derived
+
+import Instances.Derived ()
 
 import Properties.Utils (prop_matchesShow)
 

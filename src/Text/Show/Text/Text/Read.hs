@@ -22,7 +22,6 @@ import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           GHC.Show (appPrec, appPrec1)
 
-import qualified Prelude as P
 import           Prelude hiding (Show)
 
 import           Text.Read.Lex (Lexeme(..))
@@ -31,7 +30,9 @@ import           Text.Read.Lex (Number)
 #endif
 import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.Data.Char (showbLitChar)
-#if !(MIN_VERSION_base(4,6,0))
+#if MIN_VERSION_base(4,6,0)
+import qualified Text.Show as S (showsPrec)
+#else
 import           Text.Show.Text.Data.Integral (showbIntegerPrec)
 import           Text.Show.Text.Data.Ratio (showbRatioPrec)
 #endif
@@ -45,7 +46,7 @@ showbLexemePrec p (Punc pun) = showbParen (p > appPrec) $ "Punc "   <> fromStrin
 showbLexemePrec p (Ident i)  = showbParen (p > appPrec) $ "Ident "  <> fromString i
 showbLexemePrec p (Symbol s) = showbParen (p > appPrec) $ "Symbol " <> fromString s
 #if MIN_VERSION_base(4,6,0)
-showbLexemePrec p (Number n) = showbParen (p > appPrec) $ "Number " <> fromString (P.showsPrec appPrec1 n "")
+showbLexemePrec p (Number n) = showbParen (p > appPrec) $ "Number " <> fromString (S.showsPrec appPrec1 n "")
 #else
 showbLexemePrec p (Int i)    = showbParen (p > appPrec) $ "Int "    <> showbIntegerPrec appPrec1 i
 showbLexemePrec p (Rat r)    = showbParen (p > appPrec) $ "Rat "    <> showbRatioPrec appPrec1 r
@@ -56,7 +57,7 @@ showbLexemePrec _ EOF        = "EOF"
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Number' to a 'Builder' with the given precedence.
 showbNumberPrec :: Int -> Number -> Builder
-showbNumberPrec p n = fromString $ P.showsPrec p n ""
+showbNumberPrec p n = fromString $ S.showsPrec p n ""
 {-# INLINE showbNumberPrec #-}
 #endif
 
