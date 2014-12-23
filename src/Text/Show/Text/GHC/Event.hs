@@ -10,7 +10,13 @@ Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Event@ module.
 -}
-module Text.Show.Text.GHC.Event (showbEvent, showbFdKeyPrec) where 
+module Text.Show.Text.GHC.Event (
+#if defined(__GHCJS__)
+    ) where
+#else
+      showbEvent
+    , showbFdKeyPrec
+    ) where 
 
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
@@ -40,3 +46,4 @@ instance Show Event where
 instance Show FdKey where
     showbPrec = showbFdKeyPrec
     INLINE(showbPrec)
+#endif

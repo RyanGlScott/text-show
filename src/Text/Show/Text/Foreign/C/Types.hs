@@ -428,6 +428,6 @@ instance Show CFloat where
     INLINE(showbPrec)
 
 instance Show CDouble where
-    showbPrec = showbDoublePrec
+    showbPrec = showbCDoublePrec
     INLINE(showbPrec)
 #endif
