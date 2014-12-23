@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
 {-|
 Module:      Text.Show.Text.Data.OldTypeable

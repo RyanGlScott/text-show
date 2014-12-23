@@ -12,7 +12,9 @@ Imports 'Show' instances for @GHC@ modules.
 module Text.Show.Text.GHC () where 
 
 #if MIN_VERSION_base(4,4,0)
+# if !defined(mingw32_HOST_OS)
 import Text.Show.Text.GHC.Event       ()
+# endif
 import Text.Show.Text.GHC.Fingerprint ()
 import Text.Show.Text.GHC.Generics    ()
 #endif

@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, MagicHash, NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, MagicHash, OverloadedStrings #-}
 #if !defined(TEXT_FORMAT)
 {-# LANGUAGE BangPatterns, RankNTypes, ScopedTypeVariables, UnboxedTuples #-}
 #endif

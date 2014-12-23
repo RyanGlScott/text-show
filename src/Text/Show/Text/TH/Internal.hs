@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-|
 Module:      Text.Show.Text.TH.Internal
 Copyright:   (C) 2014 Ryan Scott
@@ -39,7 +39,7 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
-import           Control.Applicative ((<$>), pure)
+import           Control.Applicative ((<$>))
 
 import           Data.List (foldl', intersperse, isPrefixOf)
 import qualified Data.Text    as TS ()
@@ -160,13 +160,11 @@ deriveShowPragmas opts dataName =
           
           inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
           inline isInlining funName
-              | isInlining opts = [ pure
-                                    . PragmaD
-                                    $ InlineP funName
+              | isInlining opts = [ pragInlD funName
 #if MIN_VERSION_template_haskell(2,8,0)
-                                              Inline FunLike AllPhases
+                                             Inline FunLike AllPhases
 #else
-                                              (InlineSpec True False Nothing)
+                                             (inlineSpecNoPhase True False)
 #endif
                                   ]
               | otherwise       = []
@@ -459,23 +457,6 @@ withType name f = do
       FamilyI (FamilyD TypeFam _ _ _) _ ->
         error "Text.Show.Text.TH.withType: Cannot use a type family name."
       _ -> error "Text.Show.Text.TH.withType: I need the name of a plain type constructor."
-
--- fweep :: Name -> a
--- fweep conName = do
---     info <- reify conName
---     case info of
---          TyConI dec ->
---             case dec of
---                  DataD    _ _ _ cons _ -> frerf cons
---                  NewtypeD _ _ _ con  _ -> frerf cons
---                  _ -> error "SQEUUUUUERPS"
---          _ -> error "SQUEEEEEEEEEEEEEEEEPS"
--- 
--- frerf :: Con -> [Type]
--- frerf (NormalC _ strictTys) = undefined
--- frerf (RecC _ varStrictTys) = undefined
--- frerf (InfixC lTy _ rTy) = undefined
--- frerf (ForallC )
 
 -- | Extracts the name from a type variable binder.
 tvbName :: TyVarBndr -> Name

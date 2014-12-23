@@ -112,6 +112,7 @@ library
                        Text.Show.Text.Utils
   build-depends:       array            >= 0.3     && < 0.6
                      , base             >= 4.2     && < 5
+                     -- , containers       >= 0.1     && < 0.6
                      , bytestring       >= 0.9     && < 0.11
                      , ghc-prim
                      , template-haskell >= 2.4     && < 2.10
@@ -127,9 +128,10 @@ library
     ghc-options:       -fobject-code
   
   if impl(ghc >= 7.2)
-    exposed-modules:   Text.Show.Text.GHC.Event
-                       Text.Show.Text.GHC.Fingerprint
+    exposed-modules:   Text.Show.Text.GHC.Fingerprint
                        Text.Show.Text.GHC.Generics
+    if !os(windows)
+      exposed-modules: Text.Show.Text.GHC.Event
   
   if impl(ghc >= 7.4)
     exposed-modules:   Text.Show.Text.GHC.Stats

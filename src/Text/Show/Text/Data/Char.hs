@@ -1,4 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Char

@@ -24,22 +24,32 @@ import Test.Tasty.QuickCheck (testProperty)
 import Text.Show.Text (showb, showbPrec)
 
 -- | Verifies that the two 'Show' instances of 'GADT' coincide.
-prop_showGADT :: Int    -- The precedence to show with
-              -> Double -- The argument to 'GADTCon2'
-              -> Int    -- The argument to 'GADTCon3'
+prop_showGADT :: Int    -- ^ The precedence to show with
+              -> Double -- ^ The argument to 'GADTCon2'
+              -> Int    -- ^ The argument to 'GADTCon3'
+              -> Char   -- ^ The argument to 'GADTCon4'
+              -> String -- ^ The argument to 'GADTCon5'
               -> Bool
-prop_showGADT p d i
-    = let gc1 :: GADT Char Int
+prop_showGADT p d i c s
+    = let gc1 :: GADT Char Int Int
           gc1 = GADTCon1
           
-          gc2 :: GADT Double Double
+          gc2 :: GADT Double Double Int
           gc2 = GADTCon2 d
           
-          gc3 :: GADT Int String
+          gc3 :: GADT Int String Int
           gc3 = GADTCon3 i
+          
+          gc4 :: GADT Char String Int
+          gc4 = GADTCon4 c
+          
+          gc5 :: GADT String String Int
+          gc5 = GADTCon5 s
       in fromString (show gc1)              == showb gc1
          && fromString (showsPrec p gc2 "") == showbPrec p gc2
          && fromString (showsPrec p gc3 "") == showbPrec p gc3
+         && fromString (showsPrec p gc4 "") == showbPrec p gc4
+         && fromString (showsPrec p gc5 "") == showbPrec p gc5
 
 derivedTests :: [TestTree]
 derivedTests =

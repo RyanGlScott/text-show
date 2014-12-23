@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-|
 Module:      Text.Show.Text.Classes
 Copyright:   (C) 2014 Ryan Scott

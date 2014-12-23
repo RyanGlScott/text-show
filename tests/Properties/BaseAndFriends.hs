@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude #-}
+{-# LANGUAGE CPP #-}
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
@@ -341,7 +341,7 @@ baseAndFriendsTests =
         , testProperty "WordPtr instance"                   (prop_matchesShow :: Int -> WordPtr -> Bool)
 --         , testProperty "ForeignPtr instance"                (prop_matchesShow :: Int -> ForeignPtr Int -> Bool)
         ]
--- #if MIN_VERSION_base(4,4,0)
+-- #if MIN_VERSION_base(4,4,0) && !defined(mingw32_HOST_OS)
 --     , testGroup "Text.Show.Text.GHC.Event"
 --         [ testProperty "Event instance"                     (prop_matchesShow :: Int -> Event -> Bool)
 --         , testProperty "FdKey instance"                     (prop_matchesShow :: Int -> FdKey -> Bool)

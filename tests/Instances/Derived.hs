@@ -1,6 +1,9 @@
-{-# LANGUAGE ExistentialQuantification, FlexibleContexts, GADTs,
-             GeneralizedNewtypeDeriving, NoImplicitPrelude, StandaloneDeriving,
+{-# LANGUAGE CPP, ExistentialQuantification, FlexibleContexts,
+             GADTs, GeneralizedNewtypeDeriving, StandaloneDeriving,
              TemplateHaskell, TypeOperators, UndecidableInstances #-}
+#if __GLASGOW_HASKELL__ >= 704
+{-# LANGUAGE PolyKinds #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Instances.Derived
@@ -39,8 +42,6 @@ module Instances.Derived (
     ) where
 
 import           Control.Applicative ((<$>), (<*>), pure)
-
-import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude hiding (Show)
 
@@ -152,11 +153,13 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       , AAOForall  <$> arbitrary <*> arbitrary <*> (arbitrary :: Gen Int)
                       ]
 
-data GADT a b where
-    GADTCon1 ::           GADT Char b
-    GADTCon2 :: Double -> GADT Double Double
-    GADTCon3 :: Int    -> GADT Int String
-deriving instance S.Show a => S.Show (GADT a b)
+data GADT a b c where
+    GADTCon1 ::           GADT Char   b      c
+    GADTCon2 :: Double -> GADT Double Double c
+    GADTCon3 :: Int    -> GADT Int    String c
+    GADTCon4 :: a      -> GADT a      b      c
+    GADTCon5 :: b      -> GADT b      b      c
+deriving instance (S.Show a, S.Show b) => S.Show (GADT a b c)
 $(deriveShow ''GADT)
 
 infixl 5 :<:
@@ -194,9 +197,7 @@ instance Arbitrary (f a) => Arbitrary (HigherKindedTypeParams f a) where
 
 data Restriction a = Restriction a
 $(return []) -- Hack to make Restriction available in the type environment at the time of reification
-instance (Read a, S.Show a) => S.Show (Restriction a) where
-    showsPrec p (Restriction r)
-        = showParen (p > appPrec) $ showString "Restriction " . showsPrec appPrec1 r
+deriving instance (Read a, S.Show a) => S.Show (Restriction a)
 instance (Read a, T.Show a) => T.Show (Restriction a) where
     showbPrec = $(mkShowbPrec ''Restriction)
 instance Arbitrary a => Arbitrary (Restriction a) where

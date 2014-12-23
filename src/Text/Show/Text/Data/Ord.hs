@@ -1,7 +1,4 @@
 {-# LANGUAGE CPP, TemplateHaskell #-}
-#if MIN_VERSION_base(4,6,0)
-{-# LANGUAGE NoImplicitPrelude #-}
-#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Ord

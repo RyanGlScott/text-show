@@ -1,4 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-|
 Module:      Text.Show.Text
 Copyright:   (C) 2014 Ryan Scott

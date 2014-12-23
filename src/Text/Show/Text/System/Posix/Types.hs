@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, NoImplicitPrelude, StandaloneDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.System.Posix.Types

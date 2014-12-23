@@ -1,4 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-|
 Module:      Properties.Utils
 Copyright:   (C) 2014 Ryan Scott

@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude #-}
+{-# LANGUAGE CPP #-}
 {-|
 Module:      Text.Show.Text.Debug.Trace
 Copyright:   (C) 2014 Ryan Scott

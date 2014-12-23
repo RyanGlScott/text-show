@@ -1,4 +1,4 @@
-{-# LANGUAGE MagicHash, NoImplicitPrelude #-}
+{-# LANGUAGE MagicHash #-}
 {-|
 Module:      Text.Show.Text.Utils
 Copyright:   (C) 2014 Ryan Scott

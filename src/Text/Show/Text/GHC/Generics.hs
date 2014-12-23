@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, NoImplicitPrelude, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, TemplateHaskell, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.GHC.Generics

@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings #-}
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Typeable

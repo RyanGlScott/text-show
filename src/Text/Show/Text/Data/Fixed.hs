@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude #-}
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Fixed

@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, NoImplicitPrelude, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, OverloadedStrings, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Control.Exception
