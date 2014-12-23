@@ -9,6 +9,7 @@
 * Added `deriveShowPragmas` to `Text.Show.Text.TH` to allow users to specify `INLINE` or `SPECIALIZE instance` pragmas with `Show` instances.
 * Added `showbSpace` to `Text.Show.Text`
 * Added `mkShowList`, `mkShowListLazy`, and `mkShowbList` to `Text.Data.Text.TH`
+* Added the `Text.Show.Text.Data.GHC.Conc.Windows` module (Windows-only)
 * Added the `Text.Show.Text.Data.OldTypeable` module for base >= 4.7
 * Added `Text.Show.Text.Debug.Trace` and `Text.Show.Text.Debug.Trace.TH`
 * Added the `Show1` class and corresponding instances for unary type constructors.

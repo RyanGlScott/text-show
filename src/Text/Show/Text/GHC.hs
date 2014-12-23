@@ -10,14 +10,16 @@ Portability: GHC
 Imports 'Show' instances for @GHC@ modules.
 -}
 module Text.Show.Text.GHC () where 
-
+#if defined(mingw32_HOST_OS)
+import Text.Show.Text.GHC.Conc.Windows ()
+#endif
 #if MIN_VERSION_base(4,4,0)
 # if !defined(mingw32_HOST_OS)
-import Text.Show.Text.GHC.Event       ()
+import Text.Show.Text.GHC.Event        ()
 # endif
-import Text.Show.Text.GHC.Fingerprint ()
-import Text.Show.Text.GHC.Generics    ()
+import Text.Show.Text.GHC.Fingerprint  ()
+import Text.Show.Text.GHC.Generics     ()
 #endif
 #if MIN_VERSION_base(4,5,0)
-import Text.Show.Text.GHC.Stats       ()
+import Text.Show.Text.GHC.Stats        ()
 #endif

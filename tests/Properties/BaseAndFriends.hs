@@ -65,6 +65,9 @@ import           Foreign.C.Types
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
 
 import           GHC.Conc (BlockReason, ThreadStatus)
+#if defined(mingw32_HOST_OS)
+import           GHC.Conc.Windows (ConsoleEvent)
+#endif
 import qualified GHC.Generics as G (Fixity)
 import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
                                Associativity, Arity)
@@ -121,7 +124,7 @@ prop_showFixed b f = fromString (showFixed b f) == showbFixed b f
 prop_showIntAtBase :: Gen Bool
 prop_showIntAtBase = do
     base <- arbitrary `suchThat` (liftA2 (&&) (> 1) (<= 16))
-    i    <- arbitrary `suchThat` (liftA2 (&&) (>= 0)) :: Gen Int
+    i    <- arbitrary `suchThat` (>= 0) :: Gen Int
     return $ fromString (showIntAtBase base intToDigit i "") == showbIntAtBase base intToDigit i
 #endif
 
@@ -364,6 +367,11 @@ baseAndFriendsTests =
 --         , testProperty "FdKey instance"                     (prop_matchesShow :: Int -> FdKey -> Bool)
 --         ]
 -- #endif
+#if defined(mingw32_HOST_OS)
+    , testGroup "Text.Show.Text.GHC.Conc.Windows"
+        [ testProperty "ConsoleEvent instance"               (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+        ]
+#endif
 #if MIN_VERSION_base(4,4,0)
     , testGroup "Text.Show.Text.GHC.Fingerprint"
         [ testProperty "Fingerprint instance"               (prop_matchesShow :: Int -> Fingerprint -> Bool)

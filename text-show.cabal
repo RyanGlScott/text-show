@@ -148,6 +148,9 @@ library
                        Text.Show.Text.Data.Type.Coercion
                        Text.Show.Text.Data.Type.Equality
 
+  if os(windows)
+    exposed-modules:   Text.Show.Text.GHC.Conc.Windows
+
 test-suite text-show-properties
   type:                exitcode-stdio-1.0
   main-is:             Properties.hs

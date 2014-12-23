@@ -66,6 +66,9 @@ import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                               ptrToIntPtr, ptrToWordPtr)
 
 import           GHC.Conc (BlockReason(..), ThreadStatus(..))
+#if defined(mingw32_HOST_OS)
+import           GHC.Conc.Windows (ConsoleEvent(..))
+#endif
 #if MIN_VERSION_base(4,4,0)
 import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import           GHC.IO.Encoding.Types (CodingProgress(..))
@@ -287,6 +290,16 @@ instance Arbitrary ThreadStatus where
                       , ThreadBlocked <$> arbitrary
                       , pure ThreadDied
                       ]
+
+#if defined(mingw32_HOST_OS)
+instance Arbitrary ConsoleEvent where
+    arbitrary = oneof $ map pure [ ControlC
+                                 , Break
+                                 , Close
+                                 , Logoff
+                                 , Shutdown
+                                 ]
+#endif
 
 instance Arbitrary (ST s a) where
     arbitrary = pure $ fixST undefined
