@@ -43,8 +43,8 @@ showbBlockReason = showb
 {-# INLINE showbBlockReason #-}
 
 instance Show ThreadId where
-    {-# INLINE showbPrec #-}
     showbPrec = showbThreadIdPrec
+--     {-# INLINE showbPrec #-}
 
 $(deriveShowPragmas defaultInlineShowbPrec ''ThreadStatus)
 $(deriveShowPragmas defaultInlineShowb     ''BlockReason)
