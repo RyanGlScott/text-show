@@ -134,7 +134,11 @@ deriveShow = deriveShowPragmas defaultPragmaOptions
 deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
                   -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
                   -> Q [Dec]
+#if __GLASGOW_HASKELL__ >= 702
 deriveShowPragmas opts dataName =
+#else
+deriveShowPragmas _    dataName =
+#endif
     withType dataName $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
     fromCons :: [TyVarBndr] -> [Con] -> Q Dec

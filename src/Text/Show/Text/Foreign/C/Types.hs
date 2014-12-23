@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving #-}
+{-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Foreign.C.Types
@@ -33,8 +33,10 @@ module Text.Show.Text.Foreign.C.Types (
     , showbCUIntMax
     , showbCClockPrec
     , showbCTimePrec
+#if MIN_VERSION_base(4,4,0)
     , showbCUSeconds
     , showbCSUSecondsPrec
+#endif
     , showbCFloatPrec
     , showbCDoublePrec
     ) where
@@ -154,6 +156,7 @@ showbCTimePrec :: Int -> CTime -> Builder
 showbCTimePrec = showbPrec
 {-# INLINE showbCTimePrec #-}
 
+#if MIN_VERSION_base(4,4,0)
 -- | Convert a 'CUSeconds' value to a 'Builder'.
 showbCUSeconds :: CUSeconds -> Builder
 showbCUSeconds = showb
@@ -163,6 +166,7 @@ showbCUSeconds = showb
 showbCSUSecondsPrec :: Int -> CSUSeconds -> Builder
 showbCSUSecondsPrec = showbPrec
 {-# INLINE showbCSUSecondsPrec #-}
+#endif
 
 -- | Convert a 'CFloat' to a 'Builder' with the given precedence.
 showbCFloatPrec :: Int -> CFloat -> Builder
@@ -195,7 +199,9 @@ deriving instance Show CIntMax
 deriving instance Show CUIntMax
 deriving instance Show CClock
 deriving instance Show CTime
+#if MIN_VERSION_base(4,4,0)
 deriving instance Show CUSeconds
 deriving instance Show CSUSeconds
+#endif
 deriving instance Show CFloat
 deriving instance Show CDouble

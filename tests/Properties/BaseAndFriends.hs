@@ -329,8 +329,10 @@ baseAndFriendsTests =
         , testProperty "CUIntMax instance"                  (prop_matchesShow :: Int -> CUIntMax -> Bool)
         , testProperty "CClock instance"                    (prop_matchesShow :: Int -> CClock -> Bool)
         , testProperty "CTime instance"                     (prop_matchesShow :: Int -> CTime -> Bool)
+#if MIN_VERSION_base(4,4,0)
         , testProperty "CUSeconds instance"                 (prop_matchesShow :: Int -> CUSeconds -> Bool)
         , testProperty "CSUSeconds instance"                (prop_matchesShow :: Int -> CSUSeconds -> Bool)
+#endif
         , testProperty "CFloat instance"                    (prop_matchesShow :: Int -> CFloat -> Bool)
         , testProperty "CDouble instance"                   (prop_matchesShow :: Int -> CUChar -> Bool)
         ]
