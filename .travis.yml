@@ -8,9 +8,18 @@ ghc:
 
 install:
   - cabal update
-  - cabal install -j --only-dependencies --enable-tests
+  - |
+    if [ $GHCVER = "7.0.4" ]; then
+      cabal install -j --only-dependencies
+    else
+      cabal install -j --only-dependencies --enable-tests
 
 script:
-  - cabal configure --enable-tests
-  - cabal build
-  - cabal test
+  - |
+    if [ $GHCVER = "7.0.4" ]; then
+      cabal configure
+      cabal build
+    else
+      cabal configure --enable-tests
+      cabal build
+      cabal test

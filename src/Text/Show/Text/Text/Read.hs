@@ -32,7 +32,8 @@ import           Text.Read.Lex (Number)
 import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.Data.Char (showbLitChar)
 #if !(MIN_VERSION_base(4,6,0))
-import           Text.Show.Text.Data.Integral (showbIntegerPrec, showbRatioPrec)
+import           Text.Show.Text.Data.Integral (showbIntegerPrec)
+import           Text.Show.Text.Data.Ratio (showbRatioPrec)
 #endif
 import           Text.Show.Text.Utils ((<>))
 
