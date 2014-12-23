@@ -21,7 +21,7 @@ install:
 script:
   - |
     if [ $GHCVER = "7.0.4" ]; then
-      cabal configure
+      cabal configure -v3
       cabal build
     else
       cabal configure --enable-tests

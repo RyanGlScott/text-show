@@ -57,8 +57,11 @@ import           Prelude hiding (Show)
 
 import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T (Show)
-import           Text.Show.Text.Classes (showb, showbPrec, showbList,
-                                         showbListDefault, showbParen, showbSpace)
+import           Text.Show.Text.Classes (showb, showbPrec, showbListDefault,
+                                         showbParen, showbSpace)
+#if __GLASGOW_HASKELL__ >= 702
+import           Text.Show.Text.Classes (showbList)
+#endif
 import           Text.Show.Text.Utils ((<>), s)
 
 {- $deriveShow
