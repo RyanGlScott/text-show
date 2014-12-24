@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-|
 Module:      Text.Show.Text.Data.Typeable.Utils
 Copyright:   (C) 2014 Ryan Scott
@@ -10,7 +11,9 @@ Utility functions for showing data types in the @Typeable@ (or @OldTypeable@) mo
 -}
 module Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple) where
 
+#if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (mempty)
+#endif
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)

@@ -34,9 +34,18 @@ module Text.Show.Text.Data.Integral (
 
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
+#if !(MIN_VERSION_base(4,8,0))
 import           Data.Monoid (mempty)
+#endif
 import           Data.Text.Lazy.Builder (Builder)
-import           Data.Word (Word, Word8, Word16, Word32, Word64)
+import           Data.Word ( Word8
+                           , Word16
+                           , Word32
+                           , Word64
+#if !(MIN_VERSION_base(4,8,0))
+                           , Word
+#endif
+                           )
 
 import           GHC.Exts (Int(I#))
 #if __GLASGOW_HASKELL__ >= 708

@@ -1,4 +1,4 @@
-{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE CPP, MagicHash #-}
 {-|
 Module:      Text.Show.Text.Utils
 Copyright:   (C) 2014 Ryan Scott
@@ -12,7 +12,9 @@ Miscellaneous utility functions.
 module Text.Show.Text.Utils where
 
 import Data.Int (Int64)
+#if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (Monoid(mappend, mempty))
+#endif
 import Data.Text (Text)
 import Data.Text.Lazy (length, replicate, toStrict, unpack)
 import Data.Text.Lazy.Builder (Builder, fromLazyText, singleton, toLazyText)

@@ -27,8 +27,6 @@ import           Prelude hiding (Show)
 import qualified Text.Show as S (show, showsPrec)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 
-#include "inline.h"
-
 -- | Convert an 'Event' to a 'Builder'.
 showbEvent :: Event -> Builder
 showbEvent = fromString . S.show
@@ -41,9 +39,9 @@ showbFdKeyPrec p fdKey = fromString $ S.showsPrec p fdKey ""
 
 instance Show Event where
     showb = showbEvent
-    INLINE(showb)
+    {-# INLINE showb #-}
 
 instance Show FdKey where
     showbPrec = showbFdKeyPrec
-    INLINE(showbPrec)
+    {-# INLINE showbPrec #-}
 #endif

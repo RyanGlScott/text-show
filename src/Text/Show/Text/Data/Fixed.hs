@@ -22,7 +22,9 @@ import Text.Show.Text.Classes (Show(showb))
 #if MIN_VERSION_base(4,7,0)
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
+# if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (mempty)
+# endif
 
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
@@ -46,7 +48,12 @@ showbFixed chopTrailingZeroes fa@(MkFixed a)
     (i, d)  = divMod (fromInteger a) res
     digits  = ceiling (logBase 10 (fromInteger $ resolution fa) :: Double)
     maxnum  = 10 ^ digits
+# if MIN_VERSION_base(4,8,0)
+    fracNum = divCeil (d * maxnum) res
+    divCeil x y = (x + y - 1) `div` y
+# else
     fracNum = div (d * maxnum) res
+# endif
 #else
 showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
 #endif

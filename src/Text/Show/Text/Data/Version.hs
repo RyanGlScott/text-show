@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Version
@@ -16,7 +16,9 @@ module Text.Show.Text.Data.Version (
     ) where
 
 import Data.List (intersperse)
+#if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (mconcat)
+#endif
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 

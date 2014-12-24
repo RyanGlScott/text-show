@@ -490,7 +490,12 @@ applyCon con typeNames _
 #endif
   where
     apply :: Name -> Pred
-    apply t = ClassP con [VarT t]
+    apply t =
+#if MIN_VERSION_template_haskell(2,10,0)
+        AppT (ConT con) (VarT t)
+#else
+        ClassP con [VarT t]
+#endif
 
 #if MIN_VERSION_template_haskell(2,9,0)
     -- Filters a list of tycon names based on their type roles.

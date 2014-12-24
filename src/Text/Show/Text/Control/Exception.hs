@@ -24,6 +24,9 @@ module Text.Show.Text.Control.Exception (
   , showbNestedAtomically
   , showbBlockedIndefinitelyOnMVar
   , showbBlockedIndefinitelyOnSTM
+#if MIN_VERSION_base(4,8,0)
+  , showbAllocationLimitExceeded
+#endif
   , showbDeadlock
   , showbNoMethodError
   , showbPatternMatchFail
@@ -36,7 +39,9 @@ module Text.Show.Text.Control.Exception (
 
 import           Control.Exception.Base
 
+#if !(MIN_VERSION_base(4,8,0))
 import           Data.Monoid (mempty)
+#endif
 import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           Prelude hiding (Show)
@@ -122,6 +127,13 @@ showbBlockedIndefinitelyOnSTM :: BlockedIndefinitelyOnSTM -> Builder
 showbBlockedIndefinitelyOnSTM BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
 {-# INLINE showbBlockedIndefinitelyOnSTM #-}
 
+#if MIN_VERSION_base(4,8,0)
+-- | Convert an 'AllocationLimitExceeded' exception to a 'Builder'
+showbAllocationLimitExceeded :: AllocationLimitExceeded -> Builder
+showbAllocationLimitExceeded AllocationLimitExceeded = "allocation limit exceeded"
+{-# INLINE showbAllocationLimitExceeded #-}
+#endif
+
 -- | Convert a 'Deadlock' exception to a 'Builder'.
 showbDeadlock :: Deadlock -> Builder
 showbDeadlock Deadlock = "<<deadlock>>"
@@ -185,7 +197,7 @@ instance Show AssertionFailed where
 #if MIN_VERSION_base(4,7,0)
 instance Show SomeAsyncException where
     showb = showbSomeAsyncException
-    INLINE(showb)
+    {-# INLINE showb #-}
 #endif
 
 instance Show AsyncException where
@@ -207,6 +219,12 @@ instance Show BlockedIndefinitelyOnMVar where
 instance Show BlockedIndefinitelyOnSTM where
     showb = showbBlockedIndefinitelyOnSTM
     INLINE(showb)
+
+#if MIN_VERSION_base(4,8,0)
+instance Show AllocationLimitExceeded where
+    showb = showbAllocationLimitExceeded
+    {-# INLINE showb #-}
+#endif
 
 instance Show Deadlock where
     showb = showbDeadlock

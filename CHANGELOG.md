@@ -1,4 +1,5 @@
 # 0.5
+* Fix build for GHC 7.10, old GHC versions, and Windows
 * Removed the `Text.Show.Text.Data.Containers` and `Text.Show.Text.Data.Time` modules. The modules for the data types in `containers` and `time` were migrated to a separate library, `text-show-instances`.
 * Removed the `-ftext-format` flag, as `text-show` no longer uses `text-format`.
 * A [serious bug](https://github.com/bos/text/issues/99) in the `text` package that caused segfaults when building large `Integer`s was fixed in `text-1.2.0.2`. A flag (`-frecent-text`) was added that allows you to take advantage of this.
@@ -9,8 +10,9 @@
 * Added `deriveShowPragmas` to `Text.Show.Text.TH` to allow users to specify `INLINE` or `SPECIALIZE instance` pragmas with `Show` instances.
 * Added `showbSpace` to `Text.Show.Text`
 * Added `mkShowList`, `mkShowListLazy`, and `mkShowbList` to `Text.Data.Text.TH`
+* For base-4.8.0.0 and above, added the `Text.Show.Text.Data.Functor.Identity`, `Text.Show.Text.Data.Void`, `Text.Show.Text.GHC.RTS.Flags`, `Text.Show.Text.GHC.StaticPtr`, and `Text.Show.Text.Numeric.Natural` modules. Also added `Show` instances for `AllocationLimitExceeded` in `Text.Show.Text.Control.Exception` and `Alt` in `Text.Show.Text.Data.Monoid`. Also fixed the `Show` instance for `Fixed` values.
 * Added the `Text.Show.Text.Data.GHC.Conc.Windows` module (Windows-only)
-* Added the `Text.Show.Text.Data.OldTypeable` module for base >= 4.7
+* Added the `Text.Show.Text.Data.OldTypeable` module for base-4.7
 * Added `Text.Show.Text.Debug.Trace` and `Text.Show.Text.Debug.Trace.TH`
 * Added the `Show1` class and corresponding instances for unary type constructors.
 * Exported `asciiTabB` in `Text.Show.Text.Data.Char`

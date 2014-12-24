@@ -2,7 +2,7 @@
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE FlexibleContexts, TypeOperators #-}
 #endif
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif
 {-|
@@ -37,10 +37,14 @@ import qualified Data.Data as D (Fixity)
 import           Data.Data (Constr, ConstrRep, DataRep, DataType)
 import           Data.Dynamic (Dynamic)
 import           Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
+import           Data.Functor.Identity (Identity)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,8,0)
+import           Data.Monoid (Alt(..))
+#endif
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable as OldT (TyCon)
 #endif
 #if MIN_VERSION_base(4,6,0)
@@ -75,6 +79,10 @@ import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
 import           GHC.IO.Encoding.Failure (CodingFailureMode)
 import           GHC.IO.Encoding.Types (CodingProgress)
 #endif
+#if MIN_VERSION_base(4,8,0)
+import           GHC.RTS.Flags
+import           GHC.StaticPtr (StaticPtrInfo)
+#endif
 #if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats)
 #endif
@@ -86,6 +94,7 @@ import           Numeric (showIntAtBase, showEFloat, showFFloat, showGFloat)
 #if MIN_VERSION_base(4,7,0)
 import           Numeric (showFFloatAlt, showGFloatAlt)
 #endif
+import           Numeric.Natural (Natural)
 
 import           Prelude hiding (Show)
 
@@ -167,6 +176,9 @@ baseAndFriendsTests =
         , testProperty "NestedAtomically instance"          (prop_matchesShow :: Int -> NestedAtomically -> Bool)
         , testProperty "BlockedIndefinitelyOnMVar instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
         , testProperty "BlockedIndefinitelyOnSTM instance"  (prop_matchesShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
+#if MIN_VERSION_base(4,8,0)
+        , testProperty "AllocationLimitExceeded instance"   (prop_matchesShow :: Int -> AllocationLimitExceeded -> Bool)
+#endif
         , testProperty "Deadlock instance"                  (prop_matchesShow :: Int -> Deadlock -> Bool)
         , testProperty "NoMethodError instance"             (prop_matchesShow :: Int -> NoMethodError -> Bool)
         , testProperty "PatternMatchFail instance"          (prop_matchesShow :: Int -> PatternMatchFail -> Bool)
@@ -240,6 +252,9 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.Functions"
         [ testProperty "Int -> Int instance"                (prop_matchesShow :: Int -> (Int -> Int) -> Bool)
         ]
+    , testGroup "Text.Show.Text.Data.Functor.Identity"
+        [ testProperty "Identity Int instance"              (prop_matchesShow :: Int -> Identity Int -> Bool)
+        ]
     , testGroup "Text.Show.Text.Data.Integral"
         [ testProperty "Int instance"                       (prop_matchesShow :: Int -> Int -> Bool)
         , testProperty "Int8 instance"                      (prop_matchesShow :: Int -> Int8 -> Bool)
@@ -274,6 +289,9 @@ baseAndFriendsTests =
         , testProperty "Last (Maybe Int) instance"          (prop_matchesShow :: Int -> Last (Maybe Int) -> Bool)
         , testProperty "Product Int instance"               (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                   (prop_matchesShow :: Int -> Sum Int -> Bool)
+#if MIN_VERSION_base(4,8,0)
+        , testPropert "Alt Maybe Int instance"              (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
+#endif
         ]
 #if MIN_VERSION_base(4,7,0)
     , testGroup "Text.Show.Text.Data.OldTypeable"
@@ -390,8 +408,29 @@ baseAndFriendsTests =
         , testProperty "Associativity instance"             (prop_matchesShow :: Int -> Associativity -> Bool)
         , testProperty "Arity instance"                     (prop_matchesShow :: Int -> Arity -> Bool)
         ]
+#if MIN_VERSION_base(4,8,0)
+    , testGroup "Text.Show.Text.GHC.RTS.Flags"
+        [ -- testProperty "RTSFlags instance"                  (prop_matchesShow :: Int -> RTSFlags -> Bool)
+--         , testProperty "GCFlags instance"                   (prop_matchesShow :: Int -> GCFlags -> Bool)
+        , testProperty "ConcFlags instance"                 (prop_matchesShow :: Int -> ConcFlags -> Bool)
+        , testProperty "MiscFlags instance"                 (prop_matchesShow :: Int -> MiscFlags -> Bool)
+        , testProperty "DebugFlags instance"                (prop_matchesShow :: Int -> DebugFlags -> Bool)
+--         , testProperty "CCFlags instance"                   (prop_matchesShow :: Int -> CCFlags -> Bool)
+--         , testProperty "ProfFlags instance"                 (prop_matchesShow :: Int -> ProfFlags -> Bool)
+--         , testProperty "TraceFlags instance"                (prop_matchesShow :: Int -> TraceFlags -> Bool)
+        , testProperty "TickyFlags instance"                (prop_matchesShow :: Int -> TickyFlags -> Bool)
+        ]
+    , testGroup "Text.Show.Text.GHC.StaticPtr"
+        [ testProperty "StaticPtrInfo instance"             (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
+        ]
+#endif
+#if MIN_VERSION_base(4,5,0)
     , testGroup "Text.Show.Text.GHC.Stats"
         [ testProperty "GCStats instance"                   (prop_matchesShow :: Int -> GCStats -> Bool)
+        ]
+#endif
+    , testGroup "Text.Show.Text.Numeric.Natural"
+        [ testProperty "Natural instance"                   (prop_matchesShow :: Int -> Natural -> Bool)
         ]
     , testGroup "Text.Show.Text.System.Exit"
         [ testProperty "ExitCode instance"                  (prop_matchesShow :: Int -> ExitCode -> Bool)

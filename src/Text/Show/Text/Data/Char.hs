@@ -21,7 +21,9 @@ module Text.Show.Text.Data.Char (
 
 import Data.Array (Array, (!), listArray)
 import Data.Char (GeneralCategory, isDigit, ord)
+#if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (mempty)
+#endif
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)

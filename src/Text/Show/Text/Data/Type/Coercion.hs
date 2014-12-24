@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, GADTs, TemplateHaskell #-}
+{-# LANGUAGE GADTs, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Type.Coercion
@@ -20,8 +20,6 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
-#include "inline.h"
-
 -- | Convert a representational equality value to a 'Builder'.
 showbCoercion :: Coercion a b -> Builder
 showbCoercion = showb
@@ -30,8 +28,8 @@ showbCoercion = showb
 -- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
 instance Show (Coercion a b) where
     showbPrec = $(mkShowbPrec ''Coercion)
-    INLINE(showb)
+    {-# INLINE showb #-}
 
 instance Show1 (Coercion a) where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    {-# INLINE showbPrec1 #-}

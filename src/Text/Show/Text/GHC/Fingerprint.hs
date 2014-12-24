@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.GHC.Fingerprint
@@ -23,8 +22,6 @@ import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Integral (showbHex)
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
-#include "inline.h"
-
 -- | Convert a 'Fingerprint' to a 'Builder'.
 showbFingerprint :: Fingerprint -> Builder
 showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
@@ -36,4 +33,4 @@ showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
 
 instance Show Fingerprint where
     showb = showbFingerprint
-    INLINE(showb)
+    {-# INLINE showb #-}

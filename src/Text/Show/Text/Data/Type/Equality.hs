@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, GADTs, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE GADTs, TemplateHaskell, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Type.Equality
@@ -20,8 +20,6 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
-#include "inline.h"
-
 -- | Convert a propositional equality value to a 'Builder'.
 showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality = showb
@@ -30,8 +28,8 @@ showbPropEquality = showb
 -- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
 instance Show (a :~: b) where
     showbPrec = $(mkShowbPrec ''(:~:))
-    INLINE(showb)
+    {-# INLINE showb #-}
 
 instance Show1 ((:~:) a) where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    {-# INLINE showbPrec1 #-}

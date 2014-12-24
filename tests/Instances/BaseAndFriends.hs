@@ -4,7 +4,9 @@
 #endif
 #if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE TypeFamilies #-}
+# if !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
+# endif
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -34,8 +36,12 @@ import qualified Data.Data as D (Fixity(..))
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
+import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
+#if MIN_VERSION_base(4,8,0)
+import           Data.Monoid (Alt(..))
+#endif
 #if MIN_VERSION_base(4,7,0)
 import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
 #endif
@@ -77,9 +83,15 @@ import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
                                M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
                                Associativity(..), Arity(..))
 #endif
+#if MIN_VERSION_base(4,8,0)
+import           GHC.RTS.Flags
+import           GHC.StaticPtr (StaticPtrInfo(..))
+#endif
 #if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats(..))
 #endif
+
+import           Numeric.Natural (Natural)
 
 import           System.Exit (ExitCode(..))
 import           System.IO (BufferMode(..), IOMode(..), Newline(..),
@@ -90,6 +102,9 @@ import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
                                         arbitraryBoundedEnum, oneof)
 
 #include "HsBaseConfig.h"
+
+instance Arbitrary Natural where
+    arbitrary = fromInteger <$> arbitrary
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
@@ -168,6 +183,11 @@ instance Arbitrary BlockedIndefinitelyOnMVar where
 
 instance Arbitrary BlockedIndefinitelyOnSTM where
     arbitrary = pure BlockedIndefinitelyOnSTM
+
+#if MIN_VERSION_base(4,8,0)
+instance Arbitrary AllocationLimitExceeded where
+    arbitrary = pure AllocationLimitExceeded
+#endif
 
 instance Arbitrary Deadlock where
     arbitrary = pure Deadlock
@@ -417,6 +437,34 @@ deriving instance Show (f (g p))           => Show ((f :.: g) p)
 #endif
 #endif
 
+#if MIN_VERSION_base(4,8,0)
+-- instance Arbitrary RTSFlags
+-- instance Arbitrary GCFlags
+
+instance Arbitrary ConcFlags where
+    arbitrary = ConcFlags <$> arbitrary <*> arbitrary
+
+instance Arbitrary MiscFlags where
+    arbitrary = MiscFlags <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+instance Arbitrary DebugFlags where
+    arbitrary = DebugFlags <$> arbitrary <*> arbitrary <*> arbitrary
+                           <*> arbitrary <*> arbitrary <*> arbitrary
+                           <*> arbitrary <*> arbitrary <*> arbitrary
+                           <*> arbitrary <*> arbitrary <*> arbitrary
+                           <*> arbitrary <*> arbitrary <*> arbitrary
+
+-- instance Arbitrary CCFlags where
+-- instance Arbitrary ProfFlags where
+-- instance Arbitrary TraceFlags where
+
+instance Arbitrary TickyFlags where
+    arbitrary = TickyFlags <$> arbitrary <*> arbitrary
+
+instance Arbitrary StaticPtrInfo where
+    arbitrary = StaticPtrInfo <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
+
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
 deriving instance Arbitrary CUChar
@@ -494,7 +542,10 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
- 
+#if MIN_VERSION_base(4,8,0)
+deriving instance Arbitrary (f a) => Arbitrary (Alt f a)
+#endif
+
 deriving instance Arbitrary a => Arbitrary (ZipList a)
 #if !(MIN_VERSION_base(4,7,0))
 deriving instance Show a => Show (ZipList a)
@@ -506,3 +557,5 @@ deriving instance Arbitrary a => Arbitrary (Down a)
 deriving instance Show a => Show (Down a)
 #endif
 #endif
+
+deriving instance Arbitrary a => Arbitrary (Identity a)
