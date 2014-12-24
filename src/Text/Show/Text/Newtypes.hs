@@ -16,7 +16,10 @@ import           Data.Text.Lazy.Builder (fromString)
 import           Foreign.Storable (Storable)
 
 #if MIN_VERSION_base(4,4,0)
-import           GHC.Generics (Generic, Generic1)
+import           GHC.Generics (Generic)
+# if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic1)
+# endif
 #endif
 
 import           Prelude hiding (Show)
@@ -38,7 +41,9 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Fractional
 #if MIN_VERSION_base(4,4,0)
            , Generic
+# if __GLASGOW_HASKELL__ >= 706
            , Generic1
+# endif
 #endif
            , Integral
            , Num

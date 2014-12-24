@@ -27,8 +27,9 @@ import Text.Read.Lex (Lexeme(..))
 import Text.Read.Lex (Number)
 #endif
 import Text.Show.Text.Classes (Show(showbPrec), showbUnary)
+import Text.Show.Text.Newtypes (LitChar(..), LitString(..))
 #if MIN_VERSION_base(4,6,0)
-import Text.Show.Text.Newtypes (FromStringShow(..), LitChar(..), LitString(..))
+import Text.Show.Text.Newtypes (FromStringShow(..))
 #else
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Ratio (showbRatioPrec)
