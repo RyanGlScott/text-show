@@ -8,12 +8,13 @@
 * Loosened the `Show` instance of `Complex a` to only depend on `Show a` (previously required `RealFloat a`) if using base-4.4.0.0 or later
 * Moved `showbRatioPrec` to `Text.Show.Text.Data.Ratio`, `showbComplexPrec` to `Text.Show.Text.Data.Complex`, `showbProxy` to `Text.Show.Text.Data.Proxy`, and `showbFingerprint` to `Text.Show.Text.GHC.Fingerprint`
 * Added `deriveShowPragmas` to `Text.Show.Text.TH` to allow users to specify `INLINE` or `SPECIALIZE instance` pragmas with `Show` instances.
-* Added `showbSpace` to `Text.Show.Text`
+* Added `showbSpace`, `showbUnary`, `showbUnary1`, and `showbBinary1` to `Text.Show.Text`
 * Added `mkShowList`, `mkShowListLazy`, and `mkShowbList` to `Text.Data.Text.TH`
 * For base-4.8.0.0 and above, added the `Text.Show.Text.Data.Functor.Identity`, `Text.Show.Text.Data.Void`, `Text.Show.Text.GHC.RTS.Flags`, `Text.Show.Text.GHC.StaticPtr`, and `Text.Show.Text.Numeric.Natural` modules. Also added `Show` instances for `AllocationLimitExceeded` in `Text.Show.Text.Control.Exception` and `Alt` in `Text.Show.Text.Data.Monoid`. Also fixed the `Show` instance for `Fixed` values.
 * Added the `Text.Show.Text.Data.GHC.Conc.Windows` module (Windows-only)
 * Added the `Text.Show.Text.Data.OldTypeable` module for base-4.7
-* Added `Text.Show.Text.Debug.Trace` and `Text.Show.Text.Debug.Trace.TH`
+* Added the `Text.Show.Text.Newtypes` module with the `FromStringShow`, `LitChar`, and `LitString` newtypes to make it easier to create `Text Show` instances with certain properties.
+* Added the `Text.Show.Text.Debug.Trace` and `Text.Show.Text.Debug.Trace.TH` modules as an analog to `Debug.Trace`
 * Added the `Show1` class and corresponding instances for unary type constructors.
 * Exported `asciiTabB` in `Text.Show.Text.Data.Char`
 

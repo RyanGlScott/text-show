@@ -19,7 +19,10 @@ module Text.Show.Text (
     , showListLazy
     , showbParen
     , showbSpace
+    , showbUnary
     , Show1(..)
+    , showbUnary1
+    , showbBinary1
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString

@@ -18,6 +18,8 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, toLazyText)
 
+import           GHC.Show (appPrec, appPrec1)
+
 import           Prelude hiding (Show(show, showList))
 
 import           System.IO (Handle)
@@ -123,6 +125,29 @@ showbListDefault showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
     go (y:ys) = s ',' <> showbx y <> go ys                  -- ..,..
     go []     = s ']'                                       -- ..]"
 {-# INLINE showbListDefault #-}
+
+-- | @'showbUnary' n p x@ produces the 'Builder' representation of a unary data
+-- constructor with name @n@ and argument @x@, in precedence context @p@.
+showbUnary :: Show a => Builder -> Int -> a -> Builder
+showbUnary nameB p x = showbParen (p > appPrec) $
+    nameB <> showbSpace <> showbPrec appPrec1 x
+{-# INLINE showbUnary #-}
+
+-- | @'showbUnary1' n p x@ produces the 'Builder' representation of a unary data
+-- constructor with name @n@ and argument @x@, in precedence context @p@.
+showbUnary1 :: (Show1 f, Show a) => Builder -> Int -> f a -> Builder
+showbUnary1 nameB p x = showbParen (p > appPrec) $
+    nameB <> showbSpace <> showbPrec1 appPrec1 x
+{-# INLINE showbUnary1 #-}
+
+-- | @'showbBinary1' n p x y@ produces the 'Builder' representation of a binary
+-- data constructor with name @n@ and arguments @x@ and @y@, in precedence
+-- context @p@.
+showbBinary1 :: (Show1 f, Show1 g, Show a) => Builder -> Int -> f a -> g a -> Builder
+showbBinary1 nameB p x y = showbParen (p > appPrec) $ nameB
+    <> showbSpace <> showbPrec1 appPrec1 x
+    <> showbSpace <> showbPrec1 appPrec1 y
+{-# INLINE showbBinary1 #-}
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.

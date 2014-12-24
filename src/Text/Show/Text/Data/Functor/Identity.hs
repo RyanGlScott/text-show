@@ -1,9 +1,4 @@
-{-# LANGUAGE CPP #-}
-#if MIN_VERSION_base(4,8,0)
-{-# LANGUAGE OverloadedStrings #-}
-#else
-{-# LANGUAGE TemplateHaskell #-}
-#endif
+{-# LANGUAGE CPP, OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Functor.Identity
@@ -22,38 +17,20 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
-
-#if MIN_VERSION_base(4,8,0)
-import GHC.Show (appPrec, appPrec1)
-
-import Text.Show.Text.Classes (showbParen)
-import Text.Show.Text.Utils ((<>))
-#else
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
-#endif
+import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
 
 #include "inline.h"
 
--- Convert an 'Identity' value to a 'Builder' with the given precedence.
+-- | Convert an 'Identity' value to a 'Builder' with the given precedence.
 showbIdentityPrec :: Show a => Int -> Identity a -> Builder
-#if MIN_VERSION_base(4,8,0)
 -- This would be equivalent to the derived instance of 'Identity' if the
 -- 'runIdentity' field were removed.
-showbIdentityPrec p (Identity x) = showbParen (p > appPrec) $
-    "Identity " <> showbPrec appPrec1 x
-#else
-showbIdentityPrec = showbPrec
-#endif
+showbIdentityPrec p (Identity x) = showbUnary "Identity" p x
 {-# INLINE showbIdentityPrec #-}
 
-#if MIN_VERSION_base(4,8,0)
 instance Show a => Show (Identity a) where
     showbPrec = showbIdentityPrec
     {-# INLINE showbPrec #-}
-#else
-$(deriveShowPragmas defaultInlineShowbPrec ''Identity)
-#endif
 
 instance Show1 Identity where
     showbPrec1 = showbPrec

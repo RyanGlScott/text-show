@@ -12,8 +12,6 @@ Portability: GHC
 -}
 module Properties.Derived (derivedTests) where
 
-import Data.Text.Lazy.Builder (fromString)
-
 import Derived
 
 import Instances.Derived ()
@@ -24,6 +22,7 @@ import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.QuickCheck (testProperty)
 
 import Text.Show.Text (showb, showbPrec)
+import Text.Show.Text.Newtypes (FromStringShow(..))
 
 -- | Verifies that the two 'Show' instances of 'GADT' coincide.
 prop_showGADT :: Int    -- ^ The precedence to show with
@@ -47,11 +46,11 @@ prop_showGADT p d i c s
           
           gc5 :: GADT String String Int
           gc5 = GADTCon5 s
-      in fromString (show gc1)              == showb gc1
-         && fromString (showsPrec p gc2 "") == showbPrec p gc2
-         && fromString (showsPrec p gc3 "") == showbPrec p gc3
-         && fromString (showsPrec p gc4 "") == showbPrec p gc4
-         && fromString (showsPrec p gc5 "") == showbPrec p gc5
+      in    showb       (FromStringShow gc1) == showb       gc1
+         && showbPrec p (FromStringShow gc2) == showbPrec p gc2
+         && showbPrec p (FromStringShow gc3) == showbPrec p gc3
+         && showbPrec p (FromStringShow gc4) == showbPrec p gc4
+         && showbPrec p (FromStringShow gc5) == showbPrec p gc5
 
 derivedTests :: [TestTree]
 derivedTests =

@@ -37,30 +37,30 @@ module Text.Show.Text.Control.Exception (
   , showbMaskingState
   ) where
 
-import           Control.Exception.Base
+import Control.Exception.Base
 
 #if !(MIN_VERSION_base(4,8,0))
-import           Data.Monoid (mempty)
+import Data.Monoid (mempty)
 #endif
-import           Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder, fromString)
 
-import           Prelude hiding (Show)
+import Prelude hiding (Show)
 
-import qualified Text.Show as S (show, showsPrec)
-import           Text.Show.Text.Classes (Show(showb, showbPrec))
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
-import           Text.Show.Text.Utils ((<>))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
+import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.Utils ((<>))
 
 #include "inline.h"
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
 showbSomeExceptionPrec :: Int -> SomeException -> Builder
-showbSomeExceptionPrec p (SomeException e) = fromString $ S.showsPrec p e ""
+showbSomeExceptionPrec p (SomeException e) = showbPrec p $ FromStringShow e
 {-# INLINE showbSomeExceptionPrec #-}
 
 -- | Convert an 'IOException' to a 'Builder'.
 showbIOException :: IOException -> Builder
-showbIOException = fromString . S.show
+showbIOException = showb . FromStringShow
 {-# INLINE showbIOException #-}
 
 -- | Convert an 'ArithException' to a 'Builder'.
@@ -95,7 +95,7 @@ showbAssertionFailed (AssertionFailed err) = fromString err
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeAsyncException' value to a 'Builder'.
 showbSomeAsyncException :: SomeAsyncException -> Builder
-showbSomeAsyncException (SomeAsyncException e) = fromString $ S.show e
+showbSomeAsyncException (SomeAsyncException e) = showb $ FromStringShow e
 {-# INLINE showbSomeAsyncException #-}
 #endif
 

@@ -16,22 +16,22 @@ module Text.Show.Text.Control.Concurrent (
     , showbBlockReason
     ) where
 
-import           Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder)
 
-import           GHC.Conc (BlockReason, ThreadId, ThreadStatus)
+import GHC.Conc (BlockReason, ThreadId, ThreadStatus)
 
-import           Prelude hiding (Show)
+import Prelude hiding (Show)
 
-import qualified Text.Show as S (showsPrec)
-import           Text.Show.Text.Classes (Show(showb, showbPrec))
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
-                                             defaultInlineShowbPrec)
+import Text.Show.Text.Classes (Show(showb, showbPrec))
+import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
+                                   defaultInlineShowbPrec)
 
 #include "inline.h"
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
 showbThreadIdPrec :: Int -> ThreadId -> Builder
-showbThreadIdPrec p ti = fromString $ S.showsPrec p ti ""
+showbThreadIdPrec p = showbPrec p . FromStringShow
 {-# INLINE showbThreadIdPrec #-}
 
 -- | Convert a 'ThreadStatus' to a 'Builder' with the given precedence.

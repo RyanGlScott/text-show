@@ -99,12 +99,12 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..),
 import           System.Posix.Types
 
 import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
-                                        arbitraryBoundedEnum, oneof)
+                                        arbitraryBoundedEnum, oneof, suchThat)
 
 #include "HsBaseConfig.h"
 
 instance Arbitrary Natural where
-    arbitrary = fromInteger <$> arbitrary
+    arbitrary = fromInteger <$> arbitrary `suchThat` (>= 0)
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary

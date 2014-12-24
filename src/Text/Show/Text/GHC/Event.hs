@@ -18,23 +18,23 @@ module Text.Show.Text.GHC.Event (
     , showbFdKeyPrec
     ) where 
 
-import           Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder)
 
-import           GHC.Event (Event, FdKey)
+import GHC.Event (Event, FdKey)
 
-import           Prelude hiding (Show)
+import Prelude hiding (Show)
 
-import qualified Text.Show as S (show, showsPrec)
-import           Text.Show.Text.Classes (Show(showb, showbPrec))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
+import Text.Show.Text.Newtypes (FromStringShow(..))
 
 -- | Convert an 'Event' to a 'Builder'.
 showbEvent :: Event -> Builder
-showbEvent = fromString . S.show
+showbEvent = showb . FromStringShow
 {-# INLINE showbEvent #-}
 
 -- | Convert an 'FdKey' to a 'Builder' with the given precedence.
 showbFdKeyPrec :: Int -> FdKey -> Builder
-showbFdKeyPrec p fdKey = fromString $ S.showsPrec p fdKey ""
+showbFdKeyPrec p = showbPrec p . FromStringShow
 {-# INLINE showbFdKeyPrec #-}
 
 instance Show Event where
