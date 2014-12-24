@@ -31,8 +31,8 @@ import Text.Show.Text.Newtypes (LitChar(..), LitString(..))
 #if MIN_VERSION_base(4,6,0)
 import Text.Show.Text.Newtypes (FromStringShow(..))
 #else
-import Text.Show.Text.Data.Integral (showbIntegerPrec)
-import Text.Show.Text.Data.Ratio (showbRatioPrec)
+import Text.Show.Text.Data.Integral ()
+import Text.Show.Text.Data.Ratio ()
 #endif
 
 #include "inline.h"

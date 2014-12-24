@@ -2,6 +2,16 @@
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE DeriveGeneric #-}
 #endif
+{-|
+Module:      Text.Show.Text.Newtypes
+Copyright:   (C) 2014 Ryan Scott
+License:     BSD-style (see the file LICENSE)
+Maintainer:  Ryan Scott
+Stability:   Experimental
+Portability: GHC
+
+Wrapper data types that give 'Show' instances desirable properties.
+-}
 module Text.Show.Text.Newtypes (
       FromStringShow(..)
     , LitChar(..)
@@ -32,6 +42,12 @@ import           Text.Show.Text.Data.Char (showbLitChar, showbLitString)
 
 #include "inline.h"
 
+-- | The @Text@ 'T.Show' instance for 'FromStringShow' is based on its @String@
+-- 'S.Show' instance. That is,
+-- 
+-- @
+-- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
+-- @
 newtype FromStringShow a = FromStringShow { fromStringShow :: a }
   deriving ( Bounded
            , Data
@@ -60,6 +76,12 @@ instance S.Show a => T.Show (FromStringShow a) where
     showbPrec p (FromStringShow x) = fromString $ S.showsPrec p x ""
     INLINE(showbPrec)
 
+-- | The @Text@ 'T.Show' instance for 'LitChar' is like that of a regular 'Char',
+-- except it is not escaped by single quotes. That is,
+-- 
+-- @
+-- showb ('LitChar' c) = 'showbLitChar' c
+-- @
 newtype LitChar = LitChar { getLitChar :: Char }
   deriving ( Bounded
            , Data
@@ -82,6 +104,12 @@ instance T.Show LitChar where
     showb = showbLitChar . getLitChar
     INLINE(showb)
 
+-- | The @Text@ 'T.Show' instance for 'LitString' is like that of a regular
+-- 'String', except it is not escaped by double quotes. That is,
+-- 
+-- @
+-- showb ('LitString' s) = 'showbLitString' s
+-- @
 newtype LitString = LitString { getLitString :: String }
   deriving ( Data
            , Eq
