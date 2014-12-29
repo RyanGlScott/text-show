@@ -84,8 +84,8 @@ tyConString = tyConName
 
 instance Show TypeRep where
     showbPrec = showbTypeRepPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show TyCon where
     showb = showbTyCon
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

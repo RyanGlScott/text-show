@@ -115,21 +115,21 @@ showbNewlineModePrec = showbPrec
 
 instance Show Handle where
     showb = showbHandle
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 $(deriveShowPragmas defaultInlineShowb     ''IOMode)
 $(deriveShowPragmas defaultInlineShowbPrec ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 $(deriveShowPragmas defaultInlineShowb     ''SeekMode)
 
 #if MIN_VERSION_base(4,3,0)
 instance Show TextEncoding where
     showb = showbTextEncoding
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 #endif
 
 #if MIN_VERSION_base(4,4,0)

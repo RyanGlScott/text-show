@@ -27,12 +27,11 @@ import qualified Data.ByteString.Lazy as BL
 #if MIN_VERSION_bytestring(0,10,4)
 import           Data.ByteString.Short (ShortByteString)
 #endif
-import           Data.Text.Lazy.Builder (Builder, fromString)
+import           Data.Text.Lazy.Builder (Builder)
 
 import           Prelude hiding (Show(show))
 
-import qualified Text.Show as S (show)
-import           Text.Show.Text.Classes (Show(showb, showbPrec))
+import           Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
@@ -42,7 +41,7 @@ import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineSho
 
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
 showbByteStringStrict :: BS.ByteString -> Builder
-showbByteStringStrict = fromString . S.show
+showbByteStringStrict = showb . FromStringShow
 {-# INLINE showbByteStringStrict #-}
 
 -- | Convert a lazy 'BL.ByteString' to a 'Builder'.
@@ -59,7 +58,7 @@ showbByteStringLazy = showbByteStringLazyPrec 0
 -- depending on the precedence.
 showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder
 #if MIN_VERSION_bytestring(0,10,0)
-showbByteStringLazyPrec _ = fromString . S.show
+showbByteStringLazyPrec _ = showb . FromStringShow
 #else
 showbByteStringLazyPrec = showbPrec
 #endif
@@ -68,18 +67,18 @@ showbByteStringLazyPrec = showbPrec
 #if MIN_VERSION_bytestring(0,10,4)
 -- | Convert a 'ShortByteString' to a 'Builder'.
 showbShortByteString :: ShortByteString -> Builder
-showbShortByteString = fromString . S.show
+showbShortByteString = showb . FromStringShow
 {-# INLINE showbShortByteString #-}
 #endif
 
 instance Show BS.ByteString where
     showb = showbByteStringStrict
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_bytestring(0,10,0)
 instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 #else
 $(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #endif
@@ -87,5 +86,5 @@ $(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #if MIN_VERSION_bytestring(0,10,4)
 instance Show ShortByteString where
     showb = showbShortByteString
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 #endif

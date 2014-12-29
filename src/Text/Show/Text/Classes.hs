@@ -1,4 +1,11 @@
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveFoldable, DeriveFunctor,
+             DeriveTraversable, GeneralizedNewtypeDeriving, OverloadedStrings #-}
+#if MIN_VERSION_base(4,4,0)
+{-# LANGUAGE DeriveGeneric #-}
+#endif
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE TypeFamilies #-}
+#endif
 {-|
 Module:      Text.Show.Text.Classes
 Copyright:   (C) 2014 Ryan Scott
@@ -11,20 +18,51 @@ The 'Show' and 'Show1' typeclasses.
 -}
 module Text.Show.Text.Classes where
 
+#if !(MIN_VERSION_base(4,8,0))
+import           Control.Applicative (Applicative((<*>), pure))
+import           Data.Foldable (Foldable)
+import           Data.Traversable (Traversable)
+#endif
+
+import           Control.Monad.Fix (MonadFix(mfix))
+import           Control.Monad.Zip (MonadZip(mzip, mzipWith, munzip))
+
+import           Data.Bits (Bits)
+#if MIN_VERSION_base(4,7,0)
+import           Data.Bits (FiniteBits)
+#endif
+import           Data.Data (Data, Typeable)
+import           Data.Ix (Ix)
+import           Data.String (IsString)
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 
+import           Foreign.Storable (Storable)
+
+#if __GLASGOW_HASKELL__ >= 708
+import           GHC.Exts (IsList(Item, fromList, toList))
+#endif
+#if MIN_VERSION_base(4,4,0)
+import           GHC.Generics (Generic)
+# if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic1)
+# endif
+#endif
 import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude hiding (Show(show, showList))
 
 import           System.IO (Handle)
 
+import           Text.Printf (IsChar, PrintfArg, PrintfType)
+import qualified Text.Show as S (Show(showsPrec))
 import           Text.Show.Text.Utils ((<>), s)
+
+#include "inline.h"
 
 -- | Conversion of values to @Text@. Because there are both strict and lazy @Text@
 -- variants, the 'Show' class deliberately avoids using @Text@ in its functions.
@@ -172,3 +210,87 @@ hPrint h = TS.hPutStrLn h . show
 hPrintLazy :: Show a => Handle -> a -> IO ()
 hPrintLazy h = TL.hPutStrLn h . showLazy
 {-# INLINE hPrintLazy #-}
+
+-- | The @Text@ 'T.Show' instance for 'FromStringShow' is based on its @String@
+-- 'S.Show' instance. That is,
+-- 
+-- @
+-- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
+-- @
+newtype FromStringShow a = FromStringShow { fromStringShow :: a }
+  deriving ( Bits
+           , Bounded
+           , Data
+           , Enum
+           , Eq
+#if MIN_VERSION_base(4,7,0)
+           , FiniteBits
+#endif
+           , Floating
+           , Foldable
+           , Fractional
+           , Functor
+#if MIN_VERSION_base(4,4,0)
+           , Generic
+# if __GLASGOW_HASKELL__ >= 706
+           , Generic1
+# endif
+#endif
+           , Integral
+           , IsChar
+           , IsString
+           , Ix
+           , Num
+           , Ord
+           , PrintfArg
+           , PrintfType
+           , Read
+           , Real
+           , RealFloat
+           , RealFrac
+           , S.Show
+           , Storable
+           , Traversable
+           , Typeable
+           )
+
+instance Applicative FromStringShow where
+    pure = FromStringShow
+    INLINE_INST_FUN(pure)
+    
+    FromStringShow f <*> FromStringShow x = FromStringShow $ f x
+    INLINE_INST_FUN((<*>))
+
+#if __GLASGOW_HASKELL__ >= 708
+instance IsList a => IsList (FromStringShow a) where
+    type Item (FromStringShow a) = Item a
+    fromList = FromStringShow . fromList
+    {-# INLINE fromList #-}
+    toList = toList . fromStringShow
+    {-# INLINE toList #-}
+#endif
+
+instance Monad FromStringShow where
+    return = FromStringShow
+    INLINE_INST_FUN(return)
+    
+    FromStringShow a >>= f = f a
+    INLINE_INST_FUN((>>=))
+
+instance MonadFix FromStringShow where
+    mfix f = FromStringShow $ let FromStringShow a = f a in a
+    INLINE_INST_FUN(mfix)
+
+instance MonadZip FromStringShow where
+    mzip (FromStringShow a) (FromStringShow b) = FromStringShow (a, b)
+    INLINE_INST_FUN(mzip)
+    
+    mzipWith f (FromStringShow a) (FromStringShow b) = FromStringShow $ f a b
+    INLINE_INST_FUN(mzipWith)
+    
+    munzip (FromStringShow (a, b)) = (FromStringShow a, FromStringShow b)
+    INLINE_INST_FUN(munzip)
+
+instance S.Show a => Show (FromStringShow a) where
+    showbPrec p (FromStringShow x) = fromString $ S.showsPrec p x ""
+    INLINE_INST_FUN(showbPrec)

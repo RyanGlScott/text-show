@@ -50,5 +50,5 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Down)
 
 instance Show1 Down where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    {-# INLINE showbPrec1 #-}
 #endif

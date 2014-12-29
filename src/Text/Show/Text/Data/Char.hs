@@ -1,4 +1,11 @@
-{-# LANGUAGE CPP, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, GeneralizedNewtypeDeriving,
+             OverloadedStrings, TemplateHaskell #-}
+#if MIN_VERSION_base(4,4,0)
+{-# LANGUAGE DeriveGeneric #-}
+#endif
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE TypeFamilies #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Char
@@ -17,21 +24,37 @@ module Text.Show.Text.Data.Char (
     , showbLitString
     , showbGeneralCategory
     , asciiTabB
+    , LitChar(..)
+    , LitString(..)
     ) where
 
-import Data.Array (Array, (!), listArray)
-import Data.Char (GeneralCategory, isDigit, ord)
+import           Data.Array (Array, (!), listArray)
+import           Data.Char (GeneralCategory, isDigit, ord)
+import           Data.Data (Data, Typeable)
+import           Data.Ix (Ix)
 #if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (mempty)
+import           Data.Monoid (Monoid(mempty))
 #endif
-import Data.Text.Lazy.Builder (Builder)
+import           Data.String (IsString)
+import           Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
+import           Foreign.Storable (Storable)
 
-import Text.Show.Text.Classes (Show(..))
-import Text.Show.Text.Data.Integral (showbIntPrec)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
-import Text.Show.Text.Utils ((<>), s)
+#if __GLASGOW_HASKELL__ >= 708
+import           GHC.Exts (IsList(Item, fromList, toList))
+#endif
+#if MIN_VERSION_base(4,4,0)
+import           GHC.Generics (Generic)
+#endif
+
+import           Prelude hiding (Show)
+
+import           Text.Printf (IsChar, PrintfArg, PrintfType)
+import qualified Text.Show as S (Show)
+import           Text.Show.Text.Classes (Show(..))
+import           Text.Show.Text.Data.Integral (showbIntPrec)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import           Text.Show.Text.Utils ((<>), s)
 
 #include "inline.h"
 
@@ -88,9 +111,72 @@ showbGeneralCategory = showb
 
 instance Show Char where
     showb = showbChar
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
     
     showbList = showbString
-    INLINE(showbList)
+    INLINE_INST_FUN(showbList)
 
 $(deriveShowPragmas defaultInlineShowb ''GeneralCategory)
+
+-- | The @Text@ 'T.Show' instance for 'LitChar' is like that of a regular 'Char',
+-- except it is not escaped by single quotes. That is,
+-- 
+-- @
+-- showb ('LitChar' c) = 'showbLitChar' c
+-- @
+newtype LitChar = LitChar { getLitChar :: Char }
+  deriving ( Bounded
+           , Data
+           , Enum
+           , Eq
+#if MIN_VERSION_base(4,4,0)
+           , Generic
+#endif
+           , IsChar
+           , Ix
+           , Ord
+           , PrintfArg
+           , Read
+           , S.Show
+           , Storable
+           , Typeable
+           )
+
+instance Show LitChar where
+    showb = showbLitChar . getLitChar
+    INLINE_INST_FUN(showb)
+
+-- | The @Text@ 'T.Show' instance for 'LitString' is like that of a regular
+-- 'String', except it is not escaped by double quotes. That is,
+-- 
+-- @
+-- showb ('LitString' s) = 'showbLitString' s
+-- @
+newtype LitString = LitString { getLitString :: String }
+  deriving ( Data
+           , Eq
+#if MIN_VERSION_base(4,4,0)
+           , Generic
+#endif
+           , IsString
+           , Monoid
+           , Ord
+           , PrintfArg
+           , PrintfType
+           , Read
+           , S.Show
+           , Typeable
+           )
+
+#if __GLASGOW_HASKELL__ >= 708
+instance IsList LitString where
+    type Item LitString = Char
+    fromList = LitString
+    {-# INLINE fromList #-}
+    toList = getLitString
+    {-# INLINE toList #-}
+#endif
+
+instance Show LitString where
+    showb = showbLitString . getLitString
+    INLINE_INST_FUN(showb)

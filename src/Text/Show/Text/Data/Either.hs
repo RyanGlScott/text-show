@@ -30,4 +30,4 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Either)
 
 instance Show a => Show1 (Either a) where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

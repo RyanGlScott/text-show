@@ -21,8 +21,7 @@ import Properties.Utils (prop_matchesShow)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.QuickCheck (testProperty)
 
-import Text.Show.Text (showb, showbPrec)
-import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text (showb, showbPrec, FromStringShow(..))
 
 -- | Verifies that the two 'Show' instances of 'GADT' coincide.
 prop_showGADT :: Int    -- ^ The precedence to show with

@@ -86,4 +86,4 @@ withDotB b | b == mempty = mempty
 
 instance HasResolution a => Show (Fixed a) where
     showb = showbFixed False
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

@@ -36,6 +36,8 @@ module Text.Show.Text (
     , printLazy
     , hPrint
     , hPrintLazy
+      -- * @FromStringShow@
+    , FromStringShow(..)
     ) where
 
 import Data.Text.Lazy.Builder

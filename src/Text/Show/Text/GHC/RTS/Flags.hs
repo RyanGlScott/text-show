@@ -25,10 +25,11 @@ module Text.Show.Text.GHC.RTS.Flags (
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.RTS.Flags
+import GHC.Show (appPrec, appPrec1)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec))
+import Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Bool     ()
 import Text.Show.Text.Data.Char     ()
 import Text.Show.Text.Data.Floating ()

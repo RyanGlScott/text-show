@@ -34,4 +34,4 @@ instance Show a => Show (Identity a) where
 
 instance Show1 Identity where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

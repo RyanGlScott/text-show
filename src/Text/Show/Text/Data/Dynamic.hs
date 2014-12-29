@@ -30,4 +30,4 @@ showbDynamic dyn = "<<" <> showbTypeRepPrec 0 (dynTypeRep dyn) <> ">>"
 
 instance Show Dynamic where
     showb = showbDynamic
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

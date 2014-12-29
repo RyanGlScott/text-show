@@ -29,4 +29,4 @@ showbVoid = absurd
 
 instance Show Void where
     showb = showbVoid
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

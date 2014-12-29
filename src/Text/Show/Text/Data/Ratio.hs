@@ -36,4 +36,4 @@ showbRatioPrec p q = showbParen (p > ratioPrec) $
 instance (Show a, Integral a) => Show (Ratio a) where
     {-# SPECIALIZE instance Show Rational #-}
     showbPrec = showbRatioPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)

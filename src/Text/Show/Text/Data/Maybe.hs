@@ -30,4 +30,4 @@ $(deriveShowPragmas defaultInlineShowbPrec ''Maybe)
 
 instance Show1 Maybe where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

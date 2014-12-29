@@ -26,8 +26,8 @@ instance Show a => Show [a] where
     {-# SPECIALIZE instance Show [Char]   #-}
     {-# SPECIALIZE instance Show [Int]    #-}
     showb = showbList
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 [] where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

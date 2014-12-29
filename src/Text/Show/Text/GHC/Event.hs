@@ -19,13 +19,9 @@ module Text.Show.Text.GHC.Event (
     ) where 
 
 import Data.Text.Lazy.Builder (Builder)
-
 import GHC.Event (Event, FdKey)
-
 import Prelude hiding (Show)
-
-import Text.Show.Text.Classes (Show(showb, showbPrec))
-import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 
 -- | Convert an 'Event' to a 'Builder'.
 showbEvent :: Event -> Builder

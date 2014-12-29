@@ -61,4 +61,4 @@ showbNaturalPrec p = showbIntegerPrec p . toInteger
 
 instance Show Natural where
     showbPrec = showbNaturalPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)

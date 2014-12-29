@@ -25,8 +25,8 @@ showbFunction _ = "<function>"
 
 instance Show (a -> b) where
     showb = showbFunction
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 ((->) a) where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

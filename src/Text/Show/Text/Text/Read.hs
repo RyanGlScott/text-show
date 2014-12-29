@@ -27,13 +27,13 @@ import Text.Read.Lex (Lexeme(..))
 import Text.Read.Lex (Number)
 #endif
 import Text.Show.Text.Classes (Show(showbPrec), showbUnary)
-import Text.Show.Text.Newtypes (LitChar(..), LitString(..))
 #if MIN_VERSION_base(4,6,0)
-import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text.Classes (FromStringShow(..))
 #else
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Ratio ()
 #endif
+import Text.Show.Text.Data.Char (LitChar(..), LitString(..))
 
 #include "inline.h"
 
@@ -62,10 +62,10 @@ showbNumberPrec p = showbPrec p . FromStringShow
 
 instance Show Lexeme where
     showbPrec = showbLexemePrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 #if MIN_VERSION_base(4,7,0)
 instance Show Number where
     showbPrec = showbNumberPrec
-    INLINE(showbPrec)
+    {-# INLINE showbPrec #-}
 #endif

@@ -104,11 +104,11 @@ showbGFloatAlt d x = formatRealFloatAlt Generic d True x
 
 instance Show Float where
     showbPrec = showbFloatPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show Double where
     showbPrec = showbDoublePrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 -------------------------------------------------------------------------------
 -- GHC.Float internal functions, adapted for Builders

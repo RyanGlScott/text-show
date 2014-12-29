@@ -33,4 +33,4 @@ $(deriveShowPragmas defaultInlineShowbPrec ''ZipList)
 
 instance Show1 ZipList where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

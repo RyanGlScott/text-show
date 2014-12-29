@@ -46,8 +46,7 @@ import Data.Text.Lazy.Builder (Builder, fromString)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec))
-import Text.Show.Text.Newtypes (FromStringShow(..))
+import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import Text.Show.Text.Utils ((<>))
 
@@ -176,23 +175,23 @@ showbMaskingState = showb
 
 instance Show SomeException where
     showbPrec = showbSomeExceptionPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show IOException where
     showb = showbIOException
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show ArithException where
     showb = showbArithException
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show ArrayException where
     showb = showbArrayException
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show AssertionFailed where
     showb = showbAssertionFailed
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,7,0)
 instance Show SomeAsyncException where
@@ -202,23 +201,23 @@ instance Show SomeAsyncException where
 
 instance Show AsyncException where
     showb = showbAsyncException
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show NonTermination where
     showb = showbNonTermination
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show NestedAtomically where
     showb = showbNestedAtomically
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show BlockedIndefinitelyOnMVar where
     showb = showbBlockedIndefinitelyOnMVar
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show BlockedIndefinitelyOnSTM where
     showb = showbBlockedIndefinitelyOnSTM
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,8,0)
 instance Show AllocationLimitExceeded where
@@ -228,30 +227,30 @@ instance Show AllocationLimitExceeded where
 
 instance Show Deadlock where
     showb = showbDeadlock
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show NoMethodError where
     showb = showbNoMethodError
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show PatternMatchFail where
     showb = showbPatternMatchFail
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show RecConError where
     showb = showbRecConError
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show RecSelError where
     showb = showbRecSelError
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show RecUpdError where
     showb = showbRecUpdError
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show ErrorCall where
     showb = showbErrorCall
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 $(deriveShowPragmas defaultInlineShowb ''MaskingState)

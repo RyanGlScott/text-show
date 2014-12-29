@@ -30,8 +30,8 @@ showbProxy = showb
 -- TODO: See why 'deriveShow' can't detect Proxy's phantom type correctly
 instance Show (Proxy s) where
     showbPrec = $(mkShowbPrec ''Proxy)
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 Proxy where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

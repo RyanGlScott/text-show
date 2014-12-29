@@ -38,4 +38,4 @@ showbArrayPrec p a = showbParen (p > appPrec) $
 
 instance (Show i, Show e, Ix i) => Show (Array i e) where
     showbPrec = showbArrayPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)

@@ -5,9 +5,9 @@
 #define CLOSE_PRAGMA #-}
 
 #if __GLASGOW_HASKELL__ >= 702
-#define INLINE(F) OPEN_PRAGMA INLINE F CLOSE_PRAGMA
+#define INLINE_INST_FUN(F) OPEN_PRAGMA INLINE F CLOSE_PRAGMA
 #else
-#define INLINE(F)
+#define INLINE_INST_FUN(F)
 #endif
 
 #endif

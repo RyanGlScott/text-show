@@ -73,7 +73,6 @@ library
   exposed-modules:     Text.Show.Text
                        Text.Show.Text.Debug.Trace
                        Text.Show.Text.Debug.Trace.TH
-                       Text.Show.Text.Newtypes
                        Text.Show.Text.TH
                        
                        Text.Show.Text.Control.Applicative

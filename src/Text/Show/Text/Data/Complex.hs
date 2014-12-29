@@ -51,11 +51,11 @@ $(deriveShowPragmas defaultInlineShowbPrec {
 
 instance Show1 Complex where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)
 #else
 instance (RealFloat a, Show a) => Show (Complex a) where
     {-# SPECIALIZE instance Show (Complex Float)  #-}
     {-# SPECIALIZE instance Show (Complex Double) #-}
     showbPrec = $(mkShowbPrec ''Complex)
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 #endif

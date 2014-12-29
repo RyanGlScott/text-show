@@ -37,14 +37,14 @@ showbTextLazy = showb . TL.unpack
 
 instance Show Builder where
     showb = showb . toLazyText
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 -- Strict variant
 instance Show TS.Text where
     showb = showbTextStrict
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 -- Lazy variant
 instance Show TL.Text where
     showb = showbTextLazy
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

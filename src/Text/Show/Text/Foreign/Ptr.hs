@@ -70,32 +70,32 @@ showbForeignPtr = showb . unsafeForeignPtrToPtr
 
 instance Show (Ptr a) where
     showb = showbPtr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 Ptr where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)
 
 instance Show (FunPtr a) where
     showb = showbFunPtr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 FunPtr where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)
 
 instance Show IntPtr where
     showbPrec = showbIntPtrPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show WordPtr where
     showb = showbWordPtr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show (ForeignPtr a) where
     showb = showbForeignPtr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show1 ForeignPtr where
     showbPrec1 = showbPrec
-    INLINE(showbPrec1)
+    INLINE_INST_FUN(showbPrec1)

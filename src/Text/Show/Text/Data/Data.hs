@@ -63,4 +63,4 @@ $(deriveShowPragmas defaultInlineShowb     ''Fixity)
 
 instance Show Constr where
     showb = showbConstr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)

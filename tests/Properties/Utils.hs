@@ -16,8 +16,7 @@ import           Test.Tasty.QuickCheck (Arbitrary)
 
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
-import           Text.Show.Text (showbPrec)
-import           Text.Show.Text.Newtypes (FromStringShow(..))
+import           Text.Show.Text (showbPrec, FromStringShow(..))
 
 -- | Verifies that a type's @Show@ instances coincide for both 'String's and 'Text',
 --   irrespective of precedence.
