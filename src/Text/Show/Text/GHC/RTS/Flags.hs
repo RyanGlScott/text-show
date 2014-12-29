@@ -25,17 +25,18 @@ module Text.Show.Text.GHC.RTS.Flags (
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.RTS.Flags
-import GHC.Show (appPrec, appPrec1)
+import GHC.Show (appPrec)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), showbParen)
-import Text.Show.Text.Data.Bool     ()
-import Text.Show.Text.Data.Char     ()
-import Text.Show.Text.Data.Floating ()
-import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Data.List     ()
-import Text.Show.Text.Data.Maybe    ()
+import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, FromStringShow(..))
+import Text.Show.Text.Data.Bool (showbBool)
+import Text.Show.Text.Data.Char ()
+import Text.Show.Text.Data.Floating (showbDoublePrec)
+import Text.Show.Text.Data.Integral (showbIntPrec, showbWord, showbWord64)
+import Text.Show.Text.Data.List ()
+import Text.Show.Text.Data.Maybe (showbMaybePrec)
+import Text.Show.Text.Utils ((<>), s)
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert an 'RTSFlags' value to a 'Builder' with the given precedence.
@@ -45,7 +46,58 @@ showbRTSFlagsPrec = showbPrec
 
 -- | Convert a 'GCFlags' value to a 'Builder' with the given precedence.
 showbGCFlagsPrec :: Int -> GCFlags -> Builder
-showbGCFlagsPrec = undefined
+showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
+       "GCFlags {statsFile = "
+    <> showbMaybePrec 0 (statsFile gcfs)
+    <> ", giveStats = "
+    <> showb (FromStringShow $ giveStats gcfs)
+    <> ", maxStkSize = "
+    <> showb (maxStkSize gcfs)
+    <> ", initialStkSize = "
+    <> showb (initialStkSize gcfs)
+    <> ", stkChunkSize = "
+    <> showb (stkChunkSize gcfs)
+    <> ", stkChunkBufferSize = "
+    <> showb (stkChunkBufferSize gcfs)
+    <> ", maxHeapSize = "
+    <> showb (maxHeapSize gcfs)
+    <> ", minAllocAreaSize = "
+    <> showb (minAllocAreaSize gcfs)
+    <> ", minOldGenSize = "
+    <> showb (minOldGenSize gcfs)
+    <> ", heapSizeSuggestion = "
+    <> showb (heapSizeSuggestion gcfs)
+    <> ", heapSizeSuggestionAuto = "
+    <> showbBool (heapSizeSuggestionAuto gcfs)
+    <> ", oldGenFactor = "
+    <> showbDoublePrec 0 (oldGenFactor gcfs)
+    <> ", pcFreeHeap = "
+    <> showbDoublePrec 0 (pcFreeHeap gcfs)
+    <> ", generations = "
+    <> showb (generations gcfs)
+    <> ", steps = "
+    <> showb (steps gcfs)
+    <> ", squeezeUpdFrames = "
+    <> showbBool (squeezeUpdFrames gcfs)
+    <> ", compact = "
+    <> showbBool (compact gcfs)
+    <> ", compactThreshold = "
+    <> showbDoublePrec 0 (compactThreshold gcfs)
+    <> ", sweep = "
+    <> showbBool (sweep gcfs)
+    <> ", ringBell = "
+    <> showbBool (ringBell gcfs)
+    <> ", frontpanel = "
+    <> showbBool (frontpanel gcfs)
+    <> ", idleGCDelayTime = "
+    <> showbWord64 (idleGCDelayTime gcfs)
+    <> ", doIdleGC = "
+    <> showbBool (doIdleGC gcfs)
+    <> ", heapBase = "
+    <> showbWord (heapBase gcfs)
+    <> ", allocLimitGrace = "
+    <> showbWord (allocLimitGrace gcfs)
+    <> s '}'
 {-# INLINE showbGCFlagsPrec #-}
 
 -- | Convert a 'ConcFlags' value to a 'Builder' with the given precedence.
@@ -60,22 +112,73 @@ showbMiscFlagsPrec = showbPrec
 
 -- | Convert a 'DebugFlags' value to a 'Builder' with the given precedence.
 showbDebugFlagsPrec :: Int -> DebugFlags -> Builder
-showbDebugFlagsPrec = showbPrec
+showbDebugFlagsPrec p = showbPrec
 {-# INLINE showbDebugFlagsPrec #-}
 
 -- | Convert a 'CCFlags' value to a 'Builder' with the given precedence.
 showbCCFlagsPrec :: Int -> CCFlags -> Builder
-showbCCFlagsPrec = undefined
+showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
+       "CCFlags {doCostCentres = "
+    <> showb (FromStringShow $ doCostCentres ccfs)
+    <> ", profilerTicks = "
+    <> showbIntPrec 0 (profilerTicks ccfs)
+    <> ", msecsPerTick = "
+    <> showbIntPrec 0 (msecsPerTick ccfs)
+    <> s '}'
 {-# INLINE showbCCFlagsPrec #-}
 
 -- | Convert a 'ProfFlags' value to a 'Builder' with the given precedence.
 showbProfFlagsPrec :: Int -> ProfFlags -> Builder
-showbProfFlagsPrec = undefined
+showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
+       "ProfFlags {doHeapProfile = "
+    <> showb (FromStringShow $ doHeapProfile pfs)
+    <> ", heapProfileInterval = "
+    <> showbWord64 (heapProfileInterval pfs)
+    <> ", heapProfileIntervalTicks = "
+    <> showbWord (heapProfileIntervalTicks pfs)
+    <> ", includeTSOs = "
+    <> showbBool (includeTSOs pfs)
+    <> ", showCCSOnException = "
+    <> showbBool (showCCSOnException pfs)
+    <> ", maxRetainerSetSize = "
+    <> showbWord (maxRetainerSetSize pfs)
+    <> ", ccsLength = "
+    <> showbWord (ccsLength pfs)
+    <> ", modSelector = "
+    <> showbMaybePrec 0 (modSelector pfs)
+    <> ", descrSelector = "
+    <> showbMaybePrec 0 (descrSelector pfs)
+    <> ", typeSelector = "
+    <> showbMaybePrec 0 (typeSelector pfs)
+    <> ", ccSelector = "
+    <> showbMaybePrec 0 (ccSelector pfs)
+    <> ", ccsSelector = "
+    <> showbMaybePrec 0 (ccsSelector pfs)
+    <> ", retainerSelector = "
+    <> showbMaybePrec 0 (retainerSelector pfs)
+    <> ", bioSelector = "
+    <> showbMaybePrec 0 (bioSelector pfs)
+    <> s '}'
 {-# INLINE showbProfFlagsPrec #-}
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
 showbTraceFlagsPrec :: Int -> TraceFlags -> Builder
-showbTraceFlagsPrec = undefined
+showbTraceFlagsPrec p tfs = showbPrec (p > appPrec) $
+       "TraceFlags {tracing = "
+    <> showb (FromStringShow $ tracing tfs)
+    <> ", timestamp = "
+    <> showbBool (timestamp tfs)
+    <> ", traceScheduler = "
+    <> showbBool (traceScheduler tfs)
+    <> ", traceGc = "
+    <> showbBool (traceGc tfs)
+    <> ", sparksSampled = "
+    <> showbBool (sparksSampled tfs)
+    <> ", sparksFull = "
+    <> showbBool (sparksFull tfs)
+    <> ", user = "
+    <> showbBool (user tfs)
+    <> s '}'
 {-# INLINE showbTraceFlagsPrec #-}
 
 -- | Convert a 'TickyFlags' value to a 'Builder' with the given precedence.
