@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 #if !(MIN_VERSION_base(4,7,0))
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GADTs, OverloadedStrings #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
