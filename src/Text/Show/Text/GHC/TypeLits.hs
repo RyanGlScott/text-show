@@ -25,19 +25,17 @@ module Text.Show.Text.GHC.TypeLits (
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
+import Prelude hiding (Show)
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 
 #if MIN_VERSION_base(4,7,0)
 import GHC.TypeLits (SomeNat(..), SomeSymbol(..), natVal, symbolVal)
 import Text.Show.Text.Data.Char (showbString)
+import Text.Show.Text.Data.Integral (showbIntegerPrec)
 #else
 import GHC.TypeLits (IsEven(..), IsZero(..), Kind, Sing, SingE(fromSing))
 import Text.Show.Text.Utils ((<>), s)
 #endif
-
-import Prelude hiding (Show)
-
-import Text.Show.Text.Classes (Show(showb, showbPrec))
-import Text.Show.Text.Data.Integral (showbIntegerPrec)
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeNat' value to a 'Builder' with the given precedence.

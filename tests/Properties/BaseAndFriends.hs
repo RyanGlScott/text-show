@@ -437,15 +437,15 @@ baseAndFriendsTests =
 #endif
 #if MIN_VERSION_base(4,6,0)
     , testGroup "Text.Show.Text.GHC.TypeLits"
+        [
 # if MIN_VERSION_base(4,7,0)
-        [ testProperty "SomeNat instance"                   (prop_matchesShow :: Int -> SomeNat -> Bool)
+          testProperty "SomeNat instance"                   (prop_matchesShow :: Int -> SomeNat -> Bool)
         , testProperty "SomeSymbol instance"                (prop_matchesShow :: Int -> SomeSymbol -> Bool)
-        ]
 -- # else
---         [ testProperty "IsEven instance"                    (prop_matchesShow :: Int -> IsEven -> Bool)
+--           testProperty "IsEven instance"                    (prop_matchesShow :: Int -> IsEven -> Bool)
 --         , testProperty "IsZero instance"                    (prop_matchesShow :: Int -> IsZero -> Bool)
---         ]
 # endif
+        ]
 #endif
     , testGroup "Text.Show.Text.Numeric.Natural"
         [ testProperty "Natural instance"                   (prop_matchesShow :: Int -> Natural -> Bool)
