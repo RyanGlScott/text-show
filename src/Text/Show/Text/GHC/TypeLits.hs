@@ -34,6 +34,7 @@ import Text.Show.Text.Data.Char (showbString)
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 #else
 import GHC.TypeLits (IsEven(..), IsZero(..), Kind, Sing, SingE(fromSing))
+import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Utils ((<>), s)
 #endif
 
