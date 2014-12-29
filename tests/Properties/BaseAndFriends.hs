@@ -62,7 +62,10 @@ import           Data.Type.Equality ((:~:))
 import qualified Data.Typeable as NewT (TyCon)
 import           GHC.Fingerprint.Type (Fingerprint)
 #endif
-import           Data.Word (Word, Word8, Word16, Word32, Word64)
+import           Data.Word (Word8, Word16, Word32, Word64)
+#if !(MIN_VERSION_base(4,8,0))
+import           Data.Word (Word)
+#endif
 import           Data.Version (Version, showVersion)
 
 import           Foreign.C.Types
@@ -290,10 +293,10 @@ baseAndFriendsTests =
         , testProperty "Product Int instance"               (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                   (prop_matchesShow :: Int -> Sum Int -> Bool)
 #if MIN_VERSION_base(4,8,0)
-        , testPropert "Alt Maybe Int instance"              (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
+        , testProperty "Alt Maybe Int instance"             (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
 #endif
         ]
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
     , testGroup "Text.Show.Text.Data.OldTypeable"
         [ -- testProperty "TypeRep instance"                   (prop_matchesShow :: Int -> OldT.TypeRep -> Bool)
           testProperty "TyCon instance"                     (prop_matchesShow :: Int -> OldT.TyCon -> Bool)
@@ -412,7 +415,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.GHC.RTS.Flags"
         [ -- testProperty "RTSFlags instance"                  (prop_matchesShow :: Int -> RTSFlags -> Bool)
 --         , testProperty "GCFlags instance"                   (prop_matchesShow :: Int -> GCFlags -> Bool)
-        , testProperty "ConcFlags instance"                 (prop_matchesShow :: Int -> ConcFlags -> Bool)
+          testProperty "ConcFlags instance"                 (prop_matchesShow :: Int -> ConcFlags -> Bool)
         , testProperty "MiscFlags instance"                 (prop_matchesShow :: Int -> MiscFlags -> Bool)
         , testProperty "DebugFlags instance"                (prop_matchesShow :: Int -> DebugFlags -> Bool)
 --         , testProperty "CCFlags instance"                   (prop_matchesShow :: Int -> CCFlags -> Bool)

@@ -24,7 +24,10 @@ of GHC).
 -}
 module Instances.BaseAndFriends () where
 
-import           Control.Applicative (ZipList(..), (<$>), (<*>), pure)
+import           Control.Applicative (ZipList(..))
+#if !(MIN_VERSION_base(4,8,0))
+import           Control.Applicative ((<*>), pure)
+#endif
 import           Control.Exception
 import           Control.Monad.ST (ST, fixST)
 
@@ -36,13 +39,14 @@ import qualified Data.Data as D (Fixity(..))
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
+import           Data.Functor ((<$>))
 import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
 #if MIN_VERSION_base(4,8,0)
 import           Data.Monoid (Alt(..))
 #endif
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
 #endif
 #if MIN_VERSION_base(4,6,0)
@@ -228,7 +232,7 @@ instance Arbitrary MaskingState where
 instance Arbitrary (Proxy s) where
     arbitrary = pure Proxy
 
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 -- TODO: Come up with an instance of TypeRep that doesn't take forever
 -- instance Arbitrary OldT.TypeRep where
 

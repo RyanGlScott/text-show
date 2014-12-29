@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, GADTs, GeneralizedNewtypeDeriving,
+{-# LANGUAGE CPP, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving,
              StandaloneDeriving, TemplateHaskell,
              TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -15,7 +15,11 @@ for testing purposes, including 'Arbitrary' instances.
 -}
 module Instances.Derived () where
 
-import Control.Applicative ((<$>), (<*>), pure)
+#if !(MIN_VERSION_base(4,8,0))
+import Control.Applicative ((<*>), pure)
+#endif
+
+import Data.Functor ((<$>))
 
 import Derived
 
