@@ -151,6 +151,9 @@ library
   if impl(ghc >= 7.4)
     exposed-modules:   Text.Show.Text.GHC.Stats
   
+  if impl(ghc >= 7.6)
+    exposed-modules:   Text.Show.Text.GHC.TypeLits
+  
   if impl(ghc < 7.7)
     build-depends:     tagged              >= 0.4.4   && < 1
   

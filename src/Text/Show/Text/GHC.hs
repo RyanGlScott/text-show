@@ -28,3 +28,6 @@ import Text.Show.Text.GHC.StaticPtr    ()
 #if MIN_VERSION_base(4,5,0)
 import Text.Show.Text.GHC.Stats        ()
 #endif
+#if MIN_VERSION_base(4,6,0)
+import Text.Show.Text.GHC.TypeLits     ()
+#endif

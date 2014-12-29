@@ -13,6 +13,7 @@
 * For base-4.8.0.0 and above, added the `Text.Show.Text.Data.Functor.Identity`, `Text.Show.Text.Data.Void`, `Text.Show.Text.GHC.RTS.Flags`, `Text.Show.Text.GHC.StaticPtr`, and `Text.Show.Text.Numeric.Natural` modules. Also added `Show` instances for `AllocationLimitExceeded` in `Text.Show.Text.Control.Exception` and `Alt` in `Text.Show.Text.Data.Monoid`. Also fixed the `Show` instance for `Fixed` values.
 * Added the `Text.Show.Text.Data.GHC.Conc.Windows` module (Windows-only)
 * Added the `Text.Show.Text.Data.OldTypeable` module for base-4.7
+* Added the `Text.Show.Text.GHC.TypeLits` module for base-4.6 and above
 * Added the `Text.Show.Text.Debug.Trace` and `Text.Show.Text.Debug.Trace.TH` modules as an analog to `Debug.Trace`
 * Added the `Show1` class and corresponding instances for unary type constructors.
 * Added `LitChar` and `LitString` to `Text.Show.Text.Data.Char`

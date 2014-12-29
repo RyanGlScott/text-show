@@ -285,79 +285,79 @@ deriving instance Show CRLim
 # if defined(HTYPE_DEV_T)
 instance Show CDev where
     showb = showbCDev
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_INO_T)
 instance Show CIno where
     showb = showbCIno
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_MODE_T)
 instance Show CMode where
     showb = showbCMode
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_OFF_T)
 instance Show COff where
     showbPrec = showbCOffPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 # endif
 
 # if defined(HTYPE_PID_T)
 instance Show CPid where
     showbPrec = showbCPidPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 # endif
 
 # if defined(HTYPE_SSIZE_T)
 instance Show CSsize where
     showbPrec = showbCSsizePrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 # endif
 
 # if defined(HTYPE_GID_T)
 instance Show CGid where
     showb = showbCGid
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_NLINK_T)
 instance Show CNlink where
     showb = showbCNlink
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_UID_T)
 instance Show CUid where
     showb = showbCUid
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_CC_T)
 instance Show CCc where
     showb = showbCCc
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_SPEED_T)
 instance Show CSpeed where
     showb = showbCSpeed
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_TCFLAG_T)
 instance Show CTcflag where
     showb = showbCTcflag
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 
 # if defined(HTYPE_RLIM_T)
 instance Show CRLim where
     showb = showbCRLim
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 # endif
 #endif
 

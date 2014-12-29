@@ -331,103 +331,103 @@ deriving instance Show CDouble
 #else
 instance Show CChar where
     showbPrec = showbCCharPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CSChar where
     showbPrec = showbCSCharPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CUChar where
     showb = showbCUChar
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CShort where
     showbPrec = showbCShortPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CUShort where
     showb = showbCUShort
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CInt where
     showbPrec = showbCIntPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CUInt where
     showb = showbCUInt
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CLong where
     showbPrec = showbCLongPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CULong where
     showb = showbCULong
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CPtrdiff where
     showbPrec = showbCPtrdiffPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CSize where
     showb = showbCSize
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CWchar where
     showbPrec = showbCWcharPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CSigAtomic where
     showbPrec = showbCSigAtomicPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CLLong where
     showbPrec = showbCLLongPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CULLong where
     showb = showbCULLong
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CIntPtr where
     showbPrec = showbCIntPtrPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CUIntPtr where
     showb = showbCUIntPtr
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CIntMax where
     showbPrec = showbCIntMaxPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CUIntMax where
     showb = showbCUIntMax
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CClock where
     showbPrec = showbCClockPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CTime where
     showbPrec = showbCTimePrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 # if MIN_VERSION_base(4,4,0)
 instance Show CUSeconds where
     showb = showbCUSeconds
-    INLINE(showb)
+    INLINE_INST_FUN(showb)
 
 instance Show CSUSeconds where
     showbPrec = showbCSUSecondsPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 # endif
 
 instance Show CFloat where
     showbPrec = showbCFloatPrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 
 instance Show CDouble where
     showbPrec = showbCDoublePrec
-    INLINE(showbPrec)
+    INLINE_INST_FUN(showbPrec)
 #endif
