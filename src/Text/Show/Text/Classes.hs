@@ -25,7 +25,9 @@ import           Data.Traversable (Traversable)
 #endif
 
 import           Control.Monad.Fix (MonadFix(mfix))
+#if MIN_VERSION_base(4,4,0)
 import           Control.Monad.Zip (MonadZip(mzip, mzipWith, munzip))
+#endif
 
 import           Data.Bits (Bits)
 #if MIN_VERSION_base(4,7,0)
@@ -281,6 +283,7 @@ instance MonadFix FromStringShow where
     mfix f = FromStringShow $ let FromStringShow a = f a in a
     INLINE_INST_FUN(mfix)
 
+#if MIN_VERSION_base(4,4,0)
 instance MonadZip FromStringShow where
     mzip (FromStringShow a) (FromStringShow b) = FromStringShow (a, b)
     INLINE_INST_FUN(mzip)
@@ -290,6 +293,7 @@ instance MonadZip FromStringShow where
     
     munzip (FromStringShow (a, b)) = (FromStringShow a, FromStringShow b)
     INLINE_INST_FUN(munzip)
+#endif
 
 instance S.Show a => Show (FromStringShow a) where
     showbPrec p (FromStringShow x) = fromString $ S.showsPrec p x ""

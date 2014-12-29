@@ -67,8 +67,8 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
     <> showb (minOldGenSize gcfs)
     <> ", heapSizeSuggestion = "
     <> showb (heapSizeSuggestion gcfs)
-    <> ", heapSizeSuggestionAuto = "
-    <> showbBool (heapSizeSuggestionAuto gcfs)
+    <> ", heapSizeSuggesionAuto = "
+    <> showbBool (heapSizeSuggesionAuto gcfs)
     <> ", oldGenFactor = "
     <> showbDoublePrec 0 (oldGenFactor gcfs)
     <> ", pcFreeHeap = "
@@ -112,7 +112,7 @@ showbMiscFlagsPrec = showbPrec
 
 -- | Convert a 'DebugFlags' value to a 'Builder' with the given precedence.
 showbDebugFlagsPrec :: Int -> DebugFlags -> Builder
-showbDebugFlagsPrec p = showbPrec
+showbDebugFlagsPrec = showbPrec
 {-# INLINE showbDebugFlagsPrec #-}
 
 -- | Convert a 'CCFlags' value to a 'Builder' with the given precedence.
@@ -163,7 +163,7 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
 showbTraceFlagsPrec :: Int -> TraceFlags -> Builder
-showbTraceFlagsPrec p tfs = showbPrec (p > appPrec) $
+showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
        "TraceFlags {tracing = "
     <> showb (FromStringShow $ tracing tfs)
     <> ", timestamp = "
