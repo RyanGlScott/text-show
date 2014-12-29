@@ -94,6 +94,9 @@ import           GHC.StaticPtr (StaticPtrInfo(..))
 #if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats(..))
 #endif
+#if MIN_VERSION_base(4,7,0)
+import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
+#endif
 
 import           Numeric.Natural (Natural)
 
@@ -467,6 +470,23 @@ instance Arbitrary TickyFlags where
 
 instance Arbitrary StaticPtrInfo where
     arbitrary = StaticPtrInfo <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
+
+-- #if MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
+-- instance Arbitrary (IsZero n)
+-- instance Arbitrary (IsEven n)
+-- #endif
+
+#if MIN_VERSION_base(4,7,0)
+instance Arbitrary SomeNat where
+    arbitrary = do
+        nat <- arbitrary `suchThat` (>= 0)
+        case someNatVal nat of
+             Just sn -> pure sn
+             Nothing -> fail "Negative natural number"
+
+instance Arbitrary SomeSymbol where
+    arbitrary = someSymbolVal <$> arbitrary
 #endif
 
 deriving instance Arbitrary CChar

@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP #-}
 #if !(MIN_VERSION_base(4,7,0))
-{-# LANGUAGE GADTs, OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts, GADTs, KindSignatures,
+             OverloadedStrings, PolyKinds, UndecidableInstances #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -27,18 +28,15 @@ import Data.Text.Lazy.Builder (Builder)
 
 #if MIN_VERSION_base(4,7,0)
 import GHC.TypeLits (SomeNat(..), SomeSymbol(..), natVal, symbolVal)
-
-import Text.Show.Text.Classes (showbPrec)
 import Text.Show.Text.Data.Char (showbString)
 #else
-import GHC.TypeLits (IsEven(..), IsZero(..))
-
+import GHC.TypeLits (IsEven(..), IsZero(..), Kind, Sing, SingE(fromSing))
 import Text.Show.Text.Utils ((<>), s)
 #endif
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 
 #if MIN_VERSION_base(4,7,0)
@@ -55,14 +53,14 @@ showbSomeSymbol (SomeSymbol x) = showbString $ symbolVal x
 -- | Convert an 'IsEven' value to a 'Builder'.
 showbIsEven :: IsEven n -> Builder
 showbIsEven IsEvenZero = s '0'
-showbIsEven (IsEven x) = "(2 * " <> showbIntegerPrec 0 x <> s ')'
-showbIsEven (IsOdd  x) = "(2 * " <> showbIntegerPrec 0 x <> " + 1)"
+showbIsEven (IsEven x) = "(2 * " <> showb x <> s ')'
+showbIsEven (IsOdd  x) = "(2 * " <> showb x <> " + 1)"
 {-# INLINE showbIsEven #-}
 
 -- | Convert an 'IsZero' value to a 'Builder'.
 showbIsZero :: IsZero n -> Builder
 showbIsZero IsZero     = s '0'
-showbIsZero (IsSucc n) = s '(' <> showbIntegerPrec n <> " + 1)"
+showbIsZero (IsSucc n) = s '(' <> showb n <> " + 1)"
 {-# INLINE showbIsZero #-}
 #endif
 
@@ -82,4 +80,8 @@ instance Show (IsEven n) where
 instance Show (IsZero n) where
     showb = showbIsZero
     {-# INLINE showb #-}
+
+instance (SingE (Kind :: k) rep, Show rep) => Show (Sing (a :: k)) where
+    showbPrec p = showbPrec p . fromSing
+    {-# INLINE showbPrec #-}
 #endif
