@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'IO'-related data types.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.System.IO (
       showbHandle
@@ -53,6 +55,8 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Handle' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbHandle :: Handle -> Builder
 showbHandle (FileHandle   file _)   = showbHandleFilePath file
 showbHandle (DuplexHandle file _ _) = showbHandleFilePath file
@@ -64,28 +68,39 @@ showbHandleFilePath file = "{handle: " <> fromString file <> s '}'
 {-# INLINE showbHandleFilePath #-}
 
 -- | Convert an 'IOMode' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbIOMode :: IOMode -> Builder
 showbIOMode = showb
 {-# INLINE showbIOMode #-}
 
 -- | Convert a 'BufferMode' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbBufferModePrec :: Int -> BufferMode -> Builder
 showbBufferModePrec = showbPrec
 {-# INLINE showbBufferModePrec #-}
 
 -- | Convert a 'HandlePosn' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbHandlePosn :: HandlePosn -> Builder
 showbHandlePosn (HandlePosn h pos)
     = showbHandle h <> " at position " <> showbIntegerPrec 0 pos
 {-# INLINE showbHandlePosn #-}
 
 -- | Convert a 'SeekMode' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbSeekMode :: SeekMode -> Builder
 showbSeekMode = showb
 {-# INLINE showbSeekMode #-}
 
 #if MIN_VERSION_base(4,3,0)
 -- | Convert a 'TextEncoding' to a 'Builder'.
+-- This function is only available with @base-4.3.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbTextEncoding :: TextEncoding -> Builder
 showbTextEncoding = fromString . textEncodingName
 {-# INLINE showbTextEncoding #-}
@@ -93,22 +108,32 @@ showbTextEncoding = fromString . textEncodingName
 
 #if MIN_VERSION_base(4,4,0)
 -- | Convert a 'CodingProgress' to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbCodingProgress :: CodingProgress -> Builder
 showbCodingProgress = showb
 {-# INLINE showbCodingProgress #-}
 
 -- | Convert a 'CodingFailureMode' value to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbCodingFailureMode :: CodingFailureMode -> Builder
 showbCodingFailureMode = showb
 {-# INLINE showbCodingFailureMode #-}
 #endif
 
 -- | Convert a 'Newline' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbNewline :: Newline -> Builder
 showbNewline = showb
 {-# INLINE showbNewline #-}
 
 -- | Convert a 'NewlineMode' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbNewlineModePrec :: Int -> NewlineMode -> Builder
 showbNewlineModePrec = showbPrec
 {-# INLINE showbNewlineModePrec #-}

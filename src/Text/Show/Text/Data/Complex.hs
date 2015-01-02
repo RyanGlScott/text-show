@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Ratio' values.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Data.Complex (showbComplexPrec) where
 
@@ -30,6 +32,8 @@ import Text.Show.Text.TH.Internal (mkShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'Complex' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.5/
 #if MIN_VERSION_base(4,4,0)
 showbComplexPrec :: Show a
 #else

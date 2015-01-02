@@ -12,6 +12,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Monoid'-related newtypes.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Monoid (
       showbAllPrec
@@ -45,42 +47,59 @@ import Text.Show.Text.TH.Internal (mkShowbPrec)
 #include "inline.h"
 
 -- | Convert an 'All' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbAllPrec :: Int -> All -> Builder
 showbAllPrec = showbPrec
 {-# INLINE showbAllPrec #-}
 
 -- | Convert an 'Any' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbAnyPrec :: Int -> Any -> Builder
 showbAnyPrec = showbPrec
 {-# INLINE showbAnyPrec #-}
 
 -- | Convert a 'Dual' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbDualPrec :: Show a => Int -> Dual a -> Builder
 showbDualPrec = showbPrec
 {-# INLINE showbDualPrec #-}
 
 -- | Convert a 'First' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbFirstPrec :: Show a => Int -> First a -> Builder
 showbFirstPrec = showbPrec
 {-# INLINE showbFirstPrec #-}
 
 -- | Convert a 'Last' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbLastPrec :: Show a => Int -> Last a -> Builder
 showbLastPrec = showbPrec
 {-# INLINE showbLastPrec #-}
 
 -- | Convert a 'Product' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbProductPrec :: Show a => Int -> Product a -> Builder
 showbProductPrec = showbPrec
 {-# INLINE showbProductPrec #-}
 
 -- | Convert a 'Sum' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbSumPrec :: Show a => Int -> Sum a -> Builder
 showbSumPrec = showbPrec
 {-# INLINE showbSumPrec #-}
 
 #if MIN_VERSION_base(4,8,0)
 -- | Convert an 'Alt' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbAltPrec :: Show (f a) => Int -> Alt f a -> Builder
 showbAltPrec = showbPrec
 {-# INLINE showbAltPrec #-}

@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Dynamic'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Dynamic (showbDynamic) where
 
@@ -24,6 +26,8 @@ import Text.Show.Text.Utils ((<>))
 #include "inline.h"
 
 -- | Convert a 'Dynamic' value to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbDynamic :: Dynamic -> Builder
 showbDynamic dyn = "<<" <> showbTypeRepPrec 0 (dynTypeRep dyn) <> ">>"
 {-# INLINE showbDynamic #-}

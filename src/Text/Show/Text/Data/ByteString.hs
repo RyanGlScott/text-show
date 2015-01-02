@@ -12,6 +12,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @bytestring@ library.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.ByteString (
       showbByteStringStrict
@@ -40,11 +42,15 @@ import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineSho
 #include "inline.h"
 
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbByteStringStrict :: BS.ByteString -> Builder
 showbByteStringStrict = showb . FromStringShow
 {-# INLINE showbByteStringStrict #-}
 
 -- | Convert a lazy 'BL.ByteString' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbByteStringLazy :: BL.ByteString -> Builder
 showbByteStringLazy = showbByteStringLazyPrec 0
 {-# INLINE showbByteStringLazy #-}
@@ -56,6 +62,8 @@ showbByteStringLazy = showbByteStringLazyPrec 0
 -- On earlier versions of @bytestring@, however, lazy 'BL.ByteString's can be printed
 -- with parentheses (e.g., @Chunk "example" Empty@ vs. @(Chunk "example" Empty)@)
 -- depending on the precedence.
+-- 
+-- /Since: 0.3/
 showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder
 #if MIN_VERSION_bytestring(0,10,0)
 showbByteStringLazyPrec _ = showb . FromStringShow
@@ -66,6 +74,9 @@ showbByteStringLazyPrec = showbPrec
 
 #if MIN_VERSION_bytestring(0,10,4)
 -- | Convert a 'ShortByteString' to a 'Builder'.
+-- This function is only available with @bytestring-0.10.4.0@ or later.
+-- 
+-- /Since: 0.3/
 showbShortByteString :: ShortByteString -> Builder
 showbShortByteString = showb . FromStringShow
 {-# INLINE showbShortByteString #-}

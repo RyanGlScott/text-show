@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Maybe' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Maybe (showbMaybePrec) where
 
@@ -22,6 +24,8 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'Maybe' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbMaybePrec :: Show a => Int -> Maybe a -> Builder
 showbMaybePrec = showbPrec
 {-# INLINE showbMaybePrec #-}

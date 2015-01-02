@@ -11,6 +11,8 @@ Functions for tracing and monitoring execution.
 
 These can be useful for investigating bugs or performance problems.
 They should /not/ be used in production code.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Debug.Trace (
       traceIO
@@ -52,6 +54,8 @@ import           Text.Show.Text.Instances ()
 
 -- | The 'traceIO' function outputs the trace message from the IO monad.
 -- This sequences the output with respect to other IO actions.
+-- 
+-- /Since: 0.5/
 traceIO :: TS.Text -> IO ()
 #if MIN_VERSION_base(4,5,0)
 traceIO = S.traceIO . TS.unpack
@@ -61,6 +65,8 @@ traceIO = S.putTraceMsg . TS.unpack
 {-# INLINE traceIO #-}
 
 -- | Like 'traceIO' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceIOLazy :: TL.Text -> IO ()
 #if MIN_VERSION_base(4,5,0)
 traceIOLazy = S.traceIO . TL.unpack
@@ -81,22 +87,30 @@ The 'trace' function should /only/ be used for debugging, or for monitoring
 execution. The function is not referentially transparent: its type indicates
 that it is a pure function but it has the side effect of outputting the
 trace message.
+
+/Since: 0.5/
 -}
 trace :: TS.Text -> a -> a
 trace text = S.trace $ TS.unpack text
 {-# INLINE trace #-}
 
 -- | Like 'trace' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceLazy :: TL.Text -> a -> a
 traceLazy text = S.trace $ TL.unpack text
 {-# INLINE traceLazy #-}
 
 -- | Like 'trace' but returns the message instead of a third value.
+-- 
+-- /Since: 0.5/
 traceId :: TS.Text -> TS.Text
 traceId a = trace a a
 {-# INLINE traceId #-}
 
 -- | Like 'traceId' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceIdLazy :: TL.Text -> TL.Text
 traceIdLazy a = traceLazy a a
 {-# INLINE traceIdLazy #-}
@@ -113,12 +127,16 @@ variables @x@ and @z@:
 >   where
 >     z = ...
 >     ...
+
+/Since: 0.5/
 -}
 traceShow :: Show a => a -> b -> b
 traceShow = traceLazy . showLazy
 {-# INLINE traceShow #-}
 
 -- | Like 'traceShow' but returns the shown value instead of a third value.
+-- 
+-- /Since: 0.5/
 traceShowId :: Show a => a -> a
 traceShowId a = traceLazy (showLazy a) a
 {-# INLINE traceShowId #-}
@@ -133,6 +151,8 @@ monad, as 'traceIO' is in the 'IO' monad.
 >   traceM $ "x: " <> show x
 >   y <- ...
 >   traceM $ "y: " <> show y
+
+/Since: 0.5/
 -}
 traceM :: Monad m => TS.Text -> m ()
 traceM text = trace text $ return ()
@@ -151,6 +171,8 @@ Like 'traceM', but uses 'show' on the argument to convert it to a 'TS.Text'.
 >   traceMShow $ x
 >   y <- ...
 >   traceMShow $ x + y
+
+/Since: 0.5/
 -}
 traceShowM :: (Show a, Monad m) => a -> m ()
 traceShowM = traceMLazy . showLazy
@@ -165,11 +187,15 @@ traceShowM = traceMLazy . showLazy
 -- 'traceStack' behaves exactly like 'trace'.  Entries in the call
 -- stack correspond to @SCC@ annotations, so it is a good idea to use
 -- @-fprof-auto@ or @-fprof-auto-calls@ to add SCC annotations automatically.
+-- 
+-- /Since: 0.5/
 traceStack :: TS.Text -> a -> a
 traceStack text = S.traceStack $ TS.unpack text
 {-# INLINE traceStack #-}
 
 -- | Like 'traceStack' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceStackLazy :: TL.Text -> a -> a
 traceStackLazy text = S.traceStack $ TL.unpack text
 {-# INLINE traceStackLazy #-}
@@ -184,11 +210,15 @@ traceStackLazy text = S.traceStack $ TL.unpack text
 -- Note that when using GHC's SMP runtime, it is possible (but rare) to get
 -- duplicate events emitted if two CPUs simultaneously evaluate the same thunk
 -- that uses 'traceEvent'.
+-- 
+-- /Since: 0.5/
 traceEvent :: TS.Text -> a -> a
 traceEvent msg = S.traceEvent $ TS.unpack msg
 {-# INLINE traceEvent #-}
 
 -- | Like 'traceEvent' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceEventLazy :: TL.Text -> a -> a
 traceEventLazy msg = S.traceEvent $ TL.unpack msg
 {-# INLINE traceEventLazy #-}
@@ -198,11 +228,15 @@ traceEventLazy msg = S.traceEvent $ TL.unpack msg
 --
 -- Compared to 'traceEvent', 'traceEventIO' sequences the event with respect to
 -- other IO actions.
+-- 
+-- /Since: 0.5/
 traceEventIO :: TS.Text -> IO ()
 traceEventIO = S.traceEventIO . TS.unpack
 {-# INLINE traceEventIO #-}
 
 -- | Like 'traceEventIO' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceEventIOLazy :: TL.Text -> IO ()
 traceEventIOLazy = S.traceEventIO . TL.unpack
 {-# INLINE traceEventIOLazy #-}
@@ -220,11 +254,15 @@ traceEventIOLazy = S.traceEventIO . TL.unpack
 -- Note that when using GHC's SMP runtime, it is possible (but rare) to get
 -- duplicate events emitted if two CPUs simultaneously evaluate the same thunk
 -- that uses 'traceMarker'.
+-- 
+-- /Since: 0.5/
 traceMarker :: TS.Text -> a -> a
 traceMarker msg = S.traceMarker $ TS.unpack msg
 {-# INLINE traceMarker #-}
 
 -- | Like 'traceMarker' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceMarkerLazy :: TL.Text -> a -> a
 traceMarkerLazy msg = S.traceMarker $ TL.unpack msg
 {-# INLINE traceMarkerLazy #-}
@@ -234,11 +272,15 @@ traceMarkerLazy msg = S.traceMarker $ TL.unpack msg
 --
 -- Compared to 'traceMarker', 'traceMarkerIO' sequences the event with respect to
 -- other IO actions.
+-- 
+-- /Since: 0.5/
 traceMarkerIO :: TS.Text -> IO ()
 traceMarkerIO = S.traceMarkerIO . TS.unpack
 {-# INLINE traceMarkerIO #-}
 
 -- | Like 'traceMarkerIO' but accepts a lazy 'TL.Text' argument.
+-- 
+-- /Since: 0.5/
 traceMarkerIOLazy :: TL.Text -> IO ()
 traceMarkerIOLazy = S.traceMarkerIO . TL.unpack
 {-# INLINE traceMarkerIOLazy #-}

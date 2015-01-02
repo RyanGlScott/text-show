@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Ratio' values.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Data.Ratio (showbRatioPrec) where
 
@@ -26,6 +28,8 @@ import Text.Show.Text.Utils ((<>))
 #include "inline.h"
 
 -- | Convert a 'Ratio' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.5/
 showbRatioPrec :: (Show a, Integral a) => Int -> Ratio a -> Builder
 showbRatioPrec p q = showbParen (p > ratioPrec) $
        showbPrec ratioPrec1 (numerator q)

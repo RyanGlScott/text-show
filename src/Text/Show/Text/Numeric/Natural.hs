@@ -19,6 +19,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Natural's.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Numeric.Natural (showbNaturalPrec) where
 
@@ -45,6 +47,8 @@ import Text.Show.Text.Data.Integral (showbIntegerPrec)
 #include "inline.h"
 
 -- | Convert a 'Natural' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.5/
 showbNaturalPrec :: Int -> Natural -> Builder
 #if MIN_VERSION_base(4,8,0)
 # if HAVE_GMP_BIGNAT

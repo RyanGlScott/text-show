@@ -9,10 +9,13 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Text' types.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Text (
-      showbTextStrict
+      showbText
     , showbTextLazy
+    , showbBuilder
     ) where
 
 import Data.Text      as TS
@@ -22,29 +25,44 @@ import Data.Text.Lazy.Builder (Builder, toLazyText)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb))
-import Text.Show.Text.Data.Char ()
-import Text.Show.Text.Data.List ()
+import Text.Show.Text.Data.Char (showbString)
 
 #include "inline.h"
 
 -- | Convert a strict 'TS.Text' into a 'Builder'.
-showbTextStrict :: TS.Text -> Builder
-showbTextStrict = showb . TS.unpack
+-- 'showbText' should not be confused with @fromText@, as 'showbText' escapes
+-- certain characters (such as double quotes).
+-- 
+-- /Since: 0.5/
+showbText :: TS.Text -> Builder
+showbText = showbString . TS.unpack
+{-# INLINE showbText #-}
 
 -- | Convert a lazy 'TL.Text' into a 'Builder'.
+-- 'showbTextLazy' should not be confused with @fromTextLazy@, as 'showbTextLazy'
+-- escapes certain characters (such as double quotes).
+-- 
+-- /Since: 0.3/
 showbTextLazy :: TL.Text -> Builder
-showbTextLazy = showb . TL.unpack
+showbTextLazy = showbString . TL.unpack
+{-# INLINE showbTextLazy #-}
 
-instance Show Builder where
-    showb = showb . toLazyText
-    INLINE_INST_FUN(showb)
+-- | Show a 'Builder' as if it were a 'String' (i.e., escape certain characters,
+-- such as double quotes).
+-- 
+-- /Since: 0.5/
+showbBuilder :: Builder -> Builder
+showbBuilder = showbTextLazy . toLazyText
+{-# INLINE showbBuilder #-}
 
--- Strict variant
 instance Show TS.Text where
-    showb = showbTextStrict
+    showb = showbText
     INLINE_INST_FUN(showb)
 
--- Lazy variant
 instance Show TL.Text where
     showb = showbTextLazy
+    INLINE_INST_FUN(showb)
+
+instance Show Builder where
+    showb = showbBuilder
     INLINE_INST_FUN(showb)

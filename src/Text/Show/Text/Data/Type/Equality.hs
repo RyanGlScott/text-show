@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for propositional equality.
+This module is only available with @base-4.7.0.0@ or later.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Type.Equality (showbPropEquality) where
 
@@ -21,6 +24,9 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
 -- | Convert a propositional equality value to a 'Builder'.
+-- This function is only available with @base-4.7.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality = showb
 {-# INLINE showbPropEquality #-}

@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Array' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Array (showbArrayPrec) where
 
@@ -28,6 +30,8 @@ import Text.Show.Text.Utils ((<>))
 #include "inline.h"
 
 -- | Convert a 'Array' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbArrayPrec :: (Show i, Show e, Ix i) => Int -> Array i e -> Builder
 showbArrayPrec p a = showbParen (p > appPrec) $
        "array "

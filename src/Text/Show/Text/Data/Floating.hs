@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for floating-point types.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Floating (
       showbRealFloatPrec
@@ -36,6 +38,8 @@ import           Text.Show.Text.Utils ((<>), i2d, s)
 #include "inline.h"
 
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder
 showbRealFloatPrec p x
     | x < 0 || isNegativeZero x = showbParen (p > 6) $ s '-' <> showbGFloat Nothing (-x)
@@ -43,11 +47,15 @@ showbRealFloatPrec p x
 {-# INLINE showbRealFloatPrec #-}
 
 -- | Convert a 'Float' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbFloatPrec :: Int -> Float -> Builder
 showbFloatPrec = showbRealFloatPrec
 {-# INLINE showbFloatPrec #-}
 
 -- | Convert a 'Double' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbDoublePrec :: Int -> Double -> Builder
 showbDoublePrec = showbRealFloatPrec
 {-# INLINE showbDoublePrec #-}
@@ -58,6 +66,8 @@ showbDoublePrec = showbRealFloatPrec
 -- In the call @'showbEFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
+-- 
+-- /Since: 0.3/
 showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbEFloat = formatRealFloat Exponent
 {-# INLINE showbEFloat #-}
@@ -68,6 +78,8 @@ showbEFloat = formatRealFloat Exponent
 -- In the call @'showbFFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
+-- 
+-- /Since: 0.3/
 showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloat = formatRealFloat Fixed
 {-# INLINE showbFFloat #-}
@@ -79,6 +91,8 @@ showbFFloat = formatRealFloat Fixed
 -- In the call @'showbGFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
+-- 
+-- /Since: 0.3/
 showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloat = formatRealFloat Generic
 {-# INLINE showbGFloat #-}
@@ -88,6 +102,8 @@ showbGFloat = formatRealFloat Generic
 -- 
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
+-- 
+-- /Since: 0.3/
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloatAlt d x = formatRealFloatAlt Fixed d True x
 {-# INLINE showbFFloatAlt #-}
@@ -98,6 +114,8 @@ showbFFloatAlt d x = formatRealFloatAlt Fixed d True x
 -- 
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
+-- 
+-- /Since: 0.3/
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloatAlt d x = formatRealFloatAlt Generic d True x
 {-# INLINE showbGFloatAlt #-}

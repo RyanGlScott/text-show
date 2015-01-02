@@ -8,6 +8,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Fingerprint' values.
+This module is only available with @base-4.4.0.0@ or later.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.GHC.Fingerprint (showbFingerprint) where
 
@@ -23,6 +26,9 @@ import Text.Show.Text.Data.Integral (showbHex)
 import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
 -- | Convert a 'Fingerprint' to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbFingerprint :: Fingerprint -> Builder
 showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
   where

@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Identity' values.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Data.Functor.Identity (showbIdentityPrec) where
 
@@ -22,6 +24,8 @@ import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
 #include "inline.h"
 
 -- | Convert an 'Identity' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.5/
 showbIdentityPrec :: Show a => Int -> Identity a -> Builder
 -- This would be equivalent to the derived instance of 'Identity' if the
 -- 'runIdentity' field were removed.

@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Version'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Version (
       showbVersionPrec
@@ -30,6 +32,8 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbVersionPrec :: Int -> Version -> Builder
 showbVersionPrec = showbPrec
 {-# INLINE showbVersionPrec #-}
@@ -37,6 +41,8 @@ showbVersionPrec = showbPrec
 -- | Provides one possible concrete representation for 'Version'.  For
 -- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags' 
 -- @= [\"tag1\",\"tag2\"]@, the output will be @1.2.3-tag1-tag2@.
+-- 
+-- /Since: 0.3/
 showbVersionConcrete :: Version -> Builder
 showbVersionConcrete (Version branch tags)
     = mconcat (intersperse (s '.') $ map showb branch) <>

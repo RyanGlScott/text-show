@@ -15,6 +15,8 @@ Portability: GHC
 
 Monomorphic 'Show' functions for Haskell newtypes corresponding to C
 types in the Foreign Function Interface (FFI).
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Foreign.C.Types (
       showbCCharPrec
@@ -74,6 +76,8 @@ import Text.Show.Text.Data.Integral ( showbInt8Prec
 #endif
 
 -- | Convert a 'CChar' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCCharPrec :: Int -> CChar -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCCharPrec = showbPrec
@@ -83,6 +87,8 @@ showbCCharPrec p c = showbInt8Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CSChar' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCSCharPrec :: Int -> CSChar -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCSCharPrec = showbPrec
@@ -92,6 +98,8 @@ showbCSCharPrec p c = showbInt8Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CUChar' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUChar :: CUChar -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCUChar = showb
@@ -101,6 +109,8 @@ showbCUChar c = showbWord8 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CShort' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCShortPrec :: Int -> CShort -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCShortPrec = showbPrec
@@ -110,6 +120,8 @@ showbCShortPrec p c = showbInt16Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CUShort' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUShort :: CUShort -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCUShort = showb
@@ -119,6 +131,8 @@ showbCUShort c = showbWord16 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CInt' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCIntPrec :: Int -> CInt -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCIntPrec = showbPrec
@@ -128,6 +142,8 @@ showbCIntPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CUInt' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUInt :: CUInt -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCUInt = showb
@@ -137,6 +153,8 @@ showbCUInt c = showbWord32 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CLong' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCLongPrec :: Int -> CLong -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCLongPrec = showbPrec
@@ -146,6 +164,8 @@ showbCLongPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CULong' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCULong :: CULong -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCULong = showb
@@ -155,6 +175,8 @@ showbCULong c = showbWord32 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CPtrdiff' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCPtrdiffPrec :: Int -> CPtrdiff -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCPtrdiffPrec = showbPrec
@@ -164,6 +186,8 @@ showbCPtrdiffPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CSize' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCSize :: CSize -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCSize = showb
@@ -173,6 +197,8 @@ showbCSize c = showbWord32 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CWchar' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCWcharPrec :: Int -> CWchar -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCWcharPrec = showbPrec
@@ -182,6 +208,8 @@ showbCWcharPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CSigAtomic' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCSigAtomicPrec :: Int -> CSigAtomic -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCSigAtomicPrec = showbPrec
@@ -191,6 +219,8 @@ showbCSigAtomicPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CLLong' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCLLongPrec :: Int -> CLLong -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCLLongPrec = showbPrec
@@ -200,6 +230,8 @@ showbCLLongPrec p c = showbInt64Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CULLong' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCULLong :: CULLong -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCULLong = showb
@@ -209,6 +241,8 @@ showbCULLong c = showbWord64 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CIntPtr' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCIntPtrPrec :: Int -> CIntPtr -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCIntPtrPrec = showbPrec
@@ -218,6 +252,8 @@ showbCIntPtrPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CUIntPtr' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUIntPtr :: CUIntPtr -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCUIntPtr = showb
@@ -227,6 +263,8 @@ showbCUIntPtr c = showbWord32 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CIntMax' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCIntMaxPrec :: Int -> CIntMax -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCIntMaxPrec = showbPrec
@@ -236,6 +274,8 @@ showbCIntMaxPrec p c = showbInt64Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CUIntMax' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUIntMax :: CUIntMax -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCUIntMax = showb
@@ -245,6 +285,8 @@ showbCUIntMax c = showbWord64 $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CClock' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCClockPrec :: Int -> CClock -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCClockPrec = showbPrec
@@ -254,6 +296,8 @@ showbCClockPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CTime' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCTimePrec :: Int -> CTime -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCTimePrec = showbPrec
@@ -264,6 +308,9 @@ showbCTimePrec p c = showbInt32Prec p $ unsafeCoerce# c
 
 #if MIN_VERSION_base(4,4,0)
 -- | Convert a 'CUSeconds' value to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbCUSeconds :: CUSeconds -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCUSeconds = showb
@@ -273,6 +320,9 @@ showbCUSeconds c = showbWord32 $ unsafeCoerce# c
 # endif
 
 -- | Convert a 'CSUSeconds' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbCSUSecondsPrec :: Int -> CSUSeconds -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCSUSecondsPrec = showbPrec
@@ -283,6 +333,8 @@ showbCSUSecondsPrec p c = showbInt32Prec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CFloat' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCFloatPrec :: Int -> CFloat -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCFloatPrec = showbPrec
@@ -292,6 +344,8 @@ showbCFloatPrec p c = showbFloatPrec p $ unsafeCoerce# c
 #endif
 
 -- | Convert a 'CDouble' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCDoublePrec :: Int -> CDouble -> Builder
 #if MIN_VERSION_base(4,5,0)
 showbCDoublePrec = showbPrec

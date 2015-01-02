@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Void' values.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Data.Void (showbVoid) where
 
@@ -23,6 +25,8 @@ import Text.Show.Text.Classes (Show(showb))
 
 -- | Since 'Void' values logically don't exist, attempting to convert one to a
 -- 'Builder' will never terminate.
+-- 
+-- /Since: 0.5/
 showbVoid :: Void -> Builder
 showbVoid = absurd
 {-# INLINE showbVoid #-}

@@ -8,7 +8,9 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Monomorphic 'Show' functions for data types in the "Data.Data" module.
+Monomorphic 'Show' functions for data types in the @Data.Data@ module.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Data (
       showbConstr
@@ -32,26 +34,36 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
 #include "inline.h"
 
 -- | Convert a 'DataType' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbDataTypePrec :: Int -> DataType -> Builder
 showbDataTypePrec = showbPrec
 {-# INLINE showbDataTypePrec #-}
 
 -- | Convert a 'DataRep' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbDataRepPrec :: Int -> DataRep -> Builder
 showbDataRepPrec = showbPrec
 {-# INLINE showbDataRepPrec #-}
 
 -- | Convert a 'Constr' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbConstr :: Constr -> Builder
 showbConstr = fromString . showConstr
 {-# INLINE showbConstr #-}
 
 -- | Convert a 'Fixity' value to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbFixity :: Fixity -> Builder
 showbFixity = showb
 {-# INLINE showbFixity #-}
 
 -- | Convert a 'ConstrRep' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbConstrRepPrec :: Int -> ConstrRep -> Builder
 showbConstrRepPrec = showbPrec
 {-# INLINE showbConstrRepPrec #-}

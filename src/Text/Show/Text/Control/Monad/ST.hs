@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for strict 'ST' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Control.Monad.ST (showbST) where
 
@@ -20,6 +22,8 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 #include "inline.h"
 
 -- | Convert a strict 'ST' value to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbST :: ST s a -> Builder
 showbST _ = "<<ST action>>"
 {-# INLINE showbST #-}

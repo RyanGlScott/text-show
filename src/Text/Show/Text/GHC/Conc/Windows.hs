@@ -1,4 +1,7 @@
-﻿{-# LANGUAGE CPP, TemplateHaskell #-}
+﻿{-# LANGUAGE CPP #-}
+#if !defined(__GHCJS__)
+{-# LANGUAGE TemplateHaskell #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.GHC.Conc.Windows
@@ -9,6 +12,11 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'ConsoleEvent'.
+This module is only available on Windows.
+
+Note that this module does not export anything on GHCJS.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.GHC.Conc.Windows (
 #if defined(__GHCJS__)
@@ -16,7 +24,6 @@ module Text.Show.Text.GHC.Conc.Windows (
 #else
       showbConsoleEvent
     ) where
-#endif
 
 import Data.Text.Lazy.Builder (Builder)
 
@@ -26,8 +33,11 @@ import Text.Show.Text.Classes (showb)
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 
 -- | Convert a 'ConsoleEvent' to a 'Builder'.
+-- 
+-- /Since: 0.5/
 showbConsoleEvent :: ConsoleEvent -> Builder
 showbConsoleEvent = showb
 {-# INLINE showbConsoleEvent #-}
 
 $(deriveShowPragmas defaultInlineShowb ''ConsoleEvent)
+#endif

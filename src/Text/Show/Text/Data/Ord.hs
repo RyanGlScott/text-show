@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Ordering' and 'Down'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Ord (
       showbOrdering
@@ -34,6 +36,8 @@ import Text.Show.Text.TH.Internal (defaultInlineShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'Ordering' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbOrdering :: Ordering -> Builder
 showbOrdering = showb
 {-# INLINE showbOrdering #-}
@@ -42,6 +46,9 @@ $(deriveShowPragmas defaultInlineShowb ''Ordering)
 
 #if MIN_VERSION_base(4,6,0)
 -- | Convert a 'Down' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.6.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbDownPrec :: Show a => Int -> Down a -> Builder
 showbDownPrec = showbPrec
 {-# INLINE showbDownPrec #-}

@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Optional 'Show' and 'Show1' instances for functions.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Functions (showbFunction) where
 
@@ -19,6 +21,8 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 #include "inline.h"
 
 -- | Convert a function to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbFunction :: (a -> b) -> Builder
 showbFunction _ = "<function>"
 {-# INLINE showbFunction #-}

@@ -7,6 +7,8 @@ Stability:   Experimental
 Portability: GHC
 
 Efficiently convert from values to 'Text' via 'Builder's.
+
+/Since: 0.1/
 -}
 module Text.Show.Text (
       -- * The 'Show' class

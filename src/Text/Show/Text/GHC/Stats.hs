@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'GCStats'.
+This module is only available with @base-4.5.0.0@ or later.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.GHC.Stats (showbGCStatsPrec) where 
 
@@ -22,6 +25,9 @@ import Text.Show.Text.Data.Floating ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert a 'GCStats' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.5.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbGCStatsPrec :: Int -> GCStats -> Builder
 showbGCStatsPrec = showbPrec
 {-# INLINE showbGCStatsPrec #-}

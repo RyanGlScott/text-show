@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Either' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Either (showbEitherPrec) where
 
@@ -22,6 +24,8 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'Either' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbEitherPrec :: (Show a, Show b) => Int -> Either a b -> Builder
 showbEitherPrec = showbPrec
 {-# INLINE showbEitherPrec #-}

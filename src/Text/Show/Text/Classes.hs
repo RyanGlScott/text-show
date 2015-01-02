@@ -60,7 +60,7 @@ import           Prelude hiding (Show(show, showList))
 
 import           System.IO (Handle)
 
-import           Text.Printf (IsChar, PrintfArg, PrintfType)
+import           Text.Printf (PrintfArg, PrintfType)
 import qualified Text.Show as S (Show(showsPrec))
 import           Text.Show.Text.Utils ((<>), s)
 
@@ -85,18 +85,26 @@ import           Text.Show.Text.Utils ((<>), s)
 -- If you do not want to create 'Show' instances manually, you can alternatively
 -- use the "Text.Show.Text.TH" module to automatically generate default 'Show'
 -- instances using Template Haskell.
+-- 
+-- /Since: 0.1/
 class Show a where
     -- | Convert a value to a 'Builder' with the given predence.
+    -- 
+    -- /Since: 0.1/
     showbPrec :: Int -- ^ The operator precedence of the enclosing context (a number
                      -- from @0@ to @11@). Function application has precedence @10@.
               -> a   -- ^ The value to be converted to a 'String'.
               -> Builder
     
     -- | A specialized variant of 'showbPrec' using precedence context zero.
+    -- 
+    -- /Since: 0.1/
     showb :: a -> Builder
     
     -- | Allows for specialized display of lists. This is used, for example, when
     -- showing lists of 'Char's.
+    -- 
+    -- /Since: 0.1/
     showbList :: [a] -> Builder
     
     showbPrec _ = showb
@@ -109,55 +117,76 @@ class Show a where
 #endif
 
 -- | Lifting of the 'Show' class to unary type constructors.
+-- 
+-- /Since: 0.5/
 class Show1 f where
     -- | 'Builder' conversion for values of a type that has a unary type constructor.
+    -- 
+    -- /Since: 0.5/
     showbPrec1 :: Show a => Int -> f a -> Builder
 
 -- | Constructs a strict 'TS.Text' from a single value.
+-- 
+-- /Since: 0.1/
 show :: Show a => a -> TS.Text
 show = toStrict . showLazy
 {-# INLINE show #-}
 
 -- | Constructs a lazy 'TL.Text' from a single value.
+-- 
+-- /Since: 0.3/
 showLazy :: Show a => a -> TL.Text
 showLazy = toLazyText . showb
 {-# INLINE showLazy #-}
 
 -- | Constructs a strict 'TS.Text' from a single value with the given precedence.
+-- 
+-- /Since: 0.3/
 showPrec :: Show a => Int -> a -> TS.Text
 showPrec p = toStrict . showPrecLazy p
 {-# INLINE showPrec #-}
 
 -- | Constructs a lazy 'TL.Text' from a single value with the given precedence.
+-- 
+-- /Since: 0.3/
 showPrecLazy :: Show a => Int -> a -> TL.Text
 showPrecLazy p = toLazyText . showbPrec p
 {-# INLINE showPrecLazy #-}
 
 -- | Construct a strict 'TS.Text' from a list of values.
+-- 
+-- /Since: 0.3.1/
 showList :: Show a => [a] -> TS.Text
 showList = toStrict . showListLazy
 {-# INLINE showList #-}
 
 -- | Construct a lazy 'TL.Text' from a list of values.
+-- 
+-- /Since: 0.3.1/
 showListLazy :: Show a => [a] -> TL.Text
 showListLazy = toLazyText . showbList
 {-# INLINE showListLazy #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
+-- 
+-- /Since: 0.1/
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
 
 -- | Construct a 'Builder' containing a single space character.
+-- 
+-- /Since: 0.5/
 showbSpace :: Builder
 showbSpace = s ' '
 {-# INLINE showbSpace #-}
 
--- |
--- Converts a list of values into a 'Builder' in which the values are surrounded
+-- | Converts a list of values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. This is the default
 -- implementation of 'showbList' save for a few special cases (e.g., 'String').
+-- 
+-- /Since: 0.3/
 showbListDefault :: (a -> Builder) -> [a] -> Builder
 showbListDefault _      []     = "[]"
 showbListDefault showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
@@ -168,6 +197,8 @@ showbListDefault showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
 
 -- | @'showbUnary' n p x@ produces the 'Builder' representation of a unary data
 -- constructor with name @n@ and argument @x@, in precedence context @p@.
+-- 
+-- /Since: 0.5/
 showbUnary :: Show a => Builder -> Int -> a -> Builder
 showbUnary nameB p x = showbParen (p > appPrec) $
     nameB <> showbSpace <> showbPrec appPrec1 x
@@ -175,6 +206,8 @@ showbUnary nameB p x = showbParen (p > appPrec) $
 
 -- | @'showbUnary1' n p x@ produces the 'Builder' representation of a unary data
 -- constructor with name @n@ and argument @x@, in precedence context @p@.
+-- 
+-- /Since: 0.5/
 showbUnary1 :: (Show1 f, Show a) => Builder -> Int -> f a -> Builder
 showbUnary1 nameB p x = showbParen (p > appPrec) $
     nameB <> showbSpace <> showbPrec1 appPrec1 x
@@ -183,6 +216,8 @@ showbUnary1 nameB p x = showbParen (p > appPrec) $
 -- | @'showbBinary1' n p x y@ produces the 'Builder' representation of a binary
 -- data constructor with name @n@ and arguments @x@ and @y@, in precedence
 -- context @p@.
+-- 
+-- /Since: 0.5/
 showbBinary1 :: (Show1 f, Show1 g, Show a) => Builder -> Int -> f a -> g a -> Builder
 showbBinary1 nameB p x y = showbParen (p > appPrec) $ nameB
     <> showbSpace <> showbPrec1 appPrec1 x
@@ -191,24 +226,32 @@ showbBinary1 nameB p x y = showbParen (p > appPrec) $ nameB
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.
+-- 
+-- /Since: 0.1/
 print :: Show a => a -> IO ()
 print = TS.putStrLn . show
 {-# INLINE print #-}
 
 -- | Writes a value's lazy 'TL.Text' representation to the standard output, followed
 --   by a newline.
+-- 
+-- /Since: 0.3/
 printLazy :: Show a => a -> IO ()
 printLazy = TL.putStrLn . showLazy
 {-# INLINE printLazy #-}
 
 -- | Writes a value's strict 'TS.Text' representation to a file handle, followed
 --   by a newline.
+-- 
+-- /Since: 0.3/
 hPrint :: Show a => Handle -> a -> IO ()
 hPrint h = TS.hPutStrLn h . show
 {-# INLINE hPrint #-}
 
 -- | Writes a value's lazy 'TL.Text' representation to a file handle, followed
 --   by a newline.
+-- 
+-- /Since: 0.3/
 hPrintLazy :: Show a => Handle -> a -> IO ()
 hPrintLazy h = TL.hPutStrLn h . showLazy
 {-# INLINE hPrintLazy #-}
@@ -219,6 +262,8 @@ hPrintLazy h = TL.hPutStrLn h . showLazy
 -- @
 -- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
 -- @
+-- 
+-- /Since: 0.5/
 newtype FromStringShow a = FromStringShow { fromStringShow :: a }
   deriving ( Bits
            , Bounded
@@ -239,7 +284,6 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
 # endif
 #endif
            , Integral
-           , IsChar
            , IsString
            , Ix
            , Num

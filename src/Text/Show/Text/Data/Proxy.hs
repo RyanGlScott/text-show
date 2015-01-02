@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Proxy' values.
+
+/Since: 0.4/
 -}
 module Text.Show.Text.Data.Proxy (showbProxy) where
 
@@ -23,6 +25,8 @@ import Text.Show.Text.TH.Internal (mkShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'Proxy' type to a 'Builder'.
+-- 
+-- /Since: 0.4/
 showbProxy :: Proxy s -> Builder
 showbProxy = showb
 {-# INLINE showbProxy #-}

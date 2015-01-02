@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'ZipList'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Control.Applicative (showbZipListPrec) where
 
@@ -25,6 +27,8 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 #include "inline.h"
 
 -- | Convert a 'ZipList' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbZipListPrec :: Show a => Int -> ZipList a -> Builder
 showbZipListPrec = showbPrec
 {-# INLINE showbZipListPrec #-}

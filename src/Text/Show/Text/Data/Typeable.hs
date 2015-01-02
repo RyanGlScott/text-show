@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Typeable@ module.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Typeable (showbTyCon, showbTypeRepPrec) where
 
@@ -30,6 +32,8 @@ import Text.Show.Text.Utils ((<>), s)
 #include "inline.h"
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p tyrep =
     case tys of
@@ -70,6 +74,8 @@ isTupleTyCon tycon = case tyconStr of
 {-# INLINE isTupleTyCon #-}
 
 -- | Convert a 'TyCon' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConString
 {-# INLINE showbTyCon #-}

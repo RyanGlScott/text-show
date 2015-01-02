@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for generics-related data types.
+This module is only available with @base-4.4.0.0@ or later.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.GHC.Generics (
       showbU1
@@ -38,56 +41,89 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
                                    defaultInlineShowbPrec, mkShowbPrec)
 
 -- | Convert a 'U1' value to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbU1 :: U1 p -> Builder
 showbU1 = showb
 {-# INLINE showbU1 #-}
 
 -- | Convert a 'Par1' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbPar1Prec :: Show p => Int -> Par1 p -> Builder
 showbPar1Prec = showbPrec
 {-# INLINE showbPar1Prec #-}
 
 -- | Convert a 'Rec1' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbRec1Prec :: Show (f p) => Int -> Rec1 f p -> Builder
 showbRec1Prec = showbPrec
 {-# INLINE showbRec1Prec #-}
 
 -- | Convert a 'K1' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbK1Prec :: Show c => Int -> K1 i c p -> Builder
 showbK1Prec = showbPrec
 {-# INLINE showbK1Prec #-}
 
 -- | Convert an 'M1' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbM1Prec :: Show (f p) => Int -> M1 i c f p -> Builder
 showbM1Prec = showbPrec
 {-# INLINE showbM1Prec #-}
 
 -- | Convert a '(:+:)' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbSumTypePrec :: (Show (f p), Show (g p)) => Int -> (f :+: g) p -> Builder
 showbSumTypePrec = showbPrec
 {-# INLINE showbSumTypePrec #-}
 
--- | Convert an '(:*:)' value to a 'Builder' with the given precedence.
+-- | Convert a '(:*:)' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbProductTypePrec :: (Show (f p), Show (g p)) => Int -> (f :*: g) p -> Builder
 showbProductTypePrec = showbPrec
 {-# INLINE showbProductTypePrec #-}
 
--- | Convert an '(:.:)' value to a 'Builder' with the given precedence.
+-- | Convert a '(:.:)' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbCompFunctorsPrec :: Show (f (g p)) => Int -> (f :.: g) p -> Builder
 showbCompFunctorsPrec = showbPrec
 {-# INLINE showbCompFunctorsPrec #-}
 
 -- | Convert a 'Fixity' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbFixityPrec :: Int -> Fixity -> Builder
 showbFixityPrec = showbPrec
 {-# INLINE showbFixityPrec #-}
 
 -- | Convert an 'Associativity' value to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbAssociativity :: Associativity -> Builder
 showbAssociativity = showb
 {-# INLINE showbAssociativity #-}
 
 -- | Convert an 'Arity' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbArityPrec :: Int -> Arity -> Builder
 showbArityPrec = showbPrec
 {-# INLINE showbArityPrec #-}

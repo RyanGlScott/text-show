@@ -13,6 +13,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @GHC.TypeLits@ module.
+This module is only available with @base-4.6.0.0@ or later.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.GHC.TypeLits (
 #if MIN_VERSION_base(4,7,0)
@@ -40,16 +43,25 @@ import Text.Show.Text.Utils ((<>), s)
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeNat' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.7.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbSomeNatPrec :: Int -> SomeNat -> Builder
 showbSomeNatPrec p (SomeNat x) = showbIntegerPrec p $ natVal x
 {-# INLINE showbSomeNatPrec #-}
 
 -- | Convert a 'SomeSymbol' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.7.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbSomeSymbol :: SomeSymbol -> Builder
 showbSomeSymbol (SomeSymbol x) = showbString $ symbolVal x
 {-# INLINE showbSomeSymbol #-}
 #else
 -- | Convert an 'IsEven' value to a 'Builder'.
+-- This function is only available with @base-4.6@.
+-- 
+-- /Since: 0.5/
 showbIsEven :: IsEven n -> Builder
 showbIsEven IsEvenZero = s '0'
 showbIsEven (IsEven x) = "(2 * " <> showb x <> s ')'
@@ -57,6 +69,9 @@ showbIsEven (IsOdd  x) = "(2 * " <> showb x <> " + 1)"
 {-# INLINE showbIsEven #-}
 
 -- | Convert an 'IsZero' value to a 'Builder'.
+-- This function is only available with @base-4.6@.
+-- 
+-- /Since: 0.5/
 showbIsZero :: IsZero n -> Builder
 showbIsZero IsZero     = s '0'
 showbIsZero (IsSucc n) = s '(' <> showb n <> " + 1)"

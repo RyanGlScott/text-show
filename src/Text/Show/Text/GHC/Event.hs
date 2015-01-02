@@ -9,6 +9,12 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Event@ module.
+This module is only available with @base-4.4.0.0@ or later and is not available
+on Windows.
+
+Note that this module does not export anything on GHCJS.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.GHC.Event (
 #if defined(__GHCJS__)
@@ -24,11 +30,19 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 
 -- | Convert an 'Event' to a 'Builder'.
+-- This function is only available with @base-4.4.0.0@ or later and is not available
+-- on Windows.
+-- 
+-- /Since: 0.3/
 showbEvent :: Event -> Builder
 showbEvent = showb . FromStringShow
 {-# INLINE showbEvent #-}
 
 -- | Convert an 'FdKey' to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.4.0.0@ or later and is not available
+-- on Windows.
+-- 
+-- /Since: 0.3/
 showbFdKeyPrec :: Int -> FdKey -> Builder
 showbFdKeyPrec p = showbPrec p . FromStringShow
 {-# INLINE showbFdKeyPrec #-}

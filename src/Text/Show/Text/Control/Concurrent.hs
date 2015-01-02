@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for concurrency-related data types.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Control.Concurrent (
       showbThreadIdPrec
@@ -29,16 +31,22 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
 #include "inline.h"
 
 -- | Convert a 'ThreadId' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbThreadIdPrec :: Int -> ThreadId -> Builder
 showbThreadIdPrec p = showbPrec p . FromStringShow
 {-# INLINE showbThreadIdPrec #-}
 
 -- | Convert a 'ThreadStatus' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbThreadStatusPrec :: Int -> ThreadStatus -> Builder
 showbThreadStatusPrec = showbPrec
 {-# INLINE showbThreadStatusPrec #-}
 
 -- | Convert a 'BlockReason' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbBlockReason :: BlockReason -> Builder
 showbBlockReason = showb
 {-# INLINE showbBlockReason #-}

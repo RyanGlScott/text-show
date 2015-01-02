@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'ExitCode'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.System.Exit (showbExitCodePrec) where
 
@@ -21,6 +23,8 @@ import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert an 'ExitCode' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbExitCodePrec :: Int -> ExitCode -> Builder
 showbExitCodePrec = showbPrec
 {-# INLINE showbExitCodePrec #-}

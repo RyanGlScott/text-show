@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'StaticPtrInfo' values.
+This module is only available with @base-4.8.0.0@ or later.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.GHC.StaticPtr (showbStaticPtrInfoPrec) where
 
@@ -24,6 +27,9 @@ import Text.Show.Text.Data.Tuple    ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Conver a 'StaticPtrInfo' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbStaticPtrInfoPrec :: Int -> StaticPtrInfo -> Builder
 showbStaticPtrInfoPrec = showbPrec
 {-# INLINE showbStaticPtrInfoPrec #-}

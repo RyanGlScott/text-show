@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Bool' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Bool (showbBool) where
 
@@ -18,6 +20,8 @@ import Text.Show.Text.Classes (showb)
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 
 -- | Convert a 'Bool' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbBool :: Bool -> Builder
 showbBool = showb
 {-# INLINE showbBool #-}

@@ -10,6 +10,8 @@ Portability: GHC
 
 Monomorphic 'Show' function for 'Lexeme' (and 'Number', if using a
 recent-enough version of @base@).
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Text.Read (
       showbLexemePrec
@@ -38,6 +40,8 @@ import Text.Show.Text.Data.Char (LitChar(..), LitString(..))
 #include "inline.h"
 
 -- | Convert a 'Lexeme' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbLexemePrec :: Int -> Lexeme -> Builder
 showbLexemePrec p (Char c)   = showbUnary "Char"   p $ LitChar c
 showbLexemePrec p (String s) = showbUnary "String" p $ LitString s
@@ -55,6 +59,9 @@ showbLexemePrec _ EOF        = "EOF"
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Number' to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.7.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbNumberPrec :: Int -> Number -> Builder
 showbNumberPrec p = showbPrec p . FromStringShow
 {-# INLINE showbNumberPrec #-}

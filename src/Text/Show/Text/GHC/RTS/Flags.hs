@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the 'GHC.RTS.Flags' module.
+This module is only available with @base-4.8.0.0@ or later.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.GHC.RTS.Flags (
       showbRTSFlagsPrec
@@ -40,11 +43,17 @@ import Text.Show.Text.Utils ((<>), s)
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 -- | Convert an 'RTSFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbRTSFlagsPrec :: Int -> RTSFlags -> Builder
 showbRTSFlagsPrec = showbPrec
 {-# INLINE showbRTSFlagsPrec #-}
 
 -- | Convert a 'GCFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbGCFlagsPrec :: Int -> GCFlags -> Builder
 showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
        "GCFlags {statsFile = "
@@ -101,21 +110,32 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
 {-# INLINE showbGCFlagsPrec #-}
 
 -- | Convert a 'ConcFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbConcFlagsPrec :: Int -> ConcFlags -> Builder
 showbConcFlagsPrec = showbPrec
 {-# INLINE showbConcFlagsPrec #-}
 
 -- | Convert a 'MiscFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbMiscFlagsPrec :: Int -> MiscFlags -> Builder
 showbMiscFlagsPrec = showbPrec
 {-# INLINE showbMiscFlagsPrec #-}
 
 -- | Convert a 'DebugFlags' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.5/
 showbDebugFlagsPrec :: Int -> DebugFlags -> Builder
 showbDebugFlagsPrec = showbPrec
 {-# INLINE showbDebugFlagsPrec #-}
 
 -- | Convert a 'CCFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbCCFlagsPrec :: Int -> CCFlags -> Builder
 showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
        "CCFlags {doCostCentres = "
@@ -128,6 +148,9 @@ showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
 {-# INLINE showbCCFlagsPrec #-}
 
 -- | Convert a 'ProfFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbProfFlagsPrec :: Int -> ProfFlags -> Builder
 showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
        "ProfFlags {doHeapProfile = "
@@ -162,6 +185,9 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
 {-# INLINE showbProfFlagsPrec #-}
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbTraceFlagsPrec :: Int -> TraceFlags -> Builder
 showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
        "TraceFlags {tracing = "
@@ -182,6 +208,9 @@ showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
 {-# INLINE showbTraceFlagsPrec #-}
 
 -- | Convert a 'TickyFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbTickyFlagsPrec :: Int -> TickyFlags -> Builder
 showbTickyFlagsPrec = showbPrec
 {-# INLINE showbTickyFlagsPrec #-}

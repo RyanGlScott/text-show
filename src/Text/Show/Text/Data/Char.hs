@@ -16,6 +16,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Char' and 'String'.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Char (
       showbChar
@@ -49,7 +51,7 @@ import           GHC.Generics (Generic)
 
 import           Prelude hiding (Show)
 
-import           Text.Printf (IsChar, PrintfArg, PrintfType)
+import           Text.Printf (PrintfArg, PrintfType)
 import qualified Text.Show as S (Show)
 import           Text.Show.Text.Classes (Show(..))
 import           Text.Show.Text.Data.Integral (showbIntPrec)
@@ -59,6 +61,8 @@ import           Text.Show.Text.Utils ((<>), s)
 #include "inline.h"
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
+-- 
+-- /Since: 0.5/
 asciiTabB :: Array Int Builder
 asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
                               "BS",  "HT",  "LF",  "VT",  "FF",  "CR",  "SO",  "SI",
@@ -67,12 +71,16 @@ asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", 
                               "SP"]
 
 -- | Convert a 'Char' to a 'Builder' (surrounded by single quotes).
+-- 
+-- /Since: 0.3/
 showbChar :: Char -> Builder
 showbChar '\'' = "'\\''"
 showbChar c    = s '\'' <> showbLitChar c <> s '\''
 {-# INLINE showbChar #-}
 
 -- | Convert a 'Char' to a 'Builder' (without single quotes).
+-- 
+-- /Since: 0.3/
 showbLitChar :: Char -> Builder
 showbLitChar c | c > '\DEL' = s '\\' <> showbIntPrec 0 (ord c)
 showbLitChar '\DEL'         = "\\DEL"
@@ -90,11 +98,15 @@ showbLitChar c              = s '\\' <> (asciiTabB ! ord c)
 {-# INLINE showbLitChar #-}
 
 -- | Convert a 'String' to a 'Builder' (surrounded by double quotes).
+-- 
+-- /Since: 0.3/
 showbString :: String -> Builder
 showbString cs = s '"' <> showbLitString cs <> s '"'
 {-# INLINE showbString #-}
 
 -- | Convert a 'String' to a 'Builder' (without double quotes).
+-- 
+-- /Since: 0.3/
 showbLitString :: String -> Builder
 showbLitString []             = mempty
 showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
@@ -105,6 +117,8 @@ showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 {-# INLINE showbLitString #-}
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbGeneralCategory :: GeneralCategory -> Builder
 showbGeneralCategory = showb
 {-# INLINE showbGeneralCategory #-}
@@ -124,6 +138,8 @@ $(deriveShowPragmas defaultInlineShowb ''GeneralCategory)
 -- @
 -- showb ('LitChar' c) = 'showbLitChar' c
 -- @
+-- 
+-- /Since: 0.5/
 newtype LitChar = LitChar { getLitChar :: Char }
   deriving ( Bounded
            , Data
@@ -132,7 +148,6 @@ newtype LitChar = LitChar { getLitChar :: Char }
 #if MIN_VERSION_base(4,4,0)
            , Generic
 #endif
-           , IsChar
            , Ix
            , Ord
            , PrintfArg
@@ -152,6 +167,8 @@ instance Show LitChar where
 -- @
 -- showb ('LitString' s) = 'showbLitString' s
 -- @
+-- 
+-- /Since: 0.5/
 newtype LitString = LitString { getLitString :: String }
   deriving ( Data
            , Eq

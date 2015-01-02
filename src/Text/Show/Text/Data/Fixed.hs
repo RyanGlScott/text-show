@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Fixed' values.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Fixed (showbFixed) where
 
@@ -37,6 +39,8 @@ import Data.Text.Lazy.Builder (fromString)
 
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
 -- whether to chop off trailing zeroes.
+-- 
+-- /Since: 0.3/
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
 #if MIN_VERSION_base(4,7,0)
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0

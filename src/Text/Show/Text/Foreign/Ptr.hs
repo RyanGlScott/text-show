@@ -10,6 +10,8 @@ Portability: GHC
 
 Monomorphic 'Show' functions for pointer types used in the Haskell
 Foreign Function Interface (FFI).
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Foreign.Ptr (
       showbPtr
@@ -40,6 +42,8 @@ import           Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
 
 -- | Convert a 'Ptr' to a 'Builder'. Note that this does not require the parameterized
 -- type to be an instance of 'Show' itself.
+-- 
+-- /Since: 0.3/
 showbPtr :: Ptr a -> Builder
 showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
   where
@@ -50,20 +54,28 @@ showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
 
 -- | Convert a 'FunPtr' to a 'Builder'. Note that this does not require the
 -- parameterized type to be an instance of 'Show' itself.
+-- 
+-- /Since: 0.3/
 showbFunPtr :: FunPtr a -> Builder
 showbFunPtr = showb . castFunPtrToPtr
 {-# INLINE showbFunPtr #-}
 
 -- | Convert an 'IntPtr' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbIntPtrPrec :: Int -> IntPtr -> Builder
 showbIntPtrPrec p ip = showbIntPrec p $ unsafeCoerce# ip
 
 -- | Convert a 'WordPtr' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbWordPtr :: WordPtr -> Builder
 showbWordPtr wp = showbWord $ unsafeCoerce# wp
 
 -- | Convert a 'ForeignPtr' to a 'Builder'. Note that this does not require the
 -- parameterized type to be an instance of 'Show' itself.
+-- 
+-- /Since: 0.3/
 showbForeignPtr :: ForeignPtr a -> Builder
 showbForeignPtr = showb . unsafeForeignPtrToPtr
 {-# INLINE showbForeignPtr #-}

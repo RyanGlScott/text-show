@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for tuple types.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Data.Tuple (
       showbUnit
@@ -38,61 +40,83 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 #include "inline.h"
 
 -- | Converts @()@ into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbUnit :: () -> Builder
 -- showbUnit () = "()"
 showbUnit = showb
 {-# INLINE showbUnit #-}
 
 -- | Converts a 2-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb2Tuple :: (Show a, Show b) => (a, b) -> Builder
 showb2Tuple = showb
 {-# INLINE showb2Tuple #-}
 
 -- | Converts a 3-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb3Tuple :: (Show a, Show b, Show c) => (a, b, c) -> Builder
 showb3Tuple = showb
 {-# INLINE showb3Tuple #-}
 
 -- | Converts a 4-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb4Tuple :: (Show a, Show b, Show c, Show d) => (a, b, c, d) -> Builder
 showb4Tuple = showb
 {-# INLINE showb4Tuple #-}
 
 -- | Converts a 5-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb5Tuple :: (Show a, Show b, Show c, Show d, Show e) => (a, b, c, d, e) -> Builder
 showb5Tuple = showb
 {-# INLINE showb5Tuple #-}
 
 -- | Converts a 6-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb6Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f) => (a, b, c, d, e, f) -> Builder
 showb6Tuple = showb
 {-# INLINE showb6Tuple #-}
 
 -- | Converts a 7-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb7Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g)
             => (a, b, c, d, e, f, g) -> Builder
 showb7Tuple = showb
 {-# INLINE showb7Tuple #-}
 
 -- | Converts an 8-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb8Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h)
             => (a, b, c, d, e, f, g, h) -> Builder
 showb8Tuple = showb
 {-# INLINE showb8Tuple #-}
 
 -- | Converts a 9-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb9Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i)
             => (a, b, c, d, e, f, g, h, i) -> Builder
 showb9Tuple = showb
 {-# INLINE showb9Tuple #-}
 
 -- | Converts a 10-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb10Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j)
              => (a, b, c, d, e, f, g, h, i, j) -> Builder
 showb10Tuple = showb
 {-# INLINE showb10Tuple #-}
 
 -- | Converts an 11-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb11Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f,
                  Show g, Show h, Show i, Show j, Show k)
              => (a, b, c, d, e, f, g, h, i, j, k) -> Builder
@@ -100,6 +124,8 @@ showb11Tuple = showb
 {-# INLINE showb11Tuple #-}
 
 -- | Converts a 12-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb12Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f,
                  Show g, Show h, Show i, Show j, Show k, Show l)
              => (a, b, c, d, e, f, g, h, i, j, k, l) -> Builder
@@ -107,6 +133,8 @@ showb12Tuple = showb
 {-# INLINE showb12Tuple #-}
 
 -- | Converts a 13-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb13Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g,
                  Show h, Show i, Show j, Show k, Show l, Show m)
              => (a, b, c, d, e, f, g, h, i, j, k, l, m) -> Builder
@@ -114,6 +142,8 @@ showb13Tuple = showb
 {-# INLINE showb13Tuple #-}
 
 -- | Converts a 14-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb14Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g,
                  Show h, Show i, Show j, Show k, Show l, Show m, Show n)
              => (a, b, c, d, e, f, g, h, i, j, k, l, m, n) -> Builder
@@ -121,6 +151,8 @@ showb14Tuple = showb
 {-# INLINE showb14Tuple #-}
 
 -- | Converts a 15-tuple into a 'Builder'.
+-- 
+-- /Since: 0.3/
 showb15Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h,
                  Show i, Show j, Show k, Show l, Show m, Show n, Show o)
              => (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) -> Builder

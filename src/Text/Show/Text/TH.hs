@@ -6,9 +6,11 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Functions to mechanically derive 'Show' instances or splice
+Functions to mechanically derive @Show@ instances or splice
 @show@-related expressions into Haskell source code. You need to enable
 the @TemplateHaskell@ language extension in order to use this module.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.TH (module Text.Show.Text.TH.Internal) where
 

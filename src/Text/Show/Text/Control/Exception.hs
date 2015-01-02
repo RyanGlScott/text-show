@@ -9,6 +9,8 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Exception's.
+
+/Since: 0.3/
 -}
 module Text.Show.Text.Control.Exception (
     showbSomeExceptionPrec
@@ -53,16 +55,22 @@ import Text.Show.Text.Utils ((<>))
 #include "inline.h"
 
 -- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbSomeExceptionPrec :: Int -> SomeException -> Builder
 showbSomeExceptionPrec p (SomeException e) = showbPrec p $ FromStringShow e
 {-# INLINE showbSomeExceptionPrec #-}
 
 -- | Convert an 'IOException' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbIOException :: IOException -> Builder
 showbIOException = showb . FromStringShow
 {-# INLINE showbIOException #-}
 
 -- | Convert an 'ArithException' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbArithException :: ArithException -> Builder
 showbArithException Overflow             = "arithmetic overflow"
 showbArithException Underflow            = "arithmetic underflow"
@@ -75,6 +83,8 @@ showbArithException RatioZeroDenominator = "Ratio has zero denominator"
 {-# INLINE showbArithException #-}
 
 -- | Convert an 'ArrayException' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbArrayException :: ArrayException -> Builder
 showbArrayException (IndexOutOfBounds s)
     =  "array index out of range"
@@ -87,18 +97,25 @@ showbArrayException (UndefinedElement s)
 {-# INLINE showbArrayException #-}
 
 -- | Convert an 'AssertionFailed' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbAssertionFailed :: AssertionFailed -> Builder
 showbAssertionFailed (AssertionFailed err) = fromString err
 {-# INLINE showbAssertionFailed #-}
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeAsyncException' value to a 'Builder'.
+-- This function is only available with @base-4.7.0.0@ or later.
+-- 
+-- /Since: 0.3/
 showbSomeAsyncException :: SomeAsyncException -> Builder
 showbSomeAsyncException (SomeAsyncException e) = showb $ FromStringShow e
 {-# INLINE showbSomeAsyncException #-}
 #endif
 
 -- | Convert an 'AsyncException' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbAsyncException :: AsyncException -> Builder
 showbAsyncException StackOverflow = "stack overflow"
 showbAsyncException HeapOverflow  = "heap overflow"
@@ -107,68 +124,95 @@ showbAsyncException UserInterrupt = "user interrupt"
 {-# INLINE showbAsyncException #-}
 
 -- | Convert a 'NonTermination' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbNonTermination :: NonTermination -> Builder
 showbNonTermination NonTermination = "<<loop>>"
 {-# INLINE showbNonTermination #-}
 
 -- | Convert a 'NestedAtomically' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbNestedAtomically :: NestedAtomically -> Builder
 showbNestedAtomically NestedAtomically = "Control.Concurrent.STM.atomically was nested"
 {-# INLINE showbNestedAtomically #-}
 
 -- | Convert a 'BlockedIndefinitelyOnMVar' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbBlockedIndefinitelyOnMVar :: BlockedIndefinitelyOnMVar -> Builder
 showbBlockedIndefinitelyOnMVar BlockedIndefinitelyOnMVar = "thread blocked indefinitely in an MVar operation"
 {-# INLINE showbBlockedIndefinitelyOnMVar #-}
 
 -- | Convert a 'BlockedIndefinitelyOnSTM' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbBlockedIndefinitelyOnSTM :: BlockedIndefinitelyOnSTM -> Builder
 showbBlockedIndefinitelyOnSTM BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
 {-# INLINE showbBlockedIndefinitelyOnSTM #-}
 
 #if MIN_VERSION_base(4,8,0)
--- | Convert an 'AllocationLimitExceeded' exception to a 'Builder'
+-- | Convert an 'AllocationLimitExceeded' exception to a 'Builder'.
+-- This function is only available with @base-4.8.0.0@ or later.
+-- 
+-- /Since: 0.5/
 showbAllocationLimitExceeded :: AllocationLimitExceeded -> Builder
 showbAllocationLimitExceeded AllocationLimitExceeded = "allocation limit exceeded"
 {-# INLINE showbAllocationLimitExceeded #-}
 #endif
 
 -- | Convert a 'Deadlock' exception to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbDeadlock :: Deadlock -> Builder
 showbDeadlock Deadlock = "<<deadlock>>"
 {-# INLINE showbDeadlock #-}
 
 -- | Convert a 'NoMethodError' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbNoMethodError :: NoMethodError -> Builder
 showbNoMethodError (NoMethodError err) = fromString err
 {-# INLINE showbNoMethodError #-}
 
 -- | Convert a 'PatternMatchFail' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbPatternMatchFail :: PatternMatchFail -> Builder
 showbPatternMatchFail (PatternMatchFail err) = fromString err
 {-# INLINE showbPatternMatchFail #-}
 
 -- | Convert a 'RecConError' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbRecConError :: RecConError -> Builder
 showbRecConError (RecConError err) = fromString err
 {-# INLINE showbRecConError #-}
 
 -- | Convert a 'RecSelError' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbRecSelError :: RecSelError -> Builder
 showbRecSelError (RecSelError err) = fromString err
 {-# INLINE showbRecSelError #-}
 
 -- | Convert a 'RecUpdError' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbRecUpdError :: RecUpdError -> Builder
 showbRecUpdError (RecUpdError err) = fromString err
 {-# INLINE showbRecUpdError #-}
 
 -- | Convert an 'ErrorCall' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbErrorCall :: ErrorCall -> Builder
 showbErrorCall (ErrorCall err) = fromString err
 {-# INLINE showbErrorCall #-}
 
 -- | Convert a 'MaskingState' to a 'Builder'.
+-- 
+-- /Since: 0.4/
 showbMaskingState :: MaskingState -> Builder
 showbMaskingState = showb
 {-# INLINE showbMaskingState #-}

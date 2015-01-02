@@ -104,6 +104,8 @@ Note that at the moment, there are a number of limitations to this approach:
 -}
 
 -- | Generates a 'T.Show' instance declaration for the given @data@ type or @newtype@.
+-- 
+-- /Since: 0.3/
 deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
 deriveShow = deriveShowPragmas defaultPragmaOptions
@@ -131,6 +133,8 @@ deriveShow = deriveShowPragmas defaultPragmaOptions
 --     {-# SPECIALIZE instance Show (ADT Int) #-}
 --     showbPrec = ...
 -- @
+-- 
+-- /Since: 0.5/
 deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
                   -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
                   -> Q [Dec]
@@ -237,74 +241,102 @@ whichADT = $(mkShow ''ADT) ADTCon == \"ADT\"
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a strict 'TS.Text'.
+-- 
+-- /Since: 0.3.1/
 mkShow :: Name -> Q Exp
 mkShow name = [| toStrict . $(mkShowLazy name) |]
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a lazy 'TL.Text'.
+-- 
+-- /Since: 0.3.1/
 mkShowLazy :: Name -> Q Exp
 mkShowLazy name = [| toLazyText . $(mkShowb name) |]
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a strict 'TS.Text' with the given precedence.
+-- 
+-- /Since: 0.3.1/
 mkShowPrec :: Name -> Q Exp
 mkShowPrec name = [| \p -> toStrict . $(mkShowPrecLazy name) p |]
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a lazy 'TL.Text' with the given precedence.
+-- 
+-- /Since: 0.3.1/
 mkShowPrecLazy :: Name -> Q Exp
 mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
 
 -- | Generates a lambda expression which converts the given list of @data@ types or
 -- @newtype@s to a strict 'TS.Text' in which the values are surrounded by square
 -- brackets and each value is separated by a comma.
+-- 
+-- /Since: 0.5/
 mkShowList :: Name -> Q Exp
 mkShowList name = [| toStrict . $(mkShowListLazy name) |]
 
 -- | Generates a lambda expression which converts the given list of @data@ types or
 -- @newtype@s to a lazy 'TL.Text' in which the values are surrounded by square
 -- brackets and each value is separated by a comma.
+-- 
+-- /Since: 0.5/
 mkShowListLazy :: Name -> Q Exp
 mkShowListLazy name = [| toLazyText . $(mkShowbList name) |]
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder'.
+-- 
+-- /Since: 0.3.1/
 mkShowb :: Name -> Q Exp
 mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 
 -- | Generates a lambda expression which converts the given @data@ type or @newtype@
 -- to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3.1/
 mkShowbPrec :: Name -> Q Exp
 mkShowbPrec name = withType name $ const consToShow
 
 -- | Generates a lambda expression which converts the given list of @data@ types or
 -- @newtype@s to a 'Builder' in which the values are surrounded by square brackets
 -- and each value is separated by a comma.
+-- 
+-- /Since: 0.5/
 mkShowbList :: Name -> Q Exp
 mkShowbList name = [| showbListDefault $(mkShowb name) |]
 
 -- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's strict 'TS.Text' output to the standard output, followed by a newline.
+-- 
+-- /Since: 0.3.1/
 mkPrint :: Name -> Q Exp
 mkPrint name = [| TS.putStrLn . $(mkShow name) |]
 
 -- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's lazy 'TL.Text' output to the standard output, followed by a newline.
+-- 
+-- /Since: 0.3.1/
 mkPrintLazy :: Name -> Q Exp
 mkPrintLazy name = [| TL.putStrLn . $(mkShowLazy name) |]
 
 -- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's strict 'TS.Text' output to the given file handle, followed by a newline.
+-- 
+-- /Since: 0.3.1/
 mkHPrint :: Name -> Q Exp
 mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 
 -- | Generates a lambda expression which writes the given @data@ type or @newtype@
 -- argument's lazy 'TL.Text' output to the given file handle, followed by a newline.
+-- 
+-- /Since: 0.3.1/
 mkHPrintLazy :: Name -> Q Exp
 mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
 -- | Options that specify what @INLINE@ or @SPECIALIZE@ pragmas to generate with
 -- a 'T.Show' instance.
+-- 
+-- /Since: 0.5/
 data PragmaOptions = PragmaOptions {
     inlineShowbPrec  :: Bool    -- ^ Whether to inline 'showbPrec'
   , inlineShowb      :: Bool    -- ^ Whether to inline 'showb'
@@ -313,18 +345,26 @@ data PragmaOptions = PragmaOptions {
 }
 
 -- | Do not generate any pragmas with a 'T.Show' instance.
+-- 
+-- /Since: 0.5/
 defaultPragmaOptions :: PragmaOptions
 defaultPragmaOptions = PragmaOptions False False False []
 
 -- | Inline the 'showbPrec' function in a 'T.Show' instance.
+-- 
+-- /Since: 0.5/
 defaultInlineShowbPrec :: PragmaOptions
 defaultInlineShowbPrec = defaultPragmaOptions { inlineShowbPrec = True }
 
--- | Inline the 'showb' function in a 'T.Show' instance
+-- | Inline the 'showb' function in a 'T.Show' instance.
+-- 
+-- /Since: 0.5/
 defaultInlineShowb :: PragmaOptions
 defaultInlineShowb = defaultPragmaOptions { inlineShowb = True }
 
 -- | Inline the 'showbList' function in a 'T.Show' instance.
+-- 
+-- /Since: 0.5/
 defaultInlineShowbList :: PragmaOptions
 defaultInlineShowbList = defaultPragmaOptions { inlineShowbList = True }
 

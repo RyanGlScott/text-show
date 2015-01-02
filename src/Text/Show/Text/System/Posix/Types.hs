@@ -12,6 +12,11 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for Haskell equivalents of POSIX data types.
+Note that these functions are only available if the operating system supports them,
+so some OSes (e.g., Windows) will not be able to use all of the functions in this
+module.
+
+/Since: 0.3/
 -}
 #include "HsBaseConfig.h"
 
@@ -83,6 +88,8 @@ import Text.Show.Text.Data.Integral ( showbInt32Prec
 
 #if defined(HTYPE_DEV_T)
 -- | Convert a 'CDev' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCDev :: CDev -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCDev = showb
@@ -94,6 +101,8 @@ showbCDev c = showbWord64 $ unsafeCoerce# c
 
 #if defined(HTYPE_INO_T)
 -- | Convert a 'CIno' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCIno :: CIno -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCIno = showb
@@ -105,6 +114,8 @@ showbCIno c = showbWord64 $ unsafeCoerce# c
 
 #if defined(HTYPE_MODE_T)
 -- | Convert a 'CMode' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCMode :: CMode -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCMode = showb
@@ -116,6 +127,8 @@ showbCMode c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_OFF_T)
 -- | Convert a 'COff' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCOffPrec :: Int -> COff -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCOffPrec = showbPrec
@@ -127,6 +140,8 @@ showbCOffPrec p c = showbInt64Prec p $ unsafeCoerce# c
 
 #if defined(HTYPE_PID_T)
 -- | Convert a 'CPid' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCPidPrec :: Int -> CPid -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCPidPrec = showbPrec
@@ -138,6 +153,8 @@ showbCPidPrec p c = showbInt32Prec p $ unsafeCoerce# c
 
 #if defined(HTYPE_SSIZE_T)
 -- | Convert a 'CSsize' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbCSsizePrec :: Int -> CSsize -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCSsizePrec = showbPrec
@@ -149,6 +166,8 @@ showbCSsizePrec p c = showbInt32Prec p $ unsafeCoerce# c
 
 #if defined(HTYPE_GID_T)
 -- | Convert a 'CGid' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCGid :: CGid -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCGid = showb
@@ -160,6 +179,8 @@ showbCGid c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_NLINK_T)
 -- | Convert a 'CNlink' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCNlink :: CNlink -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCNlink = showb
@@ -171,6 +192,8 @@ showbCNlink c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_UID_T)
 -- | Convert a 'CUid' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCUid :: CUid -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCUid = showb
@@ -182,6 +205,8 @@ showbCUid c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_CC_T)
 -- | Convert a 'CCc' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCCc :: CCc -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCCc = showb
@@ -193,6 +218,8 @@ showbCCc c = showbWord8 $ unsafeCoerce# c
 
 #if defined(HTYPE_SPEED_T)
 -- | Convert a 'CSpeed' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCSpeed :: CSpeed -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCSpeed = showb
@@ -204,6 +231,8 @@ showbCSpeed c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_TCFLAG_T)
 -- | Convert a 'CTcflag' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCTcflag :: CTcflag -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCTcflag = showb
@@ -215,6 +244,8 @@ showbCTcflag c = showbWord32 $ unsafeCoerce# c
 
 #if defined(HTYPE_RLIM_T)
 -- | Convert a 'CRLim' to a 'Builder'.
+-- 
+-- /Since: 0.3/
 showbCRLim :: CRLim -> Builder
 # if MIN_VERSION_base(4,5,0)
 showbCRLim = showb
@@ -225,6 +256,8 @@ showbCRLim c = showbWord64 $ unsafeCoerce# c
 #endif
 
 -- | Convert an 'Fd' to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.3/
 showbFdPrec :: Int -> Fd -> Builder
 showbFdPrec = showbPrec
 {-# INLINE showbFdPrec #-}

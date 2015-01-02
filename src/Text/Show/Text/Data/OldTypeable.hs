@@ -9,6 +9,9 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @OldTypeable@ module.
+This module is only available with @base-4.7@.
+
+/Since: 0.5/
 -}
 module Text.Show.Text.Data.OldTypeable (showbTyCon, showbTypeRepPrec) where
 
@@ -23,11 +26,17 @@ import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'TyCon' to a 'Builder'.
+-- This function is only available with @base-4.7@.
+-- 
+-- /Since: 0.5/
 showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConName
 {-# INLINE showbTyCon #-}
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.7@.
+-- 
+-- /Since: 0.5/
 showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p (TypeRep _ tycon tys) =
     case tys of
