@@ -1,13 +1,4 @@
 # 0.5
-* TODO: Add options argument to Text.Show.Text.TH, with the capability to:
--- Only encode certain constructors (for use with data families)
--- Optionally encode unary data constructors without constructor name
--- Use a `String` Show instance instead of a calculated one
-* TODO: Vastly improve the documentation in Text.Show.Text.TH
-* TODO: Watch out for polymorphic kinds when calling reifyRoles
-* TODO: Rework TH so that it inspects VarTs and AppTs instead of using type roles
-* TODO: Add test with equality constraint derivation (e.g., (a ~ Int, Show a) => Show (SomeADT a))
-* TODO: 2014-2015
 * Fix build for GHC 7.10, old GHC versions, and Windows
 * Removed the `Text.Show.Text.Data.Containers` and `Text.Show.Text.Data.Time` modules. The modules for the data types in `containers` and `time` were migrated to a separate library, `text-show-instances`.
 * Removed the `-ftext-format` flag, as `text-show` no longer uses `text-format`.
