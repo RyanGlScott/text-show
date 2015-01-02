@@ -46,7 +46,7 @@ license-file:        LICENSE
 author:              Ryan Scott
 maintainer:          Ryan Scott <ryan.gl.scott@ku.edu>
 stability:           Experimental
-copyright:           (C) 2014 Ryan Scott
+copyright:           (C) 2014-2015 Ryan Scott
 category:            Text
 build-type:          Simple
 extra-source-files:  CHANGELOG.md, README.md, include/inline.h

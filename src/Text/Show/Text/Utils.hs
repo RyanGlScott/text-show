@@ -1,7 +1,7 @@
 {-# LANGUAGE CPP, MagicHash #-}
 {-|
 Module:      Text.Show.Text.Utils
-Copyright:   (C) 2014 Ryan Scott
+Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
