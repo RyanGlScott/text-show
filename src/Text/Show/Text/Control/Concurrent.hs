@@ -25,8 +25,7 @@ import GHC.Conc (BlockReason, ThreadId, ThreadStatus)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
-                                   defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 #include "inline.h"
 
@@ -55,5 +54,5 @@ instance Show ThreadId where
     showbPrec = showbThreadIdPrec
     INLINE_INST_FUN(showbPrec)
 
-$(deriveShowPragmas defaultInlineShowbPrec ''ThreadStatus)
-$(deriveShowPragmas defaultInlineShowb     ''BlockReason)
+$(deriveShow ''ThreadStatus)
+$(deriveShow ''BlockReason)

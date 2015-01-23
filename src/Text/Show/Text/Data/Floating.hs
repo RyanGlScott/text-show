@@ -376,7 +376,6 @@ expt base n
     | base == 2 && n >= minExpt && n <= maxExpt = expts `unsafeAt` n
     | base == 10 && n <= maxExpt10              = expts10 `unsafeAt` n
     | otherwise                                 = base^n
-{-# INLINE expt #-}
 
 -- | Cached powers of two.
 expts :: Array Int Integer

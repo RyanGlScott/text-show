@@ -15,6 +15,7 @@ Monomorphic 'Show' function for 'Fixed' values.
 module Text.Show.Text.Data.Fixed (showbFixed) where
 
 import Data.Fixed (HasResolution(..))
+import Data.Semigroup (timesN)
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
@@ -29,7 +30,7 @@ import Data.Monoid (mempty)
 # endif
 
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
+import Text.Show.Text.Utils ((<>), lengthB, s)
 #else
 import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)
@@ -60,26 +61,25 @@ showbFixed chopTrailingZeroes fa@(MkFixed a)
 # endif
 #else
 showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
-#endif
 {-# INLINE showbFixed #-}
+#endif
 
 #if MIN_VERSION_base(4,7,0)
 -- | Only works for positive 'Integer's.
 showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder
 showbIntegerZeroes True _ 0 = mempty
-showbIntegerZeroes chopTrailingZeroes digits a = replicateB (digits - lengthB sh) (s '0') <> sh'
+showbIntegerZeroes chopTrailingZeroes digits a
+    = timesN (fromIntegral . max 0 $ digits - lengthB sh) (s '0') <> sh'
   where
     sh, sh' :: Builder
     sh  = showb a
     sh' = if chopTrailingZeroes then chopZeroesB a else sh
-{-# INLINE showbIntegerZeroes #-}
 
 -- | Chops off the trailing zeroes of an 'Integer'.
 chopZeroesB :: Integer -> Builder
 chopZeroesB 0 = mempty
 chopZeroesB a | mod a 10 == 0 = chopZeroesB (div a 10)
 chopZeroesB a = showb a
-{-# INLINE chopZeroesB #-}
 
 -- | Prepends a dot to a non-empty 'Builder'.
 withDotB :: Builder -> Builder

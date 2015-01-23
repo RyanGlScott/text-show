@@ -55,7 +55,7 @@ import           Text.Printf (PrintfArg, PrintfType)
 import qualified Text.Show as S (Show)
 import           Text.Show.Text.Classes (Show(..))
 import           Text.Show.Text.Data.Integral (showbIntPrec)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import           Text.Show.Text.TH.Internal (deriveShow)
 import           Text.Show.Text.Utils ((<>), s)
 
 #include "inline.h"
@@ -95,7 +95,6 @@ showbLitChar '\t'           = "\\t"
 showbLitChar '\v'           = "\\v"
 showbLitChar '\SO'          = "\\SO"
 showbLitChar c              = s '\\' <> (asciiTabB ! ord c)
-{-# INLINE showbLitChar #-}
 
 -- | Convert a 'String' to a 'Builder' (surrounded by double quotes).
 -- 
@@ -114,7 +113,6 @@ showbLitString ('"':cs)       = "\\\"" <> showbLitString cs
 showbLitString (c:d:cs)
     | c > '\DEL' && isDigit d = s '\\' <> showbIntPrec 0 (ord c) <> "\\&" <> s d <> showbLitString cs
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
-{-# INLINE showbLitString #-}
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
 -- 
@@ -130,7 +128,7 @@ instance Show Char where
     showbList = showbString
     INLINE_INST_FUN(showbList)
 
-$(deriveShowPragmas defaultInlineShowb ''GeneralCategory)
+$(deriveShow ''GeneralCategory)
 
 -- | The @Text@ 'T.Show' instance for 'LitChar' is like that of a regular 'Char',
 -- except it is not escaped by single quotes. That is,

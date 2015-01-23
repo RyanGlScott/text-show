@@ -21,21 +21,22 @@ module Text.Show.Text.Foreign.Ptr (
     , showbForeignPtr
     ) where
 
-import           Data.Text.Lazy.Builder (Builder)
+import Data.Semigroup (timesN)
+import Data.Text.Lazy.Builder (Builder)
 
-import           Foreign.ForeignPtr (ForeignPtr)
-import           Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
+import Foreign.ForeignPtr (ForeignPtr)
+import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
-import           GHC.ForeignPtr (unsafeForeignPtrToPtr)
-import           GHC.Num (wordToInteger)
-import           GHC.Ptr (Ptr(..))
-import           GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
+import GHC.ForeignPtr (unsafeForeignPtrToPtr)
+import GHC.Num (wordToInteger)
+import GHC.Ptr (Ptr(..))
+import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
-import           Prelude hiding (Show)
+import Prelude hiding (Show)
 
-import           Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
-import           Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
-import           Text.Show.Text.Utils ((<>), lengthB, replicateB, s)
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
+import Text.Show.Text.Utils ((<>), lengthB, s)
 
 #include "MachDeps.h"
 #include "inline.h"
@@ -48,9 +49,10 @@ showbPtr :: Ptr a -> Builder
 showbPtr (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
   where
     padOut :: Builder -> Builder
-    padOut ls =    s '0' <> s 'x'
-                <> replicateB (2*SIZEOF_HSPTR - lengthB ls) (s '0')
-                <> ls
+    padOut ls =
+         s '0' <> s 'x'
+      <> timesN (fromIntegral . max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (s '0')
+      <> ls
 
 -- | Convert a 'FunPtr' to a 'Builder'. Note that this does not require the
 -- parameterized type to be an instance of 'Show' itself.

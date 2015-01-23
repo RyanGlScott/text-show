@@ -80,7 +80,6 @@ showbArithException Denormal             = "denormal"
 #if MIN_VERSION_base(4,6,0)
 showbArithException RatioZeroDenominator = "Ratio has zero denominator"
 #endif
-{-# INLINE showbArithException #-}
 
 -- | Convert an 'ArrayException' to a 'Builder'.
 -- 

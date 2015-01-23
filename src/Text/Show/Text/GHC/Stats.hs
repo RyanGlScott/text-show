@@ -22,7 +22,7 @@ import GHC.Stats (GCStats)
 import Text.Show.Text.Classes (showbPrec)
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Floating ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'GCStats' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.5.0.0@ or later.
@@ -32,4 +32,4 @@ showbGCStatsPrec :: Int -> GCStats -> Builder
 showbGCStatsPrec = showbPrec
 {-# INLINE showbGCStatsPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''GCStats)
+$(deriveShow ''GCStats)

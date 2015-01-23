@@ -52,6 +52,7 @@ lengthB = length . toLazyText
 -- | @'replicateB' n b@ yields a 'Builder' containing @b@ repeated @n@ times.
 -- 
 -- /Since: 0.3/
+{-# DEPRECATED replicateB "Use @timesN@ from the @semigroups@ library instead." #-}
 replicateB :: Int64 -> Builder -> Builder
 replicateB n = fromLazyText . replicate n . toLazyText
 {-# INLINE replicateB #-}
@@ -77,7 +78,6 @@ toText = toStrict . toLazyText
 unlinesB :: [Builder] -> Builder
 unlinesB (b:bs) = b <> s '\n' <> unlinesB bs
 unlinesB []     = mempty
-{-# INLINE unlinesB #-}
 
 -- | Merges several 'Builder's, separating them by spaces.
 -- 
@@ -86,4 +86,3 @@ unwordsB :: [Builder] -> Builder
 unwordsB (b:bs@(_:_)) = b <> s ' ' <> unwordsB bs
 unwordsB [b]          = b
 unwordsB []           = mempty
-{-# INLINE unwordsB #-}

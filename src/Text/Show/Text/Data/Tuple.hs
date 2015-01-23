@@ -35,7 +35,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 #include "inline.h"
 
@@ -159,21 +159,21 @@ showb15Tuple :: (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h,
 showb15Tuple = showb
 {-# INLINE showb15Tuple #-}
 
-$(deriveShowPragmas defaultInlineShowb ''())
-$(deriveShowPragmas defaultInlineShowb ''(,))
-$(deriveShowPragmas defaultInlineShowb ''(,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,,,,,))
-$(deriveShowPragmas defaultInlineShowb ''(,,,,,,,,,,,,,,))
+$(deriveShow ''())
+$(deriveShow ''(,))
+$(deriveShow ''(,,))
+$(deriveShow ''(,,,))
+$(deriveShow ''(,,,,))
+$(deriveShow ''(,,,,,))
+$(deriveShow ''(,,,,,,))
+$(deriveShow ''(,,,,,,,))
+$(deriveShow ''(,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,,,,,))
+$(deriveShow ''(,,,,,,,,,,,,,,))
 
 instance Show a => Show1 ((,) a) where
     showbPrec1 = showbPrec

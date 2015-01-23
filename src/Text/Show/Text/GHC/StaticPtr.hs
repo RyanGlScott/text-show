@@ -24,7 +24,7 @@ import Text.Show.Text.Data.Char     ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List     ()
 import Text.Show.Text.Data.Tuple    ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Conver a 'StaticPtrInfo' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -34,4 +34,4 @@ showbStaticPtrInfoPrec :: Int -> StaticPtrInfo -> Builder
 showbStaticPtrInfoPrec = showbPrec
 {-# INLINE showbStaticPtrInfoPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''StaticPtrInfo)
+$(deriveShow ''StaticPtrInfo)

@@ -45,6 +45,7 @@ showbComplexPrec :: (RealFloat a, Show a)
 showbComplexPrec = showbPrec
 {-# INLINE showbComplexPrec #-}
 
+-- TODO: Remove this CPP hack once the TH deriving mechanism becomes smarter
 #if MIN_VERSION_base(4,4,0)
 $(deriveShowPragmas defaultInlineShowbPrec {
                         specializeTypes = [ [t| Complex Float  |]

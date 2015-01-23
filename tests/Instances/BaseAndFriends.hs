@@ -40,6 +40,9 @@ import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
 import           Data.Functor ((<$>))
+#if !(MIN_VERSION_transformers(0,4,0))
+import           Data.Functor.Classes ()
+#endif
 import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
@@ -147,16 +150,10 @@ instance Arbitrary SomeException where
 
 -- instance Arbitrary IOException
 
+deriving instance Bounded ArithException
+deriving instance Enum ArithException
 instance Arbitrary ArithException where
-    arbitrary = oneof $ map pure [ Overflow
-                                 , Underflow
-                                 , LossOfPrecision
-                                 , DivideByZero
-                                 , Denormal
-#if MIN_VERSION_base(4,6,0)
-                                 , RatioZeroDenominator
-#endif
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary ArrayException where
     arbitrary = oneof [ IndexOutOfBounds <$> arbitrary
@@ -172,12 +169,10 @@ instance Arbitrary SomeAsyncException where
     arbitrary = SomeAsyncException <$> (arbitrary :: Gen AsyncException)
 #endif
 
+deriving instance Bounded AsyncException
+deriving instance Enum AsyncException
 instance Arbitrary AsyncException where
-    arbitrary = oneof $ map pure [ StackOverflow
-                                 , HeapOverflow
-                                 , ThreadKilled
-                                 , UserInterrupt
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary NonTermination where
     arbitrary = pure NonTermination
@@ -221,11 +216,10 @@ instance Arbitrary RecUpdError where
 instance Arbitrary ErrorCall where
     arbitrary = ErrorCall <$> arbitrary
 
+deriving instance Bounded MaskingState
+deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
-    arbitrary = oneof $ map pure [ Unmasked
-                                 , MaskedInterruptible
-                                 , MaskedUninterruptible
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 
 -- instance Arbitrary Lexeme
 -- #if MIN_VERSION_base(4,7,0)
@@ -289,8 +283,10 @@ instance Arbitrary DataRep where
 instance Arbitrary DataType where
     arbitrary = mkDataType <$> arbitrary <*> arbitrary
 
+deriving instance Bounded D.Fixity
+deriving instance Enum D.Fixity
 instance Arbitrary D.Fixity where
-    arbitrary = oneof $ map pure [D.Prefix, D.Infix]
+    arbitrary = arbitraryBoundedEnum
 
 #if MIN_VERSION_base(4,7,0)
 instance Coercible a b => Arbitrary (Coercion a b) where
@@ -300,14 +296,10 @@ instance a ~ b => Arbitrary (a :~: b) where
     arbitrary = pure Refl
 #endif
 
+deriving instance Bounded BlockReason
+deriving instance Enum BlockReason
 instance Arbitrary BlockReason where
-    arbitrary = oneof $ map pure [ BlockedOnMVar
-                                 , BlockedOnBlackHole
-                                 , BlockedOnException
-                                 , BlockedOnSTM
-                                 , BlockedOnForeignCall
-                                 , BlockedOnOther
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 
 -- instance Arbitrary ThreadId
 
@@ -319,13 +311,9 @@ instance Arbitrary ThreadStatus where
                       ]
 
 #if defined(mingw32_HOST_OS)
+deriving instance Bounded ConsoleEvent
 instance Arbitrary ConsoleEvent where
-    arbitrary = oneof $ map pure [ ControlC
-                                 , Break
-                                 , Close
-                                 , Logoff
-                                 , Shutdown
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 #endif
 
 instance Arbitrary (ST s a) where
@@ -334,8 +322,9 @@ instance Arbitrary (ST s a) where
 -- instance Arbitrary Handle
 -- instance Arbitrary HandlePosn
 
+deriving instance Bounded IOMode
 instance Arbitrary IOMode where
-    arbitrary = oneof $ map pure [ReadMode, WriteMode, AppendMode, ReadWriteMode]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary BufferMode where
     arbitrary = oneof [ pure NoBuffering
@@ -343,11 +332,14 @@ instance Arbitrary BufferMode where
                       , BlockBuffering <$> arbitrary
                       ]
 
+deriving instance Bounded SeekMode
 instance Arbitrary SeekMode where
-    arbitrary = oneof $ map pure [AbsoluteSeek, RelativeSeek, SeekFromEnd]
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded Newline
+deriving instance Enum Newline
 instance Arbitrary Newline where
-    arbitrary = oneof $ map pure [LF, CRLF]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary NewlineMode where
     arbitrary = NewlineMode <$> arbitrary <*> arbitrary
@@ -360,15 +352,15 @@ deriving instance Show NewlineMode
 #endif
 
 #if MIN_VERSION_base(4,4,0)
+deriving instance Bounded CodingProgress
+deriving instance Enum CodingProgress
 instance Arbitrary CodingProgress where
-    arbitrary = oneof $ map pure [InputUnderflow, OutputUnderflow, InvalidSequence]
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded CodingFailureMode
+deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
-    arbitrary = oneof $ map pure [ ErrorOnCodingFailure
-                                 , IgnoreCodingFailure
-                                 , TransliterateCodingFailure
-                                 , RoundtripFailure
-                                 ]
+    arbitrary = arbitraryBoundedEnum
 #endif
 
 #if MIN_VERSION_base(4,5,0)
@@ -414,8 +406,10 @@ instance Arbitrary (f (g p)) => Arbitrary ((f :.: g) p) where
 instance Arbitrary G.Fixity where
     arbitrary = oneof [pure G.Prefix, G.Infix <$> arbitrary <*> arbitrary]
 
+deriving instance Bounded Associativity
+deriving instance Enum Associativity
 instance Arbitrary Associativity where
-    arbitrary = oneof $ map pure [LeftAssociative, RightAssociative, NotAssociative]
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]

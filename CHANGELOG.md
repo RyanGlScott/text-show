@@ -1,3 +1,7 @@
+# 0.5.1
+* Deprecated `replicateB` in favor of `timesN` from the `semigroups` library
+* Added `integer-simple` flag, removed the `transformers-four` flag
+
 # 0.5
 * Fix build for GHC 7.10, old GHC versions, and Windows
 * Removed the `Text.Show.Text.Data.Containers` and `Text.Show.Text.Data.Time` modules. The modules for the data types in `containers` and `time` were migrated to a separate library, `text-show-instances`.

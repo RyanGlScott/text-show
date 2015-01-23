@@ -27,7 +27,6 @@ showbArgs :: Show a => Builder -> [a] -> Builder
 showbArgs _   []     = mempty
 showbArgs _   [a]    = showbPrec 10 a
 showbArgs sep (a:as) = showbPrec 10 a <> sep <> showbArgs sep as
-{-# INLINE showbArgs #-}
 
 -- | Helper function for showing a list of 'Show' instances in a tuple.
 showbTuple :: Show a => [a] -> Builder

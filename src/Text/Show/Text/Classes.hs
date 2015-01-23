@@ -24,9 +24,9 @@ import           Data.Foldable (Foldable)
 import           Data.Traversable (Traversable)
 #endif
 
-import           Control.Monad.Fix (MonadFix(mfix))
+import           Control.Monad.Fix (MonadFix(..))
 #if MIN_VERSION_base(4,4,0)
-import           Control.Monad.Zip (MonadZip(mzip, mzipWith, munzip))
+import           Control.Monad.Zip (MonadZip(..))
 #endif
 
 import           Data.Bits (Bits)

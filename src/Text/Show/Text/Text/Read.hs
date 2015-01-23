@@ -55,7 +55,6 @@ showbLexemePrec p (Int i)    = showbUnary "Int" p i
 showbLexemePrec p (Rat r)    = showbUnary "Rat" p r
 #endif
 showbLexemePrec _ EOF        = "EOF"
-{-# INLINE showbLexemePrec #-}
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Number' to a 'Builder' with the given precedence.

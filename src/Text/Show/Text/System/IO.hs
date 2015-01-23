@@ -50,8 +50,8 @@ import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
-                                   defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
+                                   defaultInlineShowb, defaultInlineShowbPrec)
 import Text.Show.Text.Utils ((<>), s)
 
 -- | Convert a 'Handle' to a 'Builder'.
@@ -143,7 +143,7 @@ instance Show Handle where
     INLINE_INST_FUN(showb)
 
 $(deriveShowPragmas defaultInlineShowb     ''IOMode)
-$(deriveShowPragmas defaultInlineShowbPrec ''BufferMode)
+$(deriveShow                               ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn

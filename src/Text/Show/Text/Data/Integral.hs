@@ -178,7 +178,6 @@ showbIntAtBase base toChr n0
         
         b' :: Builder
         b' = s c <> b
-{-# INLINE showbIntAtBase #-}
 
 -- | Show /non-negative/ 'Integral' numbers in base 2.
 -- 

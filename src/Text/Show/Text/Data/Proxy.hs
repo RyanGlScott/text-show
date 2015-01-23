@@ -31,7 +31,6 @@ showbProxy :: Proxy s -> Builder
 showbProxy = showb
 {-# INLINE showbProxy #-}
 
--- TODO: See why 'deriveShow' can't detect Proxy's phantom type correctly
 instance Show (Proxy s) where
     showbPrec = $(mkShowbPrec ''Proxy)
     INLINE_INST_FUN(showb)

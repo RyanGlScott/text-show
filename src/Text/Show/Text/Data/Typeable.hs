@@ -51,7 +51,6 @@ showbTypeRepPrec p tyrep =
   where
     tycon = typeRepTyCon tyrep
     tys   = typeRepArgs tyrep
-{-# INLINE showbTypeRepPrec #-}
 
 #if !(MIN_VERSION_base(4,4,0))
 -- | The list 'TyCon'.
@@ -71,7 +70,6 @@ isTupleTyCon tycon = case tyconStr of
     _           -> False
   where
     tyconStr = tyConString tycon
-{-# INLINE isTupleTyCon #-}
 
 -- | Convert a 'TyCon' to a 'Builder'.
 -- 

@@ -40,7 +40,7 @@ import Text.Show.Text.Data.Integral (showbIntPrec, showbWord, showbWord64)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Maybe (showbMaybePrec)
 import Text.Show.Text.Utils ((<>), s)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert an 'RTSFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -107,7 +107,6 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
     <> ", allocLimitGrace = "
     <> showbWord (allocLimitGrace gcfs)
     <> s '}'
-{-# INLINE showbGCFlagsPrec #-}
 
 -- | Convert a 'ConcFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -145,7 +144,6 @@ showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
     <> ", msecsPerTick = "
     <> showbIntPrec 0 (msecsPerTick ccfs)
     <> s '}'
-{-# INLINE showbCCFlagsPrec #-}
 
 -- | Convert a 'ProfFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -182,7 +180,6 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
     <> ", bioSelector = "
     <> showbMaybePrec 0 (bioSelector pfs)
     <> s '}'
-{-# INLINE showbProfFlagsPrec #-}
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -205,7 +202,6 @@ showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
     <> ", user = "
     <> showbBool (user tfs)
     <> s '}'
-{-# INLINE showbTraceFlagsPrec #-}
 
 -- | Convert a 'TickyFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -215,17 +211,17 @@ showbTickyFlagsPrec :: Int -> TickyFlags -> Builder
 showbTickyFlagsPrec = showbPrec
 {-# INLINE showbTickyFlagsPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''RTSFlags)
+$(deriveShow ''RTSFlags)
 
 instance Show GCFlags where
     showbPrec = showbGCFlagsPrec
     {-# INLINE showbPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''ConcFlags)
+$(deriveShow ''ConcFlags)
 
-$(deriveShowPragmas defaultInlineShowbPrec ''MiscFlags)
+$(deriveShow ''MiscFlags)
 
-$(deriveShowPragmas defaultInlineShowbPrec ''DebugFlags)
+$(deriveShow ''DebugFlags)
 
 instance Show CCFlags where
     showbPrec = showbCCFlagsPrec
@@ -239,4 +235,4 @@ instance Show TraceFlags where
     showbPrec = showbTraceFlagsPrec
     {-# INLINE showbPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''TickyFlags)
+$(deriveShow ''TickyFlags)
