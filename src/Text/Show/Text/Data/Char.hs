@@ -50,7 +50,10 @@ import           GHC.Exts (IsList(Item, fromList, toList))
 #if MIN_VERSION_base(4,4,0)
 import           GHC.Generics (Generic)
 #endif
-import           GHC.Show (showLitChar, showLitString)
+import           GHC.Show (showLitChar)
+#if MIN_VERSION_base(4,4,0)
+import           GHC.Show (showLitString)
+#endif
 
 import           Prelude hiding (Show)
 
@@ -234,7 +237,25 @@ instance Read LitString where
 
 instance Show LitString where
     showb = showbLitString . getLitString
+#if MIN_VERSION_base(4,4,0)
     INLINE_INST_FUN(showb)
+#else
+      where
+        showLitString :: String -> ShowS
+        -- | Same as 'showLitChar', but for strings
+        -- It converts the string to a string using Haskell escape conventions
+        -- for non-printable characters. Does not add double-quotes around the
+        -- whole thing; the caller should do that.
+        -- The main difference from showLitChar (apart from the fact that the
+        -- argument is a string not a list) is that we must escape double-quotes 
+        showLitString []         s = s
+        showLitString ('"' : cs) s = showString "\\\"" (showLitString cs s)
+        showLitString (c   : cs) s = showLitChar c (showLitString cs s)
+           -- Making 's' an explicit parameter makes it clear to GHC that
+           -- showLitString has arity 2, which avoids it allocating an extra lambda
+           -- The sticking point is the recursive call to (showLitString cs), which
+           -- it can't figure out would be ok with arity 2.
+#endif
 
 instance S.Show LitString where
     showsPrec _ = showLitString . getLitString
