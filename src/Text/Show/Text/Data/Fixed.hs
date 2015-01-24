@@ -15,7 +15,6 @@ Monomorphic 'Show' function for 'Fixed' values.
 module Text.Show.Text.Data.Fixed (showbFixed) where
 
 import Data.Fixed (HasResolution(..))
-import Data.Semigroup (timesN)
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
@@ -25,6 +24,7 @@ import Text.Show.Text.Classes (Show(showb))
 #if MIN_VERSION_base(4,7,0)
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
+import Data.Semigroup (timesN)
 # if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid (mempty)
 # endif

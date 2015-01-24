@@ -38,8 +38,9 @@ module Text.Show.Text (
     , printLazy
     , hPrint
     , hPrintLazy
-      -- * @FromStringShow@
+      -- * Conversion between @String@ and @Text@ 'Show'
     , FromStringShow(..)
+    , FromTextShow(..)
     ) where
 
 import Data.Text.Lazy.Builder

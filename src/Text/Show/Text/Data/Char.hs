@@ -1,5 +1,5 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, GeneralizedNewtypeDeriving,
-             OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, FlexibleInstances,
+             GeneralizedNewtypeDeriving, OverloadedStrings, TemplateHaskell #-}
 #if MIN_VERSION_base(4,4,0)
 {-# LANGUAGE DeriveGeneric #-}
 #endif
@@ -33,11 +33,13 @@ module Text.Show.Text.Data.Char (
 import           Data.Array (Array, (!), listArray)
 import           Data.Char (GeneralCategory, isDigit, ord)
 import           Data.Data (Data, Typeable)
+import           Data.Functor ((<$>))
 import           Data.Ix (Ix)
 #if !(MIN_VERSION_base(4,8,0))
 import           Data.Monoid (Monoid(mempty))
 #endif
-import           Data.String (IsString)
+import           Data.Semigroup (Semigroup)
+import           Data.String (IsString(..))
 import           Data.Text.Lazy.Builder (Builder)
 
 import           Foreign.Storable (Storable)
@@ -48,10 +50,16 @@ import           GHC.Exts (IsList(Item, fromList, toList))
 #if MIN_VERSION_base(4,4,0)
 import           GHC.Generics (Generic)
 #endif
+import           GHC.Show (showLitChar, showLitString)
 
 import           Prelude hiding (Show)
 
-import           Text.Printf (PrintfArg, PrintfType)
+import qualified Text.ParserCombinators.ReadP as ReadP (get)
+import           Text.ParserCombinators.ReadP (many)
+import qualified Text.ParserCombinators.ReadPrec as ReadPrec (get)
+import           Text.ParserCombinators.ReadPrec (ReadPrec, lift)
+import           Text.Printf (IsChar, PrintfArg, PrintfType)
+import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show as S (Show)
 import           Text.Show.Text.Classes (Show(..))
 import           Text.Show.Text.Data.Integral (showbIntPrec)
@@ -146,18 +154,44 @@ newtype LitChar = LitChar { getLitChar :: Char }
 #if MIN_VERSION_base(4,4,0)
            , Generic
 #endif
+           , IsChar
            , Ix
            , Ord
            , PrintfArg
-           , Read
-           , S.Show
            , Storable
            , Typeable
            )
 
+instance IsString [LitChar] where
+    fromString = map LitChar
+
+instance Read LitChar where
+    readPrec = LitChar <$> ReadPrec.get
+    INLINE_INST_FUN(readPrec)
+    
+    readListPrec = (fmap . map) LitChar (readListPrec :: ReadPrec [Char])
+    INLINE_INST_FUN(readListPrec)
+    
+    readList =
+        (fmap . map . mapFst . map) LitChar (readList :: ReadS [Char])
+      where
+        mapFst :: (a -> b) -> (a, c) -> (b, c)
+        mapFst f (x, y) = (f x, y)
+    INLINE_INST_FUN(readList)
+
 instance Show LitChar where
     showb = showbLitChar . getLitChar
     INLINE_INST_FUN(showb)
+    
+    showbList = showbString . map getLitChar
+    INLINE_INST_FUN(showbList)
+
+instance S.Show LitChar where
+    showsPrec _ = showLitChar . getLitChar
+    INLINE_INST_FUN(showsPrec)
+    
+    showList = showList . map getLitChar
+    INLINE_INST_FUN(showList)
 
 -- | The @Text@ 'T.Show' instance for 'LitString' is like that of a regular
 -- 'String', except it is not escaped by double quotes. That is,
@@ -178,8 +212,7 @@ newtype LitString = LitString { getLitString :: String }
            , Ord
            , PrintfArg
            , PrintfType
-           , Read
-           , S.Show
+           , Semigroup
            , Typeable
            )
 
@@ -192,6 +225,17 @@ instance IsList LitString where
     {-# INLINE toList #-}
 #endif
 
+instance Read LitString where
+    readPrec = LitString <$> (lift $ many ReadP.get)
+    INLINE_INST_FUN(readPrec)
+    
+    readListPrec = readListPrecDefault
+    INLINE_INST_FUN(readListPrec)
+
 instance Show LitString where
     showb = showbLitString . getLitString
     INLINE_INST_FUN(showb)
+
+instance S.Show LitString where
+    showsPrec _ = showLitString . getLitString
+    INLINE_INST_FUN(showsPrec)

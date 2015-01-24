@@ -118,7 +118,7 @@ import           Test.Tasty.QuickCheck (Gen, arbitrary, suchThat, testProperty)
 import           Text.Show.Functions ()
 import           Text.Show.Text hiding (Show)
 import           Text.Show.Text.Functions ()
-import           Text.Show.Text.Data.Char (asciiTabB)
+import           Text.Show.Text.Data.Char (LitChar, LitString, asciiTabB)
 import           Text.Show.Text.Data.Fixed (showbFixed)
 import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
 #if MIN_VERSION_base(4,7,0)
@@ -160,7 +160,11 @@ prop_showVersion v = fromString (showVersion v) == showbVersionConcrete v
 
 baseAndFriendsTests :: [TestTree]
 baseAndFriendsTests =
-    [ testGroup "Text.Show.Text.Control.Applicative"
+    [ testGroup "Text.Show.Text"
+        [ testProperty "FromStringShow Int instance"        (prop_matchesShow :: Int -> FromStringShow Int -> Bool)
+        , testProperty "FromTextShow Int instance"          (prop_matchesShow :: Int -> FromTextShow Int -> Bool)
+        ]
+    , testGroup "Text.Show.Text.Control.Applicative"
         [ testProperty "ZipList Int instance"               (prop_matchesShow :: Int -> ZipList Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Control.Concurrent"
@@ -216,6 +220,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.Char"
         [ testProperty "Char instance"                      (prop_matchesShow :: Int -> Char -> Bool)
         , testProperty "GeneralCategory instance"           (prop_matchesShow :: Int -> GeneralCategory -> Bool)
+        , testProperty "LitChar instance"                   (prop_matchesShow :: Int -> LitChar -> Bool)
         , testCase "asciiTab = asciiTabB" $                 map fromString asciiTab @=? elems (asciiTabB)
         ]
     , testGroup "Text.Show.Text.Data.Complex"
@@ -282,6 +287,9 @@ baseAndFriendsTests =
         [ testProperty "String instance"                    (prop_matchesShow :: Int -> String -> Bool)
         , testProperty "[String] instance"                  (prop_matchesShow :: Int -> [String] -> Bool)
         , testProperty "[Int] instance"                     (prop_matchesShow :: Int -> [Int] -> Bool)
+        , testProperty "[LitChar] instance"                 (prop_matchesShow :: Int -> [LitChar] -> Bool)
+        , testProperty "LitString instance"                 (prop_matchesShow :: Int -> LitString -> Bool)
+        , testProperty "[LitString] instance"               (prop_matchesShow :: Int -> [LitString] -> Bool)
         , testProperty "showbListDefault output"            prop_showListDefault
         ]
     , testGroup "Text.Show.Text.Data.Maybe"

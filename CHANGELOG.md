@@ -1,5 +1,8 @@
 # 0.5.1
 * Deprecated `replicateB` in favor of `timesN` from the `semigroups` library
+* Added `FromTextShow` to `Text.Show.Text`, which admits a `String` `Show` instance for any data type with a `Text` `Show` instance (the counterpart of `FromStringShow`)
+* Added `Monoid` and `Semigroup` instances for `FromStringShow`, `Semigroup` instance for `LitString`, `IsChar` instance for `LitChar`, and `IsString` instance for `[LitChar]`
+* Changed the `String` `Show` instances of `FromStringShow`, `LitChar`, and `LitString` to more closely match the `Text` `Show` instances. As a result, the `Read` instances for these data types were also changed so that `read . show = read . show = id`.
 * Added `integer-simple` flag, removed the `transformers-four` flag
 
 # 0.5

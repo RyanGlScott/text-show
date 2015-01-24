@@ -21,6 +21,7 @@ module Text.Show.Text.Classes where
 #if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative (Applicative((<*>), pure))
 import           Data.Foldable (Foldable)
+import           Data.Monoid (Monoid)
 import           Data.Traversable (Traversable)
 #endif
 
@@ -34,7 +35,9 @@ import           Data.Bits (Bits)
 import           Data.Bits (FiniteBits)
 #endif
 import           Data.Data (Data, Typeable)
+import           Data.Functor ((<$>))
 import           Data.Ix (Ix)
+import           Data.Semigroup (Semigroup)
 import           Data.String (IsString)
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
@@ -61,8 +64,9 @@ import           Prelude hiding (Show(show, showList))
 import           System.IO (Handle)
 
 import           Text.Printf (PrintfArg, PrintfType)
+import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show as S (Show(showsPrec))
-import           Text.Show.Text.Utils ((<>), s)
+import           Text.Show.Text.Utils ((<>), s, toString)
 
 #include "inline.h"
 
@@ -286,15 +290,15 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Integral
            , IsString
            , Ix
+           , Monoid
            , Num
            , Ord
            , PrintfArg
            , PrintfType
-           , Read
            , Real
            , RealFloat
            , RealFrac
-           , S.Show
+           , Semigroup
            , Storable
            , Traversable
            , Typeable
@@ -339,6 +343,112 @@ instance MonadZip FromStringShow where
     INLINE_INST_FUN(munzip)
 #endif
 
+instance Read a => Read (FromStringShow a) where
+    readPrec = FromStringShow <$> readPrec
+    INLINE_INST_FUN(readPrec)
+    
+    readListPrec = readListPrecDefault
+    INLINE_INST_FUN(readListPrec)
+
 instance S.Show a => Show (FromStringShow a) where
     showbPrec p (FromStringShow x) = fromString $ S.showsPrec p x ""
     INLINE_INST_FUN(showbPrec)
+
+instance S.Show a => S.Show (FromStringShow a) where
+    showsPrec p (FromStringShow x) = showsPrec p x
+    INLINE_INST_FUN(showsPrec)
+
+-- | The @String@ 'S.Show' instance for 'FromTextShow' is based on its @Text@
+-- 'T.Show' instance. That is,
+-- 
+-- @
+-- showsPrec p ('FromTextShow' x) str = 'toString' (showbPrec p x) ++ str
+-- @
+-- 
+-- /Since: 0.5/
+newtype FromTextShow a = FromTextShow { fromTextShow :: a }
+  deriving ( Bits
+           , Bounded
+           , Data
+           , Enum
+           , Eq
+#if MIN_VERSION_base(4,7,0)
+           , FiniteBits
+#endif
+           , Floating
+           , Foldable
+           , Fractional
+           , Functor
+#if MIN_VERSION_base(4,4,0)
+           , Generic
+# if __GLASGOW_HASKELL__ >= 706
+           , Generic1
+# endif
+#endif
+           , Integral
+           , IsString
+           , Ix
+           , Monoid
+           , Num
+           , Ord
+           , PrintfArg
+           , PrintfType
+           , Real
+           , RealFloat
+           , RealFrac
+           , Semigroup
+           , Show
+           , Storable
+           , Traversable
+           , Typeable
+           )
+
+instance Applicative FromTextShow where
+    pure = FromTextShow
+    INLINE_INST_FUN(pure)
+    
+    FromTextShow f <*> FromTextShow x = FromTextShow $ f x
+    INLINE_INST_FUN((<*>))
+
+#if __GLASGOW_HASKELL__ >= 708
+instance IsList a => IsList (FromTextShow a) where
+    type Item (FromTextShow a) = Item a
+    fromList = FromTextShow . fromList
+    {-# INLINE fromList #-}
+    toList = toList . fromTextShow
+    {-# INLINE toList #-}
+#endif
+
+instance Monad FromTextShow where
+    return = FromTextShow
+    INLINE_INST_FUN(return)
+    
+    FromTextShow a >>= f = f a
+    INLINE_INST_FUN((>>=))
+
+instance MonadFix FromTextShow where
+    mfix f = FromTextShow $ let FromTextShow a = f a in a
+    INLINE_INST_FUN(mfix)
+
+#if MIN_VERSION_base(4,4,0)
+instance MonadZip FromTextShow where
+    mzip (FromTextShow a) (FromTextShow b) = FromTextShow (a, b)
+    INLINE_INST_FUN(mzip)
+    
+    mzipWith f (FromTextShow a) (FromTextShow b) = FromTextShow $ f a b
+    INLINE_INST_FUN(mzipWith)
+    
+    munzip (FromTextShow (a, b)) = (FromTextShow a, FromTextShow b)
+    INLINE_INST_FUN(munzip)
+#endif
+
+instance Read a => Read (FromTextShow a) where
+    readPrec = FromTextShow <$> readPrec
+    INLINE_INST_FUN(readPrec)
+    
+    readListPrec = readListPrecDefault
+    INLINE_INST_FUN(readListPrec)
+
+instance Show a => S.Show (FromTextShow a) where
+    showsPrec p (FromTextShow x) str = toString (showbPrec p x) ++ str
+    INLINE_INST_FUN(showsPrec)

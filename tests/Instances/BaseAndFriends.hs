@@ -111,6 +111,9 @@ import           System.Posix.Types
 import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
                                         arbitraryBoundedEnum, oneof, suchThat)
 
+import           Text.Show.Text (FromStringShow(..), FromTextShow(..))
+import           Text.Show.Text.Data.Char (LitChar(..), LitString(..))
+
 #include "HsBaseConfig.h"
 
 instance Arbitrary Natural where
@@ -577,3 +580,9 @@ deriving instance Show a => Show (Down a)
 #endif
 
 deriving instance Arbitrary a => Arbitrary (Identity a)
+
+deriving instance Arbitrary a => Arbitrary (FromStringShow a)
+deriving instance Arbitrary a => Arbitrary (FromTextShow a)
+
+deriving instance Arbitrary LitChar
+deriving instance Arbitrary LitString
