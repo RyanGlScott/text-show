@@ -237,8 +237,12 @@ instance Read LitString where
 
 instance Show LitString where
     showb = showbLitString . getLitString
-#if MIN_VERSION_base(4,4,0)
     INLINE_INST_FUN(showb)
+
+instance S.Show LitString where
+    showsPrec _ = showLitString . getLitString
+#if MIN_VERSION_base(4,4,0)
+    INLINE_INST_FUN(showsPrec)
 #else
       where
         showLitString :: String -> ShowS
@@ -256,7 +260,3 @@ instance Show LitString where
            -- The sticking point is the recursive call to (showLitString cs), which
            -- it can't figure out would be ok with arity 2.
 #endif
-
-instance S.Show LitString where
-    showsPrec _ = showLitString . getLitString
-    INLINE_INST_FUN(showsPrec)
