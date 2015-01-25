@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances, InstanceSigs,
+{-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances,
              OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 {-|
 Module:      Text.Show.Text.Generic
@@ -218,7 +218,6 @@ instance Show c => GShow (K1 i c) where
     isNullary _ = False
 
 instance (Constructor c, GShow a) => GShow (M1 C c a) where
-    gShowbPrec :: ConType -> Int -> M1 C c a b -> Builder
     gShowbPrec _ n c@(M1 x) = case fixity of
         Prefix    -> showbParen (n > appPrec && not (isNullary x || conIsTuple c)) $
                (if (conIsTuple c) then mempty else fromString (conName c))

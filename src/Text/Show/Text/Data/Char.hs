@@ -245,16 +245,17 @@ instance S.Show LitString where
     INLINE_INST_FUN(showsPrec)
 #else
       where
+        -- Taken directly from @GHC.Show@
         showLitString :: String -> ShowS
-        -- | Same as 'showLitChar', but for strings
+        -- Same as 'showLitChar', but for strings
         -- It converts the string to a string using Haskell escape conventions
         -- for non-printable characters. Does not add double-quotes around the
         -- whole thing; the caller should do that.
         -- The main difference from showLitChar (apart from the fact that the
         -- argument is a string not a list) is that we must escape double-quotes 
-        showLitString []         s = s
-        showLitString ('"' : cs) s = showString "\\\"" (showLitString cs s)
-        showLitString (c   : cs) s = showLitChar c (showLitString cs s)
+        showLitString []         str = str
+        showLitString ('"' : cs) str = showString "\\\"" (showLitString cs str)
+        showLitString (c   : cs) str = showLitChar c (showLitString cs str)
            -- Making 's' an explicit parameter makes it clear to GHC that
            -- showLitString has arity 2, which avoids it allocating an extra lambda
            -- The sticking point is the recursive call to (showLitString cs), which
