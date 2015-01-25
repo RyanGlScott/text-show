@@ -40,8 +40,10 @@ import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
 import           Data.Functor ((<$>))
-#if !(MIN_VERSION_transformers(0,4,0))
+#if defined(VERSION_transformers)
+# if !(MIN_VERSION_transformers(0,4,0))
 import           Data.Functor.Classes ()
+# endif
 #endif
 import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
