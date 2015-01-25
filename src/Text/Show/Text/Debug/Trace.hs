@@ -12,6 +12,11 @@ Functions for tracing and monitoring execution.
 These can be useful for investigating bugs or performance problems.
 They should /not/ be used in production code.
 
+If you do not wish to require 'Show' instances for your @trace@ functions,
+the "Text.Show.Text.Debug.Trace.TH" and "Text.Show.Text.Debug.Trace.Generic" modules
+exist to convert the input to a debug message using Template Haskell or generics,
+respectively.
+
 /Since: 0.5/
 -}
 module Text.Show.Text.Debug.Trace (

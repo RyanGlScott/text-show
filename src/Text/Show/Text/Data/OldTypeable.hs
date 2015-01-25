@@ -23,7 +23,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils ((<>), isTupleString, s)
 
 -- | Convert a 'TyCon' to a 'Builder'.
 -- This function is only available with @base-4.7@.
@@ -54,8 +54,7 @@ showbTypeRepPrec p (TypeRep _ tycon tys) =
 
 -- | Does the 'TyCon' represent a tuple type constructor?
 isTupleTyCon :: TyCon -> Bool
-isTupleTyCon (TyCon _ _ _ ('(':',':_)) = True
-isTupleTyCon _                         = False
+isTupleTyCon (TyCon _ _ _ str) = isTupleString str
 {-# INLINE isTupleTyCon #-}
 
 instance Show TyCon where

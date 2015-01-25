@@ -1,4 +1,6 @@
-# 0.5.1
+# 0.6
+* Fixed a bug in which infix backticked data constructors (e.g., ~data Add = Int `Plus` Int~) would not be shown correctly.
+* Added generics support with the `Text.Show.Text.Generic` and `Text.Show.Text.Debug.Trace.Generic` modules
 * Deprecated `replicateB` in favor of `timesN` from the `semigroups` library
 * Added `FromTextShow` to `Text.Show.Text`, which admits a `String` `Show` instance for any data type with a `Text` `Show` instance (the counterpart of `FromStringShow`)
 * Added `Monoid` and `Semigroup` instances for `FromStringShow`, `Semigroup` instance for `LitString`, `IsChar` instance for `LitChar`, and `IsString` instance for `[LitChar]`

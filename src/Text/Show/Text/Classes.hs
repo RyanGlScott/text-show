@@ -88,7 +88,8 @@ import           Text.Show.Text.Utils ((<>), s, toString)
 -- 
 -- If you do not want to create 'Show' instances manually, you can alternatively
 -- use the "Text.Show.Text.TH" module to automatically generate default 'Show'
--- instances using Template Haskell.
+-- instances using Template Haskell, or the "Text.Show.Text.Generic" module to
+-- quickly define 'Show' instances using 'genericShowbPrec'.
 -- 
 -- /Since: 0.1/
 class Show a where
@@ -365,7 +366,7 @@ instance S.Show a => S.Show (FromStringShow a) where
 -- showsPrec p ('FromTextShow' x) str = 'toString' (showbPrec p x) ++ str
 -- @
 -- 
--- /Since: 0.5/
+-- /Since: 0.6/
 newtype FromTextShow a = FromTextShow { fromTextShow :: a }
   deriving ( Bits
            , Bounded
@@ -452,3 +453,7 @@ instance Read a => Read (FromTextShow a) where
 instance Show a => S.Show (FromTextShow a) where
     showsPrec p (FromTextShow x) str = toString (showbPrec p x) ++ str
     INLINE_INST_FUN(showsPrec)
+
+instance Show1 FromTextShow where
+    showbPrec1 = showbPrec
+    INLINE_INST_FUN(showbPrec1)

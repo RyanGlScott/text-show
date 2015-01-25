@@ -16,9 +16,9 @@ Portability: GHC
 -}
 module Properties.MkShow (mkShowTests) where
 
-import qualified Data.Text      as TS (pack)
-import qualified Data.Text.Lazy as TL (pack)
-import           Data.Text.Lazy.Builder (fromString)
+import qualified Data.Text      as TS (Text, pack)
+import qualified Data.Text.Lazy as TL (Text, pack)
+import           Data.Text.Lazy.Builder (Builder, fromString)
 
 import           Derived
 
@@ -26,34 +26,67 @@ import           Instances.Derived ()
 
 import           Test.Tasty.QuickCheck (NonZero)
 import           Test.Tasty (TestTree, testGroup)
-import           Test.Tasty.QuickCheck (testProperty)
+import           Test.Tasty.QuickCheck (Arbitrary, testProperty)
 
+import qualified Text.Show as S (Show)
 import           Text.Show.Text.TH
 
 -- | Verifies 'mkShow' (and related functions) produce the same output as their
---   'String' counterparts. This uses a data type that is a 'Show' instance.
-prop_mkShowIsInstance :: Int -> AllAtOnce Int Int Int Int -> Bool
-prop_mkShowIsInstance p a =
-       TS.pack    (show        a   ) == $(mkShow         ''AllAtOnce)   a
-    && TL.pack    (show        a   ) == $(mkShowLazy     ''AllAtOnce)   a
-    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''AllAtOnce) p a
-    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''AllAtOnce) p a
-    && fromString (show        a   ) == $(mkShowb        ''AllAtOnce)   a
-    && fromString (showsPrec p a "") == $(mkShowbPrec    ''AllAtOnce) p a
+-- 'String' counterparts.
+prop_mkShow :: (Arbitrary a, S.Show a)
+            => (a -> TS.Text)        -- ^ 'mkShow'
+            -> (a -> TL.Text)        -- ^ 'mkShowLazy'
+            -> (a -> Builder)        -- ^ 'mkShowb'
+            -> (Int -> a -> TS.Text) -- ^ 'mkShowPrec'
+            -> (Int -> a -> TL.Text) -- ^ 'mkShowPrecLazy'
+            -> (Int -> a -> Builder) -- ^ 'mkShowbPrec'
+            -> ([a] -> TS.Text)      -- ^ 'mkShowList'
+            -> ([a] -> TL.Text)      -- ^ 'mkShowListLazy'
+            -> ([a] -> Builder)      -- ^ 'mkShowbList'
+            -> Int -> a -> Bool
+prop_mkShow s1 s2 s3 sp1 sp2 sp3 sl1 sl2 sl3 p a =
+       TS.pack    (show          a   ) == s1      a
+    && TL.pack    (show          a   ) == s2      a
+    && fromString (show          a   ) == s3      a
+    && TS.pack    (showsPrec p   a "") == sp1 p   a
+    && TL.pack    (showsPrec p   a "") == sp2 p   a
+    && fromString (showsPrec p   a "") == sp3 p   a
+    && TS.pack    (showList    [a] "") == sl1   [a]
+    && TL.pack    (showList    [a] "") == sl2   [a]
+    && fromString (showList    [a] "") == sl3   [a]
 
 -- | Verifies 'mkShow' (and related functions) produce the same output as their
---   'String' counterparts. This uses a data type that is not a 'Show' instance.
+-- 'String' counterparts. This uses a data type that is a 'Show' instance.
+prop_mkShowIsInstance :: Int -> AllAtOnce Int Int Int Int -> Bool
+prop_mkShowIsInstance = prop_mkShow
+    $(mkShow         ''AllAtOnce)
+    $(mkShowLazy     ''AllAtOnce)
+    $(mkShowb        ''AllAtOnce)
+    $(mkShowPrec     ''AllAtOnce)
+    $(mkShowPrecLazy ''AllAtOnce)
+    $(mkShowbPrec    ''AllAtOnce)
+    $(mkShowList     ''AllAtOnce)
+    $(mkShowListLazy ''AllAtOnce)
+    $(mkShowbList    ''AllAtOnce)
+
+-- | Verifies 'mkShow' (and related functions) produce the same output as their
+-- 'String' counterparts. This uses a data type that is not a 'Show' instance.
 prop_mkShowIsNotInstance :: Int -> NonZero Int -> Bool
-prop_mkShowIsNotInstance p a =
-       TS.pack    (show        a   ) == $(mkShow         ''NonZero)   a
-    && TL.pack    (show        a   ) == $(mkShowLazy     ''NonZero)   a
-    && TS.pack    (showsPrec p a "") == $(mkShowPrec     ''NonZero) p a
-    && TL.pack    (showsPrec p a "") == $(mkShowPrecLazy ''NonZero) p a
-    && fromString (show        a   ) == $(mkShowb        ''NonZero)   a
-    && fromString (showsPrec p a "") == $(mkShowbPrec    ''NonZero) p a
+prop_mkShowIsNotInstance = prop_mkShow
+    $(mkShow         ''NonZero)
+    $(mkShowLazy     ''NonZero)
+    $(mkShowb        ''NonZero)
+    $(mkShowPrec     ''NonZero)
+    $(mkShowPrecLazy ''NonZero)
+    $(mkShowbPrec    ''NonZero)
+    $(mkShowList     ''NonZero)
+    $(mkShowListLazy ''NonZero)
+    $(mkShowbList    ''NonZero)
 
 -- prop_mkPrintIsInstance
 -- prop_mkPrintIsNotInstance
+-- prop_traceIsInstance
+-- prop_traceIsNotInstance
 
 mkShowTests :: [TestTree]
 mkShowTests =

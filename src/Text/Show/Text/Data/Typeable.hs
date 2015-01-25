@@ -27,7 +27,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils ((<>), isTupleString, s)
 
 #include "inline.h"
 
@@ -65,11 +65,8 @@ funTc = mkTyCon "->"
 
 -- | Does the 'TyCon' represent a tuple type constructor?
 isTupleTyCon :: TyCon -> Bool
-isTupleTyCon tycon = case tyconStr of
-    ('(':',':_) -> True
-    _           -> False
-  where
-    tyconStr = tyConString tycon
+isTupleTyCon = isTupleString . tyConString
+{-# INLINE isTupleTyCon #-}
 
 -- | Convert a 'TyCon' to a 'Builder'.
 -- 

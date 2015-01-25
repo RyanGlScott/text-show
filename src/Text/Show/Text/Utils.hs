@@ -36,6 +36,19 @@ infixr 6 <>
 (<>) = mappend
 {-# INLINE (<>) #-}
 
+-- | Checks if a 'String' names a valid Haskell infix type constructor (i.e., does
+-- it begin with a colon?).
+isInfixTypeCon :: String -> Bool
+isInfixTypeCon (':':_) = True
+isInfixTypeCon _       = False
+{-# INLINE isInfixTypeCon #-}
+
+-- | Checks if a 'String' represents a tuple (other than '()')
+isTupleString :: String -> Bool
+isTupleString ('(':',':_) = True
+isTupleString _           = False
+{-# INLINE isTupleString #-}
+
 -- | A shorter name for 'singleton' for convenience's sake (since it tends to be used
 -- pretty often in @text-show@).
 s :: Char -> Builder

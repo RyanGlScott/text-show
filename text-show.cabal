@@ -1,5 +1,5 @@
 name:                text-show
-version:             0.5.1
+version:             0.6
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
@@ -39,6 +39,10 @@ description:         @text-show@ offers a replacement for the @Show@ typeclass i
                      depending on the precedence end with @Prec@ (e.g., @showbIntPrec@),
                      whereas functions that show the same values regardless of
                      precedence do not end with @Prec@ (e.g., @showbBool@).
+                     .
+                     Support for automatically deriving @Show@ instances can be found
+                     in the "Text.Show.Text.TH" and "Text.Show.Text.Generic" modules.
+                     If you don't know which one to use, use @Text.Show.Text.TH@.
 homepage:            https://github.com/RyanGlScott/text-show
 bug-reports:         https://github.com/RyanGlScott/text-show/issues
 license:             BSD3
@@ -150,7 +154,9 @@ library
       cpp-options:     -DINTEGER_GMP
   
   if impl(ghc >= 7.2)
-    exposed-modules:   Text.Show.Text.GHC.Fingerprint
+    exposed-modules:   Text.Show.Text.Debug.Trace.Generic
+                       Text.Show.Text.Generic
+                       Text.Show.Text.GHC.Fingerprint
                        Text.Show.Text.GHC.Generics
     if !os(windows)
       exposed-modules: Text.Show.Text.GHC.Event
@@ -192,6 +198,7 @@ test-suite text-show-properties
   other-modules:       Derived
                        Instances.BaseAndFriends
                        Instances.Derived
+                       Instances.Utils
                        Properties.BaseAndFriends
                        Properties.Builder
                        Properties.Derived
@@ -205,13 +212,15 @@ test-suite text-show-properties
                      , tasty-hunit                >= 0.8   && < 0.10
                      , tasty-quickcheck           >= 0.8   && < 0.9
                      , text                       >= 0.2   && < 1.3
-                     , text-show                  == 0.5.1
+                     , text-show                  == 0.6
   hs-source-dirs:      tests
   ghc-options:         -Wall
   
-  -- Prior to GHC 7.6, GHC generics lived in ghc-prim
-  if impl(ghc >= 7.2) && impl(ghc < 7.6)
-    build-depends:     ghc-prim
+  if impl(ghc >= 7.2)
+    cpp-options:       -DGENERICS
+    if impl(ghc < 7.6)
+      -- Prior to GHC 7.6, GHC generics lived in ghc-prim
+      build-depends:     ghc-prim
 
   if impl(ghc < 7.7)
     build-depends:     tagged                     >= 0.4.4 && < 1

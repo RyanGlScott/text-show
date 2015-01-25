@@ -25,7 +25,7 @@ import Derived
 
 import Prelude hiding (Show)
 
-import Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, oneof)
+import Test.Tasty.QuickCheck (Arbitrary(..), Gen, oneof)
 
 import Text.Show.Text (Show(showbPrec))
 import Text.Show.Text.TH (deriveShow, mkShowbPrec)
@@ -39,16 +39,10 @@ instance Arbitrary (PhantomNullary a) where
     arbitrary = pure PhantomNullary
 
 $(deriveShow ''MonomorphicUnary)
-instance Arbitrary MonomorphicUnary where
-    arbitrary = MonomorphicUnary <$> arbitrary
+deriving instance Arbitrary MonomorphicUnary
 
 $(deriveShow ''PolymorphicUnary)
-instance Arbitrary a => Arbitrary (PolymorphicUnary a b) where
-    arbitrary = PolymorphicUnary <$> arbitrary
-
-$(deriveShow ''MonomorphicNewtype)
-
-$(deriveShow ''PolymorphicNewtype)
+deriving instance Arbitrary a => Arbitrary (PolymorphicUnary a b)
 
 $(deriveShow ''MonomorphicProduct)
 instance Arbitrary MonomorphicProduct where
@@ -72,7 +66,7 @@ instance Arbitrary MonomorphicInfix where
 
 $(deriveShow ''PolymorphicInfix)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (PolymorphicInfix a b c) where
-    arbitrary = (:\:) <$> arbitrary <*> arbitrary
+    arbitrary = PolyInf <$> arbitrary <*> arbitrary
 
 $(deriveShow ''MonomorphicForall)
 instance Arbitrary MonomorphicForall where
@@ -97,13 +91,15 @@ $(deriveShow ''GADT)
 $(deriveShow ''LeftAssocTree)
 instance Arbitrary a => Arbitrary (LeftAssocTree a) where
     arbitrary = oneof [ LeftAssocLeaf <$> arbitrary
-                      , (:<:) <$> arbitrary <*> arbitrary
+                      , (:<:) <$> (LeftAssocLeaf <$> arbitrary)
+                              <*> (LeftAssocLeaf <$> arbitrary)
                       ]
 
 $(deriveShow ''RightAssocTree)
 instance Arbitrary a => Arbitrary (RightAssocTree a) where
     arbitrary = oneof [ RightAssocLeaf <$> arbitrary
-                      , (:>:) <$> arbitrary <*> arbitrary
+                      , (:>:) <$> (RightAssocLeaf <$> arbitrary)
+                              <*> (RightAssocLeaf <$> arbitrary)
                       ]
 
 $(deriveShow ''(:?:))
@@ -112,18 +108,15 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (a :?: b) where
 
 instance Show (f a) => Show (HigherKindedTypeParams f a) where
     showbPrec = $(mkShowbPrec ''HigherKindedTypeParams)
-instance Arbitrary (f a) => Arbitrary (HigherKindedTypeParams f a) where
-    arbitrary = HigherKindedTypeParams <$> arbitrary
+deriving instance Arbitrary (f a) => Arbitrary (HigherKindedTypeParams f a)
 
 instance (Read a, Show a) => Show (Restriction a) where
     showbPrec = $(mkShowbPrec ''Restriction)
-instance Arbitrary a => Arbitrary (Restriction a) where
-    arbitrary = Restriction <$> arbitrary
+deriving instance Arbitrary a => Arbitrary (Restriction a)
 
 instance (Read a, Show a) => Show (RestrictedContext a) where
     showbPrec = $(mkShowbPrec ''RestrictedContext)
-instance Arbitrary a => Arbitrary (RestrictedContext a) where
-    arbitrary = RestrictedContext <$> arbitrary
+deriving instance Arbitrary a => Arbitrary (RestrictedContext a)
 
 instance Show (f (Fix f)) => Show (Fix f) where
     showbPrec = $(mkShowbPrec ''Fix)

@@ -50,7 +50,7 @@ import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
 import           Data.Monoid (Alt(..))
 #endif
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
-import qualified Data.OldTypeable.Internal as OldT (TyCon(..))
+import qualified Data.OldTypeable.Internal as OldT (TyCon(..), TypeRep(..))
 #endif
 #if MIN_VERSION_base(4,6,0)
 import           Data.Ord (Down(..))
@@ -63,7 +63,7 @@ import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
 #if MIN_VERSION_base(4,4,0)
-import qualified Data.Typeable.Internal as NewT (TyCon(..))
+import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
 import           GHC.Fingerprint.Type (Fingerprint(..))
 
 #if !(MIN_VERSION_base(4,7,0))
@@ -82,6 +82,7 @@ import           GHC.Conc (BlockReason(..), ThreadStatus(..))
 #if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent(..))
 #endif
+import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 #if MIN_VERSION_base(4,4,0)
 import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import           GHC.IO.Encoding.Types (CodingProgress(..))
@@ -101,11 +102,13 @@ import           GHC.Stats (GCStats(..))
 import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 #endif
 
+import           Instances.Utils ((<@>))
+
 import           Numeric.Natural (Natural)
 
 import           System.Exit (ExitCode(..))
-import           System.IO (BufferMode(..), IOMode(..), Newline(..),
-                            NewlineMode(..), SeekMode(..))
+import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
+                            SeekMode(..), Handle, stdin, stdout, stderr)
 import           System.Posix.Types
 
 import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
@@ -147,11 +150,17 @@ instance Arbitrary GeneralCategory where
 instance Arbitrary Version where
     arbitrary = Version <$> arbitrary <*> arbitrary
 
--- TODO: Be more creative with this instance
 instance Arbitrary SomeException where
     arbitrary = SomeException <$> (arbitrary :: Gen AssertionFailed)
 
--- instance Arbitrary IOException
+instance Arbitrary IOException where
+    arbitrary = IOError <$> arbitrary <*> arbitrary <*> arbitrary
+                        <*> arbitrary <*> arbitrary <*> arbitrary
+
+deriving instance Bounded IOErrorType
+deriving instance Enum IOErrorType
+instance Arbitrary IOErrorType where
+    arbitrary = arbitraryBoundedEnum
 
 deriving instance Bounded ArithException
 deriving instance Enum ArithException
@@ -167,7 +176,6 @@ instance Arbitrary AssertionFailed where
     arbitrary = AssertionFailed <$> arbitrary
 
 #if MIN_VERSION_base(4,7,0)
--- TODO: Be more creative with this instance
 instance Arbitrary SomeAsyncException where
     arbitrary = SomeAsyncException <$> (arbitrary :: Gen AsyncException)
 #endif
@@ -214,8 +222,6 @@ instance Arbitrary RecUpdError where
 
 -- ErrorCall is a newtype starting with base-4.7.0.0, but we'll
 -- manually derive Arbitrary to support older versions of GHC.
--- 
--- deriving instance Arbitrary ErrorCall
 instance Arbitrary ErrorCall where
     arbitrary = ErrorCall <$> arbitrary
 
@@ -224,25 +230,27 @@ deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
     arbitrary = arbitraryBoundedEnum
 
--- instance Arbitrary Lexeme
+-- TODO: instance Arbitrary Lexeme
 -- #if MIN_VERSION_base(4,7,0)
--- instance Arbitrary Number
+-- TODO: instance Arbitrary Number
 -- #endif
 
 instance Arbitrary (Proxy s) where
     arbitrary = pure Proxy
 
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
--- TODO: Come up with an instance of TypeRep that doesn't take forever
--- instance Arbitrary OldT.TypeRep where
+instance Arbitrary OldT.TypeRep where
+    arbitrary = OldT.TypeRep <$> arbitrary <*> arbitrary <@> []
+--     arbitrary = OldT.TypeRep <$> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary OldT.TyCon where
     arbitrary = OldT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #endif
 
 #if MIN_VERSION_base(4,4,0)
--- TODO: Come up with an instance of TypeRep that doesn't take forever
--- instance Arbitrary NewT.TypeRep where
+instance Arbitrary NewT.TypeRep where
+    arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <@> []
+--     arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary NewT.TyCon where
     arbitrary = NewT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
@@ -261,7 +269,6 @@ instance Show Fingerprint where
 #endif
 #endif
 
--- TODO: Be more creative with this instance
 instance Arbitrary Dynamic where
     arbitrary = toDyn <$> (arbitrary :: Gen Int)
 
@@ -304,7 +311,7 @@ deriving instance Enum BlockReason
 instance Arbitrary BlockReason where
     arbitrary = arbitraryBoundedEnum
 
--- instance Arbitrary ThreadId
+-- TODO: instance Arbitrary ThreadId
 
 instance Arbitrary ThreadStatus where
     arbitrary = oneof [ pure ThreadRunning
@@ -322,8 +329,9 @@ instance Arbitrary ConsoleEvent where
 instance Arbitrary (ST s a) where
     arbitrary = pure $ fixST undefined
 
--- instance Arbitrary Handle
--- instance Arbitrary HandlePosn
+instance Arbitrary Handle where
+    arbitrary = oneof $ map pure [stdin, stdout, stderr]
+-- TODO: instance Arbitrary HandlePosn
 
 deriving instance Bounded IOMode
 instance Arbitrary IOMode where
@@ -348,7 +356,7 @@ instance Arbitrary NewlineMode where
     arbitrary = NewlineMode <$> arbitrary <*> arbitrary
 
 #if MIN_VERSION_base(4,3,0)
--- instance Arbitrary TextEncoding
+-- TODO: instance Arbitrary TextEncoding
 #else
 deriving instance Show Newline
 deriving instance Show NewlineMode
@@ -377,8 +385,8 @@ instance Arbitrary GCStats where
 #endif
 
 -- #if MIN_VERSION_base(4,4,0)
--- instance Arbitrary Event
--- instance Arbitrary FdKey
+-- TODO: instance Arbitrary Event
+-- TODO: instance Arbitrary FdKey
 -- #endif
 
 #if MIN_VERSION_base(4,4,0)
@@ -428,8 +436,6 @@ deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
 -- Due to a GHC bug (https://ghc.haskell.org/trac/ghc/ticket/9830), this Show
 -- instance produces output with the wrong precedence on older versions of GHC.
 -- I'll manually define the Show instance to get the correct behavior.
--- 
--- deriving instance (Show (f p), Show (g p)) => Show ((f :*: g) p)
 instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
     showsPrec p (l :*: r) = showParen (p > prec) $
           showsPrec (prec + 1) l
@@ -442,8 +448,8 @@ deriving instance Show (f (g p))           => Show ((f :.: g) p)
 #endif
 
 #if MIN_VERSION_base(4,8,0)
--- instance Arbitrary RTSFlags
--- instance Arbitrary GCFlags
+-- TODO: instance Arbitrary RTSFlags
+-- TODO: instance Arbitrary GCFlags
 
 instance Arbitrary ConcFlags where
     arbitrary = ConcFlags <$> arbitrary <*> arbitrary
@@ -458,9 +464,9 @@ instance Arbitrary DebugFlags where
                            <*> arbitrary <*> arbitrary <*> arbitrary
                            <*> arbitrary <*> arbitrary <*> arbitrary
 
--- instance Arbitrary CCFlags where
--- instance Arbitrary ProfFlags where
--- instance Arbitrary TraceFlags where
+-- TODO: instance Arbitrary CCFlags where
+-- TODO: instance Arbitrary ProfFlags where
+-- TODO: instance Arbitrary TraceFlags where
 
 instance Arbitrary TickyFlags where
     arbitrary = TickyFlags <$> arbitrary <*> arbitrary
@@ -470,8 +476,8 @@ instance Arbitrary StaticPtrInfo where
 #endif
 
 -- #if MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
--- instance Arbitrary (IsZero n)
--- instance Arbitrary (IsEven n)
+-- TODO: instance Arbitrary (IsZero n)
+-- TODO: instance Arbitrary (IsEven n)
 -- #endif
 
 #if MIN_VERSION_base(4,7,0)
