@@ -12,7 +12,9 @@
 -- nicely with it for some reason.
 {-# LANGUAGE PolyKinds #-}
 #endif
-#if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+-- Starting with GHC 7.10, NullaryTypeClasses was deprecated in favor of
+-- MultiParamTypeClasses, which is already enabled
 {-# LANGUAGE NullaryTypeClasses #-}
 #endif
 {-|
@@ -55,8 +57,12 @@ module Derived (
     , AssocData1(..)
     , AssocClass2(..)
     , AssocData2(..)
+    -- , AssocClass3(..)
+    -- , AssocData3(..)
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
     , NullaryClass(..)
     , NullaryData(..)
+#endif
     , GADTFam(..)
     ) where
 
@@ -235,24 +241,54 @@ deriving instance S.Show (f (Fix f)) => S.Show (Fix f)
 infix 2 `ASInfix`
 data family AllShow a b c d
 data instance AllShow () () c d = ASNullary
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 newtype instance AllShow Int b c d = ASUnary Int
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 data instance AllShow Bool Bool c d = ASProduct Bool Bool
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 data instance AllShow Char Double c d = ASRecord {
     asRecord1 :: Char
   , asRecord2 :: Double
   , asRecord3 :: c
-  } deriving (S.Show, Generic)
+  } deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+             {- Woraround for a bizarre bug in older GHCs -}
+             , Generic
+# endif
+             )
 data instance AllShow Float Ordering c d = Float `ASInfix` Ordering
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 
 data family NotAllShow a b c d
 data instance NotAllShow ()  ()  () d = NASNoShow
 data instance NotAllShow Int Int c  d = NASShow1 Int Int
                                       | NASShow2 c
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 
 infix 1 `ODIInfix`
 data family OneDataInstance a b c d
@@ -265,24 +301,54 @@ data instance OneDataInstance a b c d = ODINullary
                                         , odiRecord3 :: c
                                       }
                                       | a `ODIInfix` b
-  deriving (S.Show, Generic)
+  deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+           {- Woraround for a bizarre bug in older GHCs -}
+           , Generic
+# endif
+           )
 
 class AssocClass1 a where
+# if __GLASGOW_HASKELL__ >= 708
     data AssocData1 a
+# else
+    -- Workaround for bug in older GHCs
+    data AssocData1 a :: *
+# endif
 instance AssocClass1 () where
-    newtype AssocData1 () = AssocCon1 Int deriving (S.Show, Generic)
+    newtype AssocData1 () = AssocCon1 Int deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+                                                   {- Woraround for a bizarre bug in older GHCs -}
+                                                   , Generic
+# endif
+                                                   )
 
 class AssocClass2 a b c where
     data AssocData2 a b c
-instance AssocClass2 () b c where
-    newtype AssocData2 () b c = AssocCon2 Int deriving (S.Show, Generic)
+instance AssocClass2 () Int Int where
+    newtype AssocData2 () Int Int = AssocCon2 Int deriving ( S.Show
+# if __GLASGOW_HASKELL__ >= 706
+                                                           {- Woraround for a bizarre bug in older GHCs -}
+                                                           , Generic
+# endif
+                                                           )
 
-#if __GLASGOW_HASKELL__ >= 708
+-- class AssocClass3 a b c where
+--     data AssocData3 a b c
+-- instance AssocClass3 () b c where
+--     newtype AssocData3 () b c = AssocCon2 Int deriving ( S.Show
+-- # if __GLASGOW_HASKELL__ >= 706
+--                                                        {- Woraround for a bizarre bug in older GHCs -}
+--                                                        , Generic
+-- # endif
+--                                                        )
+
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
 class NullaryClass where
     data NullaryData
 instance NullaryClass where
     newtype NullaryData = NullaryCon Int deriving (S.Show, Generic)
-#endif
+# endif
 
 data family GADTFam a b c
 data instance GADTFam a b c where

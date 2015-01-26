@@ -61,7 +61,7 @@ derivedTests =
         , testProperty "OneDataInstance Int Int Int Int instance"        (prop_matchesShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
         , testProperty "AssocData1 () instance"                          (prop_matchesShow :: Int -> AssocData1 () -> Bool)
         , testProperty "AssocData2 () instance"                          (prop_matchesShow :: Int -> AssocData2 () Int Int -> Bool)
-#if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
         , testProperty "NullaryData instance"                            (prop_matchesShow :: Int -> NullaryData -> Bool)
 #endif
         , testProperty "GADTFam Char Int Int instance"                   (prop_matchesShow :: Int -> GADTFam Char Int Int -> Bool)
@@ -95,7 +95,7 @@ derivedTests =
         , testProperty "HigherKindedTypeParams Maybe Int generic show"   (prop_genericShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
         , testProperty "RestrictedContext Int generic show"              (prop_genericShow :: Int -> RestrictedContext Int -> Bool)
         , testProperty "Fix Maybe generic show"                          (prop_genericShow :: Int -> Fix Maybe -> Bool)
-# if MIN_VERSION_template_haskell(2,7,0)
+# if MIN_VERSION_template_haskell(2,7,0) && __GLASGOW_HASKELL__ >= 706
         , testProperty "AllShow () () Int Int generic show"              (prop_matchesShow :: Int -> AllShow () () Int Int -> Bool)
         , testProperty "AllShow Int Int Int Int generic show"            (prop_matchesShow :: Int -> AllShow Int Int Int Int -> Bool)
         , testProperty "AllShow Bool Bool Int Int generic show"          (prop_matchesShow :: Int -> AllShow Bool Bool Int Int -> Bool)
@@ -105,7 +105,7 @@ derivedTests =
         , testProperty "OneDataInstance Int Int Int Int generic show"    (prop_genericShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
         , testProperty "AssocData1 () generic show"                      (prop_genericShow :: Int -> AssocData1 () -> Bool)
         , testProperty "AssocData2 () generic show"                      (prop_genericShow :: Int -> AssocData2 () Int Int -> Bool)
-#  if __GLASGOW_HASKELL__ >= 708
+#  if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
         , testProperty "NullaryData generic show"                        (prop_genericShow :: Int -> NullaryData -> Bool)
 #  endif
 # endif

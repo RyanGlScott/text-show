@@ -43,8 +43,11 @@ module Text.Show.Text.TH.Internal (
     ) where
 
 import           Data.Functor ((<$>))
-import           Data.List (foldl', find, intersperse)
+import           Data.List (foldl', intersperse)
+#if MIN_VERSION_template_haskell(2,7,0)
+import           Data.List (find)
 import           Data.Maybe (fromJust)
+#endif
 #if !(MIN_VERSION_base(4,8,0))
 import           Data.Monoid (mempty)
 #endif
@@ -208,8 +211,21 @@ deriveShowDataFamFromDec opts parentName tvbs dec =
     typeNames = map tvbName tvbs
     
     lhsTypeNames :: [Name]
+# if __GLASGOW_HASKELL__ >= 710
+    lhsTypeNames = filterTyVars typeNames instTypes
+# else
     lhsTypeNames = drop (length instTypes) typeNames
-    
+# endif
+
+# if __GLASGOW_HASKELL__ >= 710
+    filterTyVars :: [Name] -> [Type] -> [Name]
+    filterTyVars ns     (SigT t _:ts) = filterTyVars ns (t:ts)
+    filterTyVars (_:ns) (VarT n  :ts) = n : filterTyVars ns ts
+    filterTyVars (_:ns) (_       :ts) = filterTyVars ns ts
+    filterTyVars [] _                 = []
+    filterTyVars _ []                 = []
+# endif
+
     rhsTypes :: [Type]
     rhsTypes = instTypes ++ drop (length instTypes) (map VarT typeNames)
     
@@ -218,12 +234,16 @@ deriveShowDataFamFromDec opts parentName tvbs dec =
                               DataInstD    _ _ tys' _ _ -> tys'
                               NewtypeInstD _ _ tys' _ _ -> tys'
                               _ -> error "Text.Show.Text.TH.deriveShow: The impossible happened."
+# if __GLASGOW_HASKELL__ >= 710
+                in tys
+# else
                 -- If PolyKinds is enabled, the first entries in this list will be
-                -- kind signatures, so drop them
+                -- kind signatures on early versions of GHC, so drop them
                 in if length tys > length tvbs
                       then drop (length tvbs) tys
                       else tys
-    
+# endif
+
     instanceType :: Q Type
     instanceType = foldl' appT (conT parentName) $ map return rhsTypes
 #endif

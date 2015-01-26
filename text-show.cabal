@@ -137,7 +137,9 @@ library
   ghc-options:         -Wall
   include-dirs:        include
   includes:            inline.h
+                     , utils.h
   install-includes:    inline.h
+                     , utils.h
   
   if flag(recent-text)
     cpp-options:       -DRECENT_TEXT
@@ -215,6 +217,11 @@ test-suite text-show-properties
                      , text-show                  == 0.6
   hs-source-dirs:      tests
   ghc-options:         -Wall
+  include-dirs:        include
+  includes:            overlap.h
+                     , utils.h
+  install-includes:    overlap.h
+                     , utils.h
   
   if impl(ghc >= 7.2)
     cpp-options:       -DGENERICS

@@ -1,6 +1,13 @@
 {-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances, GADTs,
-             GeneralizedNewtypeDeriving, OverlappingInstances, StandaloneDeriving,
+             GeneralizedNewtypeDeriving, StandaloneDeriving,
              TemplateHaskell, TypeOperators, UndecidableInstances #-}
+#include "overlap.h"
+__LANGUAGE_OVERLAPPING_INSTANCES__
+#if __GLASGOW_HASKELL__ >= 706
+-- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
+-- -- nicely with it for some reason.
+{-# LANGUAGE PolyKinds #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Instances.Derived
@@ -87,15 +94,15 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       ]
 
 $(deriveShow ''GADT)
-instance Arbitrary (GADT Char b c) where
+instance __OVERLAPPING__  Arbitrary (GADT Char b c) where
     arbitrary = pure GADTCon1
-instance Arbitrary (GADT Double Double c) where
+instance __OVERLAPPING__  Arbitrary (GADT Double Double c) where
     arbitrary = GADTCon2 <$> arbitrary
-instance Arbitrary (GADT Int String c) where
+instance __OVERLAPPING__  Arbitrary (GADT Int String c) where
     arbitrary = GADTCon3 <$> arbitrary
-instance Arbitrary a => Arbitrary (GADT a b c) where
+instance __OVERLAPPABLE__ Arbitrary a => Arbitrary (GADT a b c) where
     arbitrary = GADTCon4 <$> arbitrary
-instance Arbitrary b => Arbitrary (GADT b b c) where
+instance __OVERLAPPING__  Arbitrary b => Arbitrary (GADT b b c) where
     arbitrary = GADTCon5 <$> arbitrary
 
 $(deriveShow ''LeftAssocTree)
@@ -161,22 +168,22 @@ $(deriveShow ''AssocData1)
 deriving instance Arbitrary (AssocData1 ())
 
 $(deriveShow 'AssocCon2)
-deriving instance Arbitrary (AssocData2 () b c)
+deriving instance Arbitrary (AssocData2 () Int Int)
 
-#if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
 $(deriveShow 'NullaryCon)
 deriving instance Arbitrary NullaryData
 #endif
 
 $(deriveShow 'GADTFamCon1)
-instance Arbitrary (GADTFam Char b c) where
+instance __OVERLAPPING__  Arbitrary (GADTFam Char b c) where
     arbitrary = pure GADTFamCon1
-instance Arbitrary (GADTFam Double Double c) where
+instance __OVERLAPPING__  Arbitrary (GADTFam Double Double c) where
     arbitrary = GADTFamCon2 <$> arbitrary
-instance Arbitrary (GADTFam Int String c) where
+instance __OVERLAPPING__  Arbitrary (GADTFam Int String c) where
     arbitrary = GADTFamCon3 <$> arbitrary
-instance Arbitrary a => Arbitrary (GADTFam a b c) where
+instance __OVERLAPPABLE__ Arbitrary a => Arbitrary (GADTFam a b c) where
     arbitrary = GADTFamCon4 <$> arbitrary
-instance Arbitrary b => Arbitrary (GADTFam b b c) where
+instance __OVERLAPPING__  Arbitrary b => Arbitrary (GADTFam b b c) where
     arbitrary = GADTFamCon5 <$> arbitrary
 #endif
