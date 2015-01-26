@@ -324,7 +324,12 @@ instance AssocClass1 () where
                                                    )
 
 class AssocClass2 a b c where
+# if __GLASGOW_HASKELL__ >= 708
     data AssocData2 a b c
+# else
+    -- Workaround for bug in older GHCs
+    data AssocData2 a b c :: *
+# endif
 instance AssocClass2 () Int Int where
     newtype AssocData2 () Int Int = AssocCon2 Int deriving ( S.Show
 # if __GLASGOW_HASKELL__ >= 706
