@@ -31,7 +31,7 @@ showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality = showb
 {-# INLINE showbPropEquality #-}
 
--- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show (a :~: b) where
     showbPrec = $(mkShowbPrec ''(:~:))
     {-# INLINE showb #-}

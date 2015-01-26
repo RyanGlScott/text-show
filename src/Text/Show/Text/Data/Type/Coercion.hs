@@ -31,7 +31,7 @@ showbCoercion :: Coercion a b -> Builder
 showbCoercion = showb
 {-# INLINE showbCoercion #-}
 
--- TODO: See why 'deriveShow' doesn't detect that b is a phantom type
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show (Coercion a b) where
     showbPrec = $(mkShowbPrec ''Coercion)
     {-# INLINE showb #-}

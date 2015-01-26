@@ -24,36 +24,6 @@ import Properties.Utils (prop_genericShow)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.QuickCheck (testProperty)
 
-import Text.Show.Text (showb, showbPrec, FromStringShow(..))
-
--- | Verifies that the two 'Show' instances of 'GADT' coincide.
-prop_showGADT :: Int    -- ^ The precedence to show with
-              -> Double -- ^ The argument to 'GADTCon2'
-              -> Int    -- ^ The argument to 'GADTCon3'
-              -> Char   -- ^ The argument to 'GADTCon4'
-              -> String -- ^ The argument to 'GADTCon5'
-              -> Bool
-prop_showGADT p d i c s
-    = let gc1 :: GADT Char Int Int
-          gc1 = GADTCon1
-          
-          gc2 :: GADT Double Double Int
-          gc2 = GADTCon2 d
-          
-          gc3 :: GADT Int String Int
-          gc3 = GADTCon3 i
-          
-          gc4 :: GADT Char String Int
-          gc4 = GADTCon4 c
-          
-          gc5 :: GADT String String Int
-          gc5 = GADTCon5 s
-      in    showb       (FromStringShow gc1) == showb       gc1
-         && showbPrec p (FromStringShow gc2) == showbPrec p gc2
-         && showbPrec p (FromStringShow gc3) == showbPrec p gc3
-         && showbPrec p (FromStringShow gc4) == showbPrec p gc4
-         && showbPrec p (FromStringShow gc5) == showbPrec p gc5
-
 derivedTests :: [TestTree]
 derivedTests =
     [ testGroup "Template Haskell-derived data types"
@@ -70,13 +40,36 @@ derivedTests =
         , testProperty "MonomorphicForall instance"                      (prop_matchesShow :: Int -> MonomorphicForall -> Bool)
         , testProperty "PolymorphicForall Int Int instance"              (prop_matchesShow :: Int -> PolymorphicForall Int Int -> Bool)
         , testProperty "AllAtOnce Int Int Int Int instance"              (prop_matchesShow :: Int -> AllAtOnce Int Int Int Int -> Bool)
-        , testProperty "GADT instance"                                   prop_showGADT
+        , testProperty "GADT Char Int Int instance"                      (prop_matchesShow :: Int -> GADT Char Int Int -> Bool)
+        , testProperty "GADT Double Double Int instance"                 (prop_matchesShow :: Int -> GADT Double Double Int -> Bool)
+        , testProperty "GADT Int String Int instance"                    (prop_matchesShow :: Int -> GADT Int String Int -> Bool)
+        , testProperty "GADT Ordering Int Int instance"                  (prop_matchesShow :: Int -> GADT Ordering Int Int -> Bool)
+        , testProperty "GADT Int Int Int instance"                       (prop_matchesShow :: Int -> GADT Int Int Int -> Bool)
         , testProperty "LeftAssocTree Int instance"                      (prop_matchesShow :: Int -> LeftAssocTree Int -> Bool)
         , testProperty "RightAssocTree Int instance"                     (prop_matchesShow :: Int -> RightAssocTree Int -> Bool)
         , testProperty "Int :?: Int instance"                            (prop_matchesShow :: Int -> Int :?: Int -> Bool)
         , testProperty "HigherKindedTypeParams Maybe Int instance"       (prop_matchesShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
         , testProperty "RestrictedContext Int instance"                  (prop_matchesShow :: Int -> RestrictedContext Int -> Bool)
         , testProperty "Fix Maybe instance"                              (prop_matchesShow :: Int -> Fix Maybe -> Bool)
+#if MIN_VERSION_template_haskell(2,7,0)                                  
+        , testProperty "AllShow () () Int Int instance"                  (prop_matchesShow :: Int -> AllShow () () Int Int -> Bool)
+        , testProperty "AllShow Int Int Int Int instance"                (prop_matchesShow :: Int -> AllShow Int Int Int Int -> Bool)
+        , testProperty "AllShow Bool Bool Int Int instance"              (prop_matchesShow :: Int -> AllShow Bool Bool Int Int -> Bool)
+        , testProperty "AllShow Char Double Int Int instance"            (prop_matchesShow :: Int -> AllShow Char Double Int Int -> Bool)
+        , testProperty "AllShow Float Ordering Int Int instance"         (prop_matchesShow :: Int -> AllShow Float Ordering Int Int -> Bool)
+        , testProperty "NotAllShow Int Int Int Int instance"             (prop_matchesShow :: Int -> NotAllShow Int Int Int Int -> Bool)
+        , testProperty "OneDataInstance Int Int Int Int instance"        (prop_matchesShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
+        , testProperty "AssocData1 () instance"                          (prop_matchesShow :: Int -> AssocData1 () -> Bool)
+        , testProperty "AssocData2 () instance"                          (prop_matchesShow :: Int -> AssocData2 () Int Int -> Bool)
+#if __GLASGOW_HASKELL__ >= 708
+        , testProperty "NullaryData instance"                            (prop_matchesShow :: Int -> NullaryData -> Bool)
+#endif
+        , testProperty "GADTFam Char Int Int instance"                   (prop_matchesShow :: Int -> GADTFam Char Int Int -> Bool)
+        , testProperty "GADTFam Double Double Int instance"              (prop_matchesShow :: Int -> GADTFam Double Double Int -> Bool)
+        , testProperty "GADTFam Int String Int instance"                 (prop_matchesShow :: Int -> GADTFam Int String Int -> Bool)
+        , testProperty "GADTFam Ordering Int Int instance"               (prop_matchesShow :: Int -> GADTFam Ordering Int Int -> Bool)
+        , testProperty "GADTFam Int Int Int instance"                    (prop_matchesShow :: Int -> GADTFam Int Int Int -> Bool)
+#endif
 #if defined(GENERICS)
         , testProperty "Nullary generic show"                            (prop_genericShow :: Int -> Nullary -> Bool)
         , testProperty "PhantomNullary Int generic show"                 (prop_genericShow :: Int -> PhantomNullary Int -> Bool)
@@ -91,13 +84,31 @@ derivedTests =
 --         , testProperty "MonomorphicForall generic show"                  (prop_genericShow :: Int -> MonomorphicForall -> Bool)
 --         , testProperty "PolymorphicForall Int Int generic show"          (prop_genericShow :: Int -> PolymorphicForall Int Int -> Bool)
 --         , testProperty "AllAtOnce Int Int Int Int generic show"          (prop_genericShow :: Int -> AllAtOnce Int Int Int Int -> Bool)
---         , testProperty "GADT generic show"                               prop_genericShowGADT
+--         , testProperty "GADT Char Int Int generic show"                  (prop_genericShow :: Int -> GADT Char Int Int -> Bool)
+--         , testProperty "GADT Double Double Int generic show"             (prop_genericShow :: Int -> GADT Double Double Int -> Bool)
+--         , testProperty "GADT Int String Int generic show"                (prop_genericShow :: Int -> GADT Int String Int -> Bool)
+--         , testProperty "GADT Ordering Int Int generic show"              (prop_genericShow :: Int -> GADT Ordering Int Int -> Bool)
+--         , testProperty "GADT Int Int Int generic show"                   (prop_genericShow :: Int -> GADT Int Int Int -> Bool)
         , testProperty "LeftAssocTree Int generic show"                  (prop_genericShow :: Int -> LeftAssocTree Int -> Bool)
         , testProperty "RightAssocTree Int generic show"                 (prop_genericShow :: Int -> RightAssocTree Int -> Bool)
         , testProperty "Int :?: Int generic show"                        (prop_genericShow :: Int -> Int :?: Int -> Bool)
         , testProperty "HigherKindedTypeParams Maybe Int generic show"   (prop_genericShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
         , testProperty "RestrictedContext Int generic show"              (prop_genericShow :: Int -> RestrictedContext Int -> Bool)
         , testProperty "Fix Maybe generic show"                          (prop_genericShow :: Int -> Fix Maybe -> Bool)
+# if MIN_VERSION_template_haskell(2,7,0)
+        , testProperty "AllShow () () Int Int generic show"              (prop_matchesShow :: Int -> AllShow () () Int Int -> Bool)
+        , testProperty "AllShow Int Int Int Int generic show"            (prop_matchesShow :: Int -> AllShow Int Int Int Int -> Bool)
+        , testProperty "AllShow Bool Bool Int Int generic show"          (prop_matchesShow :: Int -> AllShow Bool Bool Int Int -> Bool)
+        , testProperty "AllShow Char Double Int Int generic show"        (prop_matchesShow :: Int -> AllShow Char Double Int Int -> Bool)
+        , testProperty "AllShow Float Ordering Int Int generic show"     (prop_matchesShow :: Int -> AllShow Float Ordering Int Int -> Bool)
+        , testProperty "NotAllShow Int Int Int Int generic show"         (prop_genericShow :: Int -> NotAllShow Int Int Int Int -> Bool)
+        , testProperty "OneDataInstance Int Int Int Int generic show"    (prop_genericShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
+        , testProperty "AssocData1 () generic show"                      (prop_genericShow :: Int -> AssocData1 () -> Bool)
+        , testProperty "AssocData2 () generic show"                      (prop_genericShow :: Int -> AssocData2 () Int Int -> Bool)
+#  if __GLASGOW_HASKELL__ >= 708
+        , testProperty "NullaryData generic show"                        (prop_genericShow :: Int -> NullaryData -> Bool)
+#  endif
+# endif
 #endif
         ]
     ]

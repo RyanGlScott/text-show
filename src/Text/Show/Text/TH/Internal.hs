@@ -43,7 +43,8 @@ module Text.Show.Text.TH.Internal (
     ) where
 
 import           Data.Functor ((<$>))
-import           Data.List (foldl', intersperse)
+import           Data.List (foldl', find, intersperse)
+import           Data.Maybe (fromJust)
 #if !(MIN_VERSION_base(4,8,0))
 import           Data.Monoid (mempty)
 #endif
@@ -146,72 +147,85 @@ deriveShow = deriveShowPragmas defaultPragmaOptions
 deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
                   -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
                   -> Q [Dec]
-#if __GLASGOW_HASKELL__ >= 702
-deriveShowPragmas opts dataName =
+deriveShowPragmas opts name = do
+    info <- reify name
+    case info of
+        TyConI{} -> deriveShowTyCon opts name
+#if MIN_VERSION_template_haskell(2,7,0)
+        DataConI{} -> deriveShowDataFamInst opts name
+        FamilyI (FamilyD DataFam _ _ _) _ -> deriveShowDataFam opts name
+        FamilyI (FamilyD TypeFam _ _ _) _ -> error $ ns ++ "Cannot use a type family name."
+        -- TODO: Figure out how this whole multiline string business works
+        _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
 #else
-deriveShowPragmas _    dataName =
+        _ -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
-    withType dataName $ \tvbs cons -> (:[]) <$> fromCons tvbs cons
   where
-    fromCons :: [TyVarBndr] -> [Con] -> Q Dec
-    fromCons tvbs cons =
-        instanceD (applyCon ''T.Show typeNames dataName)
-                  (appT classType instanceType)
-                  ([ funD 'showbPrec [ clause []
-                                              (normalB $ consToShow cons)
-                                              []
-                                     ]
-                   ] ++ inlineShowbPrecDec
-                     ++ inlineShowbDec
-                     ++ inlineShowbListDec
-                     ++ specializeDecs
-                  )
-        
+    ns :: String
+    ns = "Text.Show.Text.TH.deriveShow: "
+
+deriveShowTyCon :: PragmaOptions
+                -> Name
+                -> Q [Dec]
+deriveShowTyCon opts tyConName = withTyCon tyConName fromCons
+  where
+    fromCons :: [TyVarBndr] -> [Con] -> Q [Dec]
+    fromCons tvbs cons = (:[]) <$>
+        instanceD (applyCon ''T.Show typeNames)
+                  (appT (conT ''T.Show) instanceType)
+                  (showbPrecDecs opts cons)
       where
-          typeNames :: [Name]
-          typeNames = map tvbName tvbs
-          
-          instanceType :: Q Type
-          instanceType = foldl' appT (conT dataName) $ map varT typeNames
-          
-          classType :: Q Type
-          classType = conT ''T.Show
-          
-          inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
-#if __GLASGOW_HASKELL__ >= 702
-          inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
-          inlineShowbDec     = inline inlineShowb 'showb
-          inlineShowbListDec = inline inlineShowbList 'showbList
-#else
-          inlineShowbPrecDec = []
-          inlineShowbDec     = []
-          inlineShowbListDec = []
-#endif
-          
-#if __GLASGOW_HASKELL__ >= 702
-          inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
-          inline isInlining funName
-              | isInlining opts = [ pragInlD funName
-# if MIN_VERSION_template_haskell(2,8,0)
-                                             Inline FunLike AllPhases
-# else
-                                             (inlineSpecNoPhase True False)
-# endif
-                                  ]
-              | otherwise       = []
-#endif
-          
-          specializeDecs :: [Q Dec]
-#if MIN_VERSION_template_haskell(2,8,0)
-          specializeDecs = (fmap . fmap) (PragmaD
-                                             . SpecialiseInstP
-                                             . AppT (ConT ''T.Show)
-                                         )
-                                         (specializeTypes opts)
-#else
-          -- There doesn't appear to be an equivalent of SpecialiseInstP in early
-          -- versions Template Haskell.
-          specializeDecs = []
+        typeNames :: [Name]
+        typeNames = map tvbName tvbs
+        
+        instanceType :: Q Type
+        instanceType = foldl' appT (conT tyConName) $ map varT typeNames
+
+#if MIN_VERSION_template_haskell(2,7,0)
+deriveShowDataFam :: PragmaOptions
+                  -> Name
+                  -> Q [Dec]
+deriveShowDataFam opts dataFamName = withDataFam dataFamName $ \tvbs decs ->
+    flip mapM decs $ deriveShowDataFamFromDec opts dataFamName tvbs
+
+deriveShowDataFamInst :: PragmaOptions
+                      -> Name
+                      -> Q [Dec]
+deriveShowDataFamInst opts dataFamInstName = (:[]) <$>
+    withDataFamInstCon dataFamInstName (deriveShowDataFamFromDec opts)
+
+deriveShowDataFamFromDec :: PragmaOptions
+                         -> Name
+                         -> [TyVarBndr]
+                         -> Dec
+                         -> Q Dec
+deriveShowDataFamFromDec opts parentName tvbs dec =
+    instanceD (applyCon ''T.Show lhsTypeNames)
+              (appT (conT ''T.Show) instanceType)
+              (showbPrecDecs opts $ decCons [dec])
+  where
+    typeNames :: [Name]
+    typeNames = map tvbName tvbs
+    
+    lhsTypeNames :: [Name]
+    lhsTypeNames = drop (length instTypes) typeNames
+    
+    rhsTypes :: [Type]
+    rhsTypes = instTypes ++ drop (length instTypes) (map VarT typeNames)
+    
+    instTypes :: [Type]
+    instTypes = let tys = case dec of
+                              DataInstD    _ _ tys' _ _ -> tys'
+                              NewtypeInstD _ _ tys' _ _ -> tys'
+                              _ -> error "Text.Show.Text.TH.deriveShow: The impossible happened."
+                -- If PolyKinds is enabled, the first entries in this list will be
+                -- kind signatures, so drop them
+                in if length tys > length tvbs
+                      then drop (length tvbs) tys
+                      else tys
+    
+    instanceType :: Q Type
+    instanceType = foldl' appT (conT parentName) $ map return rhsTypes
 #endif
 
 {- $mk
@@ -302,7 +316,25 @@ mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 -- 
 -- /Since: 0.3.1/
 mkShowbPrec :: Name -> Q Exp
-mkShowbPrec name = withType name $ const consToShow
+-- TODO: This will break once data families are added. Rework the 'withTyCon' part.
+mkShowbPrec name = do
+    info <- reify name
+    case info of
+        TyConI{} -> withTyCon name $ \_ decs -> consToShow decs
+#if MIN_VERSION_template_haskell(2,7,0)
+        DataConI{} -> withDataFamInstCon name $ \_ _ dec ->
+            consToShow $ decCons [dec]
+        FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam name $ \_ decs ->
+            consToShow $ decCons decs
+        FamilyI (FamilyD TypeFam _ _ _) _ -> error $ ns ++ "Cannot use a type family name."
+        -- TODO: Figure out how this whole multiline string business works
+        _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
+#else
+        _ -> error $ ns ++ "The name must be of a plain type constructor."
+#endif
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.mk: "
 
 -- | Generates a lambda expression which converts the given list of @data@ types or
 -- @newtype@s to a 'Builder' in which the values are surrounded by square brackets
@@ -435,7 +467,7 @@ encodeArgs p (RecC conName ts) = do
                                          , [| fromString ", "                          |]
                                          ]
                                    )
-                            (zip args ts)
+                                   (zip args ts)
         braceCommaArgs = [| s '{' |] : take (length showArgs - 1) showArgs
         mappendArgs    = foldr (flip infixApp [| (<>) |])
                            [| s '}' |]
@@ -494,53 +526,90 @@ intConst :: a -> Int -> a
 intConst = const
 {-# INLINE intConst #-}
 
--- | Boilerplate for top level splices.
+-- | Boilerplate for top level splicing of plain type constructors.
 -- 
 -- The given 'Name' must be from a type constructor. Furthermore, the
 -- type constructor must be either a data type or a newtype. Any other
 -- value will result in an exception.
-withType :: Name
-         -> ([TyVarBndr] -> [Con] -> Q a)
-         -- ^ Function that generates the actual code. Will be applied
-         -- to the type variable binders and constructors extracted
-         -- from the given 'Name'.
-         -> Q a
-         -- ^ Resulting value in the 'Q'uasi monad.
-withType name f = do
+withTyCon :: Name -- ^ Name of the plain type constructor
+            -> ([TyVarBndr] -> [Con] -> Q a)
+            -- ^ Function that generates the actual code. Will be applied
+            -- to the type variable binders and constructors extracted
+            -- from the given 'Name'.
+            -> Q a
+            -- ^ Resulting value in the 'Q'uasi monad.
+withTyCon name f = do
     info <- reify name
     case info of
-      TyConI dec ->
-        case dec of
-          DataD    _ _ tvbs cons _ -> f tvbs cons
-          NewtypeD _ _ tvbs con  _ -> f tvbs [con]
-          other -> error $ "Text.Show.Text.TH.withType: Unsupported type "
-                          ++ S.show other ++ ". Must be a data type or newtype."
-      ClassI{} -> error "Text.Show.Text.TH.withType: Cannot use a typeclass name."
+        TyConI dec ->
+            case dec of
+                DataD    _ _ tvbs cons _ -> f tvbs cons
+                NewtypeD _ _ tvbs con  _ -> f tvbs [con]
+                other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data type or newtype."
+        _ -> error $ ns ++ "The name must be of a plain type constructor."
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.withTyCon: "
+
 #if MIN_VERSION_template_haskell(2,7,0)
-      FamilyI (FamilyD DataFam _ _ _) _ ->
-        error "Text.Show.Text.TH.withType: Data families are not supported as of now."
-      FamilyI (FamilyD TypeFam _ _ _) _ ->
-        error "Text.Show.Text.TH.withType: Cannot use a type family name."
+withDataFam :: Name
+            -> ([TyVarBndr] -> [Dec] -> Q a)
+            -> Q a
+withDataFam name f = do
+    info <- reify name
+    case info of
+        FamilyI (FamilyD DataFam _ tvbs _) decs -> f tvbs decs
+        FamilyI (FamilyD TypeFam _ _    _) _    ->
+            error $ ns ++ "Cannot use a type family name."
+        other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family name."
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.withDataFam: "
+
+withDataFamInstCon :: Name
+                   -> (Name -> [TyVarBndr] -> Dec -> Q a)
+                   -> Q a
+withDataFamInstCon dficName f = do
+    dficInfo <- reify dficName
+    case dficInfo of
+        DataConI _ _ parentName _ -> do
+            parentInfo <- reify parentName
+            case parentInfo of
+                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \tvbs decs ->
+                    let sameDefDec = fromJust . flip find decs $ \dec ->
+                          case dec of
+                              DataInstD    _ _ _ cons _ -> any ((dficName ==) . constructorName) cons 
+                              NewtypeInstD _ _ _ con  _ -> dficName == constructorName con
+                              _ -> error $ ns ++ "Must be a data or newtype instance."
+                    in f parentName tvbs sameDefDec
+                _ -> error $ ns ++ "Data constructor " ++ S.show dficName ++ " is not from a data family instance."
+        other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family instance constructor."
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.withDataFamInstCon: "
 #endif
-      _ -> error "Text.Show.Text.TH.withType: I need the name of a plain type constructor."
+
+decCons :: [Dec] -> [Con]
+decCons decs = flip concatMap decs $ \dec -> case dec of
+    DataInstD    _ _ _ cons _ -> cons
+    NewtypeInstD _ _ _ con  _ -> [con]
+    _ -> error $ "Text.Show.Text.TH.decCons: Must be a data or newtype instance."
+
+constructorName :: Con -> Name
+constructorName (NormalC name      _  ) = name
+constructorName (RecC    name      _  ) = name
+constructorName (InfixC  _    name _  ) = name
+constructorName (ForallC _    _    con) = constructorName con
 
 -- | Extracts the name from a type variable binder.
 tvbName :: TyVarBndr -> Name
-tvbName (PlainTV  name)   = name
+tvbName (PlainTV  name  ) = name
 tvbName (KindedTV name _) = name
 
 -- | Applies a typeclass to several type parameters to produce the type predicate of
--- an instance declaration. If a recent version of Template Haskell is used, this
--- function will filter type parameters that have phantom roles (since they have no
--- effect on the instance declaration.
-applyCon :: Name -> [Name] -> Name -> Q [Pred]
-#if MIN_VERSION_template_haskell(2,9,0)
-applyCon con typeNames targetData
-    = map apply . nonPhantomNames typeNames <$> reifyRoles targetData
-#else
-applyCon con typeNames _
-    = return $ map apply typeNames
-#endif
+-- an instance declaration.
+applyCon :: Name -> [Name] -> Q [Pred]
+applyCon con typeNames = return $ map apply typeNames
   where
     apply :: Name -> Pred
     apply t =
@@ -550,12 +619,56 @@ applyCon con typeNames _
         ClassP con [VarT t]
 #endif
 
-#if MIN_VERSION_template_haskell(2,9,0)
-    -- Filters a list of tycon names based on their type roles.
-    -- If a tycon has a phantom type role, remove it from the list.
-    nonPhantomNames :: [Name] -> [Role] -> [Name]
-    nonPhantomNames (_:ns) (PhantomR:rs) = nonPhantomNames ns rs
-    nonPhantomNames (n:ns) (_:rs)        = n:(nonPhantomNames ns rs)
-    nonPhantomNames []     _             = []
-    nonPhantomNames _      []            = []
+-- TODO: DEAR GOD LOOK AT ALL THE PRAGMAS OMFG
+-- Seriously though, document this. It's important.
+showbPrecDecs :: PragmaOptions -> [Con] -> [Q Dec]
+#if __GLASGOW_HASKELL__ >= 702
+showbPrecDecs opts cons =
+#else
+showbPrecDecs _    cons =
+#endif
+    [ funD 'showbPrec [ clause []
+                               (normalB $ consToShow cons)
+                               []
+                      ]
+    ] ++ inlineShowbPrecDec
+      ++ inlineShowbDec
+      ++ inlineShowbListDec
+      ++ specializeDecs
+  where
+    inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
+#if __GLASGOW_HASKELL__ >= 702
+    inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
+    inlineShowbDec     = inline inlineShowb 'showb
+    inlineShowbListDec = inline inlineShowbList 'showbList
+#else
+    inlineShowbPrecDec = []
+    inlineShowbDec     = []
+    inlineShowbListDec = []
+#endif
+          
+#if __GLASGOW_HASKELL__ >= 702
+    inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
+    inline isInlining funName
+        | isInlining opts = [ pragInlD funName
+# if MIN_VERSION_template_haskell(2,8,0)
+                                       Inline FunLike AllPhases
+# else
+                                       (inlineSpecNoPhase True False)
+# endif
+                            ]
+        | otherwise       = []
+#endif
+          
+    specializeDecs :: [Q Dec]
+#if MIN_VERSION_template_haskell(2,8,0)
+    specializeDecs = (map . fmap) (PragmaD
+                                       . SpecialiseInstP
+                                       . AppT (ConT ''T.Show)
+                                  )
+                                  (specializeTypes opts)
+#else
+    -- There doesn't appear to be an equivalent of SpecialiseInstP in early
+    -- versions Template Haskell.
+    specializeDecs = []
 #endif

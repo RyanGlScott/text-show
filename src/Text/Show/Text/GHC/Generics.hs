@@ -128,6 +128,7 @@ showbArityPrec :: Int -> Arity -> Builder
 showbArityPrec = showbPrec
 {-# INLINE showbArityPrec #-}
 
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show (U1 p) where
     showbPrec = $(mkShowbPrec ''U1)
     {-# INLINE showb #-}
@@ -142,30 +143,38 @@ instance Show1 Par1 where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}
 
+-- TODO: Derive with TH once it can detect higher-kinded types properly
 instance Show (f p) => Show (Rec1 f p) where
     showbPrec = $(mkShowbPrec ''Rec1)
     {-# INLINE showbPrec #-}
 
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show c => Show (K1 i c p) where
     showbPrec = $(mkShowbPrec ''K1)
     {-# INLINE showbPrec #-}
 
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show c => Show1 (K1 i c) where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}
 
+-- TODO: Derive with TH once it can detect phantom types
+-- and higher-kinded types properly
 instance Show (f p) => Show (M1 i c f p) where
     showbPrec = $(mkShowbPrec ''M1)
     {-# INLINE showbPrec #-}
 
+-- TODO: Derive with TH once it can detect higher-kinded types properly
 instance (Show (f p), Show (g p)) => Show ((f :+: g) p) where
     showbPrec = $(mkShowbPrec ''(:+:))
     {-# INLINE showbPrec #-}
 
+-- TODO: Derive with TH once it can detect higher-kinded types properly
 instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
     showbPrec = $(mkShowbPrec ''(:*:))
     {-# INLINE showbPrec #-}
 
+-- TODO: Derive with TH once it can detect higher-kinded types properly
 instance Show (f (g p)) => Show ((f :.: g) p) where
     showbPrec = $(mkShowbPrec ''(:.:))
     {-# INLINE showbPrec #-}

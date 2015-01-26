@@ -1,5 +1,7 @@
 # 0.6
+* `deriveShow` can now construct instances for data families, using either the data family name or a data instance constructor as an argument. See the documentation in `Text.Show.Text.TH` for more details.
 * Fixed a bug in which infix backticked data constructors (e.g., ```data Add = Int `Plus` Int```) would not be shown correctly.
+* Removed the phantom-type detecting mechanism with `template-haskell-2.9.0.0` or higher. This method of finding phantom types is intrinsically flawed and is not usable on older GHCs. I plan on introducing a more robust mechanism for detecting phantom types on more versions of Template Haskell in `text-show-0.7`.
 * Added generics support with the `Text.Show.Text.Generic` and `Text.Show.Text.Debug.Trace.Generic` modules
 * Deprecated `replicateB` in favor of `timesN` from the `semigroups` library
 * Added `FromTextShow` to `Text.Show.Text`, which admits a `String` `Show` instance for any data type with a `Text` `Show` instance (the counterpart of `FromStringShow`)

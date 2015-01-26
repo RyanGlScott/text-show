@@ -31,6 +31,7 @@ showbProxy :: Proxy s -> Builder
 showbProxy = showb
 {-# INLINE showbProxy #-}
 
+-- TODO: Derive with TH once it can detect phantom types properly
 instance Show (Proxy s) where
     showbPrec = $(mkShowbPrec ''Proxy)
     INLINE_INST_FUN(showb)

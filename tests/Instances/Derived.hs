@@ -1,6 +1,6 @@
-{-# LANGUAGE CPP, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving,
-             StandaloneDeriving, TemplateHaskell,
-             TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances, GADTs,
+             GeneralizedNewtypeDeriving, OverlappingInstances, StandaloneDeriving,
+             TemplateHaskell, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Instances.Derived
@@ -87,6 +87,16 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       ]
 
 $(deriveShow ''GADT)
+instance Arbitrary (GADT Char b c) where
+    arbitrary = pure GADTCon1
+instance Arbitrary (GADT Double Double c) where
+    arbitrary = GADTCon2 <$> arbitrary
+instance Arbitrary (GADT Int String c) where
+    arbitrary = GADTCon3 <$> arbitrary
+instance Arbitrary a => Arbitrary (GADT a b c) where
+    arbitrary = GADTCon4 <$> arbitrary
+instance Arbitrary b => Arbitrary (GADT b b c) where
+    arbitrary = GADTCon5 <$> arbitrary
 
 $(deriveShow ''LeftAssocTree)
 instance Arbitrary a => Arbitrary (LeftAssocTree a) where
@@ -122,4 +132,51 @@ instance Show (f (Fix f)) => Show (Fix f) where
     showbPrec = $(mkShowbPrec ''Fix)
 deriving instance Arbitrary (f (Fix f)) => Arbitrary (Fix f)
 
--- TODO: Test data family instances, once they're supported
+#if MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow ''AllShow)
+instance Arbitrary (AllShow () () c d) where
+    arbitrary = pure ASNullary
+deriving instance Arbitrary (AllShow Int b c d)
+instance Arbitrary (AllShow Bool Bool c d) where
+    arbitrary = ASProduct <$> arbitrary <*> arbitrary
+instance Arbitrary c => Arbitrary (AllShow Char Double c d) where
+    arbitrary = ASRecord <$> arbitrary <*> arbitrary <*> arbitrary
+instance Arbitrary (AllShow Float Ordering c d) where
+    arbitrary = ASInfix <$> arbitrary <*> arbitrary
+
+$(deriveShow 'NASShow1)
+instance Arbitrary c => Arbitrary (NotAllShow Int Int c d) where
+    arbitrary = oneof [NASShow1 <$> arbitrary <*> arbitrary, NASShow2 <$> arbitrary]
+
+$(deriveShow ''OneDataInstance)
+instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (OneDataInstance a b c d) where
+    arbitrary = oneof [ pure ODINullary
+                      , ODIUnary   <$> arbitrary
+                      , ODIProduct <$> arbitrary <*> arbitrary
+                      , ODIRecord  <$> arbitrary <*> arbitrary <*> arbitrary
+                      , ODIInfix   <$> arbitrary <*> arbitrary
+                      ]
+
+$(deriveShow ''AssocData1)
+deriving instance Arbitrary (AssocData1 ())
+
+$(deriveShow 'AssocCon2)
+deriving instance Arbitrary (AssocData2 () b c)
+
+#if __GLASGOW_HASKELL__ >= 708
+$(deriveShow 'NullaryCon)
+deriving instance Arbitrary NullaryData
+#endif
+
+$(deriveShow 'GADTFamCon1)
+instance Arbitrary (GADTFam Char b c) where
+    arbitrary = pure GADTFamCon1
+instance Arbitrary (GADTFam Double Double c) where
+    arbitrary = GADTFamCon2 <$> arbitrary
+instance Arbitrary (GADTFam Int String c) where
+    arbitrary = GADTFamCon3 <$> arbitrary
+instance Arbitrary a => Arbitrary (GADTFam a b c) where
+    arbitrary = GADTFamCon4 <$> arbitrary
+instance Arbitrary b => Arbitrary (GADTFam b b c) where
+    arbitrary = GADTFamCon5 <$> arbitrary
+#endif

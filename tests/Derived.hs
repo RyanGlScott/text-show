@@ -1,13 +1,19 @@
-{-# LANGUAGE CPP, ExistentialQuantification, FlexibleContexts,
-             GADTs, GeneralizedNewtypeDeriving, StandaloneDeriving,
-             TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE CPP, ExistentialQuantification, FlexibleContexts, FlexibleInstances,
+             GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
+             StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 #if defined(GENERICS)
 {-# LANGUAGE DeriveGeneric #-}
+#endif
+#if MIN_VERSION_template_haskell(2,7,0)
+{-# LANGUAGE TypeFamilies #-}
 #endif
 #if __GLASGOW_HASKELL__ >= 706
 -- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
 -- nicely with it for some reason.
 {-# LANGUAGE PolyKinds #-}
+#endif
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE NullaryTypeClasses #-}
 #endif
 {-|
 Module:      Derived
@@ -42,6 +48,16 @@ module Derived (
     , Restriction(..)
     , RestrictedContext(..)
     , Fix(..)
+    , AllShow(..)
+    , NotAllShow(..)
+    , OneDataInstance(..)
+    , AssocClass1(..)
+    , AssocData1(..)
+    , AssocClass2(..)
+    , AssocData2(..)
+    , NullaryClass(..)
+    , NullaryData(..)
+    , GADTFam(..)
     ) where
 
 #if defined(GENERICS)
@@ -215,10 +231,65 @@ newtype Fix f = Fix (f (Fix f))
 #endif
 deriving instance S.Show (f (Fix f)) => S.Show (Fix f)
 
--- TODO: Test data family instances, once they're supported
--- 
--- data family DataFamily a b c :: *
--- data instance DataFamily [a] [b] c = DataInstance1 a
---                                    | DataInstance2 [b]
---   deriving Show
--- newtype instance DataFamily Int Int c = NewtypeInstance Int deriving Show 
+#if MIN_VERSION_template_haskell(2,7,0)
+infix 2 `ASInfix`
+data family AllShow a b c d
+data instance AllShow () () c d = ASNullary
+  deriving (S.Show, Generic)
+newtype instance AllShow Int b c d = ASUnary Int
+  deriving (S.Show, Generic)
+data instance AllShow Bool Bool c d = ASProduct Bool Bool
+  deriving (S.Show, Generic)
+data instance AllShow Char Double c d = ASRecord {
+    asRecord1 :: Char
+  , asRecord2 :: Double
+  , asRecord3 :: c
+  } deriving (S.Show, Generic)
+data instance AllShow Float Ordering c d = Float `ASInfix` Ordering
+  deriving (S.Show, Generic)
+
+data family NotAllShow a b c d
+data instance NotAllShow ()  ()  () d = NASNoShow
+data instance NotAllShow Int Int c  d = NASShow1 Int Int
+                                      | NASShow2 c
+  deriving (S.Show, Generic)
+
+infix 1 `ODIInfix`
+data family OneDataInstance a b c d
+data instance OneDataInstance a b c d = ODINullary
+                                      | ODIUnary a
+                                      | ODIProduct a b
+                                      | ODIRecord {
+                                          odiRecord1 :: a
+                                        , odiRecord2 :: b
+                                        , odiRecord3 :: c
+                                      }
+                                      | a `ODIInfix` b
+  deriving (S.Show, Generic)
+
+class AssocClass1 a where
+    data AssocData1 a
+instance AssocClass1 () where
+    newtype AssocData1 () = AssocCon1 Int deriving (S.Show, Generic)
+
+class AssocClass2 a b c where
+    data AssocData2 a b c
+instance AssocClass2 () b c where
+    newtype AssocData2 () b c = AssocCon2 Int deriving (S.Show, Generic)
+
+#if __GLASGOW_HASKELL__ >= 708
+class NullaryClass where
+    data NullaryData
+instance NullaryClass where
+    newtype NullaryData = NullaryCon Int deriving (S.Show, Generic)
+#endif
+
+data family GADTFam a b c
+data instance GADTFam a b c where
+    GADTFamCon1 ::           GADTFam Char   b      c
+    GADTFamCon2 :: Double -> GADTFam Double Double c
+    GADTFamCon3 :: Int    -> GADTFam Int    String c
+    GADTFamCon4 :: a      -> GADTFam a      b      c
+    GADTFamCon5 :: b      -> GADTFam b      b      c
+deriving instance (S.Show a, S.Show b) => S.Show (GADTFam a b c)
+#endif
