@@ -1,7 +1,5 @@
-{-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
-#if MIN_VERSION_base(4,4,0)
-{-# LANGUAGE FlexibleContexts, TypeOperators #-}
-#endif
+{-# LANGUAGE CPP, FlexibleContexts, GeneralizedNewtypeDeriving,
+             StandaloneDeriving, TypeOperators #-}
 #if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE TypeFamilies #-}
 # if !(MIN_VERSION_base(4,8,0))
@@ -64,14 +62,11 @@ import           Data.Coerce (Coercible)
 import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
-#if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
-import           GHC.Fingerprint.Type (Fingerprint(..))
 
 #if !(MIN_VERSION_base(4,7,0))
 import           Data.Word (Word64)
 import           Numeric (showHex)
-#endif
 #endif
 import           Data.Version (Version(..))
 
@@ -84,22 +79,19 @@ import           GHC.Conc (BlockReason(..), ThreadStatus(..))
 #if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent(..))
 #endif
-import           GHC.IO.Exception (IOException(..), IOErrorType(..))
-#if MIN_VERSION_base(4,4,0)
+import           GHC.Fingerprint.Type (Fingerprint(..))
 import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import           GHC.IO.Encoding.Types (CodingProgress(..))
+import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 import qualified GHC.Generics as G (Fixity(..))
 import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
                                M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
                                Associativity(..), Arity(..))
-#endif
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
 #endif
-#if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats(..))
-#endif
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 #endif
@@ -118,6 +110,7 @@ import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
 
 import           Text.Show.Text (FromStringShow(..), FromTextShow(..))
 import           Text.Show.Text.Data.Char (LitChar(..), LitString(..))
+import           Text.Show.Text.Generic (ConType(..))
 
 #include "HsBaseConfig.h"
 
@@ -249,7 +242,6 @@ instance Arbitrary OldT.TyCon where
     arbitrary = OldT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #endif
 
-#if MIN_VERSION_base(4,4,0)
 instance Arbitrary NewT.TypeRep where
     arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <@> []
 --     arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <*> arbitrary
@@ -268,7 +260,6 @@ instance Show Fingerprint where
       hex16 :: Word64 -> String
       hex16 i = let hex = showHex i ""
                  in replicate (16 - length hex) '0' ++ hex
-#endif
 #endif
 
 instance Arbitrary Dynamic where
@@ -357,14 +348,8 @@ instance Arbitrary Newline where
 instance Arbitrary NewlineMode where
     arbitrary = NewlineMode <$> arbitrary <*> arbitrary
 
-#if MIN_VERSION_base(4,3,0)
 -- TODO: instance Arbitrary TextEncoding
-#else
-deriving instance Show Newline
-deriving instance Show NewlineMode
-#endif
 
-#if MIN_VERSION_base(4,4,0)
 deriving instance Bounded CodingProgress
 deriving instance Enum CodingProgress
 instance Arbitrary CodingProgress where
@@ -374,9 +359,7 @@ deriving instance Bounded CodingFailureMode
 deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
     arbitrary = arbitraryBoundedEnum
-#endif
 
-#if MIN_VERSION_base(4,5,0)
 instance Arbitrary GCStats where
     arbitrary = GCStats <$> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
@@ -384,14 +367,10 @@ instance Arbitrary GCStats where
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
-#endif
 
--- #if MIN_VERSION_base(4,4,0)
 -- TODO: instance Arbitrary Event
 -- TODO: instance Arbitrary FdKey
--- #endif
 
-#if MIN_VERSION_base(4,4,0)
 instance Arbitrary (U1 p) where
     arbitrary = pure U1
 
@@ -447,7 +426,6 @@ instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
 
 deriving instance Show (f (g p))           => Show ((f :.: g) p)
 #endif
-#endif
 
 #if MIN_VERSION_base(4,8,0)
 -- TODO: instance Arbitrary RTSFlags
@@ -493,6 +471,9 @@ instance Arbitrary SomeNat where
 instance Arbitrary SomeSymbol where
     arbitrary = someSymbolVal <$> arbitrary
 #endif
+
+instance Arbitrary ConType where
+    arbitrary = oneof [pure Rec, pure Tup, pure Pref, Inf <$> arbitrary]
 
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar

@@ -1,7 +1,4 @@
-{-# LANGUAGE CPP #-}
-#if MIN_VERSION_base(4,4,0)
-{-# LANGUAGE FlexibleContexts, TypeOperators #-}
-#endif
+{-# LANGUAGE CPP, FlexibleContexts, TypeOperators #-}
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif
@@ -58,10 +55,7 @@ import qualified Data.Text as TL
 import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
 #endif
-#if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable as NewT (TyCon, TypeRep)
-import           GHC.Fingerprint.Type (Fingerprint)
-#endif
 import           Data.Word (Word8, Word16, Word32, Word64)
 #if !(MIN_VERSION_base(4,8,0))
 import           Data.Word (Word)
@@ -75,20 +69,17 @@ import           GHC.Conc (BlockReason, ThreadStatus)
 #if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent)
 #endif
+import           GHC.Fingerprint.Type (Fingerprint)
 import qualified GHC.Generics as G (Fixity)
 import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
                                Associativity, Arity)
-#if MIN_VERSION_base(4,4,0)
 import           GHC.IO.Encoding.Failure (CodingFailureMode)
 import           GHC.IO.Encoding.Types (CodingProgress)
-#endif
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo)
 #endif
-#if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats)
-#endif
 import           GHC.Show (asciiTab, showList__)
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol)
@@ -104,10 +95,7 @@ import           Numeric.Natural (Natural)
 
 import           Prelude hiding (Show)
 
-import           Properties.Utils (prop_matchesShow)
-#if __GLASGOW_HASKELL__ >= 702
-import           Properties.Utils (prop_genericShow)
-#endif
+import           Properties.Utils (prop_matchesShow, prop_genericShow)
 
 import           System.Exit (ExitCode)
 import           System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode, Handle)
@@ -120,7 +108,6 @@ import           Test.Tasty.QuickCheck (Gen, arbitrary, suchThat, testProperty)
 
 import           Text.Show.Functions ()
 import           Text.Show.Text hiding (Show)
-import           Text.Show.Text.Functions ()
 import           Text.Show.Text.Data.Char (LitChar, LitString, asciiTabB)
 import           Text.Show.Text.Data.Fixed (showbFixed)
 import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
@@ -130,6 +117,8 @@ import           Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
 import           Text.Show.Text.Data.Integral (showbIntAtBase)
 import           Text.Show.Text.Data.List (showbListDefault)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
+import           Text.Show.Text.Functions ()
+import           Text.Show.Text.Generic (ConType)
 
 #include "HsBaseConfig.h"
 
@@ -339,13 +328,11 @@ baseAndFriendsTests =
         , testProperty "(Int, Int, Int) instance"               (prop_matchesShow :: Int -> (Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int) instance"          (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int, Int) instance"     (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-#if __GLASGOW_HASKELL__ >= 702
         , testProperty "() generic show"                        (prop_genericShow :: Int -> () -> Bool)
         , testProperty "(Int, Int) generic show"                (prop_genericShow :: Int -> (Int, Int) -> Bool)
         , testProperty "(Int, Int, Int) generic show"           (prop_genericShow :: Int -> (Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int) generic show"      (prop_genericShow :: Int -> (Int, Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int, Int) generic show" (prop_genericShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-#endif
         ]
 #if MIN_VERSION_base(4,7,0)
     , testGroup "Text.Show.Text.Data.Type.Coercion"
@@ -355,12 +342,10 @@ baseAndFriendsTests =
         [ testProperty "(:~:) instance"                         (prop_matchesShow :: Int -> Int :~: Int -> Bool)
         ]
 #endif
-#if MIN_VERSION_base(4,4,0)
     , testGroup "Text.Show.Text.Data.Typeable"
         [ testProperty "TypeRep instance"                       (prop_matchesShow :: Int -> NewT.TypeRep -> Bool)
         , testProperty "TyCon instance"                         (prop_matchesShow :: Int -> NewT.TyCon -> Bool)
         ]
-#endif
     , testGroup "Text.Show.Text.Data.Version"
         [ testProperty "Version instance"                       (prop_matchesShow :: Int -> Version -> Bool)
         , testProperty "showbVersionConcrete output"            prop_showVersion
@@ -389,10 +374,8 @@ baseAndFriendsTests =
         , testProperty "CUIntMax instance"                      (prop_matchesShow :: Int -> CUIntMax -> Bool)
         , testProperty "CClock instance"                        (prop_matchesShow :: Int -> CClock -> Bool)
         , testProperty "CTime instance"                         (prop_matchesShow :: Int -> CTime -> Bool)
-#if MIN_VERSION_base(4,4,0)
         , testProperty "CUSeconds instance"                     (prop_matchesShow :: Int -> CUSeconds -> Bool)
         , testProperty "CSUSeconds instance"                    (prop_matchesShow :: Int -> CSUSeconds -> Bool)
-#endif
         , testProperty "CFloat instance"                        (prop_matchesShow :: Int -> CFloat -> Bool)
         , testProperty "CDouble instance"                       (prop_matchesShow :: Int -> CUChar -> Bool)
         ]
@@ -403,22 +386,24 @@ baseAndFriendsTests =
         , testProperty "WordPtr instance"                       (prop_matchesShow :: Int -> WordPtr -> Bool)
 --         , testProperty "ForeignPtr instance"                    (prop_matchesShow :: Int -> ForeignPtr Int -> Bool)
         ]
--- #if MIN_VERSION_base(4,4,0) && !defined(mingw32_HOST_OS)
+-- #if !defined(mingw32_HOST_OS)
 --     , testGroup "Text.Show.Text.GHC.Event"
 --         [ testProperty "Event instance"                         (prop_matchesShow :: Int -> Event -> Bool)
 --         , testProperty "FdKey instance"                         (prop_matchesShow :: Int -> FdKey -> Bool)
 --         ]
 -- #endif
+    , testGroup "Text.Show.Text.Generic"
+        [ testProperty "ConType instance"                       (prop_matchesShow :: Int -> ConType -> Bool)
+        , testProperty "ConType generic show"                   (prop_genericShow :: Int -> ConType -> Bool)
+        ]
 #if defined(mingw32_HOST_OS)
     , testGroup "Text.Show.Text.GHC.Conc.Windows"
-        [ testProperty "ConsoleEvent instance"                   (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+        [ testProperty "ConsoleEvent instance"                  (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
         ]
 #endif
-#if MIN_VERSION_base(4,4,0)
     , testGroup "Text.Show.Text.GHC.Fingerprint"
         [ testProperty "Fingerprint instance"                   (prop_matchesShow :: Int -> Fingerprint -> Bool)
         ]
-#endif
     , testGroup "Text.Show.Text.GHC.Generics"
         [ testProperty "U1 Int instance"                        (prop_matchesShow :: Int -> U1 Int -> Bool)
         , testProperty "Par1 Int instance"                      (prop_matchesShow :: Int -> Par1 Int -> Bool)
@@ -448,11 +433,9 @@ baseAndFriendsTests =
         [ testProperty "StaticPtrInfo instance"                 (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
         ]
 #endif
-#if MIN_VERSION_base(4,5,0)
     , testGroup "Text.Show.Text.GHC.Stats"
         [ testProperty "GCStats instance"                       (prop_matchesShow :: Int -> GCStats -> Bool)
         ]
-#endif
 #if MIN_VERSION_base(4,6,0)
     , testGroup "Text.Show.Text.GHC.TypeLits"
         [
@@ -477,13 +460,9 @@ baseAndFriendsTests =
         , testProperty "BufferMode instance"                    (prop_matchesShow :: Int -> BufferMode -> Bool)
 --         , testProperty "HandlePosn instance"                    (prop_matchesShow :: Int -> HandlePosn -> Bool)
         , testProperty "SeekMode instance"                      (prop_matchesShow :: Int -> SeekMode -> Bool)
--- #if MIN_VERSION_base(4,3,0)
 --         , testProperty "TextEncoding"                           (prop_matchesShow :: Int -> TextEncoding -> Bool)
--- #endif
-#if MIN_VERSION_base(4,4,0)
         , testProperty "CodingProgress instance"                (prop_matchesShow :: Int -> CodingProgress -> Bool)
         , testProperty "CodingFailureMode instance"             (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
-#endif
         , testProperty "Newline instance"                       (prop_matchesShow :: Int -> Newline -> Bool)
         , testProperty "NewlineMode instance"                   (prop_matchesShow :: Int -> NewlineMode -> Bool)
         ]

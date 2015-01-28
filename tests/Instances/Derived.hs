@@ -152,7 +152,7 @@ instance Arbitrary (AllShow Float Ordering c d) where
     arbitrary = ASInfix <$> arbitrary <*> arbitrary
 
 $(deriveShow 'NASShow1)
-instance Arbitrary c => Arbitrary (NotAllShow Int Int c d) where
+instance Arbitrary b => Arbitrary (NotAllShow Int b Int d) where
     arbitrary = oneof [NASShow1 <$> arbitrary <*> arbitrary, NASShow2 <$> arbitrary]
 
 $(deriveShow ''OneDataInstance)

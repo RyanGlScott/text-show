@@ -12,15 +12,14 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-@QuickCheck@ properties for 'mkShow' and related functions in "Text.Show.Text.TH".
+@QuickCheck@ properties for 'mkShowbPrec' in "Text.Show.Text.TH".
 -}
 module Properties.MkShow (mkShowTests) where
 
-import qualified Data.Text      as TS (Text, pack)
-import qualified Data.Text.Lazy as TL (Text, pack)
-import           Data.Text.Lazy.Builder (Builder, fromString)
-
-import           Derived
+import           Derived (AllAtOnce)
+#if MIN_VERSION_template_haskell(2,7,0)
+import           Derived (NotAllShow(..), OneDataInstance)
+#endif
 
 import           Instances.Derived ()
 
@@ -28,74 +27,30 @@ import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.QuickCheck (Arbitrary, testProperty)
 
 import qualified Text.Show as S (Show)
-import           Text.Show.Text.TH
+import           Text.Show.Text (Builder, FromStringShow(..), showbPrec)
+import           Text.Show.Text.TH (mkShowbPrec)
 
--- | Verifies 'mkShow' (and related functions) produce the same output as their
--- 'String' counterparts.
-prop_mkShow :: (Arbitrary a, S.Show a)
-            => (a -> TS.Text)        -- ^ 'mkShow'
-            -> (a -> TL.Text)        -- ^ 'mkShowLazy'
-            -> (a -> Builder)        -- ^ 'mkShowb'
-            -> (Int -> a -> TS.Text) -- ^ 'mkShowPrec'
-            -> (Int -> a -> TL.Text) -- ^ 'mkShowPrecLazy'
-            -> (Int -> a -> Builder) -- ^ 'mkShowbPrec'
-            -> ([a] -> TS.Text)      -- ^ 'mkShowList'
-            -> ([a] -> TL.Text)      -- ^ 'mkShowListLazy'
-            -> ([a] -> Builder)      -- ^ 'mkShowbList'
-            -> Int -> a -> Bool
-prop_mkShow s1 s2 s3 sp1 sp2 sp3 sl1 sl2 sl3 p a =
-       TS.pack    (show          a   ) == s1      a
-    && TL.pack    (show          a   ) == s2      a
-    && fromString (show          a   ) == s3      a
-    && TS.pack    (showsPrec p   a "") == sp1 p   a
-    && TL.pack    (showsPrec p   a "") == sp2 p   a
-    && fromString (showsPrec p   a "") == sp3 p   a
-    && TS.pack    (showList    [a] "") == sl1   [a]
-    && TL.pack    (showList    [a] "") == sl2   [a]
-    && fromString (showList    [a] "") == sl3   [a]
+-- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' does.
+prop_mkShowbPrec :: (Arbitrary a, S.Show a)
+                 => (Int -> a -> Builder) -- ^ TH-generated 'mkShowbPrec' function
+                 -> Int -> a -> Bool
+prop_mkShowbPrec sf p x = showbPrec p (FromStringShow x) == sf p x
 
--- | Verifies 'mkShow' (and related functions) produce the same output as their
--- 'String' counterparts. This uses a plain type constructor.
-prop_mkShowTyCon :: Int -> AllAtOnce Int Int Int Int -> Bool
-prop_mkShowTyCon = prop_mkShow
-    $(mkShow         ''AllAtOnce)
-    $(mkShowLazy     ''AllAtOnce)
-    $(mkShowb        ''AllAtOnce)
-    $(mkShowPrec     ''AllAtOnce)
-    $(mkShowPrecLazy ''AllAtOnce)
-    $(mkShowbPrec    ''AllAtOnce)
-    $(mkShowList     ''AllAtOnce)
-    $(mkShowListLazy ''AllAtOnce)
-    $(mkShowbList    ''AllAtOnce)
+-- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' does.
+-- This uses a plain type constructor.
+prop_mkShowbPrecTyCon :: Int -> AllAtOnce Int Int Int Int -> Bool
+prop_mkShowbPrecTyCon = prop_mkShowbPrec $(mkShowbPrec ''AllAtOnce)
 
 #if MIN_VERSION_template_haskell(2,7,0)
--- | Verifies 'mkShow' (and related functions) produce the same output as their
--- 'String' counterparts. This uses a data family name.
-prop_mkShowDataFam :: Int -> OneDataInstance Int Int Int Int -> Bool
-prop_mkShowDataFam = prop_mkShow
-    $(mkShow         ''OneDataInstance)
-    $(mkShowLazy     ''OneDataInstance)
-    $(mkShowb        ''OneDataInstance)
-    $(mkShowPrec     ''OneDataInstance)
-    $(mkShowPrecLazy ''OneDataInstance)
-    $(mkShowbPrec    ''OneDataInstance)
-    $(mkShowList     ''OneDataInstance)
-    $(mkShowListLazy ''OneDataInstance)
-    $(mkShowbList    ''OneDataInstance)
+-- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' does.
+-- This uses a data family name.
+prop_mkShowbPrecDataFam :: Int -> OneDataInstance Int Int Int Int -> Bool
+prop_mkShowbPrecDataFam = prop_mkShowbPrec $(mkShowbPrec ''OneDataInstance)
 
--- | Verifies 'mkShow' (and related functions) produce the same output as their
--- 'String' counterparts. This uses a data family instance constructor.
-prop_mkShowDataFamInstCon :: Int -> NotAllShow Int Int Int Int -> Bool
-prop_mkShowDataFamInstCon = prop_mkShow
-    $(mkShow         'NASShow1)
-    $(mkShowLazy     'NASShow1)
-    $(mkShowb        'NASShow1)
-    $(mkShowPrec     'NASShow1)
-    $(mkShowPrecLazy 'NASShow1)
-    $(mkShowbPrec    'NASShow1)
-    $(mkShowList     'NASShow1)
-    $(mkShowListLazy 'NASShow1)
-    $(mkShowbList    'NASShow1)
+-- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' does.
+-- This uses a data family instance constructor.
+prop_mkShowbPrecDataFamInstCon :: Int -> NotAllShow Int Int Int Int -> Bool
+prop_mkShowbPrecDataFamInstCon = prop_mkShowbPrec $(mkShowbPrec 'NASShow1)
 #endif
 
 -- prop_mkPrint
@@ -104,13 +59,13 @@ prop_mkShowDataFamInstCon = prop_mkShow
 mkShowTests :: [TestTree]
 mkShowTests =
     [ testGroup "mkShow and related functions"
-        [ testProperty "$(mkShow ''AllAtOnce) (a plain type constructor)"             prop_mkShowTyCon
---         , testProperty "$(mkPrint ''AllAtOnce) (a plain type constructor)"            prop_mkPrintTyCon
+        [ testProperty "$(mkShowbPrec ''AllAtOnce) (a plain type constructor)"             prop_mkShowbPrecTyCon
+--         , testProperty "$(mkPrint ''AllAtOnce) (a plain type constructor)"                 prop_mkPrintTyCon
 #if MIN_VERSION_template_haskell(2,7,0)
-        , testProperty "$(mkShow ''NotAllShow) (a data family instance constructor)"  prop_mkShowDataFamInstCon
---         , testProperty "$(mkPrint ''NotAllShow) (a data family instance constructor)" prop_mkShowDataFamInstCon
-        , testProperty "$(mkShow ''OneDataInstance) (a data family name)"             prop_mkShowDataFam
---         , testProperty "$(mkPrint ''OneDataInstance) (a data family name)"            prop_mkPrintDataFam
+        , testProperty "$(mkShowbPrec ''NotAllShow) (a data family instance constructor)"  prop_mkShowbPrecDataFamInstCon
+--         , testProperty "$(mkPrint ''NotAllShow) (a data family instance constructor)"      prop_mkShowDataFamInstCon
+        , testProperty "$(mkShowbPrec ''OneDataInstance) (a data family name)"             prop_mkShowbPrecDataFam
+--         , testProperty "$(mkPrint ''OneDataInstance) (a data family name)"                 prop_mkPrintDataFam
 #endif
         ]
     ]

@@ -1,9 +1,6 @@
-{-# LANGUAGE CPP, ExistentialQuantification, FlexibleContexts, FlexibleInstances,
-             GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
+{-# LANGUAGE CPP, DeriveGeneric, ExistentialQuantification, FlexibleContexts,
+             FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
              StandaloneDeriving, TypeOperators, UndecidableInstances #-}
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric #-}
-#endif
 #if MIN_VERSION_template_haskell(2,7,0)
 {-# LANGUAGE TypeFamilies #-}
 #endif
@@ -66,9 +63,7 @@ module Derived (
     , GADTFam(..)
     ) where
 
-#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-#endif
 
 import           Prelude hiding (Show)
 
@@ -77,83 +72,35 @@ import           Test.Tasty.QuickCheck (Arbitrary)
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
 
-data Nullary = Nullary
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data Nullary = Nullary deriving (S.Show, Generic)
 
-data PhantomNullary a = PhantomNullary
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data PhantomNullary a = PhantomNullary deriving (S.Show, Generic)
 
-newtype MonomorphicUnary = MonomorphicUnary Int
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+newtype MonomorphicUnary = MonomorphicUnary Int deriving (S.Show, Generic)
 
-newtype PolymorphicUnary a b = PolymorphicUnary a
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+newtype PolymorphicUnary a b = PolymorphicUnary a deriving (S.Show, Generic)
 
-data MonomorphicProduct = MonomorphicProduct Char Double Int
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data MonomorphicProduct = MonomorphicProduct Char Double Int deriving (S.Show, Generic)
 
-data PolymorphicProduct a b c d = PolymorphicProduct a b c
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data PolymorphicProduct a b c d = PolymorphicProduct a b c deriving (S.Show, Generic)
 
 data MonomorphicRecord = MonomorphicRecord {
     monomorphicRecord1 :: Char
   , monomorphicRecord2 :: Double
   , monomorphicRecord3 :: Int
-} deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+} deriving (S.Show, Generic)
 
 data PolymorphicRecord a b c d = PolymorphicRecord {
     polymorphicRecord1 :: a
   , polymorphicRecord2 :: b
   , polymorphicRecord3 :: c
-} deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+} deriving (S.Show, Generic)
 
 infix 7 :/:
-data MonomorphicInfix = Int :/: Double
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data MonomorphicInfix = Int :/: Double deriving (S.Show, Generic)
 
 infix 8 `PolyInf`
-data PolymorphicInfix a b c = a `PolyInf` b
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data PolymorphicInfix a b c = a `PolyInf` b deriving (S.Show, Generic)
 
 -- TODO: Figure out how to create Generic instances for MonomorphicForall, PolymorphicForall,
 -- AllAtOnce, and GADT
@@ -188,53 +135,24 @@ deriving instance (S.Show a, S.Show b) => S.Show (GADT a b c)
 infixl 5 :<:
 data LeftAssocTree a = LeftAssocLeaf a
                      | LeftAssocTree a :<: LeftAssocTree a
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+  deriving (S.Show, Generic)
 
 infixl 5 :>:
 data RightAssocTree a = RightAssocLeaf a
                       | RightAssocTree a :>: RightAssocTree a
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+  deriving (S.Show, Generic)
 
 infix 4 :?:
-data a :?: b = a :?: b
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+data a :?: b = a :?: b deriving (S.Show, Generic)
 
-newtype HigherKindedTypeParams f a = HigherKindedTypeParams (f a)
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+newtype HigherKindedTypeParams f a = HigherKindedTypeParams (f a) deriving (S.Show, Generic)
 
-newtype Restriction a = Restriction a
-#if __GLASGOW_HASKELL__ >= 702
-  deriving Generic
-#endif
+newtype Restriction a = Restriction a deriving Generic
 deriving instance (Read a, S.Show a) => S.Show (Restriction a)
 
-newtype RestrictedContext a = RestrictedContext (Restriction a)
-  deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
+newtype RestrictedContext a = RestrictedContext (Restriction a) deriving (S.Show, Generic)
 
-newtype Fix f = Fix (f (Fix f))
-#if __GLASGOW_HASKELL__ >= 702
-  deriving Generic
-#endif
+newtype Fix f = Fix (f (Fix f)) deriving Generic
 deriving instance S.Show (f (Fix f)) => S.Show (Fix f)
 
 #if MIN_VERSION_template_haskell(2,7,0)
@@ -280,9 +198,9 @@ data instance AllShow Float Ordering c d = Float `ASInfix` Ordering
            )
 
 data family NotAllShow a b c d :: *
-data instance NotAllShow ()  ()  () d = NASNoShow
-data instance NotAllShow Int Int c  d = NASShow1 Int Int
-                                      | NASShow2 c
+data instance NotAllShow ()  ()  ()  d = NASNoShow
+data instance NotAllShow Int b   Int d = NASShow1 Int Int
+                                       | NASShow2 b
   deriving ( S.Show
 # if __GLASGOW_HASKELL__ >= 706
            {- Woraround for a bizarre bug in older GHCs -}

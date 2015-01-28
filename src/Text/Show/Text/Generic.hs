@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances,
+{-# LANGUAGE CPP, DeriveGeneric, FlexibleContexts, FlexibleInstances,
              OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
 {-|
 Module:      Text.Show.Text.Generic
@@ -58,11 +58,14 @@ import           Prelude hiding (Show)
 
 import           System.IO (Handle)
 
+import qualified Text.Show as S (Show)
 import           Text.Show.Text.Classes (Show(showbPrec), showbListDefault,
                                          showbParen, showbSpace)
 import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils ((<>), isInfixTypeCon, isTupleString,
                                        s, toString)
+
+#include "inline.h"
 
 {- $generics
 
@@ -103,7 +106,7 @@ instance Show Oops where
     showbPrec = 'genericShowbPrec'
 @
 
-If you forget to add a \"@deriving 'Generic'@\" clause to your data type, at
+If you forget to add a @deriving 'Generic'@ clause to your data type, at
 compile-time, you will get an error message that begins roughly as follows:
 
 @
@@ -198,10 +201,19 @@ genericHPrintLazy h = TL.hPutStrLn h . genericShowLazy
 
 -- | Whether a constructor is a record ('Rec'), a tuple ('Tup'), is prefix ('Pref'),
 -- or infix ('Inf').
+-- 
+-- /Since: 0.6/
 data ConType = Rec | Tup | Pref | Inf Builder
+  deriving (Eq, Generic, Ord, S.Show)
+
+instance Show ConType where
+    showbPrec = genericShowbPrec
+    INLINE_INST_FUN(showbPrec)
 
 -- | Class of generic representation types ('Rep') that can be converted to
 -- a 'Builder'.
+-- 
+-- /Since: 0.6/
 class GShow f where
     -- This function is used as the default generic implementation of 'showbPrec'.
     gShowbPrec :: ConType -> Int -> f a -> Builder
