@@ -7,7 +7,8 @@
 * Added `FromTextShow` to `Text.Show.Text`, which admits a `String` `Show` instance for any data type with a `Text` `Show` instance (the counterpart of `FromStringShow`)
 * Added `Monoid` and `Semigroup` instances for `FromStringShow`, `Semigroup` instance for `LitString`, `IsChar` instance for `LitChar`, and `IsString` instance for `[LitChar]`
 * Changed the `String` `Show` instances of `FromStringShow`, `LitChar`, and `LitString` to more closely match the `Text` `Show` instances. As a result, the `Read` instances for these data types were also changed so that `read . show = read . show = id`.
-* Added `integer-simple` flag, removed the `transformers-four` flag
+* Removed the `recent-text` flag. We'll allow users to build with older versions of `text`, but the latest version is recommended. Because of this, the `integer-simple` and `integer-gmp` flags are not needed.
+* Removed the `transformers-four` flag, as it is not needed now that `transformers-compat` is a dependency
 
 # 0.5
 * Fix build for GHC 7.10, old GHC versions, and Windows

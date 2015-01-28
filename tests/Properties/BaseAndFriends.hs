@@ -22,7 +22,7 @@ import           Control.Applicative (ZipList(..), liftA2)
 import           Control.Exception
 import           Control.Monad.ST
 
-#if !defined(mingw32_HOST_OS)
+#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 import           Data.Array (Array)
 #endif
 import           Data.Array (elems)
@@ -105,7 +105,7 @@ import           Numeric.Natural (Natural)
 import           Prelude hiding (Show)
 
 import           Properties.Utils (prop_matchesShow)
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
 import           Properties.Utils (prop_genericShow)
 #endif
 
@@ -138,7 +138,7 @@ prop_showFixed :: Bool -> Fixed E12 -> Bool
 prop_showFixed b f = fromString (showFixed b f) == showbFixed b f
 
 -- | Verifies 'showIntAtBase' and 'showbIntAtBase' generate the same output.
-#if !defined(mingw32_HOST_OS)
+#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 prop_showIntAtBase :: Gen Bool
 prop_showIntAtBase = do
     base <- arbitrary `suchThat` (liftA2 (&&) (> 1) (<= 16))
@@ -204,7 +204,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Control.Monad.ST"
         [ testProperty "ST instance"                            (prop_matchesShow :: Int -> ST Int Int -> Bool)
         ]
-#if !defined(mingw32_HOST_OS)
+#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why this test diverges on Windows
     , testGroup "Text.Show.Text.Data.Array"
         [ testProperty "Array Int Int instance"                 (prop_matchesShow :: Int -> Array Int Int -> Bool)
@@ -281,7 +281,7 @@ baseAndFriendsTests =
         , testProperty "Word16 instance"                        (prop_matchesShow :: Int -> Word16 -> Bool)
         , testProperty "Word32 instance"                        (prop_matchesShow :: Int -> Word32 -> Bool)
         , testProperty "Word64 instance"                        (prop_matchesShow :: Int -> Word64 -> Bool)
-#if !defined(mingw32_HOST_OS)
+#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why this diverges on Windows
         , testProperty "showbIntAtBase output"                  prop_showIntAtBase
 #endif
@@ -339,7 +339,7 @@ baseAndFriendsTests =
         , testProperty "(Int, Int, Int) instance"               (prop_matchesShow :: Int -> (Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int) instance"          (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
         , testProperty "(Int, Int, Int, Int, Int) instance"     (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
         , testProperty "() generic show"                        (prop_genericShow :: Int -> () -> Bool)
         , testProperty "(Int, Int) generic show"                (prop_genericShow :: Int -> (Int, Int) -> Bool)
         , testProperty "(Int, Int, Int) generic show"           (prop_genericShow :: Int -> (Int, Int, Int) -> Bool)

@@ -17,7 +17,7 @@ import Derived
 import Instances.Derived ()
 
 import Properties.Utils (prop_matchesShow)
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
 import Properties.Utils (prop_genericShow)
 #endif
 
@@ -70,7 +70,7 @@ derivedTests =
         , testProperty "GADTFam Ordering Int Int instance"               (prop_matchesShow :: Int -> GADTFam Ordering Int Int -> Bool)
         , testProperty "GADTFam Int Int Int instance"                    (prop_matchesShow :: Int -> GADTFam Int Int Int -> Bool)
 #endif
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
         , testProperty "Nullary generic show"                            (prop_genericShow :: Int -> Nullary -> Bool)
         , testProperty "PhantomNullary Int generic show"                 (prop_genericShow :: Int -> PhantomNullary Int -> Bool)
         , testProperty "MonomorphicUnary generic show"                   (prop_genericShow :: Int -> MonomorphicUnary -> Bool)

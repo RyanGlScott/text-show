@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE FlexibleContexts #-}
 #endif
 {-|
@@ -22,7 +22,7 @@ import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
 import           Text.Show.Text
 
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic, Rep)
 import           Text.Show.Text.Generic
 #endif
@@ -32,7 +32,7 @@ import           Text.Show.Text.Generic
 prop_matchesShow :: (S.Show a, T.Show a, Arbitrary a) => Int -> a -> Bool
 prop_matchesShow p x = showbPrec p (FromStringShow x) == showbPrec p x
 
-#if defined(GENERICS)
+#if __GLASGOW_HASKELL__ >= 702
 -- | Verifies that a type's @Show@ instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
 -- TODO: Add other generic functions

@@ -211,19 +211,19 @@ deriveShowDataFamFromDec opts parentName tvbs dec =
     typeNames = map tvbName tvbs
     
     lhsTypeNames :: [Name]
-# if __GLASGOW_HASKELL__ >= 710
+# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
     lhsTypeNames = filterTyVars typeNames instTypes
 # else
     lhsTypeNames = drop (length instTypes) typeNames
 # endif
 
-# if __GLASGOW_HASKELL__ >= 710
+# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
     filterTyVars :: [Name] -> [Type] -> [Name]
     filterTyVars ns     (SigT t _:ts) = filterTyVars ns (t:ts)
     filterTyVars (_:ns) (VarT n  :ts) = n : filterTyVars ns ts
     filterTyVars (_:ns) (_       :ts) = filterTyVars ns ts
-    filterTyVars [] _                 = []
-    filterTyVars _ []                 = []
+    filterTyVars []     _             = []
+    filterTyVars _      []            = []
 # endif
 
     rhsTypes :: [Type]
@@ -234,7 +234,7 @@ deriveShowDataFamFromDec opts parentName tvbs dec =
                               DataInstD    _ _ tys' _ _ -> tys'
                               NewtypeInstD _ _ tys' _ _ -> tys'
                               _ -> error "Text.Show.Text.TH.deriveShow: The impossible happened."
-# if __GLASGOW_HASKELL__ >= 710
+# if MIN_VERSION_template_haskell(2,10,0)
                 in tys
 # else
                 -- If PolyKinds is enabled, the first entries in this list will be
