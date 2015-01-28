@@ -1,6 +1,7 @@
 # 0.6
 * `deriveShow` can now construct instances for data families, using either the data family name or a data instance constructor as an argument. See the documentation in `Text.Show.Text.TH` for more details.
 * Fixed a bug in which infix backticked data constructors (e.g., ```data Add = Int `Plus` Int```) would not be shown correctly.
+* Fixed typo in `Text.Show.Text.GHC.RTS.Flags`
 * Removed the phantom-type detecting mechanism with `template-haskell-2.9.0.0` or higher. This method of finding phantom types is intrinsically flawed and is not usable on older GHCs. I plan on introducing a more robust mechanism for detecting phantom types on more versions of Template Haskell in `text-show-0.7`.
 * Added generics support with the `Text.Show.Text.Generic` and `Text.Show.Text.Debug.Trace.Generic` modules
 * Deprecated `replicateB` in favor of `timesN` from the `semigroups` library
@@ -8,6 +9,7 @@
 * Added `Monoid` and `Semigroup` instances for `FromStringShow`, `Semigroup` instance for `LitString`, `IsChar` instance for `LitChar`, and `IsString` instance for `[LitChar]`
 * Changed the `String` `Show` instances of `FromStringShow`, `LitChar`, and `LitString` to more closely match the `Text` `Show` instances. As a result, the `Read` instances for these data types were also changed so that `read . show = read . show = id`.
 * Removed the `recent-text` flag. We'll allow users to build with older versions of `text`, but the latest version is recommended. Because of this, the `integer-simple` and `integer-gmp` flags are not needed.
+* Removed the `integer-gmp2` flag, as it supported a configuration that didn't actually compile on GHC
 * Removed the `transformers-four` flag, as it is not needed now that `transformers-compat` is a dependency
 
 # 0.5

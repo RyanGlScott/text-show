@@ -76,8 +76,8 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
     <> showb (minOldGenSize gcfs)
     <> ", heapSizeSuggestion = "
     <> showb (heapSizeSuggestion gcfs)
-    <> ", heapSizeSuggesionAuto = "
-    <> showbBool (heapSizeSuggesionAuto gcfs)
+    <> ", heapSizeSuggestionAuto = "
+    <> showbBool (heapSizeSuggestionAuto gcfs)
     <> ", oldGenFactor = "
     <> showbDoublePrec 0 (oldGenFactor gcfs)
     <> ", pcFreeHeap = "

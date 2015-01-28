@@ -1,12 +1,5 @@
 {-# LANGUAGE CPP #-}
-
-#if defined(MIN_VERSION_integer_gmp)
-# define HAVE_GMP_BIGNAT MIN_VERSION_integer_gmp(1,0,0)
-#else
-# define HAVE_GMP_BIGNAT 0
-#endif
-
-#if HAVE_GMP_BIGNAT
+#if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE MagicHash #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -26,15 +19,12 @@ module Text.Show.Text.Numeric.Natural (showbNaturalPrec) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-#if HAVE_GMP_BIGNAT
+#if MIN_VERSION_base(4,8,0)
 import GHC.Integer.GMP.Internals (Integer(..))
+import GHC.Natural (Natural(..))
 import GHC.Types (Word(..))
 
 import Text.Show.Text.Data.Integral (showbWord)
-#endif
-
-#if MIN_VERSION_base(4,8,0)
-import GHC.Natural (Natural(..))
 #else
 import Numeric.Natural (Natural)
 #endif
@@ -51,15 +41,10 @@ import Text.Show.Text.Data.Integral (showbIntegerPrec)
 -- /Since: 0.5/
 showbNaturalPrec :: Int -> Natural -> Builder
 #if MIN_VERSION_base(4,8,0)
-# if HAVE_GMP_BIGNAT
 showbNaturalPrec _ (NatS# w#)  = showbWord $ W# w#
 showbNaturalPrec p (NatJ# bn)  = showbIntegerPrec p $ Jp# bn
-# else
-showbNaturalPrec p (Natural i) = showbIntegerPrec p i
-{-# INLINE showbNaturalPrec #-}
-# endif
 #else
-showbNaturalPrec p = showbIntegerPrec p . toInteger
+showbNaturalPrec p             = showbIntegerPrec p . toInteger
 {-# INLINE showbNaturalPrec #-}
 #endif
 
