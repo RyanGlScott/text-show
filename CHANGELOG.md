@@ -1,3 +1,6 @@
+### 0.6.0.1
+* Forgot to include some header files in `text-show.cabal`
+
 # 0.6
 * `deriveShow` can now construct instances for data families, using either the data family name or a data instance constructor as an argument. See the documentation in `Text.Show.Text.TH` for more details.
 * Fixed a bug in which infix backticked data constructors (e.g., ```data Add = Int `Plus` Int```) would not be shown correctly.

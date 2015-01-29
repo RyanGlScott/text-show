@@ -7,7 +7,6 @@ At the moment, `text-show` provides `Show` instances for most data types in the 
 For most uses, simply importing `Text.Show.Text` will suffice:
 
 ```haskell
-{-# LANGUAGE NoImplicitPrelude #-}
 module Main where
 
 import Data.Text (Text)
