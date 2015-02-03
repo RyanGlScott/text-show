@@ -1,5 +1,6 @@
-{-# LANGUAGE CPP, DeriveGeneric, FlexibleContexts, FlexibleInstances,
-             OverloadedStrings, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, FlexibleContexts,
+             FlexibleInstances, OverloadedStrings, ScopedTypeVariables,
+             TypeOperators #-}
 {-|
 Module:      Text.Show.Text.Generic
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -50,6 +51,7 @@ import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
+import           Data.Typeable (Typeable)
 
 import           GHC.Generics
 import           GHC.Show (appPrec, appPrec1)
@@ -204,7 +206,7 @@ genericHPrintLazy h = TL.hPutStrLn h . genericShowLazy
 -- 
 -- /Since: 0.6/
 data ConType = Rec | Tup | Pref | Inf Builder
-  deriving (Eq, Generic, Ord, S.Show)
+  deriving (Eq, Generic, Ord, S.Show, Typeable)
 
 instance Show ConType where
     showbPrec = genericShowbPrec

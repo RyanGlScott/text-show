@@ -1,3 +1,7 @@
+# 0.7
+* Added `showbUArrayPrec` (and corresponding `Show` instance for `UArray`s) and `showbIArrayPrec` to `Text.Data.Text.Data.Array`.
+* `Typeable` instance for `ConType`
+
 ### 0.6.0.1
 * Forgot to include some header files in `text-show.cabal`
 

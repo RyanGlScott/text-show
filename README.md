@@ -13,11 +13,11 @@ import Data.Text (Text)
 import Prelude hiding (Show(..), print)
 import Text.Show.Text
 
-number :: Text
-number = show (Just "Hello, World!")
+hello :: Text
+hello = show (Just "Hello, World!")
 
 main :: IO ()
-main = print number
+main = print hello
 ```
 
 If you desire it, there are also monomorphic versions of the `showb` function available in the submodules of `Text.Show.Text`. A naming convention is present in which functions that show different values depending on the precedence end with `Prec`(e.g., `showbIntPrec`), whereas functions that show the same values regardless of precedence do not end with `Prec` (e.g., `showbBool`).

@@ -21,6 +21,7 @@ import           Control.Monad.ST
 
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 import           Data.Array (Array)
+import           Data.Array.Unboxed (UArray)
 #endif
 import           Data.Array (elems)
 import qualified Data.ByteString      as BS (ByteString)
@@ -197,6 +198,7 @@ baseAndFriendsTests =
 -- TODO: Figure out why this test diverges on Windows
     , testGroup "Text.Show.Text.Data.Array"
         [ testProperty "Array Int Int instance"                 (prop_matchesShow :: Int -> Array Int Int -> Bool)
+        , testProperty "UArray Int Int instance"                (prop_matchesShow :: Int -> UArray Int Int -> Bool)
         ]
 #endif
     , testGroup "Text.Show.Text.Data.Bool"

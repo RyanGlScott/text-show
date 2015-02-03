@@ -25,11 +25,11 @@ description:         @text-show@ offers a replacement for the @Show@ typeclass i
                         import Prelude hiding (Show(..), print)
                         import Text.Show.Text
                         .
-                        number :: Text
-                        number = show (Just \"Hello, World!\")
+                        hello :: Text
+                        hello = show (Just \"Hello, World!\")
                         .
                         main :: IO ()
-                        main = print number
+                        main = print hello
                      @
                      .
                      If you desire it, there are also monomorphic versions of the @showb@
