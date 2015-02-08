@@ -20,7 +20,45 @@ Portability: GHC
 Defines data types with derived 'Show' instances (using "Text.Show.Text.TH")
 for testing purposes, including 'Arbitrary' instances.
 -}
-module Instances.Derived () where
+module Instances.Derived (
+      showbNullary
+    , showbPhantomNullary
+    , showbMonomorphicUnaryPrec
+    , showbPolymorphicUnaryPrec
+    , showbMonomorphicProductPrec
+    , showbPolymorphicProductPrec
+    , showbMonomorphicRecordPrec
+    , showbPolymorphicRecordPrec
+    , showbMonomorphicInfixPrec
+    , showbPolymorphicInfixPrec
+    , showbMonomorphicForallPrec
+    , showbPolymorphicForallPrec
+    , showbAllAtOncePrec
+    , showbGADTPrec
+    , showbLeftAssocTreePrec
+    , showbRightAssocTreePrec
+    , showbQuestionMarkPrec
+--     , showbHigherKindedTypeParamsPrec
+--     , showbRestrictionPrec
+--     , showbRestrictedContextPrec
+--     , showbFixPrec
+#if MIN_VERSION_template_haskell(2,7,0)
+    , showbASNullary
+    , showbASUnaryPrec
+    , showbASProductPrec
+    , showbASRecordPrec
+    , showbASInfixPrec
+    , showbNASShowPrec
+    , showbOneDataInstancePrec
+    , showbAssocData1Prec
+    , showbAssocData2Prec
+    -- , showbAssocData3Prec
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+    , showbNullaryDataPrec
+# endif
+    , showbGADTFamPrec
+#endif
+    ) where
 
 #if !(MIN_VERSION_base(4,8,0))
 import Control.Applicative ((<*>), pure)
@@ -34,8 +72,119 @@ import Prelude hiding (Show)
 
 import Test.Tasty.QuickCheck (Arbitrary(..), Gen, oneof)
 
-import Text.Show.Text (Show(showbPrec))
+import Text.Show.Text (Show(showb, showbPrec), Builder)
 import Text.Show.Text.TH (deriveShow, mkShowbPrec)
+
+showbNullary :: Nullary -> Builder
+showbNullary = showb
+
+showbPhantomNullary :: Show a => PhantomNullary a -> Builder
+showbPhantomNullary = showb
+
+showbMonomorphicUnaryPrec :: Int -> MonomorphicUnary -> Builder
+showbMonomorphicUnaryPrec = showbPrec
+
+showbPolymorphicUnaryPrec :: (Show a, Show b) => Int -> PolymorphicUnary a b -> Builder
+showbPolymorphicUnaryPrec = showbPrec
+
+showbMonomorphicProductPrec :: Int -> MonomorphicProduct -> Builder
+showbMonomorphicProductPrec = showbPrec
+
+showbPolymorphicProductPrec :: (Show a, Show b, Show c, Show d)
+                            => Int -> PolymorphicProduct a b c d -> Builder
+showbPolymorphicProductPrec = showbPrec
+
+showbMonomorphicRecordPrec :: Int -> MonomorphicRecord -> Builder
+showbMonomorphicRecordPrec = showbPrec
+
+showbPolymorphicRecordPrec :: (Show a, Show b, Show c, Show d)
+                           => Int -> PolymorphicRecord a b c d -> Builder
+showbPolymorphicRecordPrec = showbPrec
+
+showbMonomorphicInfixPrec :: Int -> MonomorphicInfix -> Builder
+showbMonomorphicInfixPrec = showbPrec
+
+showbPolymorphicInfixPrec :: (Show a, Show b, Show c)
+                          => Int -> PolymorphicInfix a b c -> Builder
+showbPolymorphicInfixPrec = showbPrec
+
+showbMonomorphicForallPrec :: Int -> MonomorphicForall -> Builder
+showbMonomorphicForallPrec = showbPrec
+
+showbPolymorphicForallPrec :: (Show a, Show b) => Int -> PolymorphicForall a b -> Builder
+showbPolymorphicForallPrec = showbPrec
+
+showbAllAtOncePrec :: (Show a, Show b, Show c, Show d)
+                   => Int -> AllAtOnce a b c d -> Builder
+showbAllAtOncePrec = showbPrec
+
+showbGADTPrec :: (Show a, Show b, Show c) => Int -> GADT a b c -> Builder
+showbGADTPrec = showbPrec
+
+showbLeftAssocTreePrec :: Show a => Int -> LeftAssocTree a -> Builder
+showbLeftAssocTreePrec = showbPrec
+
+showbRightAssocTreePrec :: Show a => Int -> RightAssocTree a -> Builder
+showbRightAssocTreePrec = showbPrec
+
+showbQuestionMarkPrec :: (Show a, Show b) => Int -> a :?: b -> Builder
+showbQuestionMarkPrec = showbPrec
+
+-- showbHigherKindedTypeParamsPrec :: Show (f a)
+--                                 => Int -> HigherKindedTypeParams f a -> Builder
+-- showbHigherKindedTypeParamsPrec = showbPrec
+-- 
+-- showbRestrictionPrec :: (Read a, Show a) => Int -> Restriction a -> Builder
+-- showbRestrictionPrec = showbPrec
+-- 
+-- showbRestrictedContextPrec :: (Read a, Show a) => Int -> RestrictedContext a -> Builder
+-- showbRestrictedContextPrec = showbPrec
+-- 
+-- showbFixPrec :: Show (f (Fix f)) => Int -> Fix f -> Builder
+-- showbFixPrec = showbPrec
+
+#if MIN_VERSION_template_haskell(2,7,0)
+showbASNullary :: (Show c, Show d) => AllShow () () c d -> Builder
+showbASNullary = showb
+
+showbASUnaryPrec :: (Show b, Show c, Show d) => Int -> AllShow Int b c d -> Builder
+showbASUnaryPrec = showbPrec
+
+showbASProductPrec :: (Show c, Show d) => Int -> AllShow Bool Bool c d -> Builder
+showbASProductPrec = showbPrec
+
+showbASRecordPrec :: (Show c, Show d) => Int -> AllShow Char Double c d -> Builder
+showbASRecordPrec = showbPrec
+
+showbASInfixPrec :: (Show c, Show d) => Int -> AllShow Float Ordering c d -> Builder
+showbASInfixPrec = showbPrec
+
+showbNASShowPrec :: (Show b, Show d) => Int -> NotAllShow Int b Int d -> Builder
+showbNASShowPrec = showbPrec
+
+showbOneDataInstancePrec :: (Show a, Show b, Show c, Show d)
+                         => Int -> OneDataInstance a b c d -> Builder
+showbOneDataInstancePrec = showbPrec
+
+showbAssocData1Prec :: Int -> AssocData1 () -> Builder
+showbAssocData1Prec = showbPrec
+
+showbAssocData2Prec :: Int -> AssocData2 () Int Int -> Builder
+showbAssocData2Prec = showbPrec
+
+-- showbAssocData3Prec :: Int -> AssocData3 () b c -> Builder
+-- showbAssocData3Prec = showbPrec
+
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+showbNullaryDataPrec :: Int -> NullaryData -> Builder
+showbNullaryDataPrec = showbPrec
+# endif
+
+showbGADTFamPrec :: (Show a, Show b, Show c) => Int -> GADTFam a b c -> Builder
+showbGADTFamPrec = showbPrec
+#endif
+
+-------------------------------------------------------------------------------
 
 $(deriveShow ''Nullary)
 instance Arbitrary Nullary where

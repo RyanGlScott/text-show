@@ -126,7 +126,8 @@ Note that at the moment, there are some limitations to this approach:
   'mkShowbPrec' (see the documentation of the 'mk' functions for more information).
 
 * 'deriveShow' lacks the ability to properly detect data types with higher-kinded
-   type parameters (e.g., @data HK f a = HK (f a)@). If you wish to derive 'T.Show'
+   type parameters (e.g., @data HK f a = HK (f a)@) or with kinds other than @*@
+   (e.g., @data List a (empty :: Bool)@). If you wish to derive 'T.Show'
    instances for these data types, you will need to use 'mkShowbPrec' (see the
    documentation of the 'mk' functions for more information).
 

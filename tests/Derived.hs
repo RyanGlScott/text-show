@@ -47,6 +47,7 @@ module Derived (
     , Restriction(..)
     , RestrictedContext(..)
     , Fix(..)
+#if MIN_VERSION_template_haskell(2,7,0)
     , AllShow(..)
     , NotAllShow(..)
     , OneDataInstance(..)
@@ -56,11 +57,12 @@ module Derived (
     , AssocData2(..)
     -- , AssocClass3(..)
     -- , AssocData3(..)
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
     , NullaryClass(..)
     , NullaryData(..)
-#endif
+# endif
     , GADTFam(..)
+#endif
     ) where
 
 import           GHC.Generics (Generic)
@@ -249,7 +251,7 @@ instance AssocClass2 () Int Int where
 -- class AssocClass3 a b c where
 --     data AssocData3 a b c :: *
 -- instance AssocClass3 () b c where
---     newtype AssocData3 () b c = AssocCon2 Int deriving ( S.Show
+--     newtype AssocData3 () b c = AssocCon3 Int deriving ( S.Show
 -- # if __GLASGOW_HASKELL__ >= 706
 --                                                        {- Woraround for a bizarre bug in older GHCs -}
 --                                                        , Generic
