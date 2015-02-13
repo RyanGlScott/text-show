@@ -118,6 +118,8 @@ $('deriveShow' ''DataFam) -- Two double quotes!
 @
 
 Note that at the moment, there are some limitations to this approach:
+* The 'Name' argument to 'deriveShow' must not be a type synonym.
+
 * 'deriveShow' makes the assumption that all type variables in a data type require a
   'T.Show' constraint when creating the type context. For example, if you have @data
   Phantom a = Phantom@, then @('deriveShow' ''Phantom)@ will generate @instance
