@@ -19,16 +19,12 @@ module Text.Show.Text.Data.ByteString (
       showbByteStringStrict
     , showbByteStringLazy
     , showbByteStringLazyPrec
-#if MIN_VERSION_bytestring(0,10,4)
     , showbShortByteString
-#endif
     ) where
 
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as BL
-#if MIN_VERSION_bytestring(0,10,4)
 import           Data.ByteString.Short (ShortByteString)
-#endif
 import           Data.Text.Lazy.Builder (Builder)
 
 import           Prelude hiding (Show(show))
@@ -72,15 +68,12 @@ showbByteStringLazyPrec = showbPrec
 #endif
 {-# INLINE showbByteStringLazyPrec #-}
 
-#if MIN_VERSION_bytestring(0,10,4)
 -- | Convert a 'ShortByteString' to a 'Builder'.
--- This function is only available with @bytestring-0.10.4.0@ or later.
 -- 
--- /Since: 0.3/
+-- /Since: 0.7/
 showbShortByteString :: ShortByteString -> Builder
 showbShortByteString = showb . FromStringShow
 {-# INLINE showbShortByteString #-}
-#endif
 
 instance Show BS.ByteString where
     showb = showbByteStringStrict
@@ -94,8 +87,6 @@ instance Show BL.ByteString where
 $(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
 #endif
 
-#if MIN_VERSION_bytestring(0,10,4)
 instance Show ShortByteString where
     showb = showbShortByteString
     INLINE_INST_FUN(showb)
-#endif

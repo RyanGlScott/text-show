@@ -29,9 +29,7 @@ import           Control.Applicative ((<*>), pure)
 import           Control.Exception
 import           Control.Monad.ST (ST, fixST)
 
-#if MIN_VERSION_bytestring(0,10,4)
 import           Data.ByteString.Short (ShortByteString, pack)
-#endif
 import           Data.Char (GeneralCategory(..))
 import qualified Data.Data as D (Fixity(..))
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
@@ -139,10 +137,8 @@ instance Arbitrary Natural where
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
 
-#if MIN_VERSION_bytestring(0,10,4)
 instance Arbitrary ShortByteString where
     arbitrary = pack <$> arbitrary
-#endif
 
 instance Arbitrary (Ptr a) where
     arbitrary = plusPtr nullPtr <$> arbitrary

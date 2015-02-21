@@ -30,9 +30,7 @@ import           Data.Array.Unboxed (UArray)
 import           Data.Array (elems)
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString)
-#if MIN_VERSION_bytestring(0,10,4)
 import           Data.ByteString.Short (ShortByteString)
-#endif
 import           Data.Char (GeneralCategory, intToDigit)
 import           Data.Complex (Complex)
 import qualified Data.Data as D (Fixity)
@@ -288,9 +286,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.ByteString"
         [ testProperty "strict ByteString instance"              (prop_matchesShow :: Int -> BS.ByteString -> Bool)
         , testProperty "lazy ByteString instance"                (prop_matchesShow :: Int -> BL.ByteString -> Bool)
-#if MIN_VERSION_bytestring(0,10,4)
         , testProperty "ShortByteString instance"                (prop_matchesShow :: Int -> ShortByteString -> Bool)
-#endif
         ]
     , testGroup "Text.Show.Text.Data.Char"
         [ testProperty "Char instance"                           (prop_matchesShow :: Int -> Char -> Bool)
