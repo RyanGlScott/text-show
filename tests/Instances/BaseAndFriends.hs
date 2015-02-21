@@ -63,13 +63,6 @@ import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
 import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
-
-#if !(MIN_VERSION_base(4,7,0))
-import           Data.Word (Word64)
-#endif
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Word (Word)
-#endif
 import           Data.Version (Version(..))
 
 import           Foreign.C.Types
@@ -105,7 +98,7 @@ import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 
 import           Instances.Utils ((<@>))
 
-import           Numeric (showHex, showOct, showEFloat, showFFloat, showGFloat)
+import           Numeric (showHex)
 #if !(MIN_VERSION_QuickCheck(2,7,7) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif
@@ -115,7 +108,7 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode
                             SeekMode(..), Handle, stdin, stdout, stderr)
 import           System.Posix.Types
 
-import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, NonNegative(..),
+import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
                                         arbitraryBoundedEnum, oneof, suchThat)
 
 import           Text.Read.Lex as Lex (Lexeme(..))
@@ -125,6 +118,16 @@ import           Text.Read.Lex (Number)
 #endif
 import           Text.Show.Text (FromStringShow(..), FromTextShow(..))
 import           Text.Show.Text.Generic (ConType(..))
+
+#if MIN_VERSION_base(4,7,0)
+import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
+import           Test.Tasty.QuickCheck (getNonNegative)
+# if !(MIN_VERSION_base(4,8,0))
+import           Data.Word (Word)
+# endif
+#else
+import           Data.Word (Word64)
+#endif
 
 #include "HsBaseConfig.h"
 

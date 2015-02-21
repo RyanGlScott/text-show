@@ -500,7 +500,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.GHC.RTS.Flags"
         [ testProperty "RTSFlags instance"                       prop_showRTSFlags
         , testProperty "GCFlags instance"                        prop_showGCFlags
-          testProperty "ConcFlags instance"                      (prop_matchesShow :: Int -> ConcFlags -> Bool)
+        , testProperty "ConcFlags instance"                      (prop_matchesShow :: Int -> ConcFlags -> Bool)
         , testProperty "MiscFlags instance"                      (prop_matchesShow :: Int -> MiscFlags -> Bool)
         , testProperty "DebugFlags instance"                     (prop_matchesShow :: Int -> DebugFlags -> Bool)
         , testProperty "CCFlags instance"                        prop_showCCFlags
@@ -590,6 +590,8 @@ baseAndFriendsTests =
         ]
     , testGroup "Text.Show.Text.Text.Read.Lex"
         [ testProperty "Lexeme instance"                         (prop_matchesShow :: Int -> Lexeme -> Bool)
+#if MIN_VERSION_base(4,7,0)
         , testProperty "Number instance"                         (prop_matchesShow :: Int -> Number -> Bool)
+#endif
         ]
     ]
