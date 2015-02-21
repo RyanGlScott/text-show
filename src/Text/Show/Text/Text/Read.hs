@@ -35,7 +35,8 @@ import Text.Show.Text.Classes (FromStringShow(..))
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.Ratio ()
 #endif
-import Text.Show.Text.Data.Char (LitChar(..), LitString(..))
+import Text.Show.Text.Data.Char ()
+import Text.Show.Text.Data.List ()
 
 #include "inline.h"
 
@@ -43,11 +44,11 @@ import Text.Show.Text.Data.Char (LitChar(..), LitString(..))
 -- 
 -- /Since: 0.3/
 showbLexemePrec :: Int -> Lexeme -> Builder
-showbLexemePrec p (Char c)   = showbUnary "Char"   p $ LitChar c
-showbLexemePrec p (String s) = showbUnary "String" p $ LitString s
-showbLexemePrec p (Punc pun) = showbUnary "Punc"   p $ LitString pun
-showbLexemePrec p (Ident i)  = showbUnary "Ident"  p $ LitString i
-showbLexemePrec p (Symbol s) = showbUnary "Symbol" p $ LitString s
+showbLexemePrec p (Char c)   = showbUnary "Char"   p c
+showbLexemePrec p (String s) = showbUnary "String" p s
+showbLexemePrec p (Punc pun) = showbUnary "Punc"   p pun
+showbLexemePrec p (Ident i)  = showbUnary "Ident"  p i
+showbLexemePrec p (Symbol s) = showbUnary "Symbol" p s
 #if MIN_VERSION_base(4,6,0)
 showbLexemePrec p (Number n) = showbUnary "Number" p $ FromStringShow n
 #else

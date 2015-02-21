@@ -66,7 +66,9 @@ import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
 
 #if !(MIN_VERSION_base(4,7,0))
 import           Data.Word (Word64)
-import           Numeric (showHex)
+#endif
+#if !(MIN_VERSION_base(4,8,0))
+import           Data.Word (Word)
 #endif
 import           Data.Version (Version(..))
 
@@ -76,13 +78,18 @@ import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr,
                               ptrToIntPtr, ptrToWordPtr)
 
 import           GHC.Conc (BlockReason(..), ThreadStatus(..))
-#if defined(mingw32_HOST_OS)
+#if !(defined(__GHCJS__))
+# if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent(..))
+# else
+import           GHC.Event (Event, evtRead, evtWrite)
+# endif
 #endif
 import           GHC.Fingerprint.Type (Fingerprint(..))
 import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import           GHC.IO.Encoding.Types (CodingProgress(..))
 import           GHC.IO.Exception (IOException(..), IOErrorType(..))
+import           GHC.IO.Handle (HandlePosn(..))
 import qualified GHC.Generics as G (Fixity(..))
 import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
                                M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
@@ -98,6 +105,7 @@ import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 
 import           Instances.Utils ((<@>))
 
+import           Numeric (showHex, showOct, showEFloat, showFFloat, showGFloat)
 #if !(MIN_VERSION_QuickCheck(2,7,7) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif
@@ -107,11 +115,15 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode
                             SeekMode(..), Handle, stdin, stdout, stderr)
 import           System.Posix.Types
 
-import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
+import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen, NonNegative(..),
                                         arbitraryBoundedEnum, oneof, suchThat)
 
+import           Text.Read.Lex as Lex (Lexeme(..))
+#if MIN_VERSION_base(4,7,0)
+import           Data.Fixed (Fixed, E12)
+import           Text.Read.Lex (Number)
+#endif
 import           Text.Show.Text (FromStringShow(..), FromTextShow(..))
-import           Text.Show.Text.Data.Char (LitChar(..), LitString(..))
 import           Text.Show.Text.Generic (ConType(..))
 
 #include "HsBaseConfig.h"
@@ -140,8 +152,6 @@ instance Arbitrary IntPtr where
 
 instance Arbitrary WordPtr where
     arbitrary = ptrToWordPtr <$> arbitrary
-
--- TODO: instance Arbitrary (ForeignPtr a)
 
 instance Arbitrary GeneralCategory where
     arbitrary = arbitraryBoundedEnum
@@ -229,10 +239,42 @@ deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
     arbitrary = arbitraryBoundedEnum
 
--- TODO: instance Arbitrary Lexeme
--- #if MIN_VERSION_base(4,7,0)
--- TODO: instance Arbitrary Number
--- #endif
+instance Arbitrary Lexeme where
+    arbitrary = oneof [ Char   <$> arbitrary
+                      , String <$> arbitrary
+                      , Punc   <$> arbitrary
+                      , Ident  <$> arbitrary
+                      , Symbol <$> arbitrary
+#if MIN_VERSION_base(4,7,0)
+                      , Number <$> arbitrary
+#elif !(MIN_VERSION_base(4,6,0))
+                      , Int    <$> arbitrary
+                      , Rat    <$> arbitrary
+#endif
+                      , pure Lex.EOF
+                      ]
+    
+#if MIN_VERSION_base(4,7,0)
+instance Arbitrary Number where
+    arbitrary = do
+        str <- oneof [ show <$> (nonneg :: Gen Double)
+                     , fmap (\d -> showEFloat Nothing d "") (nonneg :: Gen Double)
+                     , fmap (\d -> showFFloat Nothing d "") (nonneg :: Gen Double)
+                     , fmap (\d -> showGFloat Nothing d "") (nonneg :: Gen Double)
+                     , show <$> (nonneg :: Gen Float)
+                     , show <$> (nonneg :: Gen Int)
+                     , fmap (\i -> "0x" ++ showHex i "") (nonneg :: Gen Int)
+                     , fmap (\i -> "0o" ++ showOct i "") (nonneg :: Gen Int)
+                     , show <$> (nonneg :: Gen Integer)
+                     , show <$> (nonneg :: Gen Word)
+                     , show <$> (nonneg :: Gen (Fixed E12))
+                     ]
+        let Number num = read str
+        pure num
+      where
+        nonneg :: (Arbitrary a, Num a, Ord a) => Gen a
+        nonneg = getNonNegative <$> arbitrary
+#endif
 
 instance Arbitrary (Proxy s) where
     arbitrary = pure Proxy
@@ -260,7 +302,7 @@ instance Arbitrary Fingerprint where
 instance Show Fingerprint where
   show (Fingerprint w1 w2) = hex16 w1 ++ hex16 w2
     where
-      -- | Formats a 64 bit number as 16 digits hex.
+      -- Formats a 64 bit number as 16 digits hex.
       hex16 :: Word64 -> String
       hex16 i = let hex = showHex i ""
                  in replicate (16 - length hex) '0' ++ hex
@@ -308,8 +350,6 @@ deriving instance Enum BlockReason
 instance Arbitrary BlockReason where
     arbitrary = arbitraryBoundedEnum
 
--- TODO: instance Arbitrary ThreadId
-
 instance Arbitrary ThreadStatus where
     arbitrary = oneof [ pure ThreadRunning
                       , pure ThreadFinished
@@ -317,10 +357,17 @@ instance Arbitrary ThreadStatus where
                       , pure ThreadDied
                       ]
 
-#if defined(mingw32_HOST_OS)
+#if !(defined(__GHCJS__))
+# if defined(mingw32_HOST_OS)
 deriving instance Bounded ConsoleEvent
 instance Arbitrary ConsoleEvent where
     arbitrary = arbitraryBoundedEnum
+# else
+instance Arbitrary Event where
+    arbitrary = oneof $ map pure [evtRead, evtWrite]
+
+-- TODO: instance Arbitrary FdKey
+# endif
 #endif
 
 instance Arbitrary (ST s a) where
@@ -328,7 +375,9 @@ instance Arbitrary (ST s a) where
 
 instance Arbitrary Handle where
     arbitrary = oneof $ map pure [stdin, stdout, stderr]
--- TODO: instance Arbitrary HandlePosn
+
+instance Arbitrary HandlePosn where
+    arbitrary = HandlePosn <$> arbitrary <*> arbitrary
 
 deriving instance Bounded IOMode
 instance Arbitrary IOMode where
@@ -352,8 +401,6 @@ instance Arbitrary Newline where
 instance Arbitrary NewlineMode where
     arbitrary = NewlineMode <$> arbitrary <*> arbitrary
 
--- TODO: instance Arbitrary TextEncoding
-
 deriving instance Bounded CodingProgress
 deriving instance Enum CodingProgress
 instance Arbitrary CodingProgress where
@@ -371,9 +418,6 @@ instance Arbitrary GCStats where
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
-
--- TODO: instance Arbitrary Event
--- TODO: instance Arbitrary FdKey
 
 instance Arbitrary (U1 p) where
     arbitrary = pure U1
@@ -432,9 +476,6 @@ deriving instance Show (f (g p))           => Show ((f :.: g) p)
 #endif
 
 #if MIN_VERSION_base(4,8,0)
--- TODO: instance Arbitrary RTSFlags
--- TODO: instance Arbitrary GCFlags
-
 instance Arbitrary ConcFlags where
     arbitrary = ConcFlags <$> arbitrary <*> arbitrary
 
@@ -447,10 +488,6 @@ instance Arbitrary DebugFlags where
                            <*> arbitrary <*> arbitrary <*> arbitrary
                            <*> arbitrary <*> arbitrary <*> arbitrary
                            <*> arbitrary <*> arbitrary <*> arbitrary
-
--- TODO: instance Arbitrary CCFlags where
--- TODO: instance Arbitrary ProfFlags where
--- TODO: instance Arbitrary TraceFlags where
 
 instance Arbitrary TickyFlags where
     arbitrary = TickyFlags <$> arbitrary <*> arbitrary
@@ -576,6 +613,3 @@ deriving instance Arbitrary a => Arbitrary (Identity a)
 
 deriving instance Arbitrary a => Arbitrary (FromStringShow a)
 deriving instance Arbitrary a => Arbitrary (FromTextShow a)
-
-deriving instance Arbitrary LitChar
-deriving instance Arbitrary LitString

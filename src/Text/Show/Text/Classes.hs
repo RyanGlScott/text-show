@@ -59,13 +59,13 @@ import           GHC.Generics (Generic1)
 #endif
 import           GHC.Show (appPrec, appPrec1)
 
-import           Prelude hiding (Show(show, showList))
+import           Prelude hiding (Show(..))
 
 import           System.IO (Handle)
 
 import           Text.Printf (PrintfArg, PrintfType)
 import           Text.Read (Read(..), readListPrecDefault)
-import qualified Text.Show as S (Show(showsPrec))
+import qualified Text.Show as S (Show(..))
 import           Text.Show.Text.Utils ((<>), s, toString)
 
 #include "inline.h"
@@ -356,7 +356,7 @@ instance S.Show a => Show (FromStringShow a) where
     INLINE_INST_FUN(showbPrec)
 
 instance S.Show a => S.Show (FromStringShow a) where
-    showsPrec p (FromStringShow x) = showsPrec p x
+    showsPrec p (FromStringShow x) = S.showsPrec p x
     INLINE_INST_FUN(showsPrec)
 
 -- | The @String@ 'S.Show' instance for 'FromTextShow' is based on its @Text@

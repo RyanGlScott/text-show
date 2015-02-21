@@ -1,5 +1,6 @@
 # 0.7
 * Added `showbUArrayPrec` (and corresponding `Show` instance for `UArray`s) and `showbIArrayPrec` to `Text.Data.Text.Data.Array`.
+* Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
 * `Typeable` instance for `ConType`
 
 ### 0.6.0.1
