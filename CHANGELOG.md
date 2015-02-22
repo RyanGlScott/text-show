@@ -4,6 +4,7 @@
 * Corrected the `Show` instance for `Lexeme` (in `Text.Show.Text.Text.Read.Lex`)
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
 * `Typeable` instance for `ConType`
+* Changed the implementations of some functions in `Text.Show.Text.Debug.Trace` to use `ByteString`s instead of `String`s
 
 ### 0.6.0.1
 * Forgot to include some header files in `text-show.cabal`

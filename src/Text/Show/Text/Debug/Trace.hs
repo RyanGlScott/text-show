@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, ForeignFunctionInterface, OverloadedStrings #-}
 {-|
 Module:      Text.Show.Text.Debug.Trace
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -20,26 +20,35 @@ respectively.
 /Since: 0.5/
 -}
 module Text.Show.Text.Debug.Trace (
-      traceIO
-    , traceIOLazy
-    , trace
+      -- * Tracing
+      -- $tracing
+      trace
     , traceLazy
     , traceId
     , traceIdLazy
     , traceShow
     , traceShowId
-    , traceM
-    , traceMLazy
-    , traceShowM
 #if MIN_VERSION_base(4,5,0)
     , traceStack
     , traceStackLazy
+#endif
+    , traceIO
+    , traceIOLazy
+    , traceM
+    , traceMLazy
+    , traceShowM
+    
+#if MIN_VERSION_base(4,5,0)
+      -- * Eventlog tracing
+      -- $eventlog_tracing
     , traceEvent
     , traceEventLazy
     , traceEventIO
     , traceEventIOLazy
 #endif
 #if MIN_VERSION_base(4,7,0)
+      -- * Execution phase markers
+      -- $markers
     , traceMarker
     , traceMarkerLazy
     , traceMarkerIO
@@ -47,38 +56,74 @@ module Text.Show.Text.Debug.Trace (
 #endif
     ) where
 
+import           Control.Monad (when)
+
+import qualified Data.ByteString as BS (null, partition)
+import           Data.ByteString (ByteString, useAsCString)
+import           Data.ByteString.Internal (c2w, packChars)
 import qualified Data.Text as TS (Text, unpack)
+import           Data.Text.Encoding (encodeUtf8)
 import qualified Data.Text.Lazy as TL (Text, unpack)
+import           Data.Text.Lazy (toStrict)
 
 import qualified Debug.Trace as S
 
+import           Foreign.C.String (CString)
+
+#if MIN_VERSION_base(4,5,0)
+import           GHC.Stack (currentCallStack, renderStack)
+#endif
+
 import           Prelude hiding (Show(show))
 
-import           Text.Show.Text.Classes (Show, showLazy)
+import           System.IO.Unsafe (unsafePerformIO)
+
+import           Text.Show.Text.Classes (Show, show)
 import           Text.Show.Text.Instances ()
+
+-- $tracing
+-- 
+-- The 'trace', 'traceShow' and 'traceIO' functions print messages to an output
+-- stream. They are intended for \"printf debugging\", that is: tracing the flow
+-- of execution and printing interesting values.
+-- 
+-- All these functions evaluate the message completely before printing
+-- it; so if the message is not fully defined, none of it will be
+-- printed.
+-- 
+-- The usual output stream is 'System.IO.stderr'. For Windows GUI applications
+-- (that have no stderr) the output is directed to the Windows debug console.
+-- Some implementations of these functions may decorate the @Text@ that\'s
+-- output to indicate that you\'re tracing.
 
 -- | The 'traceIO' function outputs the trace message from the IO monad.
 -- This sequences the output with respect to other IO actions.
 -- 
 -- /Since: 0.5/
 traceIO :: TS.Text -> IO ()
-#if MIN_VERSION_base(4,5,0)
-traceIO = S.traceIO . TS.unpack
-#else
-traceIO = S.putTraceMsg . TS.unpack
-#endif
-{-# INLINE traceIO #-}
+traceIO = traceIOByteString . encodeUtf8
 
 -- | Like 'traceIO' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceIOLazy :: TL.Text -> IO ()
-#if MIN_VERSION_base(4,5,0)
-traceIOLazy = S.traceIO . TL.unpack
-#else
-traceIOLazy = S.putTraceMsg . TL.unpack
-#endif
-{-# INLINE traceIOLazy #-}
+traceIOLazy = traceIO . toStrict
+
+traceIOByteString :: ByteString -> IO ()
+traceIOByteString msg = useAsCString "%s\n" $ \cfmt -> do
+    -- NB: debugBelch can't deal with null bytes, so filter them
+    -- out so we don't accidentally truncate the message.  See Trac #9395
+    let (nulls, msg') = BS.partition (== c2w '\0') msg
+    useAsCString msg' $ \cmsg ->
+      debugBelch cfmt cmsg
+    when (not (BS.null nulls)) $
+      useAsCString "WARNING: previous trace message had null bytes" $ \cmsg ->
+        debugBelch cfmt cmsg
+
+-- don't use debugBelch() directly, because we cannot call varargs functions
+-- using the FFI.
+foreign import ccall unsafe "HsBase.h debugBelch2"
+    debugBelch :: CString -> CString -> IO ()
 
 {-|
 The 'trace' function outputs the trace message given as its first argument,
@@ -96,29 +141,31 @@ trace message.
 /Since: 0.5/
 -}
 trace :: TS.Text -> a -> a
-trace text = S.trace $ TS.unpack text
-{-# INLINE trace #-}
+trace = traceByteString . encodeUtf8
 
 -- | Like 'trace' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceLazy :: TL.Text -> a -> a
-traceLazy text = S.trace $ TL.unpack text
-{-# INLINE traceLazy #-}
+traceLazy = trace . toStrict
+
+{-# NOINLINE traceByteString #-}
+traceByteString :: ByteString -> a -> a
+traceByteString bs expr = unsafePerformIO $ do
+    traceIOByteString bs
+    return expr
 
 -- | Like 'trace' but returns the message instead of a third value.
 -- 
 -- /Since: 0.5/
 traceId :: TS.Text -> TS.Text
 traceId a = trace a a
-{-# INLINE traceId #-}
 
 -- | Like 'traceId' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceIdLazy :: TL.Text -> TL.Text
 traceIdLazy a = traceLazy a a
-{-# INLINE traceIdLazy #-}
 
 {-|
 Like 'trace', but uses 'show' on the argument to convert it to a 'TS.Text'.
@@ -136,15 +183,13 @@ variables @x@ and @z@:
 /Since: 0.5/
 -}
 traceShow :: Show a => a -> b -> b
-traceShow = traceLazy . showLazy
-{-# INLINE traceShow #-}
+traceShow = trace . show
 
 -- | Like 'traceShow' but returns the shown value instead of a third value.
 -- 
 -- /Since: 0.5/
 traceShowId :: Show a => a -> a
-traceShowId a = traceLazy (showLazy a) a
-{-# INLINE traceShowId #-}
+traceShowId a = trace (show a) a
 
 {-|
 Like 'trace' but returning unit in an arbitrary monad. Allows for convenient
@@ -161,12 +206,10 @@ monad, as 'traceIO' is in the 'IO' monad.
 -}
 traceM :: Monad m => TS.Text -> m ()
 traceM text = trace text $ return ()
-{-# INLINE traceM #-}
 
 -- | Like 'traceM' but accepts a lazy 'TL.Text' argument.
 traceMLazy :: Monad m => TL.Text -> m ()
 traceMLazy text = traceLazy text $ return ()
-{-# INLINE traceMLazy #-}
 
 {-|
 Like 'traceM', but uses 'show' on the argument to convert it to a 'TS.Text'.
@@ -180,13 +223,12 @@ Like 'traceM', but uses 'show' on the argument to convert it to a 'TS.Text'.
 /Since: 0.5/
 -}
 traceShowM :: (Show a, Monad m) => a -> m ()
-traceShowM = traceMLazy . showLazy
-{-# INLINE traceShowM #-}
+traceShowM = traceM . show
 
 #if MIN_VERSION_base(4,5,0)
 -- | Like 'trace' but additionally prints a call stack if one is
 -- available.
---
+-- 
 -- In the current GHC implementation, the call stack is only
 -- availble if the program was compiled with @-prof@; otherwise
 -- 'traceStack' behaves exactly like 'trace'.  Entries in the call
@@ -195,15 +237,32 @@ traceShowM = traceMLazy . showLazy
 -- 
 -- /Since: 0.5/
 traceStack :: TS.Text -> a -> a
-traceStack text = S.traceStack $ TS.unpack text
-{-# INLINE traceStack #-}
+traceStack = traceStackByteString . encodeUtf8
 
 -- | Like 'traceStack' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceStackLazy :: TL.Text -> a -> a
-traceStackLazy text = S.traceStack $ TL.unpack text
-{-# INLINE traceStackLazy #-}
+traceStackLazy = traceStack . toStrict
+
+traceStackByteString :: ByteString -> a -> a
+traceStackByteString bs expr = unsafePerformIO $ do
+    traceIOByteString bs
+    stack <- currentCallStack
+    when (not (null stack)) . traceIOByteString . packChars $ renderStack stack
+    return expr
+
+-- $eventlog_tracing
+-- 
+-- Eventlog tracing is a performance profiling system. These functions emit
+-- extra events into the eventlog. In combination with eventlog profiling
+-- tools these functions can be used for monitoring execution and
+-- investigating performance problems.
+-- 
+-- Currently only GHC provides eventlog profiling, see the GHC user guide for
+-- details on how to use it. These function exists for other Haskell
+-- implementations but no events are emitted. Note that the @Text@ message is
+-- always evaluated, whether or not profiling is available or enabled.
 
 -- | The 'traceEvent' function behaves like 'trace' with the difference that
 -- the message is emitted to the eventlog, if eventlog profiling is available
@@ -218,44 +277,59 @@ traceStackLazy text = S.traceStack $ TL.unpack text
 -- 
 -- /Since: 0.5/
 traceEvent :: TS.Text -> a -> a
-traceEvent msg = S.traceEvent $ TS.unpack msg
-{-# INLINE traceEvent #-}
+traceEvent = S.traceEvent . TS.unpack
 
 -- | Like 'traceEvent' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceEventLazy :: TL.Text -> a -> a
-traceEventLazy msg = S.traceEvent $ TL.unpack msg
-{-# INLINE traceEventLazy #-}
+traceEventLazy = S.traceEvent . TL.unpack
 
 -- | The 'traceEventIO' function emits a message to the eventlog, if eventlog
 -- profiling is available and enabled at runtime.
---
+-- 
 -- Compared to 'traceEvent', 'traceEventIO' sequences the event with respect to
 -- other IO actions.
 -- 
 -- /Since: 0.5/
 traceEventIO :: TS.Text -> IO ()
 traceEventIO = S.traceEventIO . TS.unpack
-{-# INLINE traceEventIO #-}
 
 -- | Like 'traceEventIO' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceEventIOLazy :: TL.Text -> IO ()
 traceEventIOLazy = S.traceEventIO . TL.unpack
-{-# INLINE traceEventIOLazy #-}
 #endif
 
 #if MIN_VERSION_base(4,7,0)
+-- $markers
+-- 
+-- When looking at a profile for the execution of a program we often want to
+-- be able to mark certain points or phases in the execution and see that
+-- visually in the profile.
+
+-- For example, a program might have several distinct phases with different
+-- performance or resource behaviour in each phase. To properly interpret the
+-- profile graph we really want to see when each phase starts and ends.
+-- 
+-- Markers let us do this: we can annotate the program to emit a marker at
+-- an appropriate point during execution and then see that in a profile.
+-- 
+-- Currently this feature is only supported in GHC by the eventlog tracing
+-- system, but in future it may also be supported by the heap profiling or
+-- other profiling tools. These function exists for other Haskell
+-- implementations but they have no effect. Note that the @Text@ message is
+-- always evaluated, whether or not profiling is available or enabled.
+
 -- | The 'traceMarker' function emits a marker to the eventlog, if eventlog
 -- profiling is available and enabled at runtime. The 'TS.Text' is the name of
 -- the marker. The name is just used in the profiling tools to help you keep
 -- clear which marker is which.
---
+-- 
 -- This function is suitable for use in pure code. In an IO context use
 -- 'traceMarkerIO' instead.
---
+-- 
 -- Note that when using GHC's SMP runtime, it is possible (but rare) to get
 -- duplicate events emitted if two CPUs simultaneously evaluate the same thunk
 -- that uses 'traceMarker'.
@@ -263,30 +337,26 @@ traceEventIOLazy = S.traceEventIO . TL.unpack
 -- /Since: 0.5/
 traceMarker :: TS.Text -> a -> a
 traceMarker msg = S.traceMarker $ TS.unpack msg
-{-# INLINE traceMarker #-}
 
 -- | Like 'traceMarker' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceMarkerLazy :: TL.Text -> a -> a
 traceMarkerLazy msg = S.traceMarker $ TL.unpack msg
-{-# INLINE traceMarkerLazy #-}
 
 -- | The 'traceMarkerIO' function emits a marker to the eventlog, if eventlog
 -- profiling is available and enabled at runtime.
---
+-- 
 -- Compared to 'traceMarker', 'traceMarkerIO' sequences the event with respect to
 -- other IO actions.
 -- 
 -- /Since: 0.5/
 traceMarkerIO :: TS.Text -> IO ()
 traceMarkerIO = S.traceMarkerIO . TS.unpack
-{-# INLINE traceMarkerIO #-}
 
 -- | Like 'traceMarkerIO' but accepts a lazy 'TL.Text' argument.
 -- 
 -- /Since: 0.5/
 traceMarkerIOLazy :: TL.Text -> IO ()
 traceMarkerIOLazy = S.traceMarkerIO . TL.unpack
-{-# INLINE traceMarkerIOLazy #-}
 #endif
