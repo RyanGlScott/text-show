@@ -1,5 +1,6 @@
 # 0.7
 * Added `showbUArrayPrec` (and corresponding `Show` instance for `UArray`s) and `showbIArrayPrec` to `Text.Data.Text.Data.Array`.
+* Renamed `showbListDefault` to `showbListWith` to match how `Text.Show` names it
 * Exposed `showbShortByteString` with all versions of `bytestring` by using the `bytestring-builder` package
 * Corrected the `Show` instance for `Lexeme` (in `Text.Show.Text.Text.Read.Lex`)
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.

@@ -61,7 +61,7 @@ import           Prelude hiding (Show)
 import           System.IO (Handle)
 
 import qualified Text.Show as S (Show)
-import           Text.Show.Text.Classes (Show(showbPrec), showbListDefault,
+import           Text.Show.Text.Classes (Show(showbPrec), showbListWith,
                                          showbParen, showbSpace)
 import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils ((<>), isInfixTypeCon, isTupleString,
@@ -171,7 +171,7 @@ genericShowbPrec p = gShowbPrec Pref p . from
 -- 
 -- /Since: 0.6/
 genericShowbList :: (Generic a, GShow (Rep a)) => [a] -> Builder
-genericShowbList = showbListDefault genericShowb
+genericShowbList = showbListWith genericShowb
 
 -- | Writes a 'Generic' instance's strict 'TS.Text' representation to the standard
 -- output, followed by a newline.

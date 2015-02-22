@@ -90,7 +90,7 @@ import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo)
 #endif
 import           GHC.Stats (GCStats)
-import           GHC.Show (asciiTab, showList__)
+import           GHC.Show (asciiTab)
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol)
 #endif
@@ -125,6 +125,7 @@ import           Text.Read.Lex (Lexeme)
 #if MIN_VERSION_base(4,7,0)
 import           Text.Read.Lex (Number)
 #endif
+import           Text.Show (showListWith)
 import           Text.Show.Functions ()
 import qualified Text.Show.Text as T (print)
 import           Text.Show.Text hiding (Show, print)
@@ -135,7 +136,7 @@ import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGF
 import           Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
 #endif
 import           Text.Show.Text.Data.Integral (showbIntAtBase)
-import           Text.Show.Text.Data.List (showbListDefault)
+import           Text.Show.Text.Data.List (showbListWith)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
 import qualified Text.Show.Text.Debug.Trace as T (traceShow)
 import           Text.Show.Text.Functions ()
@@ -170,9 +171,9 @@ prop_showIntAtBase = do
     pure $ fromString (showIntAtBase base intToDigit i "") == showbIntAtBase base intToDigit i
 #endif
 
--- | Verifies 'showList__' and 'showbListDefault' generate the same output.
-prop_showListDefault :: [Char] -> Bool
-prop_showListDefault str = fromString (showList__ shows str "") == showbListDefault showb str
+-- | Verifies 'showListWith' and 'showbListWith' generate the same output.
+prop_showListWith :: [Char] -> Bool
+prop_showListWith str = fromString (showListWith shows str "") == showbListWith showb str
 
 -- | Verifies the 'Show' instance for 'TextEncoding' is accurate.
 prop_showTextEncoding :: Int -> Property
@@ -382,7 +383,7 @@ baseAndFriendsTests =
         [ testProperty "String instance"                         (prop_matchesShow :: Int -> String -> Bool)
         , testProperty "[String] instance"                       (prop_matchesShow :: Int -> [String] -> Bool)
         , testProperty "[Int] instance"                          (prop_matchesShow :: Int -> [Int] -> Bool)
-        , testProperty "showbListDefault output"                 prop_showListDefault
+        , testProperty "showbListWith output"                    prop_showListWith
         ]
     , testGroup "Text.Show.Text.Data.Maybe"
         [ testProperty "Maybe Int instance"                      (prop_matchesShow :: Int -> Maybe Int -> Bool)

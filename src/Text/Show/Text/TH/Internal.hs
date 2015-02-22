@@ -66,7 +66,7 @@ import           Prelude hiding (Show)
 
 import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T (Show)
-import           Text.Show.Text.Classes (showb, showbPrec, showbListDefault,
+import           Text.Show.Text.Classes (showb, showbPrec, showbListWith,
                                          showbParen, showbSpace)
 #if __GLASGOW_HASKELL__ >= 702
 import           Text.Show.Text.Classes (showbList)
@@ -412,7 +412,7 @@ mkShowbPrec name = do
 -- 
 -- /Since: 0.5/
 mkShowbList :: Name -> Q Exp
-mkShowbList name = [| showbListDefault $(mkShowb name) |]
+mkShowbList name = [| showbListWith $(mkShowb name) |]
 
 -- | Generates a lambda expression which writes the given data type or family
 -- argument's strict 'TS.Text' output to the standard output, followed by a newline.

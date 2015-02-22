@@ -26,5 +26,5 @@ script:
     else
       cabal configure --enable-tests
       cabal build --ghc-option=-Werror
-      cabal test --ghc-option=-Werror --show-details=always
+      cabal test --show-details=always
     fi

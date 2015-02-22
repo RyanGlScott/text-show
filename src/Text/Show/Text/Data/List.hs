@@ -8,14 +8,14 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Exports 'showbListDefault'.
+Exports 'showbListWith'.
 -}
-module Text.Show.Text.Data.List (showbListDefault) where
+module Text.Show.Text.Data.List (showbListWith) where
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec, showbList),
-                               Show1(showbPrec1), showbListDefault)
+                               Show1(showbPrec1), showbListWith)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 

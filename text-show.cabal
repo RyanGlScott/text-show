@@ -1,5 +1,5 @@
 name:                text-show
-version:             0.6.0.1
+version:             0.7
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
@@ -191,7 +191,7 @@ test-suite text-show-properties
                      , tasty-hunit                >= 0.8   && < 0.10
                      , tasty-quickcheck           >= 0.8   && < 0.9
                      , text                       >= 0.8   && < 1.3
-                     , text-show                  == 0.6.0.1
+                     , text-show                  == 0.7
   hs-source-dirs:      tests
   ghc-options:         -Wall
   include-dirs:        include

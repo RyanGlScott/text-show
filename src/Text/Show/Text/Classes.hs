@@ -116,7 +116,7 @@ class Show a where
     
     showb = showbPrec 0
     
-    showbList = showbListDefault showb
+    showbList = showbListWith showb
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
 #endif
@@ -188,17 +188,20 @@ showbSpace = s ' '
 {-# INLINE showbSpace #-}
 
 -- | Converts a list of values into a 'Builder' in which the values are surrounded
--- by square brackets and each value is separated by a comma. This is the default
--- implementation of 'showbList' save for a few special cases (e.g., 'String').
+-- by square brackets and each value is separated by a comma. The function argument
+-- controls how each element is shown.
+
+-- @'showbListWith' 'showb'@ is the default implementation of 'showbList' save for
+-- a few special cases (e.g., 'String').
 -- 
--- /Since: 0.3/
-showbListDefault :: (a -> Builder) -> [a] -> Builder
-showbListDefault _      []     = "[]"
-showbListDefault showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
+-- /Since: 0.7/
+showbListWith :: (a -> Builder) -> [a] -> Builder
+showbListWith _      []     = "[]"
+showbListWith showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
   where
-    go (y:ys) = s ',' <> showbx y <> go ys                  -- ..,..
-    go []     = s ']'                                       -- ..]"
-{-# INLINE showbListDefault #-}
+    go (y:ys) = s ',' <> showbx y <> go ys               -- ..,..
+    go []     = s ']'                                    -- ..]"
+{-# INLINE showbListWith #-}
 
 -- | @'showbUnary' n p x@ produces the 'Builder' representation of a unary data
 -- constructor with name @n@ and argument @x@, in precedence context @p@.
