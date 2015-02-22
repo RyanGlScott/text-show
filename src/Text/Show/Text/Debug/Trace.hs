@@ -60,17 +60,21 @@ import           Control.Monad (when)
 
 import qualified Data.ByteString as BS (null, partition)
 import           Data.ByteString (ByteString, useAsCString)
-import           Data.ByteString.Internal (c2w, packChars)
-import qualified Data.Text as TS (Text, unpack)
+import           Data.ByteString.Internal (c2w)
+import qualified Data.Text as TS (Text)
 import           Data.Text.Encoding (encodeUtf8)
-import qualified Data.Text.Lazy as TL (Text, unpack)
+import qualified Data.Text.Lazy as TL (Text)
 import           Data.Text.Lazy (toStrict)
-
-import qualified Debug.Trace as S
 
 import           Foreign.C.String (CString)
 
 #if MIN_VERSION_base(4,5,0)
+import qualified Data.ByteString.Char8 as BS (pack)
+import qualified Data.Text as TS (unpack)
+import qualified Data.Text.Lazy as TL (unpack)
+
+import qualified Debug.Trace as S
+
 import           GHC.Stack (currentCallStack, renderStack)
 #endif
 
@@ -249,7 +253,7 @@ traceStackByteString :: ByteString -> a -> a
 traceStackByteString bs expr = unsafePerformIO $ do
     traceIOByteString bs
     stack <- currentCallStack
-    when (not (null stack)) . traceIOByteString . packChars $ renderStack stack
+    when (not (null stack)) . traceIOByteString . BS.pack $ renderStack stack
     return expr
 
 -- $eventlog_tracing
