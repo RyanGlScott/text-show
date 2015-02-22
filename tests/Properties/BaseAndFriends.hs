@@ -65,6 +65,8 @@ import           Data.Word (Word)
 #endif
 import           Data.Version (Version, showVersion)
 
+import qualified Debug.Trace as S (traceShow)
+
 import           Foreign.C.Types
 import           Foreign.ForeignPtr (newForeignPtr_)
 import           Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
@@ -106,14 +108,17 @@ import           Prelude hiding (Show)
 import           Properties.Utils
 
 import           System.Exit (ExitCode)
+import qualified System.IO as S (print)
 import           System.IO (BufferMode, IOMode, HandlePosn, Newline,
-                            NewlineMode, SeekMode, Handle, mkTextEncoding)
+                            NewlineMode, SeekMode, Handle,
+                            mkTextEncoding, stdout, stderr)
+import           System.IO.Silently (capture_, hCapture_)
 import           System.Posix.Types
 
 import           Test.QuickCheck.Instances ()
 import           Test.Tasty (TestTree, testGroup)
 import           Test.Tasty.HUnit ((@=?), testCase)
-import           Test.Tasty.QuickCheck (Gen, arbitrary, generate,
+import           Test.Tasty.QuickCheck (Gen, Property, arbitrary, generate,
                                         oneof, suchThat, testProperty)
 
 import           Text.Read.Lex (Lexeme)
@@ -121,7 +126,8 @@ import           Text.Read.Lex (Lexeme)
 import           Text.Read.Lex (Number)
 #endif
 import           Text.Show.Functions ()
-import           Text.Show.Text hiding (Show)
+import qualified Text.Show.Text as T (print)
+import           Text.Show.Text hiding (Show, print)
 import           Text.Show.Text.Data.Char (asciiTabB)
 import           Text.Show.Text.Data.Fixed (showbFixed)
 import           Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
@@ -131,20 +137,29 @@ import           Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
 import           Text.Show.Text.Data.Integral (showbIntAtBase)
 import           Text.Show.Text.Data.List (showbListDefault)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
+import qualified Text.Show.Text.Debug.Trace as T (traceShow)
 import           Text.Show.Text.Functions ()
 import           Text.Show.Text.Generic (ConType)
 
 #include "HsBaseConfig.h"
+
+-- | Verifies the 'print' functions for 'String' and 'TS.Text' @Show@ display
+-- the same output.
+prop_print :: String -> Property
+prop_print str = ioProperty $ do
+    sRes <- capture_ $ S.print str
+    tRes <- capture_ $ T.print str
+    pure $ sRes == tRes
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
 prop_showFixed :: Bool -> Fixed E12 -> Bool
 prop_showFixed b f = fromString (showFixed b f) == showbFixed b f
 
 -- | Verifies the 'Show' instance for 'ForeignPtr' is accurate.
-prop_showForeignPtr :: Int -> Ptr Int -> Property Bool
+prop_showForeignPtr :: Int -> Ptr Int -> Property
 prop_showForeignPtr p ptr = ioProperty $ do
     fptr <- newForeignPtr_ ptr
-    pure $ matchesShow p fptr
+    pure $ prop_matchesShow p fptr
 
 -- | Verifies 'showIntAtBase' and 'showbIntAtBase' generate the same output.
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
@@ -160,7 +175,7 @@ prop_showListDefault :: [Char] -> Bool
 prop_showListDefault str = fromString (showList__ shows str "") == showbListDefault showb str
 
 -- | Verifies the 'Show' instance for 'TextEncoding' is accurate.
-prop_showTextEncoding :: Int -> Property Bool
+prop_showTextEncoding :: Int -> Property
 prop_showTextEncoding p = ioProperty $ do
     -- Based on this description:
     -- http://hackage.haskell.org/package/base-4.7.0.2/docs/System-IO.html#v:mkTextEncoding
@@ -169,13 +184,13 @@ prop_showTextEncoding p = ioProperty $ do
                                        , "UTF-32", "UTF-32BE", "UTF-32LE"
                                        ]
     tenc <- mkTextEncoding utf
-    pure $ matchesShow p tenc
+    pure $ prop_matchesShow p tenc
 
 -- | Verifies the 'Show' instance for 'ThreadId' is accurate.
-prop_showThreadId :: Int -> Property Bool
+prop_showThreadId :: Int -> Property
 prop_showThreadId p = ioProperty $ do
     tid <- myThreadId
-    pure $ matchesShow p tid
+    pure $ prop_matchesShow p tid
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
 -- is one of E, F, or G).
@@ -190,35 +205,43 @@ prop_showVersion v = fromString (showVersion v) == showbVersionConcrete v
 
 #if MIN_VERSION_base(4,8,0)
 -- | Verifies that the 'Show' instance for 'RTSFlags' is accurate.
-prop_showRTSFlags :: Int -> Property Bool
+prop_showRTSFlags :: Int -> Property
 prop_showRTSFlags p = ioProperty $ do
     rtsflags <- getRTSFlags
-    pure $ matchesShow p rtsflags
+    pure $ prop_matchesShow p rtsflags
 
 -- | Verifies that the 'Show' instance for 'GCFlags' is accurate.
-prop_showGCFlags :: Int -> Property Bool
+prop_showGCFlags :: Int -> Property
 prop_showGCFlags p = ioProperty $ do
     gcflags <- getGCFlags
-    pure $ matchesShow p gcflags
+    pure $ prop_matchesShow p gcflags
 
 -- | Verifies that the 'Show' instance for 'CCFlags' is accurate.
-prop_showCCFlags :: Int -> Property Bool
+prop_showCCFlags :: Int -> Property
 prop_showCCFlags p = ioProperty $ do
     ccflags <- getCCFlags
-    pure $ matchesShow p ccflags
+    pure $ prop_matchesShow p ccflags
 
 -- | Verifies that the 'Show' instance for 'ProfFlags' is accurate.
-prop_showProfFlags :: Int -> Property Bool
+prop_showProfFlags :: Int -> Property
 prop_showProfFlags p = ioProperty $ do
     profflags <- getProfFlags
-    pure $ matchesShow p profflags
+    pure $ prop_matchesShow p profflags
 
 -- | Verifies that the 'Show' instance for 'TraceFlags' is accurate.
-prop_showTraceFlags :: Int -> Property Bool
+prop_showTraceFlags :: Int -> Property
 prop_showTraceFlags p = ioProperty $ do
     traceflags <- getTraceFlags
-    pure $ matchesShow p traceflags
+    pure $ prop_matchesShow p traceflags
 #endif
+
+-- | Verifies the 'traceShow' functions for 'String' and 'TS.Text' @Show@ display
+-- the same output.
+prop_traceShow :: String -> Property
+prop_traceShow str = ioProperty $ do
+    sRes <- hCapture_ [stdout, stderr] . S.traceShow str $ pure ()
+    tRes <- hCapture_ [stdout, stderr] . T.traceShow str $ pure ()
+    pure $ sRes == tRes
 
 baseAndFriendsTests :: [TestTree]
 baseAndFriendsTests =
@@ -235,6 +258,8 @@ baseAndFriendsTests =
         , testProperty "FromTextShow [Char] instance"            (prop_matchesShow :: Int -> FromTextShow [Char] -> Bool)
         , testProperty "FromTextShow [Char]: read . show = id"   (prop_readShow :: Int -> FromTextShow [Char] -> Bool)
         , testProperty "FromTextShow [Char] = String" $          prop_showEq (FromTextShow :: String -> FromTextShow [Char])
+        , testProperty "print behavior"                          prop_print
+        , testProperty "traceShow behavior"                      prop_traceShow
         ]
     , testGroup "Text.Show.Text.Control.Applicative"
         [ testProperty "ZipList Int instance"                    (prop_matchesShow :: Int -> ZipList Int -> Bool)
