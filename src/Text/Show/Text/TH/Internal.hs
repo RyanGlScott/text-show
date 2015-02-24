@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, TemplateHaskell #-}
+{-# LANGUAGE CPP, MagicHash, TemplateHaskell #-}
 {-|
 Module:      Text.Show.Text.TH.Internal
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -58,6 +58,8 @@ import           Data.Text.Lazy.Builder (fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
+import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
+import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH
@@ -495,10 +497,10 @@ encodeArgs p (NormalC conName [])
     = match (conP conName [])
             (normalB [| intConst (fromString $(stringE (nameBase conName))) $(varE p) |])
             []
-encodeArgs p (NormalC conName [_]) = do
+encodeArgs p (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
     
-    let showArg  = [| showbPrec appPrec1 $(varE arg) |]
+    let showArg  = [| showbPrec appPrec1 $(mPrimExp argTy arg) |]
         namedArg = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(showArg) |] 
     
     match (conP conName [varP arg])
@@ -519,7 +521,10 @@ encodeArgs p (NormalC conName ts) = do
                  (normalB [| intConst $(mappendArgs) $(varE p) |])
                  []
        else do
-           let showArgs = map (appE [| showbPrec appPrec1 |] . varE) args
+           let showArgs = map (\(arg, (_, argTy))
+                                 -> [| showbPrec appPrec1 $(mPrimExp argTy arg) |]
+                              )
+                              (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
                namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
            
@@ -530,10 +535,10 @@ encodeArgs p (RecC conName []) = encodeArgs p $ NormalC conName []
 encodeArgs p (RecC conName ts) = do
     args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
     
-    let showArgs       = concatMap (\(arg, (argName, _, _))
+    let showArgs       = concatMap (\(arg, (argName, _, argTy))
                                       -> [ [| fromString $(stringE (nameBase argName)) |]
                                          , [| fromString " = "                         |]
-                                         , [| showb $(varE arg)                        |]
+                                         , [| showb $(mPrimExp argTy arg)              |]
                                          , [| fromString ", "                          |]
                                          ]
                                    )
@@ -547,7 +552,7 @@ encodeArgs p (RecC conName ts) = do
     match (conP conName $ map varP args)
           (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
           []
-encodeArgs p (InfixC _ conName _) = do
+encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
     al   <- newName "argL"
     ar   <- newName "argR"
     info <- reify conName
@@ -563,13 +568,13 @@ encodeArgs p (InfixC _ conName _) = do
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
-                          [| showbPrec (conPrec + 1) $(varE al)
+                          [| showbPrec (conPrec + 1) $(mPrimExp alTy al)
                           <> showbSpace
                           <> $(mBacktickE)
                           <> fromString $(opNameE)
                           <> $(mBacktickE)
                           <> showbSpace
-                          <> showbPrec (conPrec + 1) $(varE ar)
+                          <> showbPrec (conPrec + 1) $(mPrimExp arTy ar)
                           |]
           )
           []
@@ -578,6 +583,18 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+-- | Checks if an type variable has an unlifted type that can be shown. If so,
+-- wrap it in its corresponding constructor. Otherwise, just return an expression
+-- with solely the type variable.
+mPrimExp :: Type -> Name -> Q Exp
+mPrimExp (ConT primTy) primName
+    | primTy == ''Char#   = [| C# $(varE primName) |]
+    | primTy == ''Double# = [| D# $(varE primName) |]
+    | primTy == ''Float#  = [| F# $(varE primName) |]
+    | primTy == ''Int#    = [| I# $(varE primName) |]
+    | primTy == ''Word#   = [| W# $(varE primName) |]
+mPrimExp _ name = varE name
 
 -- | Checks if a 'Name' represents a tuple type constructor (other than '()')
 isNonUnitTuple :: Name -> Bool

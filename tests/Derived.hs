@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP, DeriveGeneric, ExistentialQuantification, FlexibleContexts,
-             FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
-             StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+             FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MagicHash,
+             MultiParamTypeClasses, StandaloneDeriving, TypeOperators,
+             UndecidableInstances #-}
 #if MIN_VERSION_template_haskell(2,7,0)
 {-# LANGUAGE TypeFamilies #-}
 #endif
@@ -40,6 +41,7 @@ module Derived (
     , PolymorphicForall(..)
     , AllAtOnce(..)
     , GADT(..)
+    , PrimADT#(..)
     , LeftAssocTree(..)
     , RightAssocTree(..)
     , (:?:)(..)
@@ -66,6 +68,7 @@ module Derived (
     ) where
 
 import           GHC.Generics (Generic)
+import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 
 import           Prelude hiding (Show)
 
@@ -105,7 +108,7 @@ infix 8 `PolyInf`
 data PolymorphicInfix a b c = a `PolyInf` b deriving (S.Show, Generic)
 
 -- TODO: Figure out how to create Generic instances for MonomorphicForall, PolymorphicForall,
--- AllAtOnce, and GADT
+-- AllAtOnce, GADT, and PrimADT
 
 data MonomorphicForall = forall a. (Arbitrary a, S.Show a, T.Show a) => MonomorphicForall a
 deriving instance S.Show MonomorphicForall
@@ -133,6 +136,22 @@ data GADT a b c where
     GADTCon4 :: a      -> GADT a      b      c
     GADTCon5 :: b      -> GADT b      b      c
 deriving instance (S.Show a, S.Show b) => S.Show (GADT a b c)
+
+infixr 5 `PrimInfixIntegral#`, `PrimInfixFloating#`, `PrimInfixChar#`
+data PrimADT# a = PrimNormal# Int# Float# Double# Char# Word#
+                | PrimRecord# {
+                    primRecordInt#    :: Int#
+                  , primRecordFloat#  :: Float#
+                  , primRecordDouble# :: Double#
+                  , primRecordChar#   :: Char#
+                  , primRecordWord#   :: Word#
+                }
+                | Int#   `PrimInfixIntegral#` Word#
+                | Float# `PrimInfixFloating#` Double#
+                | Char#  `PrimInfixChar#`     Char#
+                | forall b. (Arbitrary b, S.Show b, T.Show b)
+                    => PrimForall# b Int# Float# Double# Char# Word#
+deriving instance S.Show (PrimADT# a)
 
 infixl 5 :<:
 data LeftAssocTree a = LeftAssocLeaf a

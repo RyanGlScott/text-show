@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances, GADTs,
-             GeneralizedNewtypeDeriving, StandaloneDeriving,
+             GeneralizedNewtypeDeriving, MagicHash, StandaloneDeriving,
              TemplateHaskell, TypeOperators, UndecidableInstances #-}
 #include "overlap.h"
 __LANGUAGE_OVERLAPPING_INSTANCES__
@@ -35,6 +35,7 @@ module Instances.Derived (
     , showbPolymorphicForallPrec
     , showbAllAtOncePrec
     , showbGADTPrec
+    , showbPrimADTPrec#
     , showbLeftAssocTreePrec
     , showbRightAssocTreePrec
     , showbQuestionMarkPrec
@@ -67,6 +68,8 @@ import Control.Applicative ((<*>), pure)
 import Data.Functor ((<$>))
 
 import Derived
+
+import GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
 
 import Prelude hiding (Show)
 
@@ -120,6 +123,9 @@ showbAllAtOncePrec = showbPrec
 
 showbGADTPrec :: (Show a, Show b, Show c) => Int -> GADT a b c -> Builder
 showbGADTPrec = showbPrec
+
+showbPrimADTPrec# :: Show a => Int -> PrimADT# a -> Builder
+showbPrimADTPrec# = showbPrec
 
 showbLeftAssocTreePrec :: Show a => Int -> LeftAssocTree a -> Builder
 showbLeftAssocTreePrec = showbPrec
@@ -253,6 +259,22 @@ instance __OVERLAPPABLE__ Arbitrary a => Arbitrary (GADT a b c) where
     arbitrary = GADTCon4 <$> arbitrary
 instance __OVERLAPPING__  Arbitrary b => Arbitrary (GADT b b c) where
     arbitrary = GADTCon5 <$> arbitrary
+
+$(deriveShow ''PrimADT#)
+instance Arbitrary (PrimADT# a) where
+    arbitrary = do
+        i@(I# i#) <- arbitrary
+        F# f#     <- arbitrary
+        D# d#     <- arbitrary
+        C# c#     <- arbitrary
+        W# w#     <- arbitrary
+        oneof $ map pure [ PrimNormal# i# f# d# c# w#
+                         , PrimRecord# i# f# d# c# w#
+                         , i# `PrimInfixIntegral#` w#
+                         , f# `PrimInfixFloating#` d#
+                         , c# `PrimInfixChar#` c#
+                         , PrimForall# i i# f# d# c# w#
+                         ]
 
 $(deriveShow ''LeftAssocTree)
 instance Arbitrary a => Arbitrary (LeftAssocTree a) where

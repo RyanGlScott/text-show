@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, TypeOperators #-}
+{-# LANGUAGE CPP, MagicHash, TypeOperators #-}
 {-|
 Module:      Properties.BaseAndFriends
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -42,6 +42,7 @@ derivedTests =
         , testProperty "GADT Int String Int instance"                    (prop_matchesShow :: Int -> GADT Int String Int -> Bool)
         , testProperty "GADT Ordering Int Int instance"                  (prop_matchesShow :: Int -> GADT Ordering Int Int -> Bool)
         , testProperty "GADT Int Int Int instance"                       (prop_matchesShow :: Int -> GADT Int Int Int -> Bool)
+        , testProperty "PrimADT# Int instance"                           (prop_matchesShow :: Int -> PrimADT# Int -> Bool)
         , testProperty "LeftAssocTree Int instance"                      (prop_matchesShow :: Int -> LeftAssocTree Int -> Bool)
         , testProperty "RightAssocTree Int instance"                     (prop_matchesShow :: Int -> RightAssocTree Int -> Bool)
         , testProperty "Int :?: Int instance"                            (prop_matchesShow :: Int -> Int :?: Int -> Bool)

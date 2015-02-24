@@ -183,6 +183,7 @@ test-suite text-show-properties
   build-depends:       array                      >= 0.3   && < 0.6
                      , base                       >= 4.5   && < 5
                      , bytestring                 >= 0.9   && < 0.11
+                     , ghc-prim
                      -- Needed to conditionally import Arbitrary Natural instance
                      , QuickCheck                 >= 2.5   && < 3
                      , quickcheck-instances       >= 0.1   && < 0.4
@@ -199,10 +200,6 @@ test-suite text-show-properties
                      , utils.h
   install-includes:    overlap.h
                      , utils.h
-  
-  -- Prior to GHC 7.6, GHC generics lived in ghc-prim
-  if impl(ghc >= 7.2) && impl(ghc < 7.6)
-    build-depends:     ghc-prim
 
   if impl(ghc < 7.7)
     build-depends:     tagged                     >= 0.4.4 && < 1
