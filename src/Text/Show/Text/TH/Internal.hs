@@ -48,9 +48,6 @@ import           Data.List (foldl', intersperse)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
 #endif
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Monoid (mempty)
-#endif
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -557,22 +554,19 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
     ar   <- newName "argR"
     info <- reify conName
     
-    let conPrec    = case info of
-                       DataConI _ _ _ (Fixity prec _) -> prec
-                       other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
-        opNameE    = stringE $ nameBase conName
-        mBacktickE = [| if isInfixTypeCon $(opNameE)
-                           then mempty
-                           else s '`'
-                     |]
+    let conPrec  = case info of
+                        DataConI _ _ _ (Fixity prec _) -> prec
+                        other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
+        opName   = nameBase conName
+        infixOpE = if isInfixTypeCon opName
+                     then [| fromString opName |]
+                     else [| s '`' <> fromString opName <> s '`' |]
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
                           [| showbPrec (conPrec + 1) $(mPrimExp alTy al)
                           <> showbSpace
-                          <> $(mBacktickE)
-                          <> fromString $(opNameE)
-                          <> $(mBacktickE)
+                          <> $(infixOpE)
                           <> showbSpace
                           <> showbPrec (conPrec + 1) $(mPrimExp arTy ar)
                           |]

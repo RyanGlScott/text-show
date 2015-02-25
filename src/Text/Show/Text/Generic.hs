@@ -281,16 +281,14 @@ instance (GShow a, GShow b) => GShow (a :*: b) where
     gShowbPrec t@(Inf o) n (a :*: b) =
            gShowbPrec t n a
         <> showbSpace
-        <> mBacktick
-        <> o
-        <> mBacktick
+        <> infixOp
         <> showbSpace
         <> gShowbPrec t n b
       where
-        mBacktick :: Builder
-        mBacktick = if isInfixTypeCon (toString o)
-            then mempty
-            else s '`'
+        infixOp :: Builder
+        infixOp = if isInfixTypeCon (toString o)
+                     then o
+                     else s '`' <> o <> s '`'
     gShowbPrec t@Tup _ (a :*: b) =
            gShowbPrec t 0 a
         <> s ','
