@@ -497,7 +497,7 @@ encodeArgs p (NormalC conName [])
 encodeArgs p (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
     
-    let showArg  = [| showbPrec appPrec1 $(mPrimExp argTy arg) |]
+    let showArg  = showbPrecPrim appPrec1 argTy arg
         namedArg = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(showArg) |] 
     
     match (conP conName [varP arg])
@@ -518,9 +518,7 @@ encodeArgs p (NormalC conName ts) = do
                  (normalB [| intConst $(mappendArgs) $(varE p) |])
                  []
        else do
-           let showArgs = map (\(arg, (_, argTy))
-                                 -> [| showbPrec appPrec1 $(mPrimExp argTy arg) |]
-                              )
+           let showArgs = map (\(arg, (_, argTy)) -> showbPrecPrim appPrec1 argTy arg)
                               (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
                namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
@@ -535,7 +533,7 @@ encodeArgs p (RecC conName ts) = do
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
                                       -> [ [| fromString $(stringE (nameBase argName)) |]
                                          , [| fromString " = "                         |]
-                                         , [| showb $(mPrimExp argTy arg)              |]
+                                         , showbPrecPrim 0 argTy arg
                                          , [| fromString ", "                          |]
                                          ]
                                    )
@@ -564,11 +562,11 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
-                          [| showbPrec (conPrec + 1) $(mPrimExp alTy al)
+                          [| $(showbPrecPrim (conPrec + 1) alTy al)
                           <> showbSpace
                           <> $(infixOpE)
                           <> showbSpace
-                          <> showbPrec (conPrec + 1) $(mPrimExp arTy ar)
+                          <> $(showbPrecPrim (conPrec + 1) arTy ar)
                           |]
           )
           []
@@ -579,16 +577,40 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 
 -- | Checks if an type variable has an unlifted type that can be shown. If so,
--- wrap it in its corresponding constructor. Otherwise, just return an expression
--- with solely the type variable.
-mPrimExp :: Type -> Name -> Q Exp
-mPrimExp (ConT primTy) primName
-    | primTy == ''Char#   = [| C# $(varE primName) |]
-    | primTy == ''Double# = [| D# $(varE primName) |]
-    | primTy == ''Float#  = [| F# $(varE primName) |]
-    | primTy == ''Int#    = [| I# $(varE primName) |]
-    | primTy == ''Word#   = [| W# $(varE primName) |]
-mPrimExp _ name = varE name
+-- wrap it in its corresponding constructor and show it. Otherwise, only show
+-- the type variable.
+showbPrecPrim :: Int -> Type -> Name -> Q Exp
+#if __GLASGOW_HASKELL__ >= 710
+-- Starting with GHC 7.10, data types containing unlifted types with derived @Show@
+-- instances show hashed literals with actual hash signs, and negative hashed
+-- literals are not surrounded with parentheses.
+showbPrecPrim p (ConT tyName) tyVarName = showE
+  where
+    tyVarE :: Q Exp
+    tyVarE = varE tyVarName
+    
+    showE :: Q Exp
+    showE | tyName == ''Char#   = [| showbPrec 0 (C# $(tyVarE)) <> s '#'           |]
+          | tyName == ''Double# = [| showbPrec 0 (D# $(tyVarE)) <> fromString "##" |]
+          | tyName == ''Float#  = [| showbPrec 0 (F# $(tyVarE)) <> s '#'           |]
+          | tyName == ''Int#    = [| showbPrec 0 (I# $(tyVarE)) <> s '#'           |]
+          | tyName == ''Word#   = [| showbPrec 0 (W# $(tyVarE)) <> fromString "##" |]
+          | otherwise = [| showbPrec p $(tyVarE) |]
+#else
+showbPrecPrim p (ConT tyName) tyVarName = [| showbPrec p $(expr) |]
+  where
+    tyVarE :: Q Exp
+    tyVarE = varE tyVarName
+    
+    expr :: Q Exp
+    expr | tyName == ''Char#   = [| C# $(tyVarE) |]
+         | tyName == ''Double# = [| D# $(tyVarE) |]
+         | tyName == ''Float#  = [| F# $(tyVarE) |]
+         | tyName == ''Int#    = [| I# $(tyVarE) |]
+         | tyName == ''Word#   = [| W# $(tyVarE) |]
+         | otherwise = tyVarE
+#endif
+showbPrecPrim p _ tyVarName = [| showbPrec p $(varE tyVarName) |]
 
 -- | Checks if a 'Name' represents a tuple type constructor (other than '()')
 isNonUnitTuple :: Name -> Bool
