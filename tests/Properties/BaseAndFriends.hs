@@ -17,7 +17,7 @@ module Properties.BaseAndFriends (baseAndFriendsTests) where
 
 import           Control.Applicative (ZipList(..), liftA2)
 #if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative (pure)
+import           Control.Applicative ((*>), pure)
 #endif
 import           Control.Concurrent (myThreadId)
 import           Control.Exception
@@ -111,7 +111,7 @@ import           System.Exit (ExitCode)
 import qualified System.IO as S (print)
 import           System.IO (BufferMode, IOMode, HandlePosn, Newline,
                             NewlineMode, SeekMode, Handle,
-                            mkTextEncoding, stdout, stderr)
+                            hFlush, mkTextEncoding, stdout, stderr)
 import           System.IO.Silently (capture_, hCapture_)
 import           System.Posix.Types
 
@@ -148,8 +148,8 @@ import           Text.Show.Text.Generic (ConType)
 -- the same output.
 prop_print :: String -> Property
 prop_print str = ioProperty $ do
-    sRes <- capture_ $ S.print str
-    tRes <- capture_ $ T.print str
+    sRes <- capture_ $ S.print str *> hFlush stdout
+    tRes <- capture_ $ T.print str *> hFlush stdout
     pure $ sRes == tRes
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
@@ -240,8 +240,9 @@ prop_showTraceFlags p = ioProperty $ do
 -- the same output.
 prop_traceShow :: String -> Property
 prop_traceShow str = ioProperty $ do
-    sRes <- hCapture_ [stdout, stderr] . S.traceShow str $ pure ()
-    tRes <- hCapture_ [stdout, stderr] . T.traceShow str $ pure ()
+    let handles = [stdout, stderr]
+    sRes <- hCapture_ handles $ S.traceShow str (pure ()) *> mapM_ hFlush handles
+    tRes <- hCapture_ handles $ T.traceShow str (pure ()) *> mapM_ hFlush handles
     pure $ sRes == tRes
 
 baseAndFriendsTests :: [TestTree]

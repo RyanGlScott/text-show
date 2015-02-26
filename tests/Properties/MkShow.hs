@@ -17,7 +17,7 @@ Portability: GHC
 module Properties.MkShow (mkShowTests) where
 
 #if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative (pure)
+import           Control.Applicative ((*>), pure)
 #endif
 
 import           Debug.Trace (traceShow)
@@ -31,7 +31,7 @@ import           Instances.Derived ()
 
 import           Properties.Utils (ioProperty)
 
-import           System.IO (stdout, stderr)
+import           System.IO (hFlush, stdout, stderr)
 import           System.IO.Silently (capture_, hCapture_)
 
 import           Test.Tasty (TestTree, testGroup)
@@ -53,8 +53,8 @@ prop_mkPrint :: S.Show a
              => (a -> IO ()) -- ^ TH-generated 'mkPrint' function
              -> a -> Property
 prop_mkPrint pf x = ioProperty $ do
-    sRes <- capture_ $ print x
-    tRes <- capture_ $ pf    x
+    sRes <- capture_ $ print x *> hFlush stdout
+    tRes <- capture_ $ pf    x *> hFlush stdout
     pure $ sRes == tRes
 
 -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
@@ -62,8 +62,9 @@ prop_mkTraceShow :: S.Show a
                  => (a -> IO () -> IO ()) -- ^ TH-generated 'mkTraceShow' function
                  -> a -> Property
 prop_mkTraceShow tsf x = ioProperty $ do
-    sRes <- hCapture_ [stdout, stderr] . traceShow x $ return ()
-    tRes <- hCapture_ [stdout, stderr] . tsf       x $ return ()
+    let handles = [stdout, stderr]
+    sRes <- hCapture_ handles $ traceShow x (pure ()) *> mapM_ hFlush handles
+    tRes <- hCapture_ handles $ tsf       x (pure ()) *> mapM_ hFlush handles
     pure $ sRes == tRes
 
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' .
