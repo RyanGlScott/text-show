@@ -5,6 +5,7 @@
 * Corrected the `Show` instance for `Lexeme` (in `Text.Show.Text.Text.Read.Lex`)
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
+* Removed the deprecated `replicateB` function
 * `Typeable` instance for `ConType`
 * Changed the implementations of some functions in `Text.Show.Text.Debug.Trace` to use `ByteString`s instead of `String`s
 

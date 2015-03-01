@@ -16,8 +16,8 @@ import Data.Int (Int64)
 import Data.Monoid (Monoid(mappend, mempty))
 #endif
 import Data.Text (Text)
-import Data.Text.Lazy (length, replicate, toStrict, unpack)
-import Data.Text.Lazy.Builder (Builder, fromLazyText, singleton, toLazyText)
+import Data.Text.Lazy (length, toStrict, unpack)
+import Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 
 import GHC.Exts (Char(C#), Int(I#))
 import GHC.Prim ((+#), chr#, ord#)
@@ -61,14 +61,6 @@ s = singleton
 lengthB :: Builder -> Int64
 lengthB = length . toLazyText
 {-# INLINE lengthB #-}
-
--- | @'replicateB' n b@ yields a 'Builder' containing @b@ repeated @n@ times.
--- 
--- /Since: 0.3/
-{-# DEPRECATED replicateB "Use @timesN@ from the @semigroups@ library instead." #-}
-replicateB :: Int64 -> Builder -> Builder
-replicateB n = fromLazyText . replicate n . toLazyText
-{-# INLINE replicateB #-}
 
 -- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
 -- as 'show' would).

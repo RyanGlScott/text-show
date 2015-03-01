@@ -30,7 +30,6 @@ module Text.Show.Text (
     , toString
     , toText
     , lengthB
-    , replicateB
     , unlinesB
     , unwordsB
       -- * Printing values
@@ -50,4 +49,4 @@ import Prelude hiding (Show(show, showList), print)
 import Text.Show.Text.Classes
 import Text.Show.Text.Instances ()
 import Text.Show.Text.Utils (toString, toText, lengthB,
-                             replicateB, unlinesB, unwordsB)
+                             unlinesB, unwordsB)
