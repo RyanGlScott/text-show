@@ -102,7 +102,7 @@ derivedTests =
         , testProperty "OneDataInstance Int Int Int Int generic show"    (prop_genericShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
         , testProperty "AssocData1 () generic show"                      (prop_genericShow :: Int -> AssocData1 () -> Bool)
         , testProperty "AssocData2 () generic show"                      (prop_genericShow :: Int -> AssocData2 () Int Int -> Bool)
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708
         , testProperty "NullaryData generic show"                        (prop_genericShow :: Int -> NullaryData -> Bool)
 # endif
 #endif

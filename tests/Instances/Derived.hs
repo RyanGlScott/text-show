@@ -54,7 +54,7 @@ module Instances.Derived (
     , showbAssocData1Prec
     , showbAssocData2Prec
     -- , showbAssocData3Prec
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708
     , showbNullaryDataPrec
 # endif
     , showbGADTFamPrec
@@ -181,7 +181,7 @@ showbAssocData2Prec = showbPrec
 -- showbAssocData3Prec :: Int -> AssocData3 () b c -> Builder
 -- showbAssocData3Prec = showbPrec
 
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708
 showbNullaryDataPrec :: Int -> NullaryData -> Builder
 showbNullaryDataPrec = showbPrec
 # endif
@@ -341,7 +341,7 @@ deriving instance Arbitrary (AssocData1 ())
 $(deriveShow 'AssocCon2)
 deriving instance Arbitrary (AssocData2 () Int Int)
 
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+#if __GLASGOW_HASKELL__ >= 708
 $(deriveShow 'NullaryCon)
 deriving instance Arbitrary NullaryData
 #endif

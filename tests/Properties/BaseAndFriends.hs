@@ -15,7 +15,7 @@ common libraries.
 -}
 module Properties.BaseAndFriends (baseAndFriendsTests) where
 
-import           Control.Applicative (ZipList(..), liftA2)
+import           Control.Applicative (Const, ZipList, liftA2)
 #if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative ((*>), pure)
 #endif
@@ -264,7 +264,8 @@ baseAndFriendsTests =
         , testProperty "traceShow behavior"                      prop_traceShow
         ]
     , testGroup "Text.Show.Text.Control.Applicative"
-        [ testProperty "ZipList Int instance"                    (prop_matchesShow :: Int -> ZipList Int -> Bool)
+        [ testProperty "Const Int Int instance"                  (prop_matchesShow :: Int -> Const Int Int -> Bool)
+        , testProperty "ZipList Int instance"                    (prop_matchesShow :: Int -> ZipList Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Control.Concurrent"
         [ testProperty "BlockReason instance"                    (prop_matchesShow :: Int -> BlockReason -> Bool)

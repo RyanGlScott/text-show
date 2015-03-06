@@ -10,7 +10,7 @@
 -- nicely with it for some reason.
 {-# LANGUAGE PolyKinds #-}
 #endif
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+#if __GLASGOW_HASKELL__ >= 708
 -- Starting with GHC 7.10, NullaryTypeClasses was deprecated in favor of
 -- MultiParamTypeClasses, which is already enabled
 {-# LANGUAGE NullaryTypeClasses #-}
@@ -59,7 +59,7 @@ module Derived (
     , AssocData2(..)
     -- , AssocClass3(..)
     -- , AssocData3(..)
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708
     , NullaryClass(..)
     , NullaryData(..)
 # endif
@@ -277,7 +277,7 @@ instance AssocClass2 () Int Int where
 -- # endif
 --                                                        )
 
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ >= 708
 class NullaryClass where
     data NullaryData
 instance NullaryClass where

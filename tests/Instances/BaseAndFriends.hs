@@ -22,7 +22,7 @@ of GHC).
 -}
 module Instances.BaseAndFriends () where
 
-import           Control.Applicative (ZipList(..))
+import           Control.Applicative (Const(..), ZipList(..))
 #if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative ((<*>), pure)
 #endif
@@ -88,6 +88,9 @@ import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
+#endif
+#if !(MIN_VERSION_base(4,8,0))
+import           GHC.Show (appPrec, appPrec1)
 #endif
 import           GHC.Stats (GCStats(..))
 #if MIN_VERSION_base(4,7,0)
@@ -596,6 +599,12 @@ deriving instance Arbitrary a => Arbitrary (Sum a)
 deriving instance Arbitrary (f a) => Arbitrary (Alt f a)
 #endif
 
+deriving instance Arbitrary a => Arbitrary (Const a b)
+#if !(MIN_VERSION_base(4,8,0))
+instance Show a => Show (Const a b) where
+    showsPrec p (Const x) = showParen (p > appPrec)
+        $ showString "Const " . showsPrec appPrec1 x
+#endif
 deriving instance Arbitrary a => Arbitrary (ZipList a)
 #if !(MIN_VERSION_base(4,7,0))
 deriving instance Show a => Show (ZipList a)

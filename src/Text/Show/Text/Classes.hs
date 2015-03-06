@@ -4,7 +4,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 #endif
 #if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE StandaloneDeriving, TypeFamilies #-}
 #endif
 {-|
 Module:      Text.Show.Text.Classes
@@ -119,6 +119,8 @@ class Show a where
     showbList = showbListWith showb
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
+
+deriving instance Typeable Show
 #endif
 
 -- | Lifting of the 'Show' class to unary type constructors.
@@ -129,6 +131,10 @@ class Show1 f where
     -- 
     -- /Since: 0.5/
     showbPrec1 :: Show a => Int -> f a -> Builder
+
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable Show1
+#endif
 
 -- | Constructs a strict 'TS.Text' from a single value.
 -- 

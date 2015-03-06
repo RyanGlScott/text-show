@@ -1,6 +1,9 @@
 {-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, FlexibleContexts,
              FlexibleInstances, OverloadedStrings, ScopedTypeVariables,
              TypeOperators #-}
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE StandaloneDeriving #-}
+#endif
 {-|
 Module:      Text.Show.Text.Generic
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -226,6 +229,10 @@ class GShow f where
     -- Whether a representation type has any constructors.
     isNullary  :: f a -> Bool
     isNullary = error "generic show (isNullary): unnecessary case"
+
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable GShow
+#endif
 
 instance GShow U1 where
     gShowbPrec _ _ U1 = mempty
