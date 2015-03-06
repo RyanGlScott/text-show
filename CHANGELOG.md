@@ -7,6 +7,7 @@
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
 * Removed the deprecated `replicateB` function
 * `Typeable` instance for `ConType`
+* Only derive `Eq` and `Ord` for `ConType` if a recent-enough version of `text` is used
 * Changed the implementations of some functions in `Text.Show.Text.Debug.Trace` to use `ByteString`s instead of `String`s
 
 ### 0.6.0.1

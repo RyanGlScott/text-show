@@ -20,25 +20,22 @@ module Text.Show.Text.Debug.Trace.Generic (
 
 import GHC.Generics (Generic, Rep)
 
-import Text.Show.Text.Debug.Trace (trace, traceM)
+import Text.Show.Text.Debug.Trace
 import Text.Show.Text.Generic (GShow, genericShow)
 
--- | Outputs the shown trace message of its first argument (a 'Generic' instance)
--- before returning the second argument.
+-- | A 'Generic' implementation of 'traceShow'.
 -- 
 -- /Since: 0.6/
 genericTraceShow :: (Generic a, GShow (Rep a)) => a -> b -> b
 genericTraceShow = trace . genericShow
 
--- | Outputs the shown trace message of its argument (a 'Generic' instance) before
--- returning that argument.
+-- | A 'Generic' implementation of 'traceShowId'.
 -- 
 -- /Since: 0.6/
 genericTraceShowId :: (Generic a, GShow (Rep a)) => a -> a
 genericTraceShowId a = trace (genericShow a) a
 
--- | Outputs the shown trace message of its argument (a 'Generic' instance) in an
--- arbitrary monad.
+-- | A 'Generic' implementation of 'traceShowM'.
 -- 
 -- /Since: 0.6/
 genericTraceShowM :: (Generic a, GShow (Rep a), Monad m) => a -> m ()

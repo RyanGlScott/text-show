@@ -21,25 +21,25 @@ module Text.Show.Text.Debug.Trace.TH (
 
 import Language.Haskell.TH.Syntax (Name, Q, Exp)
 
-import Text.Show.Text.Debug.Trace (trace, traceM)
+import Text.Show.Text.Debug.Trace
 import Text.Show.Text.TH.Internal (mkShow)
 
--- | Generates a lambda expression which outputs the shown trace message of its first
--- argument before returning the second argument.
+-- | Generates a lambda expression which behaves like 'traceShow' (without requiring a
+-- @Show@ instance).
 -- 
 -- /Since: 0.5/
 mkTraceShow :: Name -> Q Exp
 mkTraceShow name = [| trace . $(mkShow name) |]
 
--- | Generates a lambda expression which outputs the shown trace message of its
--- argument before returning that argument.
+-- | Generates a lambda expression which behaves like 'traceShowId' (without requiring a
+-- @Show@ instance).
 -- 
 -- /Since: 0.5/
 mkTraceShowId :: Name -> Q Exp
 mkTraceShowId name = [| \a -> trace ($(mkShow name) a) a |]
 
--- | Generates a lambda expression which outputs the shown trace message of its
--- argument in an arbitrary monad.
+-- | Generates a lambda expression which behaves like 'traceShowM' (without requiring a
+-- @Show@ instance).
 -- 
 -- /Since: 0.5/
 mkTraceShowM :: Name -> Q Exp

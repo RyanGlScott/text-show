@@ -64,7 +64,7 @@ import           Language.Haskell.TH
 import           Prelude hiding (Show)
 
 import qualified Text.Show as S (Show(show))
-import qualified Text.Show.Text.Classes as T (Show)
+import qualified Text.Show.Text.Classes as T
 import           Text.Show.Text.Classes (showb, showbPrec, showbListWith,
                                          showbParen, showbSpace)
 #if __GLASGOW_HASKELL__ >= 702
@@ -111,12 +111,13 @@ $('deriveShow' 'AssocDataChar) -- Only one single quote!
 data family DataFam a
 data instance DataFam Int = DataFamInt Int Int
 newtype instance DataFam Char = DataFamChar Char
-$('deriveShow' ''DataFam) -- Two double quotes!
+$('deriveShow' ''DataFam) -- Two single quotes!
 -- Generates Show instances for all data instances of DataFam
 -- (DataFamInt and DataFamChar)
 @
 
 Note that at the moment, there are some limitations to this approach:
+
 * The 'Name' argument to 'deriveShow' must not be a type synonym.
 
 * 'deriveShow' makes the assumption that all type variables in a data type require a
@@ -330,59 +331,57 @@ instance Show (f a) => Show (HigherKinded f a) where
 
 -}
 
--- | Generates a lambda expression which converts the given data type or family
--- to a strict 'TS.Text'.
+-- | Generates a lambda expression which behaves like 'T.show' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShow :: Name -> Q Exp
 mkShow name = [| toStrict . $(mkShowLazy name) |]
 
--- | Generates a lambda expression which converts the given data type or family
--- to a lazy 'TL.Text'.
+-- | Generates a lambda expression which behaves like 'T.showLazy' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShowLazy :: Name -> Q Exp
 mkShowLazy name = [| toLazyText . $(mkShowb name) |]
 
--- | Generates a lambda expression which converts the given data type or family
--- to a strict 'TS.Text' with the given precedence.
+-- | Generates a lambda expression which behaves like 'T.showPrec' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShowPrec :: Name -> Q Exp
 mkShowPrec name = [| \p -> toStrict . $(mkShowPrecLazy name) p |]
 
--- | Generates a lambda expression which converts the given data type or family
--- to a lazy 'TL.Text' with the given precedence.
+-- | Generates a lambda expression which behaves like 'T.showPrecLazy' (without
+-- requiring a 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShowPrecLazy :: Name -> Q Exp
 mkShowPrecLazy name = [| \p -> toLazyText . $(mkShowbPrec name) p |]
 
--- | Generates a lambda expression which converts the given list of data types or
--- families to a strict 'TS.Text' in which the values are surrounded by square
--- brackets and each value is separated by a comma.
+-- | Generates a lambda expression which behaves like 'T.showList' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.5/
 mkShowList :: Name -> Q Exp
 mkShowList name = [| toStrict . $(mkShowListLazy name) |]
 
--- | Generates a lambda expression which converts the given list of data types or
--- families to a lazy 'TL.Text' in which the values are surrounded by square
--- brackets and each value is separated by a comma.
+-- | Generates a lambda expression which behaves like 'T.showListLazy' (without
+-- requiring a 'T.Show' instance).
 -- 
 -- /Since: 0.5/
 mkShowListLazy :: Name -> Q Exp
 mkShowListLazy name = [| toLazyText . $(mkShowbList name) |]
 
--- | Generates a lambda expression which converts the given data type or family
--- to a 'Builder'.
+-- | Generates a lambda expression which behaves like 'T.showb' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShowb :: Name -> Q Exp
 mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
 
--- | Generates a lambda expression which converts the given data type or family
--- to a 'Builder' with the given precedence.
+-- | Generates a lambda expression which behaves like 'T.showPrec' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkShowbPrec :: Name -> Q Exp
@@ -405,37 +404,36 @@ mkShowbPrec name = do
     ns :: String
     ns = "Text.Show.Text.TH.mk: "
 
--- | Generates a lambda expression which converts the given list of data types or
--- families to a 'Builder' in which the values are surrounded by square brackets
--- and each value is separated by a comma.
+-- | Generates a lambda expression which behaves like 'T.showbList' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.5/
 mkShowbList :: Name -> Q Exp
 mkShowbList name = [| showbListWith $(mkShowb name) |]
 
--- | Generates a lambda expression which writes the given data type or family
--- argument's strict 'TS.Text' output to the standard output, followed by a newline.
+-- | Generates a lambda expression which behaves like 'T.print' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkPrint :: Name -> Q Exp
 mkPrint name = [| TS.putStrLn . $(mkShow name) |]
 
--- | Generates a lambda expression which writes the given data type or family
--- argument's lazy 'TL.Text' output to the standard output, followed by a newline.
+-- | Generates a lambda expression which behaves like 'T.printLazy' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkPrintLazy :: Name -> Q Exp
 mkPrintLazy name = [| TL.putStrLn . $(mkShowLazy name) |]
 
--- | Generates a lambda expression which writes the given data type or family
--- argument's strict 'TS.Text' output to the given file handle, followed by a newline.
+-- | Generates a lambda expression which behaves like 'T.hPrint' (without requiring a
+-- 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkHPrint :: Name -> Q Exp
 mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 
--- | Generates a lambda expression which writes the given data type or family
--- argument's lazy 'TL.Text' output to the given file handle, followed by a newline.
+-- | Generates a lambda expression which behaves like 'T.hPrintLazy' (without
+-- requiring a 'T.Show' instance).
 -- 
 -- /Since: 0.3.1/
 mkHPrintLazy :: Name -> Q Exp
