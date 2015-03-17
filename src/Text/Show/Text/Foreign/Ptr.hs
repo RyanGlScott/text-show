@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, MagicHash #-}
+{-# LANGUAGE CPP       #-}
+{-# LANGUAGE MagicHash #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Foreign.Ptr

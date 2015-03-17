@@ -1,7 +1,11 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                  #-}
 #if !(MIN_VERSION_base(4,7,0))
-{-# LANGUAGE FlexibleContexts, GADTs, KindSignatures,
-             OverloadedStrings, PolyKinds, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE GADTs                #-}
+{-# LANGUAGE KindSignatures       #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE PolyKinds            #-}
+{-# LANGUAGE UndecidableInstances #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|

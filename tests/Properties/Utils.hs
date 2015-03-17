@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, FlexibleContexts #-}
+{-# LANGUAGE CPP              #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-|
 Module:      Properties.Utils
 Copyright:   (C) 2014-2015 Ryan Scott

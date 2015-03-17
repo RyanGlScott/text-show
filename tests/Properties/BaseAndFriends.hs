@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, FlexibleContexts, TypeOperators #-}
+{-# LANGUAGE CPP              #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators    #-}
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif

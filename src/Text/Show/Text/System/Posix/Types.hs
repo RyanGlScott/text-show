@@ -1,6 +1,8 @@
-{-# LANGUAGE CPP, GeneralizedNewtypeDeriving, StandaloneDeriving #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 #if !(MIN_VERSION_base(4,5,0))
-{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE MagicHash                  #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|

@@ -1,4 +1,5 @@
-{-# LANGUAGE GADTs, TemplateHaskell #-}
+{-# LANGUAGE GADTs           #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Type.Coercion

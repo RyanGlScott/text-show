@@ -1,12 +1,19 @@
-{-# LANGUAGE CPP, FlexibleContexts, FlexibleInstances, GADTs,
-             GeneralizedNewtypeDeriving, MagicHash, StandaloneDeriving,
-             TemplateHaskell, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MagicHash                  #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE UndecidableInstances       #-}
 #include "overlap.h"
 __LANGUAGE_OVERLAPPING_INSTANCES__
 #if __GLASGOW_HASKELL__ >= 706
 -- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
 -- -- nicely with it for some reason.
-{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE PolyKinds                  #-}
 #endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -63,9 +70,9 @@ module Instances.Derived (
 
 #if !(MIN_VERSION_base(4,8,0))
 import Control.Applicative ((<*>), pure)
-#endif
 
 import Data.Functor ((<$>))
+#endif
 
 import Derived
 

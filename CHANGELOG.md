@@ -4,7 +4,8 @@
 * Renamed `showbListDefault` to `showbListWith` to match how `Text.Show` names it
 * Exposed `showbShortByteString` with all versions of `bytestring` by using the `bytestring-builder` package
 * Corrected the `Show` instance for `Lexeme` (in `Text.Show.Text.Text.Read.Lex`)
-* The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly
+* Fixed `TypeRep` output on GHC 7.10 and later
+* The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.12 and later
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
 * Removed the deprecated `replicateB` function
 * `Typable` instances for `Show`, `Show1`, and `GShow` (with GHC 7.8 and later)

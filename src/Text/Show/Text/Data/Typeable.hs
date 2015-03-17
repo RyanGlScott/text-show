@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, OverloadedStrings #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Typeable
@@ -18,6 +19,9 @@ import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (TyCon(..), funTc, listTc)
+# if MIN_VERSION_base(4,8,0)
+import Data.Typeable.Internal (typeRepKinds)
+# endif
 #else
 import Data.Typeable (TyCon, mkTyCon, tyConString, typeOf)
 #endif
@@ -47,10 +51,18 @@ showbTypeRepPrec p tyrep =
          | otherwise          -> showbParen (p > 9) $
                                     showbPrec p tycon
                                  <> showbSpace
-                                 <> showbArgs showbSpace tys
+                                 <> showbArgs showbSpace
+#if MIN_VERSION_base(4,8,0)
+                                                         (kinds ++ tys)
+#else
+                                                         tys
+#endif
   where
     tycon = typeRepTyCon tyrep
     tys   = typeRepArgs tyrep
+#if MIN_VERSION_base(4,8,0)
+    kinds = typeRepKinds tyrep
+#endif
 
 #if !(MIN_VERSION_base(4,4,0))
 -- | The list 'TyCon'.

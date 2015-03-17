@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, MagicHash, TypeOperators #-}
+{-# LANGUAGE CPP           #-}
+{-# LANGUAGE MagicHash     #-}
+{-# LANGUAGE TypeOperators #-}
 {-|
 Module:      Properties.BaseAndFriends
 Copyright:   (C) 2014-2015 Ryan Scott

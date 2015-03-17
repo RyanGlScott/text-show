@@ -1,4 +1,6 @@
-{-# LANGUAGE GADTs, TemplateHaskell, TypeOperators #-}
+{-# LANGUAGE GADTs           #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeOperators   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Type.Equality

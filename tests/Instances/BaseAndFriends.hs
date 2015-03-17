@@ -1,12 +1,15 @@
-{-# LANGUAGE CPP, FlexibleContexts, GeneralizedNewtypeDeriving,
-             StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TypeOperators              #-}
 #if MIN_VERSION_base(4,7,0)
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies               #-}
 # if !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 # endif
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans               #-}
 {-|
 Module:      Instances.BaseAndFriends
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -35,7 +38,9 @@ import qualified Data.Data as D (Fixity(..))
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
+#if !(MIN_VERSION_base(4,8,0))
 import           Data.Functor ((<$>))
+#endif
 #if defined(VERSION_transformers)
 # if !(MIN_VERSION_transformers(0,4,0))
 import           Data.Functor.Classes ()
@@ -291,8 +296,12 @@ instance Arbitrary OldT.TyCon where
 #endif
 
 instance Arbitrary NewT.TypeRep where
-    arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <@> []
---     arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary
+#if MIN_VERSION_base(4,8,0)
+                                                         <@> [] <@> []
+#else
+                                                         <@> []
+#endif
 
 instance Arbitrary NewT.TyCon where
     arbitrary = NewT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary

@@ -1,19 +1,27 @@
-{-# LANGUAGE CPP, DeriveGeneric, ExistentialQuantification, FlexibleContexts,
-             FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MagicHash,
-             MultiParamTypeClasses, StandaloneDeriving, TypeOperators,
-             UndecidableInstances #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE ExistentialQuantification  #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MagicHash                  #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE UndecidableInstances       #-}
 #if MIN_VERSION_template_haskell(2,7,0)
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies               #-}
 #endif
 #if __GLASGOW_HASKELL__ >= 706
 -- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
 -- nicely with it for some reason.
-{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE PolyKinds                  #-}
 #endif
-#if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
 -- Starting with GHC 7.10, NullaryTypeClasses was deprecated in favor of
 -- MultiParamTypeClasses, which is already enabled
-{-# LANGUAGE NullaryTypeClasses #-}
+{-# LANGUAGE NullaryTypeClasses         #-}
 #endif
 {-|
 Module:      Derived

@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, MagicHash, OverloadedStrings #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE MagicHash         #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Integral

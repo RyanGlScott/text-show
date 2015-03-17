@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP             #-}
 #if !(MIN_VERSION_bytestring(0,10,0))
 {-# LANGUAGE TemplateHaskell #-}
 #endif

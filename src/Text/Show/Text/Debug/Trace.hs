@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, ForeignFunctionInterface, OverloadedStrings #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE OverloadedStrings        #-}
 {-|
 Module:      Text.Show.Text.Debug.Trace
 Copyright:   (C) 2014-2015 Ryan Scott

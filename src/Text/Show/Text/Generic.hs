@@ -1,6 +1,11 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveGeneric, FlexibleContexts,
-             FlexibleInstances, OverloadedStrings, ScopedTypeVariables,
-             TypeOperators #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE DeriveDataTypeable  #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 #if __GLASGOW_HASKELL__ >= 708
 {-# LANGUAGE StandaloneDeriving #-}
 #endif

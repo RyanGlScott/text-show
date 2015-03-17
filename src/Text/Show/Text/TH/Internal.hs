@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, MagicHash, TemplateHaskell #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE MagicHash       #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-|
 Module:      Text.Show.Text.TH.Internal
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -42,7 +44,9 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
+#if !(MIN_VERSION_base(4,8,0))
 import           Data.Functor ((<$>))
+#endif
 import           Data.List (foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Data.List (find)
@@ -578,7 +582,7 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -- wrap it in its corresponding constructor and show it. Otherwise, only show
 -- the type variable.
 showbPrecPrim :: Int -> Type -> Name -> Q Exp
-#if __GLASGOW_HASKELL__ >= 710
+#if __GLASGOW_HASKELL__ >= 712
 -- Starting with GHC 7.10, data types containing unlifted types with derived @Show@
 -- instances show hashed literals with actual hash signs, and negative hashed
 -- literals are not surrounded with parentheses.

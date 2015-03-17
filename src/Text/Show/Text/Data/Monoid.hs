@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, TemplateHaskell #-}
+{-# LANGUAGE CPP              #-}
+{-# LANGUAGE TemplateHaskell  #-}
 #if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE FlexibleContexts #-}
 #endif

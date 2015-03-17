@@ -1,4 +1,4 @@
-﻿{-# LANGUAGE CPP #-}
+﻿{-# LANGUAGE CPP             #-}
 #if !defined(__GHCJS__)
 {-# LANGUAGE TemplateHaskell #-}
 #endif

@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP, MagicHash #-}
+{-# LANGUAGE CPP       #-}
+{-# LANGUAGE MagicHash #-}
 {-|
 Module:      Text.Show.Text.Utils
 Copyright:   (C) 2014-2015 Ryan Scott

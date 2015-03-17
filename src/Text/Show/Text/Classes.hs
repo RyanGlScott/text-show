@@ -1,10 +1,18 @@
-{-# LANGUAGE CPP, DeriveDataTypeable, DeriveFoldable, DeriveFunctor,
-             DeriveTraversable, GeneralizedNewtypeDeriving, OverloadedStrings #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveDataTypeable         #-}
+{-# LANGUAGE DeriveFoldable             #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE DeriveTraversable          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+
 #if MIN_VERSION_base(4,4,0)
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric              #-}
 #endif
+
 #if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TypeFamilies               #-}
 #endif
 {-|
 Module:      Text.Show.Text.Classes
@@ -21,6 +29,7 @@ module Text.Show.Text.Classes where
 #if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative (Applicative((<*>), pure))
 import           Data.Foldable (Foldable)
+import           Data.Functor ((<$>))
 import           Data.Monoid (Monoid)
 import           Data.Traversable (Traversable)
 #endif
@@ -35,7 +44,6 @@ import           Data.Bits (Bits)
 import           Data.Bits (FiniteBits)
 #endif
 import           Data.Data (Data, Typeable)
-import           Data.Functor ((<$>))
 import           Data.Ix (Ix)
 import           Data.Semigroup (Semigroup)
 import           Data.String (IsString)
