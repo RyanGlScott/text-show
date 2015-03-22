@@ -105,7 +105,7 @@ import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 import           Instances.Utils ((<@>))
 
 import           Numeric (showHex)
-#if !(MIN_VERSION_QuickCheck(2,7,7) && MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_QuickCheck(2,8,0) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif
 
@@ -137,7 +137,7 @@ import           Data.Word (Word64)
 
 #include "HsBaseConfig.h"
 
-#if !(MIN_VERSION_QuickCheck(2,7,7) && MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_QuickCheck(2,8,0) && MIN_VERSION_base(4,8,0))
 instance Arbitrary Natural where
     arbitrary = fromInteger <$> arbitrary `suchThat` (>= 0)
 #endif
