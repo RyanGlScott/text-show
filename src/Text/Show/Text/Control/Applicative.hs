@@ -28,6 +28,9 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 #include "inline.h"
 
+-- | Convert a 'Const' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.7/
 showbConstPrec :: Show a => Int -> Const a b -> Builder
 showbConstPrec p (Const x) = showbUnary "Const" p x
 {-# INLINE showbConstPrec #-}
