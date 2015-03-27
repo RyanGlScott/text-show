@@ -17,11 +17,11 @@ Portability: GHC
 -}
 module Properties.MkShow (mkShowTests) where
 
-#if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative ((*>), pure)
-#endif
+-- #if !(MIN_VERSION_base(4,8,0))
+-- import           Control.Applicative ((*>), pure)
+-- #endif
 
-import           Debug.Trace (traceShow)
+-- import           Debug.Trace (traceShow)
 
 import           Derived (AllAtOnce)
 #if MIN_VERSION_template_haskell(2,7,0)
@@ -30,18 +30,18 @@ import           Derived (NotAllShow(..), OneDataInstance)
 
 import           Instances.Derived ()
 
-import           Properties.Utils (ioProperty)
+-- import           Properties.Utils (ioProperty)
 
-import           System.IO (hFlush, stdout, stderr)
-import           System.IO.Silently (capture_, hCapture_)
+-- import           System.IO (hFlush, stdout, stderr)
+-- import           System.IO.Silently (capture_, hCapture_)
 
 import           Test.Tasty (TestTree, testGroup)
-import           Test.Tasty.QuickCheck (Property, testProperty)
+import           Test.Tasty.QuickCheck (testProperty)
 
 import qualified Text.Show as S (Show)
 import           Text.Show.Text (Builder, FromStringShow(..), showbPrec)
-import           Text.Show.Text.Debug.Trace.TH (mkTraceShow)
-import           Text.Show.Text.TH (mkPrint, mkShowbPrec)
+-- import           Text.Show.Text.Debug.Trace.TH (mkTraceShow)
+import           Text.Show.Text.TH (mkShowbPrec)
 
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
 prop_mkShowbPrec :: S.Show a
@@ -49,39 +49,39 @@ prop_mkShowbPrec :: S.Show a
                  -> Int -> a -> Bool
 prop_mkShowbPrec sf p x = showbPrec p (FromStringShow x) == sf p x
 
--- | Verifies 'mkPrint' produces the same output as 'print'.
-prop_mkPrint :: S.Show a
-             => (a -> IO ()) -- ^ TH-generated 'mkPrint' function
-             -> a -> Property
-prop_mkPrint pf x = ioProperty $ do
-    sRes <- capture_ $ print x *> hFlush stdout
-    tRes <- capture_ $ pf    x *> hFlush stdout
-    pure $ sRes == tRes
-
--- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
-prop_mkTraceShow :: S.Show a
-                 => (a -> IO () -> IO ()) -- ^ TH-generated 'mkTraceShow' function
-                 -> a -> Property
-prop_mkTraceShow tsf x = ioProperty $ do
-    let handles = [stdout, stderr]
-    sRes <- hCapture_ handles $ traceShow x (pure ()) *> mapM_ hFlush handles
-    tRes <- hCapture_ handles $ tsf       x (pure ()) *> mapM_ hFlush handles
-    pure $ sRes == tRes
+-- -- | Verifies 'mkPrint' produces the same output as 'print'.
+-- prop_mkPrint :: S.Show a
+--              => (a -> IO ()) -- ^ TH-generated 'mkPrint' function
+--              -> a -> Property
+-- prop_mkPrint pf x = ioProperty $ do
+--     sRes <- capture_ $ print x *> hFlush stdout
+--     tRes <- capture_ $ pf    x *> hFlush stdout
+--     pure $ sRes == tRes
+-- 
+-- -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
+-- prop_mkTraceShow :: S.Show a
+--                  => (a -> IO () -> IO ()) -- ^ TH-generated 'mkTraceShow' function
+--                  -> a -> Property
+-- prop_mkTraceShow tsf x = ioProperty $ do
+--     let handles = [stdout, stderr]
+--     sRes <- hCapture_ handles $ traceShow x (pure ()) *> mapM_ hFlush handles
+--     tRes <- hCapture_ handles $ tsf       x (pure ()) *> mapM_ hFlush handles
+--     pure $ sRes == tRes
 
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec' .
 -- This uses a plain type constructor.
 prop_mkShowbPrecTyCon :: Int -> AllAtOnce Int Int Int Int -> Bool
 prop_mkShowbPrecTyCon = prop_mkShowbPrec $(mkShowbPrec ''AllAtOnce)
 
--- | Verifies 'mkPrint' produces the same output as 'print'.
--- This uses a plain type constructor.
-prop_mkPrintTyCon :: AllAtOnce Int Int Int Int -> Property
-prop_mkPrintTyCon = prop_mkPrint $(mkPrint ''AllAtOnce)
-
--- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
--- This uses a plain type constructor.
-prop_mkTraceShowTyCon :: AllAtOnce Int Int Int Int -> Property
-prop_mkTraceShowTyCon = prop_mkTraceShow $(mkTraceShow ''AllAtOnce)
+-- -- | Verifies 'mkPrint' produces the same output as 'print'.
+-- -- This uses a plain type constructor.
+-- prop_mkPrintTyCon :: AllAtOnce Int Int Int Int -> Property
+-- prop_mkPrintTyCon = prop_mkPrint $(mkPrint ''AllAtOnce)
+-- 
+-- -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
+-- -- This uses a plain type constructor.
+-- prop_mkTraceShowTyCon :: AllAtOnce Int Int Int Int -> Property
+-- prop_mkTraceShowTyCon = prop_mkTraceShow $(mkTraceShow ''AllAtOnce)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
@@ -89,45 +89,45 @@ prop_mkTraceShowTyCon = prop_mkTraceShow $(mkTraceShow ''AllAtOnce)
 prop_mkShowbPrecDataFam :: Int -> OneDataInstance Int Int Int Int -> Bool
 prop_mkShowbPrecDataFam = prop_mkShowbPrec $(mkShowbPrec ''OneDataInstance)
 
--- | Verifies 'mkPrint' produces the same output as 'print'.
--- This uses a data family name.
-prop_mkPrintDataFam :: OneDataInstance Int Int Int Int -> Property
-prop_mkPrintDataFam = prop_mkPrint $(mkPrint ''OneDataInstance)
-
--- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
--- This uses a data family name.
-prop_mkTraceShowDataFam :: OneDataInstance Int Int Int Int -> Property
-prop_mkTraceShowDataFam = prop_mkTraceShow $(mkTraceShow ''OneDataInstance)
+-- -- | Verifies 'mkPrint' produces the same output as 'print'.
+-- -- This uses a data family name.
+-- prop_mkPrintDataFam :: OneDataInstance Int Int Int Int -> Property
+-- prop_mkPrintDataFam = prop_mkPrint $(mkPrint ''OneDataInstance)
+-- 
+-- -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
+-- -- This uses a data family name.
+-- prop_mkTraceShowDataFam :: OneDataInstance Int Int Int Int -> Property
+-- prop_mkTraceShowDataFam = prop_mkTraceShow $(mkTraceShow ''OneDataInstance)
 
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
 -- This uses a data family instance constructor.
 prop_mkShowbPrecDataFamInstCon :: Int -> NotAllShow Int Int Int Int -> Bool
 prop_mkShowbPrecDataFamInstCon = prop_mkShowbPrec $(mkShowbPrec 'NASShow1)
 
--- | Verifies 'mkPrint' produces the same output as 'print'.
--- This uses a data family instance constructor.
-prop_mkPrintDataFamInstCon :: NotAllShow Int Int Int Int -> Property
-prop_mkPrintDataFamInstCon = prop_mkPrint $(mkPrint 'NASShow1)
-
--- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
--- This uses a data family instance constructor.
-prop_mkTraceShowDataFamInstCon :: NotAllShow Int Int Int Int -> Property
-prop_mkTraceShowDataFamInstCon = prop_mkTraceShow $(mkTraceShow 'NASShow1)
+-- -- | Verifies 'mkPrint' produces the same output as 'print'.
+-- -- This uses a data family instance constructor.
+-- prop_mkPrintDataFamInstCon :: NotAllShow Int Int Int Int -> Property
+-- prop_mkPrintDataFamInstCon = prop_mkPrint $(mkPrint 'NASShow1)
+-- 
+-- -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
+-- -- This uses a data family instance constructor.
+-- prop_mkTraceShowDataFamInstCon :: NotAllShow Int Int Int Int -> Property
+-- prop_mkTraceShowDataFamInstCon = prop_mkTraceShow $(mkTraceShow 'NASShow1)
 #endif
 
 mkShowTests :: [TestTree]
 mkShowTests =
     [ testGroup "mkShow and related functions"
         [ testProperty "$(mkShowbPrec ''AllAtOnce) (a plain type constructor)"            prop_mkShowbPrecTyCon
-        , testProperty "$(mkPrint ''AllAtOnce) (a plain type constructor)"                prop_mkPrintTyCon
-        , testProperty "$(mkTraceShow ''AllAtOnce) (a plain type constructor)"            prop_mkTraceShowTyCon
+--         , testProperty "$(mkPrint ''AllAtOnce) (a plain type constructor)"                prop_mkPrintTyCon
+--         , testProperty "$(mkTraceShow ''AllAtOnce) (a plain type constructor)"            prop_mkTraceShowTyCon
 #if MIN_VERSION_template_haskell(2,7,0)
         , testProperty "$(mkShowbPrec ''NotAllShow) (a data family instance constructor)" prop_mkShowbPrecDataFamInstCon
-        , testProperty "$(mkPrint ''NotAllShow) (a data family instance constructor)"     prop_mkPrintDataFamInstCon
-        , testProperty "$(mkTraceShow ''NotAllShow) (a data family instance constructor)" prop_mkTraceShowDataFamInstCon
+--         , testProperty "$(mkPrint ''NotAllShow) (a data family instance constructor)"     prop_mkPrintDataFamInstCon
+--         , testProperty "$(mkTraceShow ''NotAllShow) (a data family instance constructor)" prop_mkTraceShowDataFamInstCon
         , testProperty "$(mkShowbPrec ''OneDataInstance) (a data family name)"            prop_mkShowbPrecDataFam
-        , testProperty "$(mkPrint ''OneDataInstance) (a data family name)"                prop_mkPrintDataFam
-        , testProperty "$(mkTraceShow ''OneDataInstance) (a data family name)"            prop_mkTraceShowDataFam
+--         , testProperty "$(mkPrint ''OneDataInstance) (a data family name)"                prop_mkPrintDataFam
+--         , testProperty "$(mkTraceShow ''OneDataInstance) (a data family name)"            prop_mkTraceShowDataFam
 #endif
         ]
     ]
