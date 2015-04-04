@@ -71,7 +71,7 @@ import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T
 import           Text.Show.Text.Classes (showb, showbPrec, showbListWith,
                                          showbParen, showbSpace)
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ > 702
 import           Text.Show.Text.Classes (showbList)
 #endif
 import           Text.Show.Text.Utils ((<>), isInfixTypeCon, isTupleString, s)
@@ -732,7 +732,7 @@ applyCon con typeNames = return $ map apply typeNames
 -- pragmas themselves) have changed considerably over the years, so there's a lot of
 -- CPP magic required to get this to work uniformly across different versions of GHC.
 showbPrecDecs :: PragmaOptions -> [Con] -> [Q Dec]
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ > 702
 showbPrecDecs opts cons =
 #else
 showbPrecDecs _    cons =
@@ -747,7 +747,7 @@ showbPrecDecs _    cons =
       ++ specializeDecs
   where
     inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ > 702
     inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
     inlineShowbDec     = inline inlineShowb 'showb
     inlineShowbListDec = inline inlineShowbList 'showbList
@@ -757,7 +757,7 @@ showbPrecDecs _    cons =
     inlineShowbListDec = []
 #endif
           
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ > 702
     inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
     inline isInlining funName
         | isInlining opts = [ pragInlD funName

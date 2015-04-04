@@ -1,13 +1,14 @@
 # NB: don't set `language: haskell` here
 
 env:
- - CABALVER=1.18 GHCVER=6.12.3
+# - CABALVER=1.18 GHCVER=6.12.3
  - CABALVER=1.18 GHCVER=7.0.4
  - CABALVER=1.18 GHCVER=7.2.2
  - CABALVER=1.18 GHCVER=7.4.2
  - CABALVER=1.18 GHCVER=7.6.3
  - CABALVER=1.18 GHCVER=7.8.4
  - CABALVER=1.22 GHCVER=7.10.1
+ - CABALVER=head GHCVER=head
 
 matrix:
   allow_failures:
@@ -43,12 +44,3 @@ script:
     fi
  - cabal check
  - cabal sdist
-
- - export SRC_TGZ=$(cabal info . | awk '{print $2 ".tar.gz";exit}') ;
-   cd dist/;
-   if [ -f "$SRC_TGZ" ]; then
-      cabal install --force-reinstalls "$SRC_TGZ";
-   else
-      echo "expected '$SRC_TGZ' not found";
-      exit 1;
-   fi
