@@ -12,10 +12,16 @@
 __LANGUAGE_OVERLAPPING_INSTANCES__
 #if __GLASGOW_HASKELL__ >= 706
 -- GHC 7.4 also supports PolyKinds, but Template Haskell doesn't seem to play
--- -- nicely with it for some reason.
+-- nicely with it for some reason.
 {-# LANGUAGE PolyKinds                  #-}
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+
+{-# OPTIONS_GHC -fno-warn-orphans               #-}
+#if __GLASGOW_HASKELL__ >= 711
+-- The TH deriving mechanism isn't smart enough at the moment to eliminate
+-- redundant constraints in Show instance declarations.
+{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
+#endif
 {-|
 Module:      Instances.Derived
 Copyright:   (C) 2014-2015 Ryan Scott
