@@ -1,10 +1,10 @@
 # NB: don't set `language: haskell` here
 
 env:
- - CABALVER=1.16 GHCVER=6.12.3
- - CABALVER=1.16 GHCVER=7.0.4
- - CABALVER=1.16 GHCVER=7.2.2
- - CABALVER=1.16 GHCVER=7.4.2
+ - CABALVER=1.18 GHCVER=6.12.3
+ - CABALVER=1.18 GHCVER=7.0.4
+ - CABALVER=1.18 GHCVER=7.2.2
+ - CABALVER=1.18 GHCVER=7.4.2
  - CABALVER=1.18 GHCVER=7.6.3
  - CABALVER=1.18 GHCVER=7.8.4
  - CABALVER=1.22 GHCVER=7.10.1
@@ -34,12 +34,13 @@ script:
  - if [ -f configure.ac ]; then autoreconf -i; fi
  - |
     if [ $GHCVER = "6.12.3" ] || [ $GHCVER = "7.0.4" ] || [ $GHCVER = "7.2.2" ]; then
-      cabal configure
+      cabal configure -v2
       cabal build
     else
       cabal configure --enable-tests -v2
       cabal build --ghc-option=-Werror
       cabal test
+    fi
  - cabal check
  - cabal sdist
 
