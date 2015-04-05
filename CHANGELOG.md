@@ -1,3 +1,10 @@
+# 0.8
+* Made `GShow` poly-kinded
+* TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
+* TODO: `Show` instances for `Decoding`, `I16`, `UnicodeException`, `Size`, and `FPFormat` from `text`
+* TODO: Perhaps export `formatRealFloat` and `formatRealFloatAlt` from `Text.Show.Text.Data.Floating`? Rename them to `formatRealFloatB` and `formatRealFloatAltB`, respectively?
+* Fixed build on GHC 7.2
+
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons
 

@@ -6,8 +6,13 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators       #-}
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds           #-}
+#endif
+
 #if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE StandaloneDeriving  #-}
 #endif
 {-|
 Module:      Text.Show.Text.Generic
