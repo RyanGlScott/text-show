@@ -547,7 +547,13 @@ encodeArgs p (RecC conName ts) = do
         namedArgs      = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
     
     match (conP conName $ map varP args)
-          (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
+          (normalB
+#if __GLASGOW_HASKELL__ >= 711
+                    [| intConst $(namedArgs) $(varE p) |]
+#else
+                    [| showbParen ($(varE p) > appPrec) $(namedArgs) |]
+#endif
+          )
           []
 encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
     al   <- newName "argL"
@@ -582,7 +588,7 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -- wrap it in its corresponding constructor and show it. Otherwise, only show
 -- the type variable.
 showbPrecPrim :: Int -> Type -> Name -> Q Exp
-#if __GLASGOW_HASKELL__ >= 712
+#if __GLASGOW_HASKELL__ >= 711
 -- Starting with GHC 7.10, data types containing unlifted types with derived @Show@
 -- instances show hashed literals with actual hash signs, and negative hashed
 -- literals are not surrounded with parentheses.

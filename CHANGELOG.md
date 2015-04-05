@@ -1,9 +1,12 @@
 # 0.8
 * Made `GShow` poly-kinded
+* The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
+* The Template Haskell derive does not parenthesize record types regardless of precedence on GHC 7.11 and later
+* Fixed build on GHC 7.2
+
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
 * TODO: `Show` instances for `Decoding`, `I16`, `UnicodeException`, `Size`, and `FPFormat` from `text`
 * TODO: Perhaps export `formatRealFloat` and `formatRealFloatAlt` from `Text.Show.Text.Data.Floating`? Rename them to `formatRealFloatB` and `formatRealFloatAltB`, respectively?
-* Fixed build on GHC 7.2
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons
@@ -16,7 +19,6 @@
 * Exposed `showbShortByteString` with all versions of `bytestring` by using the `bytestring-builder` package
 * Corrected the `Show` instance for `Lexeme` (in `Text.Show.Text.Text.Read.Lex`)
 * Fixed `TypeRep` output on GHC 7.10 and later
-* The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.12 and later
 * Removed `LitChar` and `LitString` from `Text.Show.Text.Data.Char`, as they were not as useful as I had imagined.
 * Removed the deprecated `replicateB` function
 * `Typable` instances for `Show`, `Show1`, and `GShow` (with GHC 7.8 and later)

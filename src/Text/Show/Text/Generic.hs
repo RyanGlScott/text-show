@@ -254,7 +254,14 @@ instance T.Show c => GShow (K1 i c) where
 
 instance (Constructor c, GShow a) => GShow (M1 C c a) where
     gShowbPrec _ n c@(M1 x) = case fixity of
-        Prefix -> showbParen (n > appPrec && not (isNullary x || conIsTuple c)) $
+        Prefix -> showbParen ( n > appPrec
+                               && not ( isNullary x
+                                        || conIsTuple c
+#if __GLASGOW_HASKELL__ >= 711
+                                        || conIsRecord c
+#endif
+                                      )
+                             ) $
                (if (conIsTuple c) then mempty else fromString (conName c))
             <> (if (isNullary x || conIsTuple c) then mempty else s ' ')
             <> (showbBraces t (gShowbPrec t appPrec1 x))
