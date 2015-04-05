@@ -137,12 +137,15 @@ import           Text.Show.Text.Generic (ConType(..))
 
 #if MIN_VERSION_base(4,7,0)
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
-import           Test.Tasty.QuickCheck (getNonNegative)
 # if !(MIN_VERSION_base(4,8,0))
 import           Data.Word (Word)
 # endif
 #else
 import           Data.Word (Word64)
+#endif
+
+#if MIN_VERSION_base(4,7,0) || MIN_VERSION_text(1,1,0)
+import           Test.Tasty.QuickCheck (getNonNegative)
 #endif
 
 #include "HsBaseConfig.h"
