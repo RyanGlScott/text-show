@@ -1,12 +1,14 @@
 # 0.8
-* Made `GShow` poly-kinded
+* Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
+* Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
+* Added `showbUnicodeException`, `showbI16Prec`, `showbDecodingPrec`, and `showbSizePrec` functions (and corresponding `Show` instances) to `Text.Show.Text.Data.Text`
+* Made `GShow` in `Text.Show.Text.Generics` poly-kinded
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
-* The Template Haskell derive does not parenthesize record types regardless of precedence on GHC 7.11 and later
+* The Template Haskell derive now does not parenthesize record types regardless of precedence on GHC 7.11 and later
 * Fixed build on GHC 7.2
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
-* TODO: `Show` instances for `Decoding`, `I16`, `UnicodeException`, `Size`, and `FPFormat` from `text`
-* TODO: Perhaps export `formatRealFloat` and `formatRealFloatAlt` from `Text.Show.Text.Data.Floating`? Rename them to `formatRealFloatB` and `formatRealFloatAltB`, respectively?
+* TODO: Investigate `base-compat`'s usefulness in the package
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons

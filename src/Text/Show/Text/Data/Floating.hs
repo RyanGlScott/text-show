@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Floating
@@ -22,6 +23,9 @@ module Text.Show.Text.Data.Floating (
     , showbGFloat
     , showbFFloatAlt
     , showbGFloatAlt
+    , FPFormat(..)
+    , formatRealFloatB
+    , formatRealFloatAltB
     ) where
 
 import           Data.Array.Base (unsafeAt)
@@ -34,6 +38,7 @@ import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import           Text.Show.Text.Utils ((<>), i2d, s)
 
 #include "inline.h"
@@ -70,7 +75,7 @@ showbDoublePrec = showbRealFloatPrec
 -- 
 -- /Since: 0.3/
 showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
-showbEFloat = formatRealFloat Exponent
+showbEFloat = formatRealFloatB Exponent
 {-# INLINE showbEFloat #-}
 
 -- | Show a signed 'RealFloat' value
@@ -82,7 +87,7 @@ showbEFloat = formatRealFloat Exponent
 -- 
 -- /Since: 0.3/
 showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
-showbFFloat = formatRealFloat Fixed
+showbFFloat = formatRealFloatB Fixed
 {-# INLINE showbFFloat #-}
 
 -- | Show a signed 'RealFloat' value
@@ -95,7 +100,7 @@ showbFFloat = formatRealFloat Fixed
 -- 
 -- /Since: 0.3/
 showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
-showbGFloat = formatRealFloat Generic
+showbGFloat = formatRealFloatB Generic
 {-# INLINE showbGFloat #-}
 
 -- | Show a signed 'RealFloat' value
@@ -106,7 +111,7 @@ showbGFloat = formatRealFloat Generic
 -- 
 -- /Since: 0.3/
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
-showbFFloatAlt d x = formatRealFloatAlt Fixed d True x
+showbFFloatAlt d x = formatRealFloatAltB Fixed d True x
 {-# INLINE showbFFloatAlt #-}
 
 -- | Show a signed 'RealFloat' value
@@ -118,7 +123,7 @@ showbFFloatAlt d x = formatRealFloatAlt Fixed d True x
 -- 
 -- /Since: 0.3/
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
-showbGFloatAlt d x = formatRealFloatAlt Generic d True x
+showbGFloatAlt d x = formatRealFloatAltB Generic d True x
 {-# INLINE showbGFloatAlt #-}
 
 instance Show Float where
@@ -133,26 +138,31 @@ instance Show Double where
 -- GHC.Float internal functions, adapted for Builders
 -------------------------------------------------------------------------------
 
--- | Like 'formatRealFloatAlt', except that the decimal is only shown for arguments
+-- | Like 'formatRealFloatAltB', except that the decimal is only shown for arguments
 -- whose absolute value is between @0.1@ and @9,999,999@.
-formatRealFloat :: RealFloat a
-                => FPFormat  -- ^ What notation to use.
-                -> Maybe Int -- ^ Number of decimal places to render.
-                -> a
-                -> Builder
-formatRealFloat fmt decs = formatRealFloatAlt fmt decs False
-{-# INLINE formatRealFloat #-}
+-- 
+-- /Since: 0.8/
+formatRealFloatB :: RealFloat a
+                 => FPFormat  -- ^ What notation to use.
+                 -> Maybe Int -- ^ Number of decimal places to render.
+                 -> a
+                 -> Builder
+formatRealFloatB fmt decs = formatRealFloatAltB fmt decs False
+{-# INLINE formatRealFloatB #-}
 
--- | Converts a 'RealFloat' value to a Builder. Super-configurable.
-formatRealFloatAlt :: RealFloat a
-                   => FPFormat  -- ^ What notation to use.
-                   -> Maybe Int -- ^ Number of decimal places to render.
-                   -> Bool      -- ^ Should a decimal point always be shown?
-                   -> a
-                   -> Builder
-{-# SPECIALIZE formatRealFloatAlt :: FPFormat -> Maybe Int -> Bool -> Float -> Builder #-}
-{-# SPECIALIZE formatRealFloatAlt :: FPFormat -> Maybe Int -> Bool -> Double -> Builder #-}
-formatRealFloatAlt fmt decs alt x
+-- | Converts a 'RealFloat' value to a Builder, specifying if a decimal point
+-- should always be shown.
+-- 
+-- /Since: 0.8/
+formatRealFloatAltB :: RealFloat a
+                    => FPFormat  -- ^ What notation to use.
+                    -> Maybe Int -- ^ Number of decimal places to render.
+                    -> Bool      -- ^ Should a decimal point always be shown?
+                    -> a
+                    -> Builder
+{-# SPECIALIZE formatRealFloatAltB :: FPFormat -> Maybe Int -> Bool -> Float -> Builder #-}
+{-# SPECIALIZE formatRealFloatAltB :: FPFormat -> Maybe Int -> Bool -> Double -> Builder #-}
+formatRealFloatAltB fmt decs alt x
    | isNaN x                   = "NaN"
    | isInfinite x              = if x < 0 then "-Infinity" else "Infinity"
    | x < 0 || isNegativeZero x = s '-' <> doFmt fmt (floatToDigits (-x))
@@ -390,3 +400,9 @@ maxExpt10 = 324
 -- | Cached powers of 10.
 expts10 :: Array Int Integer
 expts10 = array (minExpt,maxExpt10) [(n,10^n) | n <- [minExpt .. maxExpt10]]
+
+-------------------------------------------------------------------------------
+-- Orphan instance for FPFormat
+-------------------------------------------------------------------------------
+
+$(deriveShowPragmas defaultInlineShowb ''FPFormat)

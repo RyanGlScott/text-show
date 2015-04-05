@@ -59,7 +59,16 @@ import qualified Data.OldTypeable.Internal as OldT (TyCon(..), TypeRep(..))
 import           Data.Ord (Down(..))
 #endif
 import           Data.Proxy (Proxy(..))
+#if MIN_VERSION_text(1,0,0)
+import           Data.Text.Encoding (Decoding(..))
+#endif
+import           Data.Text.Encoding.Error (UnicodeException(..))
+import           Data.Text.Foreign (I16)
+#if MIN_VERSION_text(1,1,0)
+import           Data.Text.Internal.Fusion.Size (Size, exactSize)
+#endif
 import           Data.Text.Lazy.Builder (Builder, fromString)
+import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 #if MIN_VERSION_base(4,7,0)
 import           Data.Coerce (Coercible)
 import           Data.Type.Coercion (Coercion(..))
@@ -114,6 +123,7 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode
                             SeekMode(..), Handle, stdin, stdout, stderr)
 import           System.Posix.Types
 
+import           Test.QuickCheck.Instances ()
 import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
                                         arbitraryBoundedEnum, oneof, suchThat)
 
@@ -147,6 +157,28 @@ instance Arbitrary Builder where
 
 instance Arbitrary ShortByteString where
     arbitrary = pack <$> arbitrary
+
+instance Arbitrary I16 where
+    arbitrary = arbitraryBoundedEnum
+
+deriving instance Bounded FPFormat
+instance Arbitrary FPFormat where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary UnicodeException where
+    arbitrary = oneof [ DecodeError <$> arbitrary <*> arbitrary
+                      , EncodeError <$> arbitrary <*> arbitrary
+                      ]
+
+#if MIN_VERSION_text(1,0,0)
+instance Arbitrary Decoding where
+    arbitrary = Some <$> arbitrary <*> arbitrary <@> undefined
+#endif
+
+#if MIN_VERSION_text(1,1,0)
+instance Arbitrary Size where
+    arbitrary = exactSize . getNonNegative <$> arbitrary
+#endif
 
 instance Arbitrary (Ptr a) where
     arbitrary = plusPtr nullPtr <$> arbitrary

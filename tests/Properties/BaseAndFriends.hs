@@ -56,6 +56,15 @@ import           Data.Proxy (Proxy)
 import           Data.Ratio (Ratio)
 import qualified Data.Text as TS
 import qualified Data.Text as TL
+#if MIN_VERSION_text(1,0,0)
+import           Data.Text.Encoding (Decoding)
+#endif
+import           Data.Text.Encoding.Error (UnicodeException)
+import           Data.Text.Foreign (I16)
+#if MIN_VERSION_text(1,1,0)
+import           Data.Text.Internal.Fusion.Size (Size)
+#endif
+import           Data.Text.Lazy.Builder.RealFloat (FPFormat)
 #if MIN_VERSION_base(4,7,0)
 import           Data.Type.Coercion (Coercion)
 import           Data.Type.Equality ((:~:))
@@ -359,6 +368,7 @@ baseAndFriendsTests =
         , testProperty "showbFFloatAlt output" $                 prop_showXFloat showFFloatAlt showbFFloatAlt
         , testProperty "showbGFloatAlt output" $                 prop_showXFloat showGFloatAlt showbGFloatAlt
 #endif
+        , testProperty "FPFormat instance"                       (prop_matchesShow :: Int -> FPFormat -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Functions"
         [ testProperty "Int -> Int instance"                     (prop_matchesShow :: Int -> (Int -> Int) -> Bool)
@@ -426,6 +436,14 @@ baseAndFriendsTests =
         [ testProperty "Builder instance"                        (prop_matchesShow :: Int -> Builder -> Bool)
         , testProperty "strict Text instance"                    (prop_matchesShow :: Int -> TS.Text -> Bool)
         , testProperty "lazy Text instance"                      (prop_matchesShow :: Int -> TL.Text -> Bool)
+        , testProperty "I16 instance"                            (prop_matchesShow :: Int -> I16 -> Bool)
+        , testProperty "UnicodeException instance"               (prop_matchesShow :: Int -> UnicodeException -> Bool)
+#if MIN_VERSION_text(1,0,0)
+        , testProperty "Decoding instance"                       (prop_matchesShow :: Int -> Decoding -> Bool)
+#endif
+#if MIN_VERSION_text(1,1,0)
+        , testProperty "Size instance"                           (prop_matchesShow :: Int -> Size -> Bool)
+#endif
         ]
     , testGroup "Text.Show.Text.Data.Tuple"
         [ testProperty "() instance"                             (prop_matchesShow :: Int -> () -> Bool)

@@ -119,7 +119,7 @@ library
                      , bytestring          >= 0.9     && < 0.11
                      , ghc-prim
                      , semigroups          >= 0.16.1  && < 1
-                     , text                >= 0.8     && < 1.3
+                     , text                >= 0.11.1  && < 1.3
                      , template-haskell    >= 2.4     && < 2.11
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -182,18 +182,18 @@ test-suite text-show-properties
                        Properties.Derived
                        Properties.MkShow
                        Properties.Utils
-  build-depends:       array                      >= 0.3   && < 0.6
-                     , base                       >= 4.5   && < 5
-                     , bytestring                 >= 0.9   && < 0.11
+  build-depends:       array                      >= 0.3    && < 0.6
+                     , base                       >= 4.5    && < 5
+                     , bytestring                 >= 0.9    && < 0.11
                      , ghc-prim
                      -- Needed to conditionally import Arbitrary Natural instance
-                     , QuickCheck                 >= 2.5   && < 3
-                     , quickcheck-instances       >= 0.1   && < 0.4
+                     , QuickCheck                 >= 2.5    && < 3
+                     , quickcheck-instances       >= 0.1    && < 0.4
                      -- , silently                   >= 1.2.4 && < 1.3
-                     , tasty                      >= 0.8   && < 0.11
-                     , tasty-hunit                >= 0.8   && < 0.10
-                     , tasty-quickcheck           >= 0.8   && < 0.9
-                     , text                       >= 0.8   && < 1.3
+                     , tasty                      >= 0.8    && < 0.11
+                     , tasty-hunit                >= 0.8    && < 0.10
+                     , tasty-quickcheck           >= 0.8    && < 0.9
+                     , text                       >= 0.11.1 && < 1.3
                      , text-show                  == 0.8
   hs-source-dirs:      tests
   default-language:    Haskell2010
