@@ -3,7 +3,7 @@
 
 #include "utils.h"
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ > 702
 # define INLINE_INST_FUN(F) OPEN_PRAGMA INLINE F CLOSE_PRAGMA
 #else
 # define INLINE_INST_FUN(F)

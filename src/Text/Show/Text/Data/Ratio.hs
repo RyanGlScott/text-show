@@ -31,14 +31,26 @@ import Text.Show.Text.Utils ((<>))
 -- | Convert a 'Ratio' to a 'Builder' with the given precedence.
 -- 
 -- /Since: 0.5/
-showbRatioPrec :: (Show a, Integral a) => Int -> Ratio a -> Builder
+showbRatioPrec ::
+#if MIN_VERSION_base(4,8,1)
+                  Show a
+#else
+                  (Show a, Integral a)
+#endif
+               => Int -> Ratio a -> Builder
 showbRatioPrec p q = showbParen (p > ratioPrec) $
        showbPrec ratioPrec1 (numerator q)
     <> " % "
     <> showbPrec ratioPrec1 (denominator q)
 {-# INLINE showbRatioPrec #-}
 
-instance (Show a, Integral a) => Show (Ratio a) where
+instance
+#if MIN_VERSION_base(4,8,1)
+         Show a
+#else
+         (Show a, Integral a)
+#endif
+      => Show (Ratio a) where
     {-# SPECIALIZE instance Show Rational #-}
     showbPrec = showbRatioPrec
     INLINE_INST_FUN(showbPrec)

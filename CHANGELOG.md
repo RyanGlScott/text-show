@@ -7,6 +7,7 @@
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons
+* Fixed build on Windows
 
 # 0.7
 * Added `showbConstPrec` (and corresponding `Show` and `Show1` instances for `Const`) to `Text.Show.Text.Control.Applicative`

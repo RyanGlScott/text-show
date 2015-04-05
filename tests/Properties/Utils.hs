@@ -48,9 +48,7 @@ prop_matchesShow p x = showbPrec p (FromStringShow x) == showbPrec p x
 
 -- | Verifies that a type's @Show@ instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
--- TODO: Add other generic functions
--- TODO: Put in tuples
-prop_genericShow :: (S.Show a, T.Show a, Generic a, GShow (Rep a))
+prop_genericShow :: (T.Show a, Generic a, GShow (Rep a))
                  => Int -> a -> Bool
 prop_genericShow p x = showbPrec p x == genericShowbPrec p x
 
