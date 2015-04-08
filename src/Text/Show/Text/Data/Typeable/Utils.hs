@@ -10,7 +10,7 @@ Utility functions for showing data types in the @Typeable@ (or @OldTypeable@) mo
 -}
 module Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple) where
 
-import Data.Monoid ((<>))
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude ()

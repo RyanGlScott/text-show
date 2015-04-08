@@ -49,7 +49,7 @@ import           Data.List (foldl', intersperse)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
 #endif
-import           Data.Monoid ((<>))
+import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)

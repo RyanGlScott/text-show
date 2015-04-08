@@ -18,7 +18,7 @@ module Text.Show.Text.Data.Version (
     ) where
 
 import Data.List (intersperse)
-import Data.Monoid ((<>))
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Version (Version(..))
 
