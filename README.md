@@ -21,3 +21,5 @@ main = print hello
 ```
 
 If you desire it, there are also monomorphic versions of the `showb` function available in the submodules of `Text.Show.Text`. A naming convention is present in which functions that show different values depending on the precedence end with `Prec`(e.g., `showbIntPrec`), whereas functions that show the same values regardless of precedence do not end with `Prec` (e.g., `showbBool`).
+
+Support for automatically deriving `Show` instances can be found in the `Text.Show.Text.TH` and `Text.Show.Text.Generic` modules. If you don't know which one to use, use `Text.Show.Text.TH`.

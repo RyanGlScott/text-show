@@ -2,6 +2,7 @@
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
 * Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
 * Added `showbUnicodeException`, `showbI16Prec`, `showbDecodingPrec`, and `showbSizePrec` functions (and corresponding `Show` instances) to `Text.Show.Text.Data.Text`
+* Added `base-compat` as a dependency. As a result, `showbAltPrec` from `Text.Show.Text.Data.Monoid` and `showbDownPrec` from `Text.Show.Text.Data.Ord` have been exposed, regardless of which version of `base` is used.
 * Made `GShow` in `Text.Show.Text.Generics` poly-kinded
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
 * The Template Haskell derive now does not parenthesize record types regardless of precedence on GHC 7.11 and later

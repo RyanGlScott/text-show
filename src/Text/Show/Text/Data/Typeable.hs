@@ -15,6 +15,7 @@ Monomorphic 'Show' functions for data types in the @Typeable@ module.
 -}
 module Text.Show.Text.Data.Typeable (showbTyCon, showbTypeRepPrec) where
 
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
@@ -31,7 +32,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils ((<>), isTupleString, s)
+import Text.Show.Text.Utils (isTupleString, s)
 
 #include "inline.h"
 

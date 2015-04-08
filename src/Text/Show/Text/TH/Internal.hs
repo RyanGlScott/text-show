@@ -44,14 +44,12 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Functor ((<$>))
-#endif
 import           Data.List (foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
 #endif
+import           Data.Monoid ((<>))
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -65,7 +63,8 @@ import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T
@@ -74,7 +73,7 @@ import           Text.Show.Text.Classes (showb, showbPrec, showbListWith,
 #if __GLASGOW_HASKELL__ > 702
 import           Text.Show.Text.Classes (showbList)
 #endif
-import           Text.Show.Text.Utils ((<>), isInfixTypeCon, isTupleString, s)
+import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
 
 {- $deriveShow
 

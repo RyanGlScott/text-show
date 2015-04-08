@@ -35,19 +35,10 @@ module Text.Show.Text.Data.Integral (
 
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Monoid (mempty)
-#endif
+import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder)
 import           Data.Text.Lazy.Builder.Int (decimal)
-import           Data.Word ( Word8
-                           , Word16
-                           , Word32
-                           , Word64
-#if !(MIN_VERSION_base(4,8,0))
-                           , Word
-#endif
-                           )
+import           Data.Word (Word8, Word16, Word32, Word64)
 
 import           GHC.Exts (Int(I#))
 #if __GLASGOW_HASKELL__ >= 708
@@ -56,10 +47,11 @@ import           GHC.Prim (Int#)
 #endif
 import           GHC.Prim ((<#), (>#))
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
-import           Text.Show.Text.Utils ((<>), s, toString)
+import           Text.Show.Text.Utils (s, toString)
 
 #include "inline.h"
 
@@ -72,11 +64,11 @@ showbIntPrec (I# p) n'@(I# n)
     | otherwise = decimal n'
   where
 #if __GLASGOW_HASKELL__ >= 708
-      isTrue :: Int# -> Bool
-      isTrue b = isTrue# b
+    isTrue :: Int# -> Bool
+    isTrue b = isTrue# b
 #else
-      isTrue :: Bool -> Bool
-      isTrue = id
+    isTrue :: Bool -> Bool
+    isTrue = id
 #endif
 
 -- | Convert an 'Int8' to a 'Builder' with the given precedence.

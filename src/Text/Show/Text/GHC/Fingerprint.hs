@@ -14,6 +14,7 @@ This module is only available with @base-4.4.0.0@ or later.
 -}
 module Text.Show.Text.GHC.Fingerprint (showbFingerprint) where
 
+import Data.Monoid.Compat ((<>))
 import Data.Semigroup (timesN)
 import Data.Text.Lazy.Builder (Builder)
 import Data.Word (Word64)
@@ -24,7 +25,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Integral (showbHex)
-import Text.Show.Text.Utils ((<>), lengthB, s)
+import Text.Show.Text.Utils (lengthB, s)
 
 -- | Convert a 'Fingerprint' to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later.

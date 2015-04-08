@@ -74,17 +74,12 @@ module Instances.Derived (
 #endif
     ) where
 
-#if !(MIN_VERSION_base(4,8,0))
-import Control.Applicative ((<*>), pure)
-
-import Data.Functor ((<$>))
-#endif
-
 import Derived
 
 import GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
 
-import Prelude hiding (Show)
+import Prelude ()
+import Prelude.Compat hiding (Show)
 
 import Test.Tasty.QuickCheck (Arbitrary(..), Gen, oneof)
 

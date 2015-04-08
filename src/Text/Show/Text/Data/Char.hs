@@ -25,17 +25,16 @@ module Text.Show.Text.Data.Char (
 
 import           Data.Array (Array, (!), listArray)
 import           Data.Char (GeneralCategory, isDigit, ord)
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Monoid (mempty)
-#endif
+import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder)
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import           Text.Show.Text.Classes (Show(..))
 import           Text.Show.Text.Data.Integral (showbIntPrec)
 import           Text.Show.Text.TH.Internal (deriveShow)
-import           Text.Show.Text.Utils ((<>), s)
+import           Text.Show.Text.Utils (s)
 
 #include "inline.h"
 

@@ -30,6 +30,7 @@ module Text.Show.Text.Data.Text (
 #endif
     ) where
 
+import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as TS
 import           Data.Text.Encoding.Error (UnicodeException(..))
 import           Data.Text.Foreign (I16)
@@ -41,7 +42,6 @@ import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.Data.Char (showbString)
 import           Text.Show.Text.Data.Integral (showbHex)
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
-import           Text.Show.Text.Utils ((<>))
 
 #if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding(..))

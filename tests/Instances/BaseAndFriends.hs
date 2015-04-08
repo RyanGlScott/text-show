@@ -25,10 +25,7 @@ of GHC).
 -}
 module Instances.BaseAndFriends () where
 
-import           Control.Applicative (Const(..), ZipList(..))
-#if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative ((<*>), pure)
-#endif
+import           Control.Applicative.Compat (Const(..), ZipList(..))
 import           Control.Exception
 import           Control.Monad.ST (ST, fixST)
 
@@ -38,9 +35,6 @@ import qualified Data.Data as D (Fixity(..))
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             mkConstr, mkDataType)
 import           Data.Dynamic (Dynamic, toDyn)
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Functor ((<$>))
-#endif
 #if defined(VERSION_transformers)
 # if !(MIN_VERSION_transformers(0,4,0))
 import           Data.Functor.Classes ()
@@ -49,15 +43,11 @@ import           Data.Functor.Classes ()
 import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
-#if MIN_VERSION_base(4,8,0)
-import           Data.Monoid (Alt(..))
-#endif
+import           Data.Monoid.Compat (Alt(..))
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable.Internal as OldT (TyCon(..), TypeRep(..))
 #endif
-#if MIN_VERSION_base(4,6,0)
-import           Data.Ord (Down(..))
-#endif
+import           Data.Ord.Compat (Down(..))
 import           Data.Proxy (Proxy(..))
 #if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding(..))
@@ -96,9 +86,9 @@ import           GHC.IO.Encoding.Types (CodingProgress(..))
 import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 import           GHC.IO.Handle (HandlePosn(..))
 import qualified GHC.Generics as G (Fixity(..))
-import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
-                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                               Associativity(..), Arity(..))
+import           GHC.Generics.Compat (U1(..), Par1(..), Rec1(..), K1(..),
+                                      M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
+                                      Associativity(..), Arity(..))
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
@@ -117,6 +107,9 @@ import           Numeric (showHex)
 #if !(MIN_VERSION_QuickCheck(2,8,0) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif
+
+import           Prelude ()
+import           Prelude.Compat
 
 import           System.Exit (ExitCode(..))
 import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
@@ -137,9 +130,6 @@ import           Text.Show.Text.Generic (ConType(..))
 
 #if MIN_VERSION_base(4,7,0)
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
-# if !(MIN_VERSION_base(4,8,0))
-import           Data.Word (Word)
-# endif
 #else
 import           Data.Word (Word64)
 #endif
@@ -500,27 +490,6 @@ instance Arbitrary Associativity where
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
 
-#if !(MIN_VERSION_base(4,7,0))
-deriving instance                             Show (U1 p)
-deriving instance Show p                   => Show (Par1 p)
-deriving instance Show (f p)               => Show (Rec1 f p)
-deriving instance Show c                   => Show (K1 i c p)
-deriving instance Show (f p)               => Show (M1 i c f p)
-deriving instance (Show (f p), Show (g p)) => Show ((f :+: g) p)
-
--- Due to a GHC bug (https://ghc.haskell.org/trac/ghc/ticket/9830), this Show
--- instance produces output with the wrong precedence on older versions of GHC.
--- I'll manually define the Show instance to get the correct behavior.
-instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
-    showsPrec p (l :*: r) = showParen (p > prec) $
-          showsPrec (prec + 1) l
-        . showString " :*: "
-        . showsPrec (prec + 1) r
-      where prec = 6
-
-deriving instance Show (f (g p))           => Show ((f :.: g) p)
-#endif
-
 #if MIN_VERSION_base(4,8,0)
 instance Arbitrary ConcFlags where
     arbitrary = ConcFlags <$> arbitrary <*> arbitrary
@@ -639,28 +608,10 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
-#if MIN_VERSION_base(4,8,0)
 deriving instance Arbitrary (f a) => Arbitrary (Alt f a)
-#endif
-
 deriving instance Arbitrary a => Arbitrary (Const a b)
-#if !(MIN_VERSION_base(4,8,0))
-instance Show a => Show (Const a b) where
-    showsPrec p (Const x) = showParen (p > appPrec)
-        $ showString "Const " . showsPrec appPrec1 x
-#endif
 deriving instance Arbitrary a => Arbitrary (ZipList a)
-#if !(MIN_VERSION_base(4,7,0))
-deriving instance Show a => Show (ZipList a)
-#endif
-
-#if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)
-#if !(MIN_VERSION_base(4,7,0))
-deriving instance Show a => Show (Down a)
-#endif
-#endif
-
 deriving instance Arbitrary a => Arbitrary (Identity a)
 
 deriving instance Arbitrary a => Arbitrary (FromStringShow a)

@@ -15,6 +15,7 @@ This module is only available with @base-4.7@.
 -}
 module Text.Show.Text.Data.OldTypeable (showbTyCon, showbTypeRepPrec) where
 
+import Data.Monoid.Compat ((<>))
 import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
                                   funTc, listTc)
 import Data.Text.Lazy.Builder (Builder, fromString)
@@ -23,7 +24,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils ((<>), isTupleString, s)
+import Text.Show.Text.Utils (isTupleString, s)
 
 -- | Convert a 'TyCon' to a 'Builder'.
 -- This function is only available with @base-4.7@.

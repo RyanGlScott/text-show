@@ -43,16 +43,14 @@ module Text.Show.Text.Control.Exception (
 
 import Control.Exception.Base
 
-#if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (mempty)
-#endif
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 
-import Prelude hiding (Show)
+import Prelude ()
+import Prelude.Compat hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
-import Text.Show.Text.Utils ((<>))
 
 #include "inline.h"
 

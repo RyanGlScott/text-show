@@ -30,6 +30,7 @@ module Text.Show.Text.Data.Floating (
 
 import           Data.Array.Base (unsafeAt)
 import           Data.Array.IArray (Array, array)
+import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as T (replicate)
 import           Data.Text.Lazy.Builder (Builder, fromString, fromText)
 import           Data.Text.Lazy.Builder.Int (decimal)
@@ -39,7 +40,7 @@ import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
-import           Text.Show.Text.Utils ((<>), i2d, s)
+import           Text.Show.Text.Utils (i2d, s)
 
 #include "inline.h"
 

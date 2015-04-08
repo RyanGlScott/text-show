@@ -55,9 +55,7 @@ module Text.Show.Text.Generic (
     , ConType(..)
     ) where
 
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Monoid (mempty)
-#endif
+import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS (Text)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -69,7 +67,8 @@ import           Data.Typeable (Typeable)
 import           GHC.Generics
 import           GHC.Show (appPrec, appPrec1)
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import           System.IO (Handle)
 
@@ -78,8 +77,7 @@ import qualified Text.Show.Text.Classes as T
 import           Text.Show.Text.Classes (Show(showbPrec), showbListWith,
                                          showbParen, showbSpace)
 import           Text.Show.Text.Instances ()
-import           Text.Show.Text.Utils ((<>), isInfixTypeCon, isTupleString,
-                                       s, toString)
+import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s, toString)
 
 #include "inline.h"
 
@@ -234,13 +232,14 @@ instance T.Show ConType where
 -- 
 -- /Since: 0.6/
 class GShow f where
-    -- This function is used as the default generic implementation of 'showbPrec'.
+    -- | This is used as the default generic implementation of 'showbPrec'.
     gShowbPrec :: ConType -> Int -> f a -> Builder
-    -- Whether a representation type has any constructors.
+    -- | Whether a representation type has any constructors.
     isNullary  :: f a -> Bool
     isNullary = error "generic show (isNullary): unnecessary case"
-
 #if __GLASGOW_HASKELL__ >= 708
+    {-# MINIMAL gShowbPrec #-}
+
 deriving instance Typeable GShow
 #endif
 

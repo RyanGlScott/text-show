@@ -17,20 +17,19 @@ module Text.Show.Text.Data.Fixed (showbFixed) where
 import Data.Fixed (HasResolution(..))
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
+import Prelude ()
+import Prelude.Compat hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb))
 
 #if MIN_VERSION_base(4,7,0)
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
+import Data.Monoid.Compat ((<>))
 import Data.Semigroup (timesN)
-# if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (mempty)
-# endif
 
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Utils ((<>), lengthB, s)
+import Text.Show.Text.Utils (lengthB, s)
 #else
 import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)

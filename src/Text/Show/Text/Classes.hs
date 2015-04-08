@@ -26,14 +26,6 @@ The 'Show' and 'Show1' typeclasses.
 -}
 module Text.Show.Text.Classes where
 
-#if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative (Applicative((<*>), pure))
-import           Data.Foldable (Foldable)
-import           Data.Functor ((<$>))
-import           Data.Monoid (Monoid)
-import           Data.Traversable (Traversable)
-#endif
-
 import           Control.Monad.Fix (MonadFix(..))
 #if MIN_VERSION_base(4,4,0)
 import           Control.Monad.Zip (MonadZip(..))
@@ -45,6 +37,7 @@ import           Data.Bits (FiniteBits)
 #endif
 import           Data.Data (Data, Typeable)
 import           Data.Ix (Ix)
+import           Data.Monoid.Compat ((<>))
 import           Data.Semigroup (Semigroup)
 import           Data.String (IsString)
 import           Data.Text         as TS (Text)
@@ -67,14 +60,15 @@ import           GHC.Generics (Generic1)
 #endif
 import           GHC.Show (appPrec, appPrec1)
 
-import           Prelude hiding (Show(..))
+import           Prelude ()
+import           Prelude.Compat hiding (Show(..))
 
 import           System.IO (Handle)
 
 import           Text.Printf (PrintfArg, PrintfType)
 import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show as S (Show(..))
-import           Text.Show.Text.Utils ((<>), s, toString)
+import           Text.Show.Text.Utils (s, toString)
 
 #include "inline.h"
 

@@ -31,6 +31,7 @@ module Text.Show.Text.System.IO (
     , showbNewlineModePrec
     ) where
 
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 
 #include "inline.h"
@@ -54,7 +55,7 @@ import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
                                    defaultInlineShowb, defaultInlineShowbPrec)
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils (s)
 
 -- | Convert a 'Handle' to a 'Builder'.
 -- 

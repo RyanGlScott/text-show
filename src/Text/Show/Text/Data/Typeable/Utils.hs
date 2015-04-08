@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-|
 Module:      Text.Show.Text.Data.Typeable.Utils
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -11,15 +10,14 @@ Utility functions for showing data types in the @Typeable@ (or @OldTypeable@) mo
 -}
 module Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple) where
 
-#if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (mempty)
-#endif
+import Data.Monoid ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
+import Prelude ()
+import Prelude.Compat hiding (Show)
 
 import Text.Show.Text.Classes (Show(showbPrec))
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils (s)
 
 -- | Helper function for showing a list of arguments, each separated by the given
 -- 'Builder'.

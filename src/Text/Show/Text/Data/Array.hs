@@ -26,16 +26,17 @@ import qualified Data.Array.Base as IArray (assocs, bounds)
 import           Data.Array.Base (IArray)
 import           Data.Array.Unboxed (UArray)
 import           Data.Ix (Ix)
+import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder)
 
 import           GHC.Show (appPrec)
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import           Text.Show.Text.Data.List ()
 import           Text.Show.Text.Data.Tuple ()
-import           Text.Show.Text.Utils ((<>))
 
 #include "inline.h"
 

@@ -15,8 +15,9 @@ Monomorphic 'Show' function for 'Ratio' values.
 -}
 module Text.Show.Text.Data.Ratio (showbRatioPrec) where
 
-import Data.Text.Lazy.Builder (Builder)
+import Data.Monoid.Compat ((<>))
 import Data.Ratio (Ratio, numerator, denominator)
+import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Real (ratioPrec, ratioPrec1)
 
@@ -24,7 +25,6 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showbPrec), showbParen)
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Utils ((<>))
 
 #include "inline.h"
 

@@ -27,6 +27,7 @@ module Text.Show.Text.GHC.RTS.Flags (
     , showbTickyFlagsPrec
     ) where
 
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.RTS.Flags
@@ -40,7 +41,7 @@ import Text.Show.Text.Data.Floating (showbDoublePrec)
 import Text.Show.Text.Data.Integral (showbIntPrec, showbWord, showbWord64)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Maybe (showbMaybePrec)
-import Text.Show.Text.Utils ((<>), s)
+import Text.Show.Text.Utils (s)
 import Text.Show.Text.TH.Internal (deriveShow)
 
 #if __GLASGOW_HASKELL__ < 711

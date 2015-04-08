@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
 {-|
 Module:      Text.Show.Text.Utils
@@ -13,29 +12,21 @@ Miscellaneous utility functions.
 module Text.Show.Text.Utils where
 
 import Data.Int (Int64)
-#if !(MIN_VERSION_base(4,8,0))
-import Data.Monoid (Monoid(mappend, mempty))
-#endif
 import Data.Text (Text)
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy (length, toStrict, unpack)
 import Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 
 import GHC.Exts (Char(C#), Int(I#))
 import GHC.Prim ((+#), chr#, ord#)
 
-import Prelude hiding (length, replicate)
+import Prelude ()
+import Prelude.Compat hiding (length)
 
 -- | Unsafe conversion for decimal digits.
 i2d :: Int -> Char
 i2d (I# i#) = C# (chr# (ord# '0'# +# i#))
 {-# INLINE i2d #-}
-
-infixr 6 <>
--- | Infix 'mappend', defined here for backwards-compatibility with older versions
--- of @base@.
-(<>) :: Monoid m => m -> m -> m
-(<>) = mappend
-{-# INLINE (<>) #-}
 
 -- | Checks if a 'String' names a valid Haskell infix type constructor (i.e., does
 -- it begin with a colon?).

@@ -18,9 +18,6 @@ common libraries.
 module Properties.BaseAndFriends (baseAndFriendsTests) where
 
 import           Control.Applicative (Const, ZipList, liftA2)
-#if !(MIN_VERSION_base(4,8,0))
-import           Control.Applicative (pure)
-#endif
 import           Control.Concurrent (myThreadId)
 import           Control.Exception
 import           Control.Monad.ST
@@ -43,15 +40,11 @@ import           Data.Functor.Identity (Identity)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
-#if MIN_VERSION_base(4,8,0)
-import           Data.Monoid (Alt(..))
-#endif
+import           Data.Monoid.Compat (Alt(..))
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable as OldT (TyCon, TypeRep)
 #endif
-#if MIN_VERSION_base(4,6,0)
-import           Data.Ord (Down(..))
-#endif
+import           Data.Ord.Compat (Down(..))
 import           Data.Proxy (Proxy)
 import           Data.Ratio (Ratio)
 import qualified Data.Text as TS
@@ -71,9 +64,6 @@ import           Data.Type.Equality ((:~:))
 #endif
 import qualified Data.Typeable as NewT (TyCon, TypeRep)
 import           Data.Word (Word8, Word16, Word32, Word64)
-#if !(MIN_VERSION_base(4,8,0))
-import           Data.Word (Word)
-#endif
 import           Data.Version (Version, showVersion)
 
 -- import qualified Debug.Trace as S (traceShow)
@@ -114,7 +104,8 @@ import           Numeric (showFFloatAlt, showGFloatAlt)
 #endif
 import           Numeric.Natural (Natural)
 
-import           Prelude hiding (Show)
+import           Prelude ()
+import           Prelude.Compat hiding (Show)
 
 import           Properties.Utils
 
@@ -410,9 +401,7 @@ baseAndFriendsTests =
         , testProperty "Last (Maybe Int) instance"               (prop_matchesShow :: Int -> Last (Maybe Int) -> Bool)
         , testProperty "Product Int instance"                    (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                        (prop_matchesShow :: Int -> Sum Int -> Bool)
-#if MIN_VERSION_base(4,8,0)
         , testProperty "Alt Maybe Int instance"                  (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
-#endif
         ]
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
     , testGroup "Text.Show.Text.Data.OldTypeable"
@@ -422,9 +411,7 @@ baseAndFriendsTests =
 #endif
     , testGroup "Text.Show.Text.Data.Ord"
         [ testProperty "Ordering instance"                       (prop_matchesShow :: Int -> Ordering -> Bool)
-#if MIN_VERSION_base(4,6,0)
         , testProperty "Down Int instance"                       (prop_matchesShow :: Int -> Down Int -> Bool)
-#endif
         ]
     , testGroup "Text.Show.Text.Data.Proxy"
         [ testProperty "Proxy Int instance"                      (prop_matchesShow :: Int -> Proxy Int -> Bool)

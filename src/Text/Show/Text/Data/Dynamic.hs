@@ -16,13 +16,13 @@ Monomorphic 'Show' function for 'Dynamic'.
 module Text.Show.Text.Data.Dynamic (showbDynamic) where
 
 import Data.Dynamic (Dynamic, dynTypeRep)
+import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Typeable (showbTypeRepPrec)
-import Text.Show.Text.Utils ((<>))
 
 #include "inline.h"
 
