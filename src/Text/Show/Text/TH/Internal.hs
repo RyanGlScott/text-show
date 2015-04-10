@@ -777,11 +777,11 @@ showbPrecDecs _    cons =
           
     specializeDecs :: [Q Dec]
 #if MIN_VERSION_template_haskell(2,8,0)
-    specializeDecs = (map . fmap) (PragmaD
-                                       . SpecialiseInstP
-                                       . AppT (ConT ''T.Show)
-                                  )
-                                  (specializeTypes opts)
+    specializeDecs = (fmap . fmap) (PragmaD
+                                        . SpecialiseInstP
+                                        . AppT (ConT ''T.Show)
+                                   )
+                                   (specializeTypes opts)
 #else
     -- There doesn't appear to be an equivalent of SpecialiseInstP in early
     -- versions Template Haskell.

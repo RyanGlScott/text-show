@@ -93,9 +93,6 @@ import           GHC.Generics.Compat (U1(..), Par1(..), Rec1(..), K1(..),
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
 #endif
-#if !(MIN_VERSION_base(4,8,0))
-import           GHC.Show (appPrec, appPrec1)
-#endif
 import           GHC.Stats (GCStats(..))
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
