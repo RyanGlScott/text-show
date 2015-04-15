@@ -112,7 +112,7 @@ showbGFloat = formatRealFloatB Generic
 -- 
 -- /Since: 0.3/
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
-showbFFloatAlt d x = formatRealFloatAltB Fixed d True x
+showbFFloatAlt d = formatRealFloatAltB Fixed d True
 {-# INLINE showbFFloatAlt #-}
 
 -- | Show a signed 'RealFloat' value
@@ -124,7 +124,7 @@ showbFFloatAlt d x = formatRealFloatAltB Fixed d True x
 -- 
 -- /Since: 0.3/
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
-showbGFloatAlt d x = formatRealFloatAltB Generic d True x
+showbGFloatAlt d = formatRealFloatAltB Generic d True
 {-# INLINE showbGFloatAlt #-}
 
 instance Show Float where

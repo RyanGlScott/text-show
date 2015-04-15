@@ -58,7 +58,7 @@ module Text.Show.Text.Debug.Trace (
 #endif
     ) where
 
-import           Control.Monad (when)
+import           Control.Monad (unless)
 
 import qualified Data.ByteString as BS (null, partition)
 import           Data.ByteString (ByteString, useAsCString)
@@ -122,7 +122,7 @@ traceIOByteString msg = useAsCString "%s\n" $ \cfmt -> do
     let (nulls, msg') = BS.partition (== c2w '\0') msg
     useAsCString msg' $ \cmsg ->
       debugBelch cfmt cmsg
-    when (not (BS.null nulls)) $
+    unless (BS.null nulls) $
       useAsCString "WARNING: previous trace message had null bytes" $ \cmsg ->
         debugBelch cfmt cmsg
 
@@ -255,7 +255,7 @@ traceStackByteString :: ByteString -> a -> a
 traceStackByteString bs expr = unsafePerformIO $ do
     traceIOByteString bs
     stack <- currentCallStack
-    when (not (null stack)) . traceIOByteString . BS.pack $ renderStack stack
+    unless (null stack) . traceIOByteString . BS.pack $ renderStack stack
     return expr
 
 -- $eventlog_tracing

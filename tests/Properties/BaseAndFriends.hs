@@ -167,13 +167,13 @@ prop_showForeignPtr p ptr = ioProperty $ do
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 prop_showIntAtBase :: Gen Bool
 prop_showIntAtBase = do
-    base <- arbitrary `suchThat` (liftA2 (&&) (> 1) (<= 16))
+    base <- arbitrary `suchThat` liftA2 (&&) (> 1) (<= 16)
     i    <- arbitrary `suchThat` (>= 0) :: Gen Int
     pure $ fromString (showIntAtBase base intToDigit i "") == showbIntAtBase base intToDigit i
 #endif
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
-prop_showListWith :: [Char] -> Bool
+prop_showListWith :: String -> Bool
 prop_showListWith str = fromString (showListWith shows str "") == showbListWith showb str
 
 -- | Verifies the 'Show' instance for 'TextEncoding' is accurate.
@@ -252,15 +252,15 @@ baseAndFriendsTests =
         [ testProperty "FromStringShow Int instance"             (prop_matchesShow :: Int -> FromStringShow Int -> Bool)
         , testProperty "FromStringShow Int: read . show = id"    (prop_readShow :: Int -> FromStringShow Int -> Bool)
         , testProperty "FromStringShow Int = Int" $              prop_showEq (FromStringShow :: Int -> FromStringShow Int)
-        , testProperty "FromStringShow [Char] instance"          (prop_matchesShow :: Int -> FromStringShow [Char] -> Bool)
-        , testProperty "FromStringShow [Char]: read . show = id" (prop_readShow :: Int -> FromStringShow [Char] -> Bool)
-        , testProperty "FromStringShow [Char] = String" $        prop_showEq (FromStringShow :: String -> FromStringShow [Char])
+        , testProperty "FromStringShow String instance"          (prop_matchesShow :: Int -> FromStringShow String -> Bool)
+        , testProperty "FromStringShow String: read . show = id" (prop_readShow :: Int -> FromStringShow String -> Bool)
+        , testProperty "FromStringShow String = String" $        prop_showEq (FromStringShow :: String -> FromStringShow String)
         , testProperty "FromTextShow Int instance"               (prop_matchesShow :: Int -> FromTextShow Int -> Bool)
         , testProperty "FromTextShow Int: read . show = id"      (prop_readShow :: Int -> FromTextShow Int -> Bool)
         , testProperty "FromTextShow Int = Int" $                prop_showEq (FromTextShow :: Int -> FromTextShow Int)
-        , testProperty "FromTextShow [Char] instance"            (prop_matchesShow :: Int -> FromTextShow [Char] -> Bool)
-        , testProperty "FromTextShow [Char]: read . show = id"   (prop_readShow :: Int -> FromTextShow [Char] -> Bool)
-        , testProperty "FromTextShow [Char] = String" $          prop_showEq (FromTextShow :: String -> FromTextShow [Char])
+        , testProperty "FromTextShow String instance"            (prop_matchesShow :: Int -> FromTextShow String -> Bool)
+        , testProperty "FromTextShow String: read . show = id"   (prop_readShow :: Int -> FromTextShow String -> Bool)
+        , testProperty "FromTextShow String = String" $          prop_showEq (FromTextShow :: String -> FromTextShow String)
         -- TODO: Figure out why these fail on NixOS
 --         , testProperty "print behavior"                          prop_print
 --         , testProperty "traceShow behavior"                      prop_traceShow
@@ -321,7 +321,7 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Data.Char"
         [ testProperty "Char instance"                           (prop_matchesShow :: Int -> Char -> Bool)
         , testProperty "GeneralCategory instance"                (prop_matchesShow :: Int -> GeneralCategory -> Bool)
-        , testCase "asciiTab = asciiTabB" $                      map fromString asciiTab @=? elems (asciiTabB)
+        , testCase "asciiTab = asciiTabB" $                      map fromString asciiTab @=? elems asciiTabB
         ]
     , testGroup "Text.Show.Text.Data.Complex"
         [ testProperty "Complex Double instance"                 (prop_matchesShow :: Int -> Complex Double -> Bool)
@@ -577,9 +577,9 @@ baseAndFriendsTests =
         , testProperty "NewlineMode instance"                    (prop_matchesShow :: Int -> NewlineMode -> Bool)
         ]
     , testGroup "Text.Show.Text.System.Posix.Types"
-        [ 
+        [ testProperty "Fd instance"                             (prop_matchesShow :: Int -> Fd -> Bool)
 #if defined(HTYPE_DEV_T)
-          testProperty "CDev instance"                           (prop_matchesShow :: Int -> CDev -> Bool)
+        , testProperty "CDev instance"                           (prop_matchesShow :: Int -> CDev -> Bool)
 #endif
 #if defined(HTYPE_INO_T)
         , testProperty "CIno instance"                           (prop_matchesShow :: Int -> CIno -> Bool)
@@ -617,7 +617,6 @@ baseAndFriendsTests =
 #if defined(HTYPE_RLIM_T)
         , testProperty "CRLim instance"                          (prop_matchesShow :: Int -> CRLim -> Bool)
 #endif
-        , testProperty "Fd instance"                             (prop_matchesShow :: Int -> Fd -> Bool)
         ]
     , testGroup "Text.Show.Text.Text.Read.Lex"
         [ testProperty "Lexeme instance"                         (prop_matchesShow :: Int -> Lexeme -> Bool)

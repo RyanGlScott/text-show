@@ -261,16 +261,20 @@ instance (Constructor c, GShow a) => GShow (M1 C c a) where
 #endif
                                       )
                              ) $
-               (if (conIsTuple c) then mempty else fromString (conName c))
-            <> (if (isNullary x || conIsTuple c) then mempty else s ' ')
-            <> (showbBraces t (gShowbPrec t appPrec1 x))
+               (if conIsTuple c
+                   then mempty
+                   else fromString (conName c))
+            <> (if isNullary x || conIsTuple c
+                   then mempty
+                   else s ' ')
+            <> showbBraces t (gShowbPrec t appPrec1 x)
         Infix _ m -> showbParen (n > m) . showbBraces t $ gShowbPrec t (m+1) x
       where
         fixity :: Fixity
         fixity = conFixity c
         
         t :: ConType
-        t = if (conIsRecord c)
+        t = if conIsRecord c
             then Rec
             else case conIsTuple c of
                 True  -> Tup

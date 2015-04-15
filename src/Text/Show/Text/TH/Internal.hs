@@ -62,6 +62,7 @@ import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax (lift)
 
 import           Prelude ()
 import           Prelude.Compat hiding (Show)
@@ -381,7 +382,7 @@ mkShowListLazy name = [| toLazyText . $(mkShowbList name) |]
 -- 
 -- /Since: 0.3.1/
 mkShowb :: Name -> Q Exp
-mkShowb name = mkShowbPrec name `appE` [| 0 :: Int |]
+mkShowb name = mkShowbPrec name `appE` [| 0 |]
 
 -- | Generates a lambda expression which behaves like 'T.showPrec' (without requiring a
 -- 'T.Show' instance).
@@ -480,7 +481,7 @@ defaultInlineShowbList = defaultPragmaOptions { inlineShowbList = True }
 -- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
 consToShow :: [Con] -> Q Exp
-consToShow []   = error $ "Text.Show.Text.TH.consToShow: Not a single constructor given!"
+consToShow []   = error "Text.Show.Text.TH.consToShow: Not a single constructor given!"
 consToShow cons = do
     p     <- newName "p"
     value <- newName "value"
@@ -499,10 +500,10 @@ encodeArgs p (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
     
     let showArg  = showbPrecPrim appPrec1 argTy arg
-        namedArg = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(showArg) |] 
+        namedArg = [| fromString $(stringE (nameBase conName ++ " ")) <> $(showArg) |] 
     
     match (conP conName [varP arg])
-          (normalB [| showbParen ($(varE p) > appPrec) $(namedArg) |])
+          (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArg) |])
           []
 encodeArgs p (NormalC conName ts) = do
     args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
@@ -511,7 +512,7 @@ encodeArgs p (NormalC conName ts) = do
        then do
            let showArgs       = map (appE [| showb |] . varE) args
                parenCommaArgs = [| s '(' |] : intersperse [| s ',' |] showArgs
-               mappendArgs    = foldr (flip infixApp [| (<>) |])
+               mappendArgs    = foldr (`infixApp` [| (<>) |])
                                       [| s ')' |]
                                       parenCommaArgs
            
@@ -522,35 +523,34 @@ encodeArgs p (NormalC conName ts) = do
            let showArgs = map (\(arg, (_, argTy)) -> showbPrecPrim appPrec1 argTy arg)
                               (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
-               namedArgs   = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
+               namedArgs   = [| fromString $(stringE (nameBase conName ++ " ")) <> $(mappendArgs) |]
            
            match (conP conName $ map varP args)
-                 (normalB [| showbParen ($(varE p) > appPrec) $(namedArgs) |])
+                 (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
                  []
 encodeArgs p (RecC conName []) = encodeArgs p $ NormalC conName []
 encodeArgs p (RecC conName ts) = do
     args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
     
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
-                                      -> [ [| fromString $(stringE (nameBase argName)) |]
-                                         , [| fromString " = "                         |]
+                                      -> [ [| fromString $(stringE (nameBase argName ++ " = ")) |]
                                          , showbPrecPrim 0 argTy arg
-                                         , [| fromString ", "                          |]
+                                         , [| fromString ", "                                   |]
                                          ]
                                    )
                                    (zip args ts)
         braceCommaArgs = [| s '{' |] : take (length showArgs - 1) showArgs
-        mappendArgs    = foldr (flip infixApp [| (<>) |])
+        mappendArgs    = foldr (`infixApp` [| (<>) |])
                            [| s '}' |]
                            braceCommaArgs
-        namedArgs      = [| fromString $(stringE (nameBase conName)) <> showbSpace <> $(mappendArgs) |]
+        namedArgs      = [| fromString $(stringE (nameBase conName ++ " ")) <> $(mappendArgs) |]
     
     match (conP conName $ map varP args)
           (normalB
 #if __GLASGOW_HASKELL__ >= 711
                     [| intConst $(namedArgs) $(varE p) |]
 #else
-                    [| showbParen ($(varE p) > appPrec) $(namedArgs) |]
+                    [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |]
 #endif
           )
           []
@@ -564,15 +564,13 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
                         other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
         opName   = nameBase conName
         infixOpE = if isInfixTypeCon opName
-                     then [| fromString opName |]
-                     else [| s '`' <> fromString opName <> s '`' |]
+                     then [| fromString (" "  ++ opName ++ " " ) |]
+                     else [| fromString (" `" ++ opName ++ "` ") |]
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
                           [| $(showbPrecPrim (conPrec + 1) alTy al)
-                          <> showbSpace
                           <> $(infixOpE)
-                          <> showbSpace
                           <> $(showbPrecPrim (conPrec + 1) arTy ar)
                           |]
           )
@@ -703,7 +701,7 @@ decCons :: [Dec] -> [Con]
 decCons decs = flip concatMap decs $ \dec -> case dec of
     DataInstD    _ _ _ cons _ -> cons
     NewtypeInstD _ _ _ con  _ -> [con]
-    _ -> error $ "Text.Show.Text.TH.decCons: Must be a data or newtype instance."
+    _ -> error "Text.Show.Text.TH.decCons: Must be a data or newtype instance."
 
 -- | Extracts the name of a constructor.
 constructorName :: Con -> Name

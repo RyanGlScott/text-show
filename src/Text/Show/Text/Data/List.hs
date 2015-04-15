@@ -23,7 +23,7 @@ import Text.Show.Text.Data.Integral ()
 
 instance Show a => Show [a] where
     {-# SPECIALIZE instance Show [String] #-}
-    {-# SPECIALIZE instance Show [Char]   #-}
+    {-# SPECIALIZE instance Show String   #-}
     {-# SPECIALIZE instance Show [Int]    #-}
     showb = showbList
     INLINE_INST_FUN(showb)
