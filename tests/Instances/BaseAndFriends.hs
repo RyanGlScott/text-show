@@ -25,7 +25,7 @@ of GHC).
 -}
 module Instances.BaseAndFriends () where
 
-import           Control.Applicative.Compat (Const(..), ZipList(..))
+import           Control.Applicative (Const(..), ZipList(..))
 import           Control.Exception
 import           Control.Monad.ST (ST, fixST)
 
@@ -43,11 +43,15 @@ import           Data.Functor.Classes ()
 import           Data.Functor.Identity (Identity(..))
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
-import           Data.Monoid.Compat (Alt(..))
+#if MIN_VERSION_base(4,8,0)
+import           Data.Monoid (Alt(..))
+#endif
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable.Internal as OldT (TyCon(..), TypeRep(..))
 #endif
-import           Data.Ord.Compat (Down(..))
+#if MIN_VERSION_base(4,6,0)
+import           Data.Ord (Down(..))
+#endif
 import           Data.Proxy (Proxy(..))
 #if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding(..))
@@ -86,9 +90,9 @@ import           GHC.IO.Encoding.Types (CodingProgress(..))
 import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 import           GHC.IO.Handle (HandlePosn(..))
 import qualified GHC.Generics as G (Fixity(..))
-import           GHC.Generics.Compat (U1(..), Par1(..), Rec1(..), K1(..),
-                                      M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                                      Associativity(..), Arity(..))
+import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
+                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
+                               Associativity(..), Arity(..))
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
@@ -605,10 +609,14 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
+#if MIN_VERSION_base(4,8,0)
 deriving instance Arbitrary (f a) => Arbitrary (Alt f a)
+#endif
 deriving instance Arbitrary a => Arbitrary (Const a b)
 deriving instance Arbitrary a => Arbitrary (ZipList a)
+#if MIN_VERSION_base(4,6,0)
 deriving instance Arbitrary a => Arbitrary (Down a)
+#endif
 deriving instance Arbitrary a => Arbitrary (Identity a)
 
 deriving instance Arbitrary a => Arbitrary (FromStringShow a)

@@ -40,11 +40,16 @@ import           Data.Functor.Identity (Identity)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.Monoid (All(..), Any(..), Dual(..), First(..),
                               Last(..), Product(..), Sum(..))
-import           Data.Monoid.Compat (Alt(..))
+#if MIN_VERSION_base(4,8,0)
+import           Data.Monoid (Alt(..))
+#endif
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import qualified Data.OldTypeable as OldT (TyCon, TypeRep)
 #endif
-import           Data.Ord.Compat (Down(..))
+#if MIN_VERSION_base(4,6,0)
+import           Data.Ord (Down(..))
+#endif
+import           Data.Orphans ()
 import           Data.Proxy (Proxy)
 import           Data.Ratio (Ratio)
 import qualified Data.Text as TS
@@ -401,7 +406,9 @@ baseAndFriendsTests =
         , testProperty "Last (Maybe Int) instance"               (prop_matchesShow :: Int -> Last (Maybe Int) -> Bool)
         , testProperty "Product Int instance"                    (prop_matchesShow :: Int -> Product Int -> Bool)
         , testProperty "Sum Int instance"                        (prop_matchesShow :: Int -> Sum Int -> Bool)
+#if MIN_VERSION_base(4,8,0)
         , testProperty "Alt Maybe Int instance"                  (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
+#endif
         ]
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
     , testGroup "Text.Show.Text.Data.OldTypeable"
@@ -411,7 +418,9 @@ baseAndFriendsTests =
 #endif
     , testGroup "Text.Show.Text.Data.Ord"
         [ testProperty "Ordering instance"                       (prop_matchesShow :: Int -> Ordering -> Bool)
+#if MIN_VERSION_base(4,6,0)
         , testProperty "Down Int instance"                       (prop_matchesShow :: Int -> Down Int -> Bool)
+#endif
         ]
     , testGroup "Text.Show.Text.Data.Proxy"
         [ testProperty "Proxy Int instance"                      (prop_matchesShow :: Int -> Proxy Int -> Bool)

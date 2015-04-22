@@ -115,7 +115,7 @@ library
                        Text.Show.Text.Utils
   build-depends:       array               >= 0.3     && < 0.6
                      , base                >= 4.2     && < 5
-                     , base-compat         >= 0.7.1   && < 1
+                     , base-compat         >= 0.8     && < 1
                      -- , containers          >= 0.1     && < 0.6
                      , bytestring          >= 0.9     && < 0.11
                      , ghc-prim
@@ -185,7 +185,8 @@ test-suite text-show-properties
                        Properties.Utils
   build-depends:       array                      >= 0.3    && < 0.6
                      , base                       >= 4.5    && < 5
-                     , base-compat                >= 0.7.1  && < 1
+                     , base-compat                >= 0.8    && < 1
+                     , base-orphans               >= 0.1    && < 1
                      , bytestring                 >= 0.9    && < 0.11
                      , ghc-prim
                      -- Needed to conditionally import Arbitrary Natural instance
