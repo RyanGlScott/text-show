@@ -382,7 +382,11 @@ mkShowListLazy name = [| toLazyText . $(mkShowbList name) |]
 -- 
 -- /Since: 0.3.1/
 mkShowb :: Name -> Q Exp
-mkShowb name = mkShowbPrec name `appE` [| 0 |]
+mkShowb name = mkShowbPrec name `appE` [| zero |]
+  where
+    -- To prevent the generated TH code from having a type ascription
+    zero :: Int
+    zero = 0
 
 -- | Generates a lambda expression which behaves like 'T.showPrec' (without requiring a
 -- 'T.Show' instance).

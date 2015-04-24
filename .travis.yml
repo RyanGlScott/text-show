@@ -36,10 +36,17 @@ script:
  - |
     if [ $GHCVER = "7.0.4" ] || [ $GHCVER = "7.2.2" ]; then
       cabal configure -v2
-      cabal build
     else
       cabal configure --enable-tests -v2
+    fi
+ - |
+    if [ $GHCVER = "7.0.4" ] || [ $GHCVER = "7.2.2" ]; then
+      cabal build
+    else
       cabal build --ghc-option=-Werror
+    fi
+ - |
+    if [ $GHCVER != "7.0.4" ] && [ $GHCVER != "7.2.2" ]; then
       cabal test --show-details=always
     fi
  - cabal check
