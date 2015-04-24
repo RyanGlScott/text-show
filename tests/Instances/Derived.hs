@@ -130,7 +130,7 @@ showbAllAtOncePrec :: (Show a, Show b, Show c, Show d)
                    => Int -> AllAtOnce a b c d -> Builder
 showbAllAtOncePrec = showbPrec
 
-showbNormalGADTPrec :: (Show a, Show b) => Int -> NormalGADT a b -> Builder
+showbNormalGADTPrec :: Int -> NormalGADT -> Builder
 showbNormalGADTPrec = showbPrec
 
 showbExistentialGADTPrec :: (Show a, Show b, Show c) => Int -> ExistentialGADT a b c -> Builder
@@ -261,7 +261,7 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       ]
 
 $(deriveShow ''NormalGADT)
-instance Arbitrary a => Arbitrary (NormalGADT a b) where
+instance Arbitrary NormalGADT where
     arbitrary = oneof [ (:.)  <$> arbitrary <*> arbitrary
                       , (:..) <$> arbitrary <*> arbitrary
                       ]

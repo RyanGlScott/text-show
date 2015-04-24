@@ -40,7 +40,7 @@ script:
     else
       cabal configure --enable-tests -v2
       cabal build --ghc-option=-Werror
-      cabal test
+      cabal test --show-details=always
     fi
  - cabal check
  - cabal sdist

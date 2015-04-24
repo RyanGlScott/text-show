@@ -139,9 +139,9 @@ data AllAtOnce a b c d = AAONullary
 deriving instance (S.Show a, S.Show b, S.Show c) => S.Show (AllAtOnce a b c d)
 
 infixr 1 :.
-data NormalGADT a b where
-    (:.)  :: a -> a -> NormalGADT a b
-    (:..) :: a -> a -> NormalGADT a b
+data NormalGADT where
+    (:.)  :: Int -> Int -> NormalGADT
+    (:..) :: Int -> Int -> NormalGADT
   deriving (S.Show, Generic)
 
 data ExistentialGADT a b c where
