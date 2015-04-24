@@ -494,13 +494,13 @@ consToShow cons = do
 encodeArgs :: Name -> Con -> Q Match
 encodeArgs p (NormalC conName [])
     = match (conP conName [])
-            (normalB [| intConst (fromString $(stringE (nameBase conName))) $(varE p) |])
+            (normalB [| intConst (fromString $(stringE (parenInfixConName conName ""))) $(varE p) |])
             []
 encodeArgs p (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
     
     let showArg  = showbPrecPrim appPrec1 argTy arg
-        namedArg = [| fromString $(stringE (nameBase conName ++ " ")) <> $(showArg) |] 
+        namedArg = [| fromString $(stringE (parenInfixConName conName " ")) <> $(showArg) |] 
     
     match (conP conName [varP arg])
           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArg) |])
@@ -523,7 +523,7 @@ encodeArgs p (NormalC conName ts) = do
            let showArgs = map (\(arg, (_, argTy)) -> showbPrecPrim appPrec1 argTy arg)
                               (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
-               namedArgs   = [| fromString $(stringE (nameBase conName ++ " ")) <> $(mappendArgs) |]
+               namedArgs   = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
            
            match (conP conName $ map varP args)
                  (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
@@ -543,7 +543,7 @@ encodeArgs p (RecC conName ts) = do
         mappendArgs    = foldr (`infixApp` [| (<>) |])
                            [| s '}' |]
                            braceCommaArgs
-        namedArgs      = [| fromString $(stringE (nameBase conName ++ " ")) <> $(mappendArgs) |]
+        namedArgs      = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
     
     match (conP conName $ map varP args)
           (normalB
@@ -564,8 +564,8 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
                         other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
         opName   = nameBase conName
         infixOpE = if isInfixTypeCon opName
-                     then [| fromString (" "  ++ opName ++ " " ) |]
-                     else [| fromString (" `" ++ opName ++ "` ") |]
+                      then [| fromString (" "  ++ opName ++ " " ) |]
+                      else [| fromString (" `" ++ opName ++ "` ") |]
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
@@ -580,6 +580,13 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------------
+
+-- | Parenthesize an infix constructor name if it is being applied as a prefix
+-- function (e.g., (:+) 1.0 2.0)
+parenInfixConName :: Name -> ShowS
+parenInfixConName conName =
+    let conNameBase = nameBase conName
+     in showParen (isInfixTypeCon conNameBase) $ showString conNameBase
 
 -- | Checks if an type variable has an unlifted type that can be shown. If so,
 -- wrap it in its corresponding constructor and show it. Otherwise, only show

@@ -3,12 +3,13 @@
 * Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
 * Added `showbUnicodeException`, `showbI16Prec`, `showbDecodingPrec`, and `showbSizePrec` functions (and corresponding `Show` instances) to `Text.Show.Text.Data.Text`
 * Made `GShow` in `Text.Show.Text.Generics` poly-kinded
+* The Template Haskell deriver (and `GShow`) now handles "infix" data constructors that are applied as prefix correctly (e.g., `(:+) 1.0 2.0`)
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
 * The Template Haskell derive now does not parenthesize record types regardless of precedence on GHC 7.11 and later
 * Fixed build on GHC 7.2
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
-* TODO: Investigate `base-compat`'s usefulness in the package
+* TODO: Have `base-compat` backport `showFFloatAlt` and `showGFloatAlt`, and use them in the test suite
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons

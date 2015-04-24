@@ -47,7 +47,8 @@ module Derived (
     , MonomorphicForall(..)
     , PolymorphicForall(..)
     , AllAtOnce(..)
-    , GADT(..)
+    , NormalGADT(..)
+    , ExistentialGADT(..)
     , PrimADT#(..)
     , LeftAssocTree(..)
     , RightAssocTree(..)
@@ -102,7 +103,8 @@ data MonomorphicRecord = MonomorphicRecord {
   , monomorphicRecord3 :: Int
 } deriving (S.Show, Generic)
 
-data PolymorphicRecord a b c d = PolymorphicRecord {
+infixr 5 :%%%:
+data PolymorphicRecord a b c d = (:%%%:) {
     polymorphicRecord1 :: a
   , polymorphicRecord2 :: b
   , polymorphicRecord3 :: c
@@ -136,13 +138,19 @@ data AllAtOnce a b c d = AAONullary
                        | forall e. (Arbitrary e, S.Show e, T.Show e) => AAOForall a c e
 deriving instance (S.Show a, S.Show b, S.Show c) => S.Show (AllAtOnce a b c d)
 
-data GADT a b c where
-    GADTCon1 ::           GADT Char   b      c
-    GADTCon2 :: Double -> GADT Double Double c
-    GADTCon3 :: Int    -> GADT Int    String c
-    GADTCon4 :: a      -> GADT a      b      c
-    GADTCon5 :: b      -> GADT b      b      c
-deriving instance (S.Show a, S.Show b) => S.Show (GADT a b c)
+infixr 1 :.
+data NormalGADT a b where
+    (:.)  :: a -> a -> NormalGADT a b
+    (:..) :: a -> a -> NormalGADT a b
+  deriving (S.Show, Generic)
+
+data ExistentialGADT a b c where
+    GADTCon1 ::           ExistentialGADT Char   b      c
+    GADTCon2 :: Double -> ExistentialGADT Double Double c
+    GADTCon3 :: Int    -> ExistentialGADT Int    String c
+    GADTCon4 :: a      -> ExistentialGADT a      b      c
+    GADTCon5 :: b      -> ExistentialGADT b      b      c
+deriving instance (S.Show a, S.Show b) => S.Show (ExistentialGADT a b c)
 
 infixr 5 `PrimInfixIntegral#`, `PrimInfixFloating#`, `PrimInfixChar#`
 data PrimADT# a = PrimNormal# Int# Float# Double# Char# Word#
@@ -171,7 +179,7 @@ data RightAssocTree a = RightAssocLeaf a
   deriving (S.Show, Generic)
 
 infix 4 :?:
-data a :?: b = a :?: b deriving (S.Show, Generic)
+data a :?: b = (:?:) a b deriving (S.Show, Generic)
 
 newtype HigherKindedTypeParams f a = HigherKindedTypeParams (f a) deriving (S.Show, Generic)
 

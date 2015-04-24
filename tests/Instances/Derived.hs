@@ -47,7 +47,8 @@ module Instances.Derived (
     , showbMonomorphicForallPrec
     , showbPolymorphicForallPrec
     , showbAllAtOncePrec
-    , showbGADTPrec
+    , showbNormalGADTPrec
+    , showbExistentialGADTPrec
     , showbPrimADTPrec#
     , showbLeftAssocTreePrec
     , showbRightAssocTreePrec
@@ -129,8 +130,11 @@ showbAllAtOncePrec :: (Show a, Show b, Show c, Show d)
                    => Int -> AllAtOnce a b c d -> Builder
 showbAllAtOncePrec = showbPrec
 
-showbGADTPrec :: (Show a, Show b, Show c) => Int -> GADT a b c -> Builder
-showbGADTPrec = showbPrec
+showbNormalGADTPrec :: (Show a, Show b) => Int -> NormalGADT a b -> Builder
+showbNormalGADTPrec = showbPrec
+
+showbExistentialGADTPrec :: (Show a, Show b, Show c) => Int -> ExistentialGADT a b c -> Builder
+showbExistentialGADTPrec = showbPrec
 
 showbPrimADTPrec# :: Show a => Int -> PrimADT# a -> Builder
 showbPrimADTPrec# = showbPrec
@@ -228,7 +232,7 @@ instance Arbitrary MonomorphicRecord where
 
 $(deriveShow ''PolymorphicRecord)
 instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (PolymorphicRecord a b c d) where
-    arbitrary = PolymorphicRecord <$> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = (:%%%:) <$> arbitrary <*> arbitrary <*> arbitrary
 
 $(deriveShow ''MonomorphicInfix)
 instance Arbitrary MonomorphicInfix where
@@ -256,16 +260,22 @@ instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (AllAtOnce a b c d
                       , AAOForall  <$> arbitrary <*> arbitrary <*> (arbitrary :: Gen Int)
                       ]
 
-$(deriveShow ''GADT)
-instance __OVERLAPPING__  Arbitrary (GADT Char b c) where
+$(deriveShow ''NormalGADT)
+instance Arbitrary a => Arbitrary (NormalGADT a b) where
+    arbitrary = oneof [ (:.)  <$> arbitrary <*> arbitrary
+                      , (:..) <$> arbitrary <*> arbitrary
+                      ]
+
+$(deriveShow ''ExistentialGADT)
+instance __OVERLAPPING__  Arbitrary (ExistentialGADT Char b c) where
     arbitrary = pure GADTCon1
-instance __OVERLAPPING__  Arbitrary (GADT Double Double c) where
+instance __OVERLAPPING__  Arbitrary (ExistentialGADT Double Double c) where
     arbitrary = GADTCon2 <$> arbitrary
-instance __OVERLAPPING__  Arbitrary (GADT Int String c) where
+instance __OVERLAPPING__  Arbitrary (ExistentialGADT Int String c) where
     arbitrary = GADTCon3 <$> arbitrary
-instance __OVERLAPPABLE__ Arbitrary a => Arbitrary (GADT a b c) where
+instance __OVERLAPPABLE__ Arbitrary a => Arbitrary (ExistentialGADT a b c) where
     arbitrary = GADTCon4 <$> arbitrary
-instance __OVERLAPPING__  Arbitrary b => Arbitrary (GADT b b c) where
+instance __OVERLAPPING__  Arbitrary b => Arbitrary (ExistentialGADT b b c) where
     arbitrary = GADTCon5 <$> arbitrary
 
 $(deriveShow ''PrimADT#)

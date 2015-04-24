@@ -263,10 +263,13 @@ instance (Constructor c, GShow a) => GShow (M1 C c a) where
                              ) $
                (if conIsTuple c
                    then mempty
-                   else fromString (conName c))
+                   else let cn = conName c
+                        in showbParen (isInfixTypeCon cn) $ fromString cn
+               )
             <> (if isNullary x || conIsTuple c
                    then mempty
-                   else s ' ')
+                   else s ' '
+               )
             <> showbBraces t (gShowbPrec t appPrec1 x)
         Infix _ m -> showbParen (n > m) . showbBraces t $ gShowbPrec t (m+1) x
       where
