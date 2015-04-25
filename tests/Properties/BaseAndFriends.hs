@@ -442,7 +442,7 @@ baseAndFriendsTests =
         ]
     , testGroup "Text.Show.Text.Data.Proxy"
         [ testProperty "Proxy Int instance"                      (prop_matchesShow :: Int -> Proxy Int -> Bool)
-        , testProperty "Proxy Int generic show"                  (prop_genericShow :: Int -> Proxy Int -> Bool)
+--         , testProperty "Proxy Int generic show"                  (prop_genericShow :: Int -> Proxy Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Ratio"
         [ testProperty "Ratio Int instance"                      (prop_matchesShow :: Int -> Ratio Int -> Bool)
