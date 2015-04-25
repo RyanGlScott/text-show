@@ -566,7 +566,7 @@ baseAndFriendsTests =
         , testProperty "K1 () Int () generic show"               (prop_genericShow :: Int -> K1 () Int () -> Bool)
         , testProperty "M1 () () Maybe Int generic show"         (prop_genericShow :: Int -> M1 () () Maybe Int -> Bool)
         , testProperty "(Maybe :+: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
-        , testProperty "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
+--         , testProperty "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         , testProperty "(Maybe :.: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
 #endif
         ]

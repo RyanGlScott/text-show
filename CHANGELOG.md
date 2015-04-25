@@ -11,8 +11,8 @@
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
 * TODO: Have `base-compat` backport `showFFloatAlt` and `showGFloatAlt`, and use them in the test suite
-* TODO: Readd `Arity`/`Associativity`/`Fixity`/`U1 p` generic show tests once `base-orphans` gets fixed
-* TODO: Readd `Proxy Int` generic show test once `tagged` gets fixed
+* TODO: Re-add `Arity`/`Associativity`/`Fixity`/`U1 p`/`(f :*: g) p` generic show tests once `base-orphans` gets fixed
+* TODO: Re-add `Proxy Int` generic show test once `tagged` gets fixed
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons
