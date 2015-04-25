@@ -1,5 +1,9 @@
+{-# LANGUAGE CPP             #-}
+
+#if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.StaticPtr
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -9,11 +13,16 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'StaticPtrInfo' values.
-This module is only available with @base-4.8.0.0@ or later.
+This module only exports functions if using @base-4.8.0.0@ or later.
 
 /Since: 0.5/
 -}
-module Text.Show.Text.GHC.StaticPtr (showbStaticPtrInfoPrec) where
+module Text.Show.Text.GHC.StaticPtr (
+#if !(MIN_VERSION_base(4,8,0))
+    ) where
+#else
+      showbStaticPtrInfoPrec
+    ) where
 
 import Data.Text.Lazy.Builder (Builder)
 
@@ -35,3 +44,4 @@ showbStaticPtrInfoPrec = showbPrec
 {-# INLINE showbStaticPtrInfoPrec #-}
 
 $(deriveShow ''StaticPtrInfo)
+#endif

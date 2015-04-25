@@ -1,7 +1,11 @@
+{-# LANGUAGE CPP             #-}
+
+#if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE GADTs           #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.Data.Type.Equality
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -11,11 +15,16 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for propositional equality.
-This module is only available with @base-4.7.0.0@ or later.
+This module only exports functions if using @base-4.7.0.0@ or later.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.Data.Type.Equality (showbPropEquality) where
+module Text.Show.Text.Data.Type.Equality (
+#if !(MIN_VERSION_base(4,7,0))
+    ) where
+#else
+      showbPropEquality
+    ) where
 
 import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Equality ((:~:)(..))
@@ -41,3 +50,4 @@ instance Show (a :~: b) where
 instance Show1 ((:~:) a) where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}
+#endif

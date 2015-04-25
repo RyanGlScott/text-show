@@ -1,4 +1,8 @@
+{-# LANGUAGE CPP              #-}
+
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE FlexibleContexts #-}
+#endif
 {-|
 Module:      Text.Show.Text.Debug.Trace.Generic
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -8,11 +12,15 @@ Stability:   Experimental
 Portability: GHC
 
 Functions that trace the values of 'Generic' instances (even if they are not
-instances of @Show@).
+instances of @Show@). This module only exports functions if the compiler supports
+generics (on GHC, 7.2 or above).
 
 /Since: 0.6/
 -}
 module Text.Show.Text.Debug.Trace.Generic (
+#if __GLASGOW_HASKELL__ < 702
+    ) where
+#else
       genericTraceShow
     , genericTraceShowId
     , genericTraceShowM
@@ -40,3 +48,4 @@ genericTraceShowId a = trace (genericShow a) a
 -- /Since: 0.6/
 genericTraceShowM :: (Generic a, GShow (Rep a), Monad m) => a -> m ()
 genericTraceShowM = traceM . genericShow
+#endif

@@ -1,8 +1,9 @@
 {-# LANGUAGE CPP             #-}
-#if !defined(__GHCJS__)
+
+#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
 {-# LANGUAGE TemplateHaskell #-}
-#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.Conc.Windows
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -12,14 +13,12 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'ConsoleEvent'.
-This module is only available on Windows.
-
-Note that this module does not export anything on GHCJS.
+This module only exports functions if using Windows, and not using GHCJS.
 
 /Since: 0.5/
 -}
 module Text.Show.Text.GHC.Conc.Windows (
-#if defined(__GHCJS__)
+#if defined(__GHCJS__) || !defined(mingw32_HOST_OS)
     ) where
 #else
       showbConsoleEvent

@@ -20,9 +20,7 @@ module Text.Show.Text.System.IO (
     , showbBufferModePrec
     , showbHandlePosn
     , showbSeekMode
-#if MIN_VERSION_base(4,3,0)
     , showbTextEncoding
-#endif
 #if MIN_VERSION_base(4,4,0)
     , showbCodingProgress
     , showbCodingFailureMode
@@ -34,11 +32,7 @@ module Text.Show.Text.System.IO (
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
 
-#include "inline.h"
-
-#if MIN_VERSION_base(4,3,0)
 import GHC.IO.Encoding.Types (TextEncoding(textEncodingName))
-#endif
 #if MIN_VERSION_base(4,4,0)
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress)
@@ -56,6 +50,8 @@ import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
                                    defaultInlineShowb, defaultInlineShowbPrec)
 import Text.Show.Text.Utils (s)
+
+#include "inline.h"
 
 -- | Convert a 'Handle' to a 'Builder'.
 -- 
@@ -99,15 +95,12 @@ showbSeekMode :: SeekMode -> Builder
 showbSeekMode = showb
 {-# INLINE showbSeekMode #-}
 
-#if MIN_VERSION_base(4,3,0)
 -- | Convert a 'TextEncoding' to a 'Builder'.
--- This function is only available with @base-4.3.0.0@ or later.
 -- 
 -- /Since: 0.3/
 showbTextEncoding :: TextEncoding -> Builder
 showbTextEncoding = fromString . textEncodingName
 {-# INLINE showbTextEncoding #-}
-#endif
 
 #if MIN_VERSION_base(4,4,0)
 -- | Convert a 'CodingProgress' to a 'Builder'.
@@ -154,11 +147,9 @@ instance Show HandlePosn where
 
 $(deriveShowPragmas defaultInlineShowb     ''SeekMode)
 
-#if MIN_VERSION_base(4,3,0)
 instance Show TextEncoding where
     showb = showbTextEncoding
     INLINE_INST_FUN(showb)
-#endif
 
 #if MIN_VERSION_base(4,4,0)
 $(deriveShowPragmas defaultInlineShowb     ''CodingProgress)

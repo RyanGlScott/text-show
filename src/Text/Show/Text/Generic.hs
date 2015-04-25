@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP                 #-}
+
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveDataTypeable  #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleContexts    #-}
@@ -6,6 +8,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators       #-}
+#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds           #-}
@@ -23,8 +26,8 @@ Stability:   Experimental
 Portability: GHC
 
 Generic versions of 'Show' class functions, as an alternative to "Text.Show.Text.TH",
-which uses Template Haskell. This module is only available if the compiler supports
-generics (on GHC, 7.2 or above).
+which uses Template Haskell. This module only exports functions if the compiler
+supports generics (on GHC, 7.2 or above).
 
 This implementation is based off of the @Generics.Deriving.Show@ module from the
 @generic-deriving@ library.
@@ -32,6 +35,9 @@ This implementation is based off of the @Generics.Deriving.Show@ module from the
 /Since: 0.6/
 -}
 module Text.Show.Text.Generic (
+#if __GLASGOW_HASKELL__ < 702
+    ) where
+#else
       -- * Generic @show@ functions
       -- $generics
       
@@ -79,7 +85,7 @@ import           Text.Show.Text.Classes (Show(showbPrec), showbListWith,
 import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s, toString)
 
-#include "inline.h"
+# include "inline.h"
 
 {- $generics
 
@@ -217,10 +223,10 @@ data ConType = Rec | Tup | Pref | Inf Builder
   deriving ( Generic
            , S.Show
            , Typeable
-#if MIN_VERSION_text(0,11,1)
+# if MIN_VERSION_text(0,11,1)
            , Eq
            , Ord
-#endif
+# endif
            )
 
 instance T.Show ConType where
@@ -237,11 +243,11 @@ class GShow f where
     -- | Whether a representation type has any constructors.
     isNullary  :: f a -> Bool
     isNullary = error "generic show (isNullary): unnecessary case"
-#if __GLASGOW_HASKELL__ >= 708
+# if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL gShowbPrec #-}
 
 deriving instance Typeable GShow
-#endif
+# endif
 
 instance GShow U1 where
     gShowbPrec _ _ U1 = mempty
@@ -256,9 +262,9 @@ instance (Constructor c, GShow a) => GShow (M1 C c a) where
         Prefix -> showbParen ( n > appPrec
                                && not ( isNullary x
                                         || conIsTuple c
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
                                         || conIsRecord c
-#endif
+# endif
                                       )
                              ) $
                (if conIsTuple c
@@ -334,3 +340,4 @@ instance (GShow a, GShow b) => GShow (a :*: b) where
     
     -- If we have a product then it is not a nullary constructor
     isNullary _ = False
+#endif

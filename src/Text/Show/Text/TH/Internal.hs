@@ -586,7 +586,7 @@ encodeArgs p (ForallC _ _ con) = encodeArgs p con
 -------------------------------------------------------------------------------
 
 -- | Parenthesize an infix constructor name if it is being applied as a prefix
--- function (e.g., (:+) 1.0 2.0)
+-- function (e.g., data Amp a = (:&) a a)
 parenInfixConName :: Name -> ShowS
 parenInfixConName conName =
     let conNameBase = nameBase conName

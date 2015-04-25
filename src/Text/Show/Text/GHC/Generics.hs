@@ -1,8 +1,11 @@
 {-# LANGUAGE CPP              #-}
+
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell  #-}
 {-# LANGUAGE TypeOperators    #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.Generics
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -12,11 +15,15 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for generics-related data types.
-This module is only available with @base-4.4.0.0@ or later.
+This module only exports functions if the compiler supports generics
+(on GHC, 7.2 or above).
 
 /Since: 0.3/
 -}
 module Text.Show.Text.GHC.Generics (
+#if __GLASGOW_HASKELL__ < 702
+    ) where
+#else
       showbU1
     , showbPar1Prec
     , showbRec1Prec
@@ -43,7 +50,7 @@ import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb,
                                    defaultInlineShowbPrec, mkShowbPrec)
 
-#include "inline.h"
+# include "inline.h"
 
 -- | Convert a 'U1' value to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later.
@@ -187,3 +194,4 @@ instance Show (f (g p)) => Show ((f :.: g) p) where
 $(deriveShowPragmas defaultInlineShowbPrec ''Fixity)
 $(deriveShowPragmas defaultInlineShowb     ''Associativity)
 $(deriveShowPragmas defaultInlineShowbPrec ''Arity)
+#endif

@@ -1,4 +1,8 @@
+{-# LANGUAGE CPP #-}
+
+#if MIN_VERSION_base(4,4,0)
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.Fingerprint
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -8,11 +12,16 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'Fingerprint' values.
-This module is only available with @base-4.4.0.0@ or later.
+This module only exports functions if using @base-4.4.0.0@ or later.
 
 /Since: 0.5/
 -}
-module Text.Show.Text.GHC.Fingerprint (showbFingerprint) where
+module Text.Show.Text.GHC.Fingerprint (
+#if !(MIN_VERSION_base(4,4,0))
+    ) where
+#else
+      showbFingerprint
+    ) where
 
 import Data.Monoid.Compat ((<>))
 import Data.Semigroup (timesN)
@@ -41,3 +50,4 @@ showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
 instance Show Fingerprint where
     showb = showbFingerprint
     {-# INLINE showb #-}
+#endif

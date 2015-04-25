@@ -1,6 +1,10 @@
+{-# LANGUAGE CPP             #-}
+
+#if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE GADTs           #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.Data.Type.Coercion
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -10,11 +14,16 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for representational equality.
-This module is only available with @base-4.7.0.0@ or later.
+This module only exports functions if using @base-4.7.0.0@ or later.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.Data.Type.Coercion (showbCoercion) where
+module Text.Show.Text.Data.Type.Coercion (
+#if !(MIN_VERSION_base(4,7,0))
+    ) where
+#else
+      showbCoercion
+    ) where
 
 import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Coercion (Coercion(..))
@@ -40,3 +49,4 @@ instance Show (Coercion a b) where
 instance Show1 (Coercion a) where
     showbPrec1 = showbPrec
     {-# INLINE showbPrec1 #-}
+#endif

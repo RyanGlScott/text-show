@@ -1,5 +1,9 @@
+{-# LANGUAGE CPP               #-}
+
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
+#endif
 {-|
 Module:      Text.Show.Text.Data.OldTypeable
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -9,11 +13,17 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @OldTypeable@ module.
-This module is only available with @base-4.7@.
+This module only exports functions if using @base-4.7@.
 
 /Since: 0.5/
 -}
-module Text.Show.Text.Data.OldTypeable (showbTyCon, showbTypeRepPrec) where
+module Text.Show.Text.Data.OldTypeable (
+#if !(MIN_VERSION_base(4,7,0)) || MIN_VERSION_base(4,8,0)
+    ) where
+#else
+      showbTyCon
+    , showbTypeRepPrec
+    ) where
 
 import Data.Monoid.Compat ((<>))
 import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
@@ -65,3 +75,4 @@ instance Show TyCon where
 instance Show TypeRep where
     showbPrec = showbTypeRepPrec
     {-# INLINE showbPrec #-}
+#endif

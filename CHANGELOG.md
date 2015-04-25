@@ -1,9 +1,10 @@
 # 0.8
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
+* Modules which were previously exported only if using a recent-enough version of GHC/`base` (e.g., `Text.Show.Text.GHC.Generics`) are now always exposed. If the functionality that the module provides is not available on a given version of GHC/`base`, the module will not expose anything.
 * Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
 * Added `showbUnicodeException`, `showbI16Prec`, `showbDecodingPrec`, and `showbSizePrec` functions (and corresponding `Show` instances) to `Text.Show.Text.Data.Text`
 * Made `GShow` in `Text.Show.Text.Generics` poly-kinded
-* The Template Haskell deriver (and `GShow`) now handles "infix" data constructors that are applied as prefix correctly (e.g., `(:+) 1.0 2.0`)
+* The Template Haskell deriver (and `GShow`) now handles "infix" data constructors that are applied as prefix correctly (e.g., `data Amp a = (:&) a a`)
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
 * The Template Haskell derive now does not parenthesize record types regardless of precedence on GHC 7.11 and later
 * Fixed build on GHC 7.2

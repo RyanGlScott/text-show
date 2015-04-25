@@ -1,5 +1,9 @@
+{-# LANGUAGE CPP             #-}
+
+#if MIN_VERSION_base(4,5,0)
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.Stats
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -9,11 +13,16 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' function for 'GCStats'.
-This module is only available with @base-4.5.0.0@ or later.
+This module only exports functions if using @base-4.5.0.0@ or later.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.GHC.Stats (showbGCStatsPrec) where 
+module Text.Show.Text.GHC.Stats (
+#if !(MIN_VERSION_base(4,5,0))
+    ) where
+#else
+      showbGCStatsPrec
+    ) where 
 
 import Data.Text.Lazy.Builder (Builder)
 
@@ -33,3 +42,4 @@ showbGCStatsPrec = showbPrec
 {-# INLINE showbGCStatsPrec #-}
 
 $(deriveShow ''GCStats)
+#endif

@@ -1,5 +1,8 @@
 {-# LANGUAGE CPP #-}
+
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.Event
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -9,15 +12,13 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Event@ module.
-This module is only available with @base-4.4.0.0@ or later and is not available
-on Windows.
-
-Note that this module does not export anything on GHCJS.
+This module only exports functions if using @base-4.4.0.0@ on a platform other
+than Windows or GHCJS.
 
 /Since: 0.3/
 -}
 module Text.Show.Text.GHC.Event (
-#if defined(__GHCJS__)
+#if defined(__GHCJS__) || defined(mingw32_HOST_OS) || !(MIN_VERSION_base(4,4,0))
     ) where
 #else
       showbEvent

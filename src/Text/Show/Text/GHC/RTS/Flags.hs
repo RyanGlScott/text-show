@@ -1,7 +1,10 @@
 {-# LANGUAGE CPP               #-}
+
+#if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 {-|
 Module:      Text.Show.Text.GHC.RTS.Flags
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -11,11 +14,14 @@ Stability:   Experimental
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the 'GHC.RTS.Flags' module.
-This module is only available with @base-4.8.0.0@ or later.
+This module only exports functions if using @base-4.8.0.0@ or later.
 
 /Since: 0.5/
 -}
 module Text.Show.Text.GHC.RTS.Flags (
+#if !(MIN_VERSION_base(4,8,0))
+    ) where
+#else
       showbRTSFlagsPrec
     , showbGCFlagsPrec
     , showbConcFlagsPrec
@@ -44,10 +50,10 @@ import Text.Show.Text.Data.Maybe (showbMaybePrec)
 import Text.Show.Text.Utils (s)
 import Text.Show.Text.TH.Internal (deriveShow)
 
-#if __GLASGOW_HASKELL__ < 711
+# if __GLASGOW_HASKELL__ < 711
 import GHC.Show (appPrec)
 import Text.Show.Text.Classes (showbParen)
-#endif
+# endif
 
 -- | Convert an 'RTSFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -62,11 +68,11 @@ showbRTSFlagsPrec = showbPrec
 -- 
 -- /Since: 0.5/
 showbGCFlagsPrec :: Int -> GCFlags -> Builder
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
 showbGCFlagsPrec _ gcfs =
-#else
+# else
 showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
-#endif
+# endif
        "GCFlags {statsFile = "
     <> showbMaybePrec 0 (statsFile gcfs)
     <> ", giveStats = "
@@ -147,11 +153,11 @@ showbDebugFlagsPrec = showbPrec
 -- 
 -- /Since: 0.5/
 showbCCFlagsPrec :: Int -> CCFlags -> Builder
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
 showbCCFlagsPrec _ ccfs =
-#else
+# else
 showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
-#endif
+# endif
        "CCFlags {doCostCentres = "
     <> showb (FromStringShow $ doCostCentres ccfs)
     <> ", profilerTicks = "
@@ -165,11 +171,11 @@ showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
 -- 
 -- /Since: 0.5/
 showbProfFlagsPrec :: Int -> ProfFlags -> Builder
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
 showbProfFlagsPrec _ pfs =
-#else
+# else
 showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
-#endif
+# endif
        "ProfFlags {doHeapProfile = "
     <> showb (FromStringShow $ doHeapProfile pfs)
     <> ", heapProfileInterval = "
@@ -205,11 +211,11 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
 -- 
 -- /Since: 0.5/
 showbTraceFlagsPrec :: Int -> TraceFlags -> Builder
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
 showbTraceFlagsPrec _ tfs =
-#else
+# else
 showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
-#endif
+# endif
        "TraceFlags {tracing = "
     <> showb (FromStringShow $ tracing tfs)
     <> ", timestamp = "
@@ -259,3 +265,4 @@ instance Show TraceFlags where
     {-# INLINE showbPrec #-}
 
 $(deriveShow ''TickyFlags)
+#endif
