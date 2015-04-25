@@ -568,8 +568,8 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
                         other -> error $ "Text.Show.Text.TH.encodeArgs: Unsupported type: " ++ S.show other
         opName   = nameBase conName
         infixOpE = if isInfixTypeCon opName
-                      then [| fromString (" "  ++ opName ++ " " ) |]
-                      else [| fromString (" `" ++ opName ++ "` ") |]
+                      then [| fromString $(stringE $ " "  ++ opName ++ " " ) |]
+                      else [| fromString $(stringE $ " `" ++ opName ++ "` ") |]
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]

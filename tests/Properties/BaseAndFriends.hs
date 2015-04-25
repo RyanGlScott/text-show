@@ -273,6 +273,9 @@ baseAndFriendsTests =
     , testGroup "Text.Show.Text.Control.Applicative"
         [ testProperty "Const Int Int instance"                  (prop_matchesShow :: Int -> Const Int Int -> Bool)
         , testProperty "ZipList Int instance"                    (prop_matchesShow :: Int -> ZipList Int -> Bool)
+#if __GLASGOW_HASKELL__ >= 706
+        , testProperty "ZipList Int generic show"                (prop_genericShow :: Int -> ZipList Int -> Bool)
+#endif
         ]
     , testGroup "Text.Show.Text.Control.Concurrent"
         [ testProperty "BlockReason instance"                    (prop_matchesShow :: Int -> BlockReason -> Bool)
@@ -317,6 +320,7 @@ baseAndFriendsTests =
 #endif
     , testGroup "Text.Show.Text.Data.Bool"
         [ testProperty "Bool instance"                           (prop_matchesShow :: Int -> Bool -> Bool)
+        , testProperty "Bool generic show"                       (prop_genericShow :: Int -> Bool -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.ByteString"
         [ testProperty "strict ByteString instance"              (prop_matchesShow :: Int -> BS.ByteString -> Bool)
@@ -343,6 +347,7 @@ baseAndFriendsTests =
         ]
     , testGroup "Text.Show.Text.Data.Either"
         [ testProperty "Either Int Int instance"                 (prop_matchesShow :: Int -> Either Int Int -> Bool)
+        , testProperty "Either Int Int generic show"             (prop_genericShow :: Int -> Either Int Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Fixed"
         [ testProperty "Fixed E0 instance"                       (prop_matchesShow :: Int -> Fixed E0 -> Bool)
@@ -409,6 +414,18 @@ baseAndFriendsTests =
 #if MIN_VERSION_base(4,8,0)
         , testProperty "Alt Maybe Int instance"                  (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
 #endif
+#if __GLASGOW_HASKELL__ >= 706
+        , testProperty "All generic show"                        (prop_genericShow :: Int -> All -> Bool)
+        , testProperty "Any generic show"                        (prop_genericShow :: Int -> Any -> Bool)
+        , testProperty "Dual Int generic show"                   (prop_genericShow :: Int -> Dual Int -> Bool)
+        , testProperty "First (Maybe Int) generic show"          (prop_genericShow :: Int -> First (Maybe Int) -> Bool)
+        , testProperty "Last (Maybe Int) generic show"           (prop_genericShow :: Int -> Last (Maybe Int) -> Bool)
+        , testProperty "Product Int generic show"                (prop_genericShow :: Int -> Product Int -> Bool)
+        , testProperty "Sum Int generic show"                    (prop_genericShow :: Int -> Sum Int -> Bool)
+#endif
+#if MIN_VERSION_base(4,8,0)
+        , testProperty "Alt Maybe Int generic show"              (prop_genericShow :: Int -> Alt Maybe Int -> Bool)
+#endif
         ]
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
     , testGroup "Text.Show.Text.Data.OldTypeable"
@@ -418,12 +435,14 @@ baseAndFriendsTests =
 #endif
     , testGroup "Text.Show.Text.Data.Ord"
         [ testProperty "Ordering instance"                       (prop_matchesShow :: Int -> Ordering -> Bool)
+        , testProperty "Ordering generic show"                   (prop_genericShow :: Int -> Ordering -> Bool)
 #if MIN_VERSION_base(4,6,0)
         , testProperty "Down Int instance"                       (prop_matchesShow :: Int -> Down Int -> Bool)
 #endif
         ]
     , testGroup "Text.Show.Text.Data.Proxy"
         [ testProperty "Proxy Int instance"                      (prop_matchesShow :: Int -> Proxy Int -> Bool)
+        , testProperty "Proxy Int generic show"                  (prop_genericShow :: Int -> Proxy Int -> Bool)
         ]
     , testGroup "Text.Show.Text.Data.Ratio"
         [ testProperty "Ratio Int instance"                      (prop_matchesShow :: Int -> Ratio Int -> Bool)
@@ -524,7 +543,10 @@ baseAndFriendsTests =
         [ testProperty "Fingerprint instance"                    (prop_matchesShow :: Int -> Fingerprint -> Bool)
         ]
     , testGroup "Text.Show.Text.GHC.Generics"
-        [ testProperty "U1 Int instance"                         (prop_matchesShow :: Int -> U1 Int -> Bool)
+        [ testProperty "Fixity instance"                         (prop_matchesShow :: Int -> G.Fixity -> Bool)
+        , testProperty "Associativity instance"                  (prop_matchesShow :: Int -> Associativity -> Bool)
+        , testProperty "Arity instance"                          (prop_matchesShow :: Int -> Arity -> Bool)
+        , testProperty "U1 Int instance"                         (prop_matchesShow :: Int -> U1 Int -> Bool)
         , testProperty "Par1 Int instance"                       (prop_matchesShow :: Int -> Par1 Int -> Bool)
         , testProperty "Rec1 Maybe Int instance"                 (prop_matchesShow :: Int -> Rec1 Maybe Int -> Bool)
         , testProperty "K1 () Int () instance"                   (prop_matchesShow :: Int -> K1 () Int () -> Bool)
@@ -532,9 +554,21 @@ baseAndFriendsTests =
         , testProperty "(Maybe :+: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         , testProperty "(Maybe :*: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         , testProperty "(Maybe :.: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
-        , testProperty "Fixity instance"                         (prop_matchesShow :: Int -> G.Fixity -> Bool)
-        , testProperty "Associativity instance"                  (prop_matchesShow :: Int -> Associativity -> Bool)
-        , testProperty "Arity instance"                          (prop_matchesShow :: Int -> Arity -> Bool)
+#if __GLASGOW_HASKELL__ >= 704
+--         , testProperty "Fixity generic show"                     (prop_genericShow :: Int -> G.Fixity -> Bool)
+--         , testProperty "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
+--         , testProperty "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
+--         , testProperty "U1 Int generic show"                     (prop_genericShow :: Int -> U1 Int -> Bool)
+#endif
+#if __GLASGOW_HASKELL__ >= 706
+        , testProperty "Par1 Int generic show"                   (prop_genericShow :: Int -> Par1 Int -> Bool)
+        , testProperty "Rec1 Maybe Int generic show"             (prop_genericShow :: Int -> Rec1 Maybe Int -> Bool)
+        , testProperty "K1 () Int () generic show"               (prop_genericShow :: Int -> K1 () Int () -> Bool)
+        , testProperty "M1 () () Maybe Int generic show"         (prop_genericShow :: Int -> M1 () () Maybe Int -> Bool)
+        , testProperty "(Maybe :+: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
+        , testProperty "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
+        , testProperty "(Maybe :.: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
+#endif
         ]
 #if MIN_VERSION_base(4,8,0)
     , testGroup "Text.Show.Text.GHC.RTS.Flags"
