@@ -554,19 +554,17 @@ baseAndFriendsTests =
         , testProperty "(Maybe :+: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         , testProperty "(Maybe :*: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         , testProperty "(Maybe :.: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
-#if __GLASGOW_HASKELL__ >= 704
---         , testProperty "Fixity generic show"                     (prop_genericShow :: Int -> G.Fixity -> Bool)
---         , testProperty "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
---         , testProperty "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
---         , testProperty "U1 Int generic show"                     (prop_genericShow :: Int -> U1 Int -> Bool)
-#endif
+        , testProperty "Fixity generic show"                     (prop_genericShow :: Int -> G.Fixity -> Bool)
+        , testProperty "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
+        , testProperty "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
+        , testProperty "U1 Int generic show"                     (prop_genericShow :: Int -> U1 Int -> Bool)
 #if __GLASGOW_HASKELL__ >= 706
         , testProperty "Par1 Int generic show"                   (prop_genericShow :: Int -> Par1 Int -> Bool)
         , testProperty "Rec1 Maybe Int generic show"             (prop_genericShow :: Int -> Rec1 Maybe Int -> Bool)
         , testProperty "K1 () Int () generic show"               (prop_genericShow :: Int -> K1 () Int () -> Bool)
         , testProperty "M1 () () Maybe Int generic show"         (prop_genericShow :: Int -> M1 () () Maybe Int -> Bool)
         , testProperty "(Maybe :+: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
---         , testProperty "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
+        , testProperty "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         , testProperty "(Maybe :.: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
 #endif
         ]

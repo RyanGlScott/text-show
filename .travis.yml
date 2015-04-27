@@ -47,7 +47,7 @@ script:
     fi
  - |
     if [ $GHCVER != "7.0.4" ] && [ $GHCVER != "7.2.2" ]; then
-      cabal test --show-details=always
+      cabal test --show-details=always --test-options="+RTS -N -RTS"
     fi
  - cabal check
  - cabal sdist
