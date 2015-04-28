@@ -17,7 +17,7 @@ module Text.Show.Text.Control.Monad.ST (showbST) where
 
 import Control.Monad.ST (ST)
 import Data.Text.Lazy.Builder (Builder)
-import Prelude hiding (Show)
+import Prelude ()
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 
 #include "inline.h"

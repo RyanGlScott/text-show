@@ -16,7 +16,7 @@ Optional 'Show' and 'Show1' instances for functions.
 module Text.Show.Text.Functions (showbFunction) where
 
 import Data.Text.Lazy.Builder (Builder)
-import Prelude hiding (Show)
+import Prelude ()
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 
 #include "inline.h"

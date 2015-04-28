@@ -19,7 +19,7 @@ import Data.Dynamic (Dynamic, dynTypeRep)
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
+import Prelude ()
 
 import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.Data.Typeable (showbTypeRepPrec)

@@ -44,7 +44,7 @@ module Text.Show.Text (
 
 import Data.Text.Lazy.Builder
 
-import Prelude hiding (Show(show, showList), print)
+import Prelude ()
 
 import Text.Show.Text.Classes
 import Text.Show.Text.Instances ()

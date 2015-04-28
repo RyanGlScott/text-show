@@ -17,7 +17,7 @@ module Text.Show.Text.Data.Void (showbVoid) where
 import Data.Text.Lazy.Builder (Builder)
 import Data.Void (Void, absurd)
 
-import Prelude hiding (Show)
+import Prelude ()
 
 import Text.Show.Text.Classes (Show(showb))
 

@@ -81,21 +81,27 @@ import           GHC.Conc (BlockReason, ThreadStatus)
 #if !(defined(__GHCJS__))
 # if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent)
-# else
+# elif MIN_VERSION_base(4,4,0)
 import           GHC.Event (Event)
 # endif
 #endif
+#if MIN_VERSION_base(4,4,0)
 import           GHC.Fingerprint.Type (Fingerprint)
+#endif
+#if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G (Fixity)
 import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
                                Associativity, Arity)
+#endif
 import           GHC.IO.Encoding.Failure (CodingFailureMode)
 import           GHC.IO.Encoding.Types (CodingProgress)
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo)
 #endif
+#if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats)
+#endif
 import           GHC.Show (asciiTab)
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol)
@@ -322,7 +328,9 @@ spec = parallel $ do
 
     describe "Text.Show.Text.Data.Bool" $ do
         prop "Bool instance"                           (prop_matchesShow :: Int -> Bool -> Bool)
+#if __GLASGOW_HASKELL__ >= 702
         prop "Bool generic show"                       (prop_genericShow :: Int -> Bool -> Bool)
+#endif
 
     describe "Text.Show.Text.Data.ByteString" $ do
         prop "strict ByteString instance"              (prop_matchesShow :: Int -> BS.ByteString -> Bool)
@@ -349,7 +357,9 @@ spec = parallel $ do
 
     describe "Text.Show.Text.Data.Either" $ do
         prop "Either Int Int instance"                 (prop_matchesShow :: Int -> Either Int Int -> Bool)
+#if __GLASGOW_HASKELL__ >= 702
         prop "Either Int Int generic show"             (prop_genericShow :: Int -> Either Int Int -> Bool)
+#endif
 
     describe "Text.Show.Text.Data.Fixed" $ do
         prop "Fixed E0 instance"                       (prop_matchesShow :: Int -> Fixed E0 -> Bool)
@@ -437,7 +447,9 @@ spec = parallel $ do
 
     describe "Text.Show.Text.Data.Ord" $ do
         prop "Ordering instance"                       (prop_matchesShow :: Int -> Ordering -> Bool)
+#if __GLASGOW_HASKELL__ >= 702
         prop "Ordering generic show"                   (prop_genericShow :: Int -> Ordering -> Bool)
+#endif
 #if MIN_VERSION_base(4,6,0)
         prop "Down Int instance"                       (prop_matchesShow :: Int -> Down Int -> Bool)
 #endif
@@ -468,11 +480,13 @@ spec = parallel $ do
         prop "(Int, Int, Int) instance"                (prop_matchesShow :: Int -> (Int, Int, Int) -> Bool)
         prop "(Int, Int, Int, Int) instance"           (prop_matchesShow :: Int -> (Int, Int, Int, Int) -> Bool)
         prop "(Int, Int, Int, Int, Int) instance"      (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+#if __GLASGOW_HASKELL__ >= 702
         prop "() generic show"                         (prop_genericShow :: Int -> () -> Bool)
         prop "(Int, Int) generic show"                 (prop_genericShow :: Int -> (Int, Int) -> Bool)
         prop "(Int, Int, Int) generic show"            (prop_genericShow :: Int -> (Int, Int, Int) -> Bool)
         prop "(Int, Int, Int, Int) generic show"       (prop_genericShow :: Int -> (Int, Int, Int, Int) -> Bool)
         prop "(Int, Int, Int, Int, Int) generic show"  (prop_genericShow :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+#endif
 
 #if MIN_VERSION_base(4,7,0)
     describe "Text.Show.Text.Data.Type.Coercion" $
@@ -514,8 +528,10 @@ spec = parallel $ do
         prop "CUIntMax instance"                       (prop_matchesShow :: Int -> CUIntMax -> Bool)
         prop "CClock instance"                         (prop_matchesShow :: Int -> CClock -> Bool)
         prop "CTime instance"                          (prop_matchesShow :: Int -> CTime -> Bool)
+#if MIN_VERSION_base(4,4,0)
         prop "CUSeconds instance"                      (prop_matchesShow :: Int -> CUSeconds -> Bool)
         prop "CSUSeconds instance"                     (prop_matchesShow :: Int -> CSUSeconds -> Bool)
+#endif
         prop "CFloat instance"                         (prop_matchesShow :: Int -> CFloat -> Bool)
         prop "CDouble instance"                        (prop_matchesShow :: Int -> CUChar -> Bool)
 
@@ -526,24 +542,27 @@ spec = parallel $ do
         prop "WordPtr instance"                        (prop_matchesShow :: Int -> WordPtr -> Bool)
         prop "ForeignPtr instance"                     prop_showForeignPtr
 
-#if !(defined(mingw32_HOST_OS) || defined(__GHCJS__))
-    describe "Text.Show.Text.GHC.Event" $ do
-        prop "Event instance"                          (prop_matchesShow :: Int -> Event -> Bool)
---         prop "FdKey instance"                          (prop_matchesShow :: Int -> FdKey -> Bool)
-#endif
-
     describe "Text.Show.Text.Generic" $ do
         prop "ConType instance"                        (prop_matchesShow :: Int -> ConType -> Bool)
         prop "ConType generic show"                    (prop_genericShow :: Int -> ConType -> Bool)
 
-#if defined(mingw32_HOST_OS) && !(defined(__GHCJS__))
+#if !(defined(__GHCJS__))
+# if defined(mingw32_HOST_OS)
     describe "Text.Show.Text.GHC.Conc.Windows" $
         prop "ConsoleEvent instance"                   (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+# elif MIN_VERSION_base(4,4,0)
+    describe "Text.Show.Text.GHC.Event" $ do
+        prop "Event instance"                          (prop_matchesShow :: Int -> Event -> Bool)
+--         prop "FdKey instance"                          (prop_matchesShow :: Int -> FdKey -> Bool)
+# endif
 #endif
 
+#if MIN_VERSION_base(4,4,0)
     describe "Text.Show.Text.GHC.Fingerprint" $
         prop "Fingerprint instance"                    (prop_matchesShow :: Int -> Fingerprint -> Bool)
+#endif
 
+#if __GLASGOW_HASKELL__ >= 702
     describe "Text.Show.Text.GHC.Generics" $ do
         prop "Fixity instance"                         (prop_matchesShow :: Int -> G.Fixity -> Bool)
         prop "Associativity instance"                  (prop_matchesShow :: Int -> Associativity -> Bool)
@@ -560,7 +579,7 @@ spec = parallel $ do
         prop "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
         prop "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
         prop "U1 Int generic show"                     (prop_genericShow :: Int -> U1 Int -> Bool)
-#if __GLASGOW_HASKELL__ >= 706
+# if __GLASGOW_HASKELL__ >= 706
         prop "Par1 Int generic show"                   (prop_genericShow :: Int -> Par1 Int -> Bool)
         prop "Rec1 Maybe Int generic show"             (prop_genericShow :: Int -> Rec1 Maybe Int -> Bool)
         prop "K1 () Int () generic show"               (prop_genericShow :: Int -> K1 () Int () -> Bool)
@@ -568,6 +587,7 @@ spec = parallel $ do
         prop "(Maybe :+: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         prop "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         prop "(Maybe :.: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
+# endif
 #endif
 
 #if MIN_VERSION_base(4,8,0)
@@ -586,8 +606,10 @@ spec = parallel $ do
         prop "StaticPtrInfo instance"                  (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
 #endif
 
+#if MIN_VERSION_base(4,5,0)
     describe "Text.Show.Text.GHC.Stats" $
         prop "GCStats instance"                        (prop_matchesShow :: Int -> GCStats -> Bool)
+#endif
 
 #if MIN_VERSION_base(4,6,0)
     describe "Text.Show.Text.GHC.TypeLits" $ do

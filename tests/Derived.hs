@@ -89,12 +89,17 @@ module Derived (
 #endif
     ) where
 
-import           GHC.Generics (Generic, Generic1)
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+# if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic1)
+# endif
+#endif
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 
 import           Prelude hiding (Show)
 
-import           Test.Tasty.QuickCheck (Arbitrary)
+import           Test.QuickCheck (Arbitrary)
 
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)

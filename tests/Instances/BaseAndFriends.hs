@@ -80,24 +80,30 @@ import           GHC.Conc (BlockReason(..), ThreadStatus(..))
 #if !(defined(__GHCJS__))
 # if defined(mingw32_HOST_OS)
 import           GHC.Conc.Windows (ConsoleEvent(..))
-# else
+# elif MIN_VERSION_base(4,4,0)
 import           GHC.Event (Event, evtRead, evtWrite)
 # endif
 #endif
+#if MIN_VERSION_base(4,4,0)
 import           GHC.Fingerprint.Type (Fingerprint(..))
+#endif
 import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import           GHC.IO.Encoding.Types (CodingProgress(..))
 import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 import           GHC.IO.Handle (HandlePosn(..))
+#if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G (Fixity(..))
 import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
                                M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
                                Associativity(..), Arity(..))
+#endif
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
 #endif
+#if MIN_VERSION_base(4,5,0)
 import           GHC.Stats (GCStats(..))
+#endif
 #if MIN_VERSION_base(4,7,0)
 import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 #endif
@@ -117,9 +123,9 @@ import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode
                             SeekMode(..), Handle, stdin, stdout, stderr)
 import           System.Posix.Types
 
+import           Test.QuickCheck (Arbitrary(..), Gen,
+                                  arbitraryBoundedEnum, oneof, suchThat)
 import           Test.QuickCheck.Instances ()
-import           Test.Tasty.QuickCheck (Arbitrary(arbitrary), Gen,
-                                        arbitraryBoundedEnum, oneof, suchThat)
 
 import           Text.Read.Lex as Lex (Lexeme(..))
 #if MIN_VERSION_base(4,7,0)
@@ -133,10 +139,15 @@ import           Text.Show.Text.Generic (ConType(..))
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
 #else
 import           Data.Word (Word64)
+
+# if !(MIN_VERSION_base(4,5,0))
+import           Data.Int (Int8, Int16, Int32, Int64)
+import           Data.Word (Word8, Word16, Word32)
+# endif
 #endif
 
 #if MIN_VERSION_base(4,7,0) || MIN_VERSION_text(1,1,0)
-import           Test.Tasty.QuickCheck (getNonNegative)
+import           Test.QuickCheck (getNonNegative)
 #endif
 
 #include "HsBaseConfig.h"
@@ -332,8 +343,10 @@ instance Arbitrary NewT.TypeRep where
 instance Arbitrary NewT.TyCon where
     arbitrary = NewT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
+#if MIN_VERSION_base(4,4,0)
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary
+#endif
 
 #if !(MIN_VERSION_base(4,7,0))
 instance Show Fingerprint where
@@ -399,7 +412,7 @@ instance Arbitrary ThreadStatus where
 deriving instance Bounded ConsoleEvent
 instance Arbitrary ConsoleEvent where
     arbitrary = arbitraryBoundedEnum
-# else
+# elif MIN_VERSION_base(4,4,0)
 instance Arbitrary Event where
     arbitrary = oneof $ map pure [evtRead, evtWrite]
 
@@ -448,6 +461,7 @@ deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
     arbitrary = arbitraryBoundedEnum
 
+#if MIN_VERSION_base(4,5,0)
 instance Arbitrary GCStats where
     arbitrary = GCStats <$> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
@@ -455,7 +469,9 @@ instance Arbitrary GCStats where
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
 
+#if __GLASGOW_HASKELL__ >= 702
 instance Arbitrary (U1 p) where
     arbitrary = pure U1
 
@@ -490,6 +506,7 @@ instance Arbitrary Associativity where
 
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
+#endif
 
 #if MIN_VERSION_base(4,8,0)
 instance Arbitrary ConcFlags where
@@ -532,6 +549,7 @@ instance Arbitrary SomeSymbol where
 instance Arbitrary ConType where
     arbitrary = oneof [pure Rec, pure Tup, pure Pref, Inf <$> arbitrary]
 
+#if MIN_VERSION_base(4,5,0)
 deriving instance Arbitrary CChar
 deriving instance Arbitrary CSChar
 deriving instance Arbitrary CUChar
@@ -551,56 +569,190 @@ deriving instance Arbitrary CWchar
 deriving instance Arbitrary CSigAtomic
 deriving instance Arbitrary CClock
 deriving instance Arbitrary CTime
+# if MIN_VERSION_base(4,4,0)
 deriving instance Arbitrary CUSeconds
 deriving instance Arbitrary CSUSeconds
+# endif
 deriving instance Arbitrary CIntPtr
 deriving instance Arbitrary CUIntPtr
 deriving instance Arbitrary CIntMax
 deriving instance Arbitrary CUIntMax
 
+# if defined(HTYPE_DEV_T)
+deriving instance Arbitrary CDev
+# endif
+# if defined(HTYPE_INO_T)
+deriving instance Arbitrary CIno
+# endif
+# if defined(HTYPE_MODE_T)
+deriving instance Arbitrary CMode
+# endif
+# if defined(HTYPE_OFF_T)
+deriving instance Arbitrary COff
+# endif
+# if defined(HTYPE_PID_T)
+deriving instance Arbitrary CPid
+# endif
+# if defined(HTYPE_SSIZE_T)
+deriving instance Arbitrary CSsize
+# endif
+# if defined(HTYPE_GID_T)
+deriving instance Arbitrary CGid
+# endif
+# if defined(HTYPE_NLINK_T)
+deriving instance Arbitrary CNlink
+# endif
+# if defined(HTYPE_UID_T)
+deriving instance Arbitrary CUid
+# endif
+# if defined(HTYPE_CC_T)
+deriving instance Arbitrary CCc
+# endif
+# if defined(HTYPE_SPEED_T)
+deriving instance Arbitrary CSpeed
+# endif
+# if defined(HTYPE_TCFLAG_T)
+deriving instance Arbitrary CTcflag
+# endif
+# if defined(HTYPE_RLIM_T)
+deriving instance Arbitrary CRLim
+# endif
+#else
+instance Arbitrary CChar where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CHAR)
+
+instance Arbitrary CSChar where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIGNED_CHAR)
+
+instance Arbitrary CUChar where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_CHAR)
+
+instance Arbitrary CShort where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SHORT)
+
+instance Arbitrary CUShort where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_SHORT)
+
+instance Arbitrary CInt where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INT)
+
+instance Arbitrary CUInt where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_INT)
+
+instance Arbitrary CLong where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_LONG)
+
+instance Arbitrary CULong where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_LONG)
+
+instance Arbitrary CLLong where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_LONG_LONG)
+
+instance Arbitrary CULLong where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_LONG_LONG)
+
+instance Arbitrary CFloat where
+    arbitrary = realToFrac <$> (arbitrary :: Gen HTYPE_FLOAT)
+
+instance Arbitrary CDouble where
+    arbitrary = realToFrac <$> (arbitrary :: Gen HTYPE_DOUBLE)
+
+instance Arbitrary CPtrdiff where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_PTRDIFF_T)
+
+instance Arbitrary CSize where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIZE_T)
+
+instance Arbitrary CWchar where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_WCHAR_T)
+
+instance Arbitrary CSigAtomic where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIG_ATOMIC_T)
+
+instance Arbitrary CClock where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CLOCK_T)
+
+instance Arbitrary CTime where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_TIME_T)
+
+# if MIN_VERSION_base(4,4,0)
+instance Arbitrary CUSeconds where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_USECONDS_T)
+
+instance Arbitrary CSUSeconds where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SUSECONDS_T)
+# endif
+
+instance Arbitrary CIntPtr where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INTPTR_T)
+
+instance Arbitrary CUIntPtr where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UINTPTR_T)
+
+instance Arbitrary CIntMax where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INTMAX_T)
+
+instance Arbitrary CUIntMax where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UINTMAX_T)
+
+# if defined(HTYPE_DEV_T)
+instance Arbitrary CDev where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_DEV_T)
+# endif
+# if defined(HTYPE_INO_T)
+instance Arbitrary CIno where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INO_T)
+# endif
+# if defined(HTYPE_MODE_T)
+instance Arbitrary CMode where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_MODE_T)
+# endif
+# if defined(HTYPE_OFF_T)
+instance Arbitrary COff where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_OFF_T)
+# endif
+# if defined(HTYPE_PID_T)
+instance Arbitrary CPid where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_PID_T)
+# endif
+# if defined(HTYPE_SSIZE_T)
+instance Arbitrary CSsize where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SSIZE_T)
+# endif
+# if defined(HTYPE_GID_T)
+instance Arbitrary CGid where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_GID_T)
+# endif
+# if defined(HTYPE_NLINK_T)
+instance Arbitrary CNlink where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_NLINK_T)
+# endif
+# if defined(HTYPE_UID_T)
+instance Arbitrary CUid where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UID_T)
+# endif
+# if defined(HTYPE_CC_T)
+instance Arbitrary CCc where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CC_T)
+# endif
+# if defined(HTYPE_SPEED_T)
+instance Arbitrary CSpeed where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SPEED_T)
+# endif
+# if defined(HTYPE_TCFLAG_T)
+instance Arbitrary CTcflag where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_TCFLAG_T)
+# endif
+# if defined(HTYPE_RLIM_T)
+instance Arbitrary CRLim where
+    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_RLIM_T)
+# endif
+#endif
+
+deriving instance Arbitrary Fd
+
 instance Arbitrary ExitCode where
     arbitrary = oneof [pure ExitSuccess, ExitFailure <$> arbitrary]
-
-#if defined(HTYPE_DEV_T)
-deriving instance Arbitrary CDev
-#endif
-#if defined(HTYPE_INO_T)
-deriving instance Arbitrary CIno
-#endif
-#if defined(HTYPE_MODE_T)
-deriving instance Arbitrary CMode
-#endif
-#if defined(HTYPE_OFF_T)
-deriving instance Arbitrary COff
-#endif
-#if defined(HTYPE_PID_T)
-deriving instance Arbitrary CPid
-#endif
-#if defined(HTYPE_SSIZE_T)
-deriving instance Arbitrary CSsize
-#endif
-#if defined(HTYPE_GID_T)
-deriving instance Arbitrary CGid
-#endif
-#if defined(HTYPE_NLINK_T)
-deriving instance Arbitrary CNlink
-#endif
-#if defined(HTYPE_UID_T)
-deriving instance Arbitrary CUid
-#endif
-#if defined(HTYPE_CC_T)
-deriving instance Arbitrary CCc
-#endif
-#if defined(HTYPE_SPEED_T)
-deriving instance Arbitrary CSpeed
-#endif
-#if defined(HTYPE_TCFLAG_T)
-deriving instance Arbitrary CTcflag
-#endif
-#if defined(HTYPE_RLIM_T)
-deriving instance Arbitrary CRLim
-#endif
-deriving instance Arbitrary Fd
 
 deriving instance Arbitrary All
 deriving instance Arbitrary Any

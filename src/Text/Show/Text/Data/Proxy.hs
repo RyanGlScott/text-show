@@ -19,7 +19,7 @@ module Text.Show.Text.Data.Proxy (showbProxy) where
 import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
+import Prelude ()
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (mkShowbPrec)

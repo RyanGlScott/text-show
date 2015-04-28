@@ -82,7 +82,7 @@ import GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
 import Prelude ()
 import Prelude.Compat hiding (Show)
 
-import Test.Tasty.QuickCheck (Arbitrary(..), Gen, oneof)
+import Test.QuickCheck (Arbitrary(..), Gen, oneof)
 
 import Text.Show.Text (Show(showb, showbPrec), Builder)
 import Text.Show.Text.TH (deriveShow, mkShowbPrec)
