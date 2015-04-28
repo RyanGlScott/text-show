@@ -1,22 +1,25 @@
 {-|
-Module:      Properties.Builder
+Module:      Spec.BuilderSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-@QuickCheck@ properties for functions that manipulate 'Builder's.
+@hspec@ tests for functions that manipulate 'Builder's.
 -}
-module Properties.Builder (builderTests) where
+module Spec.BuilderSpec (main, spec) where
 
 import Instances.BaseAndFriends ()
 
-import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.QuickCheck (testProperty)
+import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.Hspec.QuickCheck (prop)
 
 import Text.Show.Text (Builder, fromString, fromText, lengthB,
                        toString, toText, unlinesB, unwordsB)
+
+main :: IO ()
+main = hspec spec
 
 -- | Verifies 'lengthB' and 'length' produce the same output.
 prop_lengthB :: String -> Bool
@@ -38,13 +41,10 @@ prop_unlinesB strs = unlinesB (map fromString strs) == fromString (unlines strs)
 prop_unwordsB :: [String] -> Bool
 prop_unwordsB strs = unwordsB (map fromString strs) == fromString (unwords strs)
 
-builderTests :: [TestTree]
-builderTests =
-    [ testGroup "Builder-related functions"
-        [ testProperty "lengthB output"             prop_lengthB
-        , testProperty "fromString . toString = id" prop_toString
-        , testProperty "fromText . toText = id"     prop_toText
-        , testProperty "unlinesB output"            prop_unlinesB
-        , testProperty "unwordsB output"            prop_unwordsB
-        ]
-    ]
+spec :: Spec
+spec = parallel . describe "Builder-related functions" $ do
+    prop "lengthB output"             prop_lengthB
+    prop "fromString . toString = id" prop_toString
+    prop "fromText . toText = id"     prop_toText
+    prop "unlinesB output"            prop_unlinesB
+    prop "unwordsB output"            prop_unwordsB

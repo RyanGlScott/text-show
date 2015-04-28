@@ -1,21 +1,22 @@
 {-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
+
 #if __GLASGOW_HASKELL__ < 706
 -- Template Haskell's name generation didn't name-mangle very well prior to GHC
 -- 7.6 and can cause name shadowing warnings, so suppress them.
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 #endif
 {-|
-Module:      Properties.MkShow
+Module:      Spec.MkShowSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-@QuickCheck@ properties for 'mkShowbPrec' in "Text.Show.Text.TH".
+@hspec@ test for 'mkShowbPrec' in "Text.Show.Text.TH".
 -}
-module Properties.MkShow (mkShowTests) where
+module Spec.MkShowSpec (main, spec) where
 
 -- #if !(MIN_VERSION_base(4,8,0))
 -- import           Control.Applicative ((*>), pure)
@@ -30,18 +31,21 @@ import           Derived (NotAllShow(..), OneDataInstance)
 
 import           Instances.Derived ()
 
--- import           Properties.Utils (ioProperty)
+-- import           Spec.Utils (ioProperty)
 
 -- import           System.IO (hFlush, stdout, stderr)
 -- import           System.IO.Silently (capture_, hCapture_)
 
-import           Test.Tasty (TestTree, testGroup)
-import           Test.Tasty.QuickCheck (testProperty)
+import           Test.Hspec (Spec, describe, hspec, parallel)
+import           Test.Hspec.QuickCheck (prop)
 
 import qualified Text.Show as S (Show)
 import           Text.Show.Text (Builder, FromStringShow(..), showbPrec)
 -- import           Text.Show.Text.Debug.Trace.TH (mkTraceShow)
 import           Text.Show.Text.TH (mkShowbPrec)
+
+main :: IO ()
+main = hspec spec
 
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
 prop_mkShowbPrec :: S.Show a
@@ -115,19 +119,16 @@ prop_mkShowbPrecDataFamInstCon = prop_mkShowbPrec $(mkShowbPrec 'NASShow1)
 -- prop_mkTraceShowDataFamInstCon = prop_mkTraceShow $(mkTraceShow 'NASShow1)
 #endif
 
-mkShowTests :: [TestTree]
-mkShowTests =
-    [ testGroup "mkShow and related functions"
-        [ testProperty "$(mkShowbPrec ''AllAtOnce) (a plain type constructor)"            prop_mkShowbPrecTyCon
---         , testProperty "$(mkPrint ''AllAtOnce) (a plain type constructor)"                prop_mkPrintTyCon
---         , testProperty "$(mkTraceShow ''AllAtOnce) (a plain type constructor)"            prop_mkTraceShowTyCon
+spec :: Spec
+spec = parallel . describe "mkShow and related functions" $ do
+    prop "$(mkShowbPrec ''AllAtOnce) (a plain type constructor)"            prop_mkShowbPrecTyCon
+--     prop "$(mkPrint ''AllAtOnce) (a plain type constructor)"                prop_mkPrintTyCon
+--     prop "$(mkTraceShow ''AllAtOnce) (a plain type constructor)"            prop_mkTraceShowTyCon
 #if MIN_VERSION_template_haskell(2,7,0)
-        , testProperty "$(mkShowbPrec ''NotAllShow) (a data family instance constructor)" prop_mkShowbPrecDataFamInstCon
---         , testProperty "$(mkPrint ''NotAllShow) (a data family instance constructor)"     prop_mkPrintDataFamInstCon
---         , testProperty "$(mkTraceShow ''NotAllShow) (a data family instance constructor)" prop_mkTraceShowDataFamInstCon
-        , testProperty "$(mkShowbPrec ''OneDataInstance) (a data family name)"            prop_mkShowbPrecDataFam
---         , testProperty "$(mkPrint ''OneDataInstance) (a data family name)"                prop_mkPrintDataFam
---         , testProperty "$(mkTraceShow ''OneDataInstance) (a data family name)"            prop_mkTraceShowDataFam
+    prop "$(mkShowbPrec ''NotAllShow) (a data family instance constructor)" prop_mkShowbPrecDataFamInstCon
+--     prop "$(mkPrint ''NotAllShow) (a data family instance constructor)"     prop_mkPrintDataFamInstCon
+--     prop "$(mkTraceShow ''NotAllShow) (a data family instance constructor)" prop_mkTraceShowDataFamInstCon
+    prop "$(mkShowbPrec ''OneDataInstance) (a data family name)"            prop_mkShowbPrecDataFam
+--     prop "$(mkPrint ''OneDataInstance) (a data family name)"                prop_mkPrintDataFam
+--     prop "$(mkTraceShow ''OneDataInstance) (a data family name)"            prop_mkTraceShowDataFam
 #endif
-        ]
-    ]

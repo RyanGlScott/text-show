@@ -58,7 +58,7 @@ cabal-version:       >=1.10
 
 source-repository head
   type:                git
-  location:            git://github.com/RyanGlScott/text-show.git
+  location:            https://github.com/RyanGlScott/text-show
 
 library
   exposed-modules:     Text.Show.Text
@@ -162,33 +162,31 @@ library
 --    exposed-modules:   Text.Show.Text.Data.Type.Coercion
 --                       Text.Show.Text.Data.Type.Equality
 
-test-suite text-show-properties
+test-suite text-show-spec
   type:                exitcode-stdio-1.0
-  main-is:             Properties.hs
+  main-is:             Spec.hs
   other-modules:       Derived
                        Instances.BaseAndFriends
                        Instances.Derived
                        Instances.Utils
-                       Properties.BaseAndFriends
-                       Properties.Builder
-                       Properties.Derived
-                       Properties.MkShow
-                       Properties.Utils
+                       Spec.BaseAndFriendsSpec
+                       Spec.BuilderSpec
+                       Spec.DerivedSpec
+                       Spec.MkShowSpec
+                       Spec.Utils
   build-depends:       array                >= 0.3    && < 0.6
-                     , base                 >= 4.5    && < 5
+                     , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.1  && < 1
                      , base-orphans         >= 0.2    && < 1
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
                      , ghc-prim
+                     , hspec                >= 2      && < 3
                      , nats                 >= 0.1    && < 2
-                     -- Needed to conditionally import Arbitrary Natural instance
                      , QuickCheck           >= 2.5    && < 3
                      , quickcheck-instances >= 0.1    && < 0.4
                      -- , silently             >= 1.2.4 && < 1.3
                      , tagged               >= 0.4.4  && < 1
-                     , tasty                >= 0.8    && < 0.11
-                     , tasty-hunit          >= 0.8    && < 0.10
                      , tasty-quickcheck     >= 0.8    && < 0.9
                      , text                 >= 0.11.1 && < 1.3
                      , text-show            == 0.8

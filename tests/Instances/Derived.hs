@@ -148,6 +148,8 @@ showbRightAssocTreePrec = showbPrec
 showbQuestionMarkPrec :: (Show a, Show b) => Int -> a :?: b -> Builder
 showbQuestionMarkPrec = showbPrec
 
+-- TODO: Uncomment when these type signatures are generated via Template Haskell
+-- 
 -- showbHigherKindedTypeParamsPrec :: Show (f a)
 --                                 => Int -> HigherKindedTypeParams f a -> Builder
 -- showbHigherKindedTypeParamsPrec = showbPrec
@@ -216,14 +218,14 @@ $(deriveShow ''MonomorphicUnary)
 deriving instance Arbitrary MonomorphicUnary
 
 $(deriveShow ''PolymorphicUnary)
-deriving instance Arbitrary a => Arbitrary (PolymorphicUnary a b)
+deriving instance Arbitrary b => Arbitrary (PolymorphicUnary a b)
 
 $(deriveShow ''MonomorphicProduct)
 instance Arbitrary MonomorphicProduct where
     arbitrary = MonomorphicProduct <$> arbitrary <*> arbitrary <*> arbitrary
 
 $(deriveShow ''PolymorphicProduct)
-instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (PolymorphicProduct a b c d) where
+instance (Arbitrary a, Arbitrary b, Arbitrary d) => Arbitrary (PolymorphicProduct a b c d) where
     arbitrary = PolymorphicProduct <$> arbitrary <*> arbitrary <*> arbitrary
 
 $(deriveShow ''MonomorphicRecord)
@@ -231,7 +233,7 @@ instance Arbitrary MonomorphicRecord where
     arbitrary = MonomorphicRecord <$> arbitrary <*> arbitrary <*> arbitrary
 
 $(deriveShow ''PolymorphicRecord)
-instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (PolymorphicRecord a b c d) where
+instance (Arbitrary a, Arbitrary b, Arbitrary d) => Arbitrary (PolymorphicRecord a b c d) where
     arbitrary = (:%%%:) <$> arbitrary <*> arbitrary <*> arbitrary
 
 $(deriveShow ''MonomorphicInfix)
@@ -239,7 +241,7 @@ instance Arbitrary MonomorphicInfix where
     arbitrary = (:/:) <$> arbitrary <*> arbitrary
 
 $(deriveShow ''PolymorphicInfix)
-instance (Arbitrary a, Arbitrary b) => Arbitrary (PolymorphicInfix a b c) where
+instance (Arbitrary a, Arbitrary c) => Arbitrary (PolymorphicInfix a b c) where
     arbitrary = PolyInf <$> arbitrary <*> arbitrary
 
 $(deriveShow ''MonomorphicForall)

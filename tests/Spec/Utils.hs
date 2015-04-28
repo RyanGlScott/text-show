@@ -1,16 +1,16 @@
 {-# LANGUAGE CPP              #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-|
-Module:      Properties.Utils
+Module:      Spec.Utils
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-@QuickCheck@ property-related utility functions.
+Testing-related utility functions.
 -}
-module Properties.Utils (
+module Spec.Utils (
       ioProperty
     , prop_matchesShow
     , prop_genericShow
@@ -23,11 +23,11 @@ import           GHC.Generics (Generic, Rep)
 import           Prelude hiding (Show)
 
 #if MIN_VERSION_QuickCheck(2,7,0)
-import qualified Test.Tasty.QuickCheck as QC (ioProperty)
+import qualified Test.QuickCheck as QC (ioProperty)
 #else
-import           Test.Tasty.QuickCheck (morallyDubiousIOProperty)
+import           Test.QuickCheck (morallyDubiousIOProperty)
 #endif
-import           Test.Tasty.QuickCheck (Property, Testable)
+import           Test.QuickCheck (Property, Testable)
 
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)

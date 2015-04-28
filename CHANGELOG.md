@@ -8,6 +8,7 @@
 * The Template Haskell deriver now handles showable unlifted types (`Char#`, `Double#`, `Float#`, `Int#`, and `Word#`) correctly on GHC 7.11 and later
 * The Template Haskell derive now does not parenthesize record types regardless of precedence on GHC 7.11 and later
 * Fixed build on GHC 7.2
+* Changes test-suite to use `hspec`, which allows for it to be built on GHC 7.0 and 7.2
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
 * TODO: Have `base-compat` backport `showFFloatAlt` and `showGFloatAlt`, and use them in the test suite
