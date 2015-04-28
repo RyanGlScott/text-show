@@ -25,7 +25,6 @@ install:
  - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
  - travis_retry cabal update
  - cabal install -j --only-dependencies --enable-tests
-    fi
 
 script:
  - if [ -f configure.ac ]; then autoreconf -i; fi
