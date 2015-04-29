@@ -91,6 +91,9 @@ import           GHC.Event (Event, evtRead, evtWrite)
 #endif
 #if MIN_VERSION_base(4,4,0)
 import           GHC.Fingerprint.Type (Fingerprint(..))
+# if !(MIN_VERSION_base(4,7,0))
+import           Numeric (showHex)
+# endif
 #endif
 #if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G (Fixity(..))
@@ -117,7 +120,6 @@ import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 
 import           Instances.Utils ((<@>))
 
-import           Numeric (showHex)
 #if !(MIN_VERSION_QuickCheck(2,8,0) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif

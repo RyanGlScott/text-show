@@ -22,6 +22,7 @@ module Spec.Utils (
 
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic, Rep)
+import           Text.Show.Text.Generic
 #endif
 
 import           Prelude hiding (Show)
@@ -36,7 +37,6 @@ import           Test.QuickCheck (Property, Testable)
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text as T (Show)
 import           Text.Show.Text hiding (Show)
-import           Text.Show.Text.Generic
 
 ioProperty :: Testable prop => IO prop -> Property
 #if MIN_VERSION_QuickCheck(2,7,0)

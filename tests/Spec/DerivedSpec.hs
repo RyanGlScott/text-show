@@ -18,7 +18,10 @@ import Derived
 
 import Instances.Derived ()
 
-import Spec.Utils (prop_matchesShow, prop_genericShow)
+import Spec.Utils (prop_matchesShow)
+#if __GLASGOW_HASKELL__ >= 702
+import Spec.Utils (prop_genericShow)
+#endif
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)

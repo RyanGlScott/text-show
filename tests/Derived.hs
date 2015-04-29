@@ -304,8 +304,8 @@ newtype Restriction a = Restriction a
 # if __GLASGOW_HASKELL__ >= 706
            , Generic1
 # endif
-#endif
            )
+#endif
 deriving instance (Read a, S.Show a) => S.Show (Restriction a)
 
 newtype RestrictedContext a = RestrictedContext (Restriction a)
