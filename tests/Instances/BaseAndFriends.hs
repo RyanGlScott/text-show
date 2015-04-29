@@ -72,7 +72,7 @@ import           Data.Type.Equality ((:~:)(..))
 #if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
 #else
-import qualified Data.Typeable as NewT (TyCon, TyRep, mkTyCon, typeOf)
+import qualified Data.Typeable as NewT (TyCon, TypeRep, mkTyCon, typeOf)
 #endif
 import           Data.Version (Version(..))
 
@@ -146,7 +146,9 @@ import           Data.Fixed (Fixed, E12)
 import           Text.Read.Lex (Number)
 #endif
 import           Text.Show.Text (FromStringShow(..), FromTextShow(..))
+#if __GLASGOW_HASKELL__ >= 702
 import           Text.Show.Text.Generic (ConType(..))
+#endif
 
 #if MIN_VERSION_base(4,7,0)
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
@@ -564,8 +566,10 @@ instance Arbitrary SomeSymbol where
     arbitrary = someSymbolVal <$> arbitrary
 #endif
 
+#if __GLASGOW_HASKELL__ >= 702
 instance Arbitrary ConType where
     arbitrary = oneof [pure Rec, pure Tup, pure Pref, Inf <$> arbitrary]
+#endif
 
 #if MIN_VERSION_base(4,5,0)
 deriving instance Arbitrary CChar

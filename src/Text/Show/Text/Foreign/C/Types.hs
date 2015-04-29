@@ -310,7 +310,7 @@ showbCUSeconds :: CUSeconds -> Builder
 showbCUSeconds = showb
 {-# INLINE showbCUSeconds #-}
 # else
-showbCUSeconds = unsafeCoerce# (showbPrec :: Int -> HTYPE_USECONDS_T -> Builder)
+showbCUSeconds = unsafeCoerce# (showb :: HTYPE_USECONDS_T -> Builder)
 # endif
 
 -- | Convert a 'CSUSeconds' value to a 'Builder' with the given precedence.

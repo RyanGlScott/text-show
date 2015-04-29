@@ -153,7 +153,9 @@ import           Text.Show.Text.Data.List (showbListWith)
 import           Text.Show.Text.Data.Version (showbVersionConcrete)
 -- import qualified Text.Show.Text.Debug.Trace as T (traceShow)
 import           Text.Show.Text.Functions ()
+#if __GLASGOW_HASKELL__ >= 702
 import           Text.Show.Text.Generic (ConType)
+#endif
 
 #include "HsBaseConfig.h"
 
@@ -544,9 +546,11 @@ spec = parallel $ do
         prop "WordPtr instance"                        (prop_matchesShow :: Int -> WordPtr -> Bool)
         prop "ForeignPtr instance"                     prop_showForeignPtr
 
+#if __GLASGOW_HASKELL__ >= 702
     describe "Text.Show.Text.Generic" $ do
         prop "ConType instance"                        (prop_matchesShow :: Int -> ConType -> Bool)
         prop "ConType generic show"                    (prop_genericShow :: Int -> ConType -> Bool)
+#endif
 
 #if !(defined(__GHCJS__))
 # if defined(mingw32_HOST_OS)
