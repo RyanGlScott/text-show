@@ -351,7 +351,7 @@ instance Arbitrary NewT.TypeRep where
                                                          <@> []
 # endif
 #else
-    arbitrary = NewT.typeOf (arbitrary :: Gen Int)
+    arbitrary = NewT.typeOf <$> (arbitrary :: Gen Int)
 #endif
 
 instance Arbitrary NewT.TyCon where
