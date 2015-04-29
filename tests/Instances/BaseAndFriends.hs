@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MagicHash                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeOperators              #-}
 #if MIN_VERSION_base(4,7,0)
@@ -128,6 +129,8 @@ import           System.Posix.Types
 import           Test.QuickCheck (Arbitrary(..), Gen,
                                   arbitraryBoundedEnum, oneof, suchThat)
 #if !(MIN_VERSION_base(4,5,0))
+import           Data.Int
+import           GHC.Prim (unsafeCoerce#)
 import           Test.QuickCheck (arbitrarySizedBoundedIntegral,
                                   arbitrarySizedFractional)
 #endif
@@ -144,7 +147,7 @@ import           Text.Show.Text.Generic (ConType(..))
 #if MIN_VERSION_base(4,7,0)
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
 #else
-import           Data.Word (Word64)
+import           Data.Word
 #endif
 
 #if MIN_VERSION_base(4,7,0) || MIN_VERSION_text(1,1,0)
@@ -672,22 +675,18 @@ instance Arbitrary CWchar where
 instance Arbitrary CSigAtomic where
     arbitrary = arbitrarySizedBoundedIntegral
 
-deriving instance Bounded CClock
 instance Arbitrary CClock where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_CLOCK_T)
 
-deriving instance Bounded CTime
 instance Arbitrary CTime where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_TIME_T)
 
 # if MIN_VERSION_base(4,4,0)
-deriving instance Bounded CUSeconds
 instance Arbitrary CUSeconds where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_USECONDS_T)
 
-deriving instance Bounded CSUSeconds
 instance Arbitrary CSUSeconds where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_SUSECONDS_T)
 # endif
 
 instance Arbitrary CIntPtr where
@@ -704,7 +703,7 @@ instance Arbitrary CUIntMax where
 
 # if defined(HTYPE_DEV_T)
 instance Arbitrary CDev where
-    arbitrary = arbitrarySizedBoundedIntegral
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_DEV_T)
 # endif
 # if defined(HTYPE_INO_T)
 instance Arbitrary CIno where
@@ -739,14 +738,12 @@ instance Arbitrary CUid where
     arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_CC_T)
-deriving instance Bounded CCc
 instance Arbitrary CCc where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_CC_T)
 # endif
 # if defined(HTYPE_SPEED_T)
-deriving instance Bounded CSpeed
 instance Arbitrary CSpeed where
-    arbitrary = arbitraryBoundedEnum
+    arbitrary = unsafeCoerce# (arbitrary :: Gen HTYPE_SPEED_T)
 # endif
 # if defined(HTYPE_TCFLAG_T)
 instance Arbitrary CTcflag where
