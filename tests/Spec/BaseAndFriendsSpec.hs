@@ -618,7 +618,8 @@ spec = parallel $ do
 # if MIN_VERSION_base(4,7,0)
         prop "SomeNat instance"                        (prop_matchesShow :: Int -> SomeNat -> Bool)
         prop "SomeSymbol instance"                     (prop_matchesShow :: Int -> SomeSymbol -> Bool)
--- # else
+# else
+        return ()
 --         prop "IsEven instance"                         (prop_matchesShow :: Int -> IsEven -> Bool)
 --         prop "IsZero instance"                         (prop_matchesShow :: Int -> IsZero -> Bool)
 # endif

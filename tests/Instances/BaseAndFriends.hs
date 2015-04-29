@@ -69,7 +69,11 @@ import           Data.Coerce (Coercible)
 import           Data.Type.Coercion (Coercion(..))
 import           Data.Type.Equality ((:~:)(..))
 #endif
+#if MIN_VERSION_base(4,4,0)
 import qualified Data.Typeable.Internal as NewT (TyCon(..), TypeRep(..))
+#else
+import qualified Data.Typeable as NewT (TyCon, TyRep, mkTyCon, typeOf)
+#endif
 import           Data.Version (Version(..))
 
 import           Foreign.C.Types
@@ -337,15 +341,23 @@ instance Arbitrary OldT.TyCon where
 #endif
 
 instance Arbitrary NewT.TypeRep where
+#if MIN_VERSION_base(4,4,0)
     arbitrary = NewT.TypeRep <$> arbitrary <*> arbitrary
-#if MIN_VERSION_base(4,8,0)
+# if MIN_VERSION_base(4,8,0)
                                                          <@> [] <@> []
-#else
+# else
                                                          <@> []
+# endif
+#else
+    arbitrary = NewT.typeOf (arbitrary :: Gen Int)
 #endif
 
 instance Arbitrary NewT.TyCon where
+#if MIN_VERSION_base(4,4,0)
     arbitrary = NewT.TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+#else
+    arbitrary = NewT.mkTyCon <$> arbitrary
+#endif
 
 #if MIN_VERSION_base(4,4,0)
 instance Arbitrary Fingerprint where
