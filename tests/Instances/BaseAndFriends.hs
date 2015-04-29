@@ -364,9 +364,8 @@ instance Arbitrary NewT.TyCon where
 #if MIN_VERSION_base(4,4,0)
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary
-#endif
 
-#if !(MIN_VERSION_base(4,7,0))
+# if !(MIN_VERSION_base(4,7,0))
 instance Show Fingerprint where
   show (Fingerprint w1 w2) = hex16 w1 ++ hex16 w2
     where
@@ -374,6 +373,7 @@ instance Show Fingerprint where
       hex16 :: Word64 -> String
       hex16 i = let hex = showHex i ""
                  in replicate (16 - length hex) '0' ++ hex
+# endif
 #endif
 
 instance Arbitrary Dynamic where
