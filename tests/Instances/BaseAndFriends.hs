@@ -91,9 +91,6 @@ import           GHC.Event (Event, evtRead, evtWrite)
 #endif
 #if MIN_VERSION_base(4,4,0)
 import           GHC.Fingerprint.Type (Fingerprint(..))
-# if !(MIN_VERSION_base(4,7,0))
-import           Numeric (showHex)
-# endif
 #endif
 #if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G (Fixity(..))
@@ -120,6 +117,9 @@ import           GHC.TypeLits (SomeNat, SomeSymbol, someNatVal, someSymbolVal)
 
 import           Instances.Utils ((<@>))
 
+#if MIN_VERSION_base(4,7,0)
+import           Numeric (showHex, showOct)
+#endif
 #if !(MIN_VERSION_QuickCheck(2,8,0) && MIN_VERSION_base(4,8,0))
 import           Numeric.Natural (Natural)
 #endif
@@ -366,16 +366,6 @@ instance Arbitrary NewT.TyCon where
 #if MIN_VERSION_base(4,4,0)
 instance Arbitrary Fingerprint where
     arbitrary = Fingerprint <$> arbitrary <*> arbitrary
-
-# if !(MIN_VERSION_base(4,7,0))
-instance Show Fingerprint where
-  show (Fingerprint w1 w2) = hex16 w1 ++ hex16 w2
-    where
-      -- Formats a 64 bit number as 16 digits hex.
-      hex16 :: Word64 -> String
-      hex16 i = let hex = showHex i ""
-                 in replicate (16 - length hex) '0' ++ hex
-# endif
 #endif
 
 instance Arbitrary Dynamic where

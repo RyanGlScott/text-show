@@ -285,7 +285,7 @@ spec = parallel $ do
     describe "Text.Show.Text.Control.Applicative" $ do
         prop "Const Int Int instance"                  (prop_matchesShow :: Int -> Const Int Int -> Bool)
         prop "ZipList Int instance"                    (prop_matchesShow :: Int -> ZipList Int -> Bool)
-#if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 702
         prop "ZipList Int generic show"                (prop_genericShow :: Int -> ZipList Int -> Bool)
 #endif
 
@@ -430,7 +430,7 @@ spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
         prop "Alt Maybe Int instance"                  (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
 #endif
-#if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 702
         prop "All generic show"                        (prop_genericShow :: Int -> All -> Bool)
         prop "Any generic show"                        (prop_genericShow :: Int -> Any -> Bool)
         prop "Dual Int generic show"                   (prop_genericShow :: Int -> Dual Int -> Bool)
@@ -581,7 +581,6 @@ spec = parallel $ do
         prop "(Maybe :+: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         prop "(Maybe :*: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         prop "(Maybe :.: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
-# if __GLASGOW_HASKELL__ >= 706
         prop "Fixity generic show"                     (prop_genericShow :: Int -> G.Fixity -> Bool)
         prop "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
         prop "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
@@ -593,7 +592,6 @@ spec = parallel $ do
         prop "(Maybe :+: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         prop "(Maybe :*: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         prop "(Maybe :.: Maybe) Int generic show"      (prop_genericShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
-# endif
 #endif
 
 #if MIN_VERSION_base(4,8,0)
