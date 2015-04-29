@@ -60,19 +60,12 @@ import Text.Show.Text.Data.Floating ()
 import Text.Show.Text.Data.Integral ()
 
 #if !(MIN_VERSION_base(4,5,0))
+import Data.Int
+import Data.Word
+
 import GHC.Prim (unsafeCoerce#)
 
-import Text.Show.Text.Data.Floating (showbDoublePrec, showbFloatPrec)
-import Text.Show.Text.Data.Integral ( showbInt8Prec
-                                    , showbInt16Prec
-                                    , showbInt32Prec
-                                    , showbInt64Prec
-                                    , showbWord8
-                                    , showbWord16
-                                    , showbWord32
-                                    , showbWord64
-                                    )
-
+# include "HsBaseConfig.h"
 # include "inline.h"
 #endif
 
@@ -84,7 +77,7 @@ showbCCharPrec :: Int -> CChar -> Builder
 showbCCharPrec = showbPrec
 {-# INLINE showbCCharPrec #-}
 #else
-showbCCharPrec p c = showbInt8Prec p $ unsafeCoerce# c
+showbCCharPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_CHAR -> Builder)
 #endif
 
 -- | Convert a 'CSChar' to a 'Builder' with the given precedence.
@@ -95,7 +88,7 @@ showbCSCharPrec :: Int -> CSChar -> Builder
 showbCSCharPrec = showbPrec
 {-# INLINE showbCSCharPrec #-}
 #else
-showbCSCharPrec p c = showbInt8Prec p $ unsafeCoerce# c
+showbCSCharPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_SIGNED_CHAR -> Builder)
 #endif
 
 -- | Convert a 'CUChar' to a 'Builder'.
@@ -106,7 +99,7 @@ showbCUChar :: CUChar -> Builder
 showbCUChar = showb
 {-# INLINE showbCUChar #-}
 #else
-showbCUChar c = showbWord8 $ unsafeCoerce# c
+showbCUChar = unsafeCoerce# (showb :: HTYPE_UNSIGNED_CHAR -> Builder)
 #endif
 
 -- | Convert a 'CShort' to a 'Builder' with the given precedence.
@@ -117,7 +110,7 @@ showbCShortPrec :: Int -> CShort -> Builder
 showbCShortPrec = showbPrec
 {-# INLINE showbCShortPrec #-}
 #else
-showbCShortPrec p c = showbInt16Prec p $ unsafeCoerce# c
+showbCShortPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_SHORT -> Builder)
 #endif
 
 -- | Convert a 'CUShort' to a 'Builder'.
@@ -128,7 +121,7 @@ showbCUShort :: CUShort -> Builder
 showbCUShort = showb
 {-# INLINE showbCUShort #-}
 #else
-showbCUShort c = showbWord16 $ unsafeCoerce# c
+showbCUShort = unsafeCoerce# (showb :: HTYPE_UNSIGNED_SHORT -> Builder)
 #endif
 
 -- | Convert a 'CInt' to a 'Builder' with the given precedence.
@@ -139,7 +132,7 @@ showbCIntPrec :: Int -> CInt -> Builder
 showbCIntPrec = showbPrec
 {-# INLINE showbCIntPrec #-}
 #else
-showbCIntPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCIntPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_INT -> Builder)
 #endif
 
 -- | Convert a 'CUInt' to a 'Builder'.
@@ -150,7 +143,7 @@ showbCUInt :: CUInt -> Builder
 showbCUInt = showb
 {-# INLINE showbCUInt #-}
 #else
-showbCUInt c = showbWord32 $ unsafeCoerce# c
+showbCUInt = unsafeCoerce# (showb :: HTYPE_UNSIGNED_INT -> Builder)
 #endif
 
 -- | Convert a 'CLong' to a 'Builder' with the given precedence.
@@ -161,7 +154,7 @@ showbCLongPrec :: Int -> CLong -> Builder
 showbCLongPrec = showbPrec
 {-# INLINE showbCLongPrec #-}
 #else
-showbCLongPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCLongPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_LONG -> Builder)
 #endif
 
 -- | Convert a 'CULong' to a 'Builder'.
@@ -172,7 +165,7 @@ showbCULong :: CULong -> Builder
 showbCULong = showb
 {-# INLINE showbCULong #-}
 #else
-showbCULong c = showbWord32 $ unsafeCoerce# c
+showbCULong = unsafeCoerce# (showb :: HTYPE_UNSIGNED_LONG -> Builder)
 #endif
 
 -- | Convert a 'CPtrdiff' to a 'Builder' with the given precedence.
@@ -183,7 +176,7 @@ showbCPtrdiffPrec :: Int -> CPtrdiff -> Builder
 showbCPtrdiffPrec = showbPrec
 {-# INLINE showbCPtrdiffPrec #-}
 #else
-showbCPtrdiffPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCPtrdiffPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_PTRDIFF_T -> Builder)
 #endif
 
 -- | Convert a 'CSize' to a 'Builder'.
@@ -194,7 +187,7 @@ showbCSize :: CSize -> Builder
 showbCSize = showb
 {-# INLINE showbCSize #-}
 #else
-showbCSize c = showbWord32 $ unsafeCoerce# c
+showbCSize = unsafeCoerce# (showb :: HTYPE_SIZE_T -> Builder)
 #endif
 
 -- | Convert a 'CWchar' to a 'Builder' with the given precedence.
@@ -205,7 +198,7 @@ showbCWcharPrec :: Int -> CWchar -> Builder
 showbCWcharPrec = showbPrec
 {-# INLINE showbCWcharPrec #-}
 #else
-showbCWcharPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCWcharPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_WCHAR_T -> Builder)
 #endif
 
 -- | Convert a 'CSigAtomic' to a 'Builder' with the given precedence.
@@ -216,7 +209,7 @@ showbCSigAtomicPrec :: Int -> CSigAtomic -> Builder
 showbCSigAtomicPrec = showbPrec
 {-# INLINE showbCSigAtomicPrec #-}
 #else
-showbCSigAtomicPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCSigAtomicPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_SIG_ATOMIC_T -> Builder)
 #endif
 
 -- | Convert a 'CLLong' to a 'Builder' with the given precedence.
@@ -227,7 +220,7 @@ showbCLLongPrec :: Int -> CLLong -> Builder
 showbCLLongPrec = showbPrec
 {-# INLINE showbCLLongPrec #-}
 #else
-showbCLLongPrec p c = showbInt64Prec p $ unsafeCoerce# c
+showbCLLongPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_LONG_LONG -> Builder)
 #endif
 
 -- | Convert a 'CULLong' to a 'Builder'.
@@ -238,7 +231,7 @@ showbCULLong :: CULLong -> Builder
 showbCULLong = showb
 {-# INLINE showbCULLong #-}
 #else
-showbCULLong c = showbWord64 $ unsafeCoerce# c
+showbCULLong = unsafeCoerce# (showb :: HTYPE_UNSIGNED_LONG_LONG -> Builder)
 #endif
 
 -- | Convert a 'CIntPtr' to a 'Builder' with the given precedence.
@@ -249,7 +242,7 @@ showbCIntPtrPrec :: Int -> CIntPtr -> Builder
 showbCIntPtrPrec = showbPrec
 {-# INLINE showbCIntPtrPrec #-}
 #else
-showbCIntPtrPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCIntPtrPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_INTPTR_T -> Builder)
 #endif
 
 -- | Convert a 'CUIntPtr' to a 'Builder'.
@@ -260,7 +253,7 @@ showbCUIntPtr :: CUIntPtr -> Builder
 showbCUIntPtr = showb
 {-# INLINE showbCUIntPtr #-}
 #else
-showbCUIntPtr c = showbWord32 $ unsafeCoerce# c
+showbCUIntPtr = unsafeCoerce# (showb :: HTYPE_UINTPTR_T -> Builder)
 #endif
 
 -- | Convert a 'CIntMax' to a 'Builder' with the given precedence.
@@ -271,7 +264,7 @@ showbCIntMaxPrec :: Int -> CIntMax -> Builder
 showbCIntMaxPrec = showbPrec
 {-# INLINE showbCIntMaxPrec #-}
 #else
-showbCIntMaxPrec p c = showbInt64Prec p $ unsafeCoerce# c
+showbCIntMaxPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_INTMAX_T -> Builder)
 #endif
 
 -- | Convert a 'CUIntMax' to a 'Builder'.
@@ -282,7 +275,7 @@ showbCUIntMax :: CUIntMax -> Builder
 showbCUIntMax = showb
 {-# INLINE showbCUIntMax #-}
 #else
-showbCUIntMax c = showbWord64 $ unsafeCoerce# c
+showbCUIntMax = unsafeCoerce# (showb :: HTYPE_UINTMAX_T -> Builder)
 #endif
 
 -- | Convert a 'CClock' to a 'Builder' with the given precedence.
@@ -293,7 +286,7 @@ showbCClockPrec :: Int -> CClock -> Builder
 showbCClockPrec = showbPrec
 {-# INLINE showbCClockPrec #-}
 #else
-showbCClockPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCClockPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_CLOCK_T -> Builder)
 #endif
 
 -- | Convert a 'CTime' to a 'Builder' with the given precedence.
@@ -304,7 +297,7 @@ showbCTimePrec :: Int -> CTime -> Builder
 showbCTimePrec = showbPrec
 {-# INLINE showbCTimePrec #-}
 #else
-showbCTimePrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCTimePrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_TIME_T -> Builder)
 #endif
 
 #if MIN_VERSION_base(4,4,0)
@@ -317,7 +310,7 @@ showbCUSeconds :: CUSeconds -> Builder
 showbCUSeconds = showb
 {-# INLINE showbCUSeconds #-}
 # else
-showbCUSeconds c = showbWord32 $ unsafeCoerce# c
+showbCUSeconds = unsafeCoerce# (showbPrec :: Int -> HTYPE_USECONDS_T -> Builder)
 # endif
 
 -- | Convert a 'CSUSeconds' value to a 'Builder' with the given precedence.
@@ -329,7 +322,7 @@ showbCSUSecondsPrec :: Int -> CSUSeconds -> Builder
 showbCSUSecondsPrec = showbPrec
 {-# INLINE showbCSUSecondsPrec #-}
 # else
-showbCSUSecondsPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCSUSecondsPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_SUSECONDS_T -> Builder)
 # endif
 #endif
 
@@ -341,7 +334,7 @@ showbCFloatPrec :: Int -> CFloat -> Builder
 showbCFloatPrec = showbPrec
 {-# INLINE showbCFloatPrec #-}
 #else
-showbCFloatPrec p c = showbFloatPrec p $ unsafeCoerce# c
+showbCFloatPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_FLOAT -> Builder)
 #endif
 
 -- | Convert a 'CDouble' to a 'Builder' with the given precedence.
@@ -352,7 +345,7 @@ showbCDoublePrec :: Int -> CDouble -> Builder
 showbCDoublePrec = showbPrec
 {-# INLINE showbCDoublePrec #-}
 #else
-showbCDoublePrec p c = showbDoublePrec p $ unsafeCoerce# c
+showbCDoublePrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_DOUBLE -> Builder)
 #endif
 
 #if MIN_VERSION_base(4,5,0)

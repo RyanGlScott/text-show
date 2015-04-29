@@ -291,7 +291,8 @@ newtype HigherKindedTypeParams f a = HigherKindedTypeParams (f a)
   deriving ( S.Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if __GLASGOW_HASKELL__ >= 706
+# if __GLASGOW_HASKELL__ >= 708
+-- Won't work on GHC 7.6 due to a PolyKinds-related bug
            , Generic1
 # endif
 #endif

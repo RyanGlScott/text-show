@@ -87,16 +87,18 @@ import           GHC.Event (Event, evtRead, evtWrite)
 #if MIN_VERSION_base(4,4,0)
 import           GHC.Fingerprint.Type (Fingerprint(..))
 #endif
-import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
-import           GHC.IO.Encoding.Types (CodingProgress(..))
-import           GHC.IO.Exception (IOException(..), IOErrorType(..))
-import           GHC.IO.Handle (HandlePosn(..))
 #if __GLASGOW_HASKELL__ >= 702
 import qualified GHC.Generics as G (Fixity(..))
 import           GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
                                M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
                                Associativity(..), Arity(..))
 #endif
+#if MIN_VERSION_base(4,4,0)
+import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
+import           GHC.IO.Encoding.Types (CodingProgress(..))
+#endif
+import           GHC.IO.Exception (IOException(..), IOErrorType(..))
+import           GHC.IO.Handle (HandlePosn(..))
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo(..))
@@ -125,6 +127,10 @@ import           System.Posix.Types
 
 import           Test.QuickCheck (Arbitrary(..), Gen,
                                   arbitraryBoundedEnum, oneof, suchThat)
+#if !(MIN_VERSION_base(4,5,0))
+import           Test.QuickCheck (arbitrarySizedBoundedIntegral,
+                                  arbitrarySizedFractional)
+#endif
 import           Test.QuickCheck.Instances ()
 
 import           Text.Read.Lex as Lex (Lexeme(..))
@@ -139,11 +145,6 @@ import           Text.Show.Text.Generic (ConType(..))
 import           Numeric (showOct, showEFloat, showFFloat, showGFloat)
 #else
 import           Data.Word (Word64)
-
-# if !(MIN_VERSION_base(4,5,0))
-import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.Word (Word8, Word16, Word32)
-# endif
 #endif
 
 #if MIN_VERSION_base(4,7,0) || MIN_VERSION_text(1,1,0)
@@ -451,6 +452,7 @@ instance Arbitrary Newline where
 instance Arbitrary NewlineMode where
     arbitrary = NewlineMode <$> arbitrary <*> arbitrary
 
+#if MIN_VERSION_base(4,4,0)
 deriving instance Bounded CodingProgress
 deriving instance Enum CodingProgress
 instance Arbitrary CodingProgress where
@@ -460,6 +462,7 @@ deriving instance Bounded CodingFailureMode
 deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
     arbitrary = arbitraryBoundedEnum
+#endif
 
 #if MIN_VERSION_base(4,5,0)
 instance Arbitrary GCStats where
@@ -619,133 +622,139 @@ deriving instance Arbitrary CRLim
 # endif
 #else
 instance Arbitrary CChar where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CHAR)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CSChar where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIGNED_CHAR)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CUChar where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_CHAR)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CShort where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SHORT)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CUShort where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_SHORT)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CInt where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INT)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CUInt where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_INT)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CLong where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_LONG)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CULong where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_LONG)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CLLong where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_LONG_LONG)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CULLong where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UNSIGNED_LONG_LONG)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CFloat where
-    arbitrary = realToFrac <$> (arbitrary :: Gen HTYPE_FLOAT)
+    arbitrary = arbitrarySizedFractional
 
 instance Arbitrary CDouble where
-    arbitrary = realToFrac <$> (arbitrary :: Gen HTYPE_DOUBLE)
+    arbitrary = arbitrarySizedFractional
 
 instance Arbitrary CPtrdiff where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_PTRDIFF_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CSize where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIZE_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CWchar where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_WCHAR_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CSigAtomic where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SIG_ATOMIC_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
+deriving instance Bounded CClock
 instance Arbitrary CClock where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CLOCK_T)
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded CTime
 instance Arbitrary CTime where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_TIME_T)
+    arbitrary = arbitraryBoundedEnum
 
 # if MIN_VERSION_base(4,4,0)
+deriving instance Bounded CUSeconds
 instance Arbitrary CUSeconds where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_USECONDS_T)
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded CSUSeconds
 instance Arbitrary CSUSeconds where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SUSECONDS_T)
+    arbitrary = arbitraryBoundedEnum
 # endif
 
 instance Arbitrary CIntPtr where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INTPTR_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CUIntPtr where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UINTPTR_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CIntMax where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INTMAX_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 instance Arbitrary CUIntMax where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UINTMAX_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 
 # if defined(HTYPE_DEV_T)
 instance Arbitrary CDev where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_DEV_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_INO_T)
 instance Arbitrary CIno where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_INO_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_MODE_T)
 instance Arbitrary CMode where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_MODE_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_OFF_T)
 instance Arbitrary COff where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_OFF_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_PID_T)
 instance Arbitrary CPid where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_PID_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_SSIZE_T)
 instance Arbitrary CSsize where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SSIZE_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_GID_T)
 instance Arbitrary CGid where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_GID_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_NLINK_T)
 instance Arbitrary CNlink where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_NLINK_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_UID_T)
 instance Arbitrary CUid where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_UID_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_CC_T)
+deriving instance Bounded CCc
 instance Arbitrary CCc where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_CC_T)
+    arbitrary = arbitraryBoundedEnum
 # endif
 # if defined(HTYPE_SPEED_T)
+deriving instance Bounded CSpeed
 instance Arbitrary CSpeed where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_SPEED_T)
+    arbitrary = arbitraryBoundedEnum
 # endif
 # if defined(HTYPE_TCFLAG_T)
 instance Arbitrary CTcflag where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_TCFLAG_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 # if defined(HTYPE_RLIM_T)
 instance Arbitrary CRLim where
-    arbitrary = fromIntegral <$> (arbitrary :: Gen HTYPE_RLIM_T)
+    arbitrary = arbitrarySizedBoundedIntegral
 # endif
 #endif
 

@@ -13,12 +13,16 @@ Testing-related utility functions.
 module Spec.Utils (
       ioProperty
     , prop_matchesShow
+#if __GLASGOW_HASKELL__ >= 702
     , prop_genericShow
+#endif
     , prop_readShow
     , prop_showEq
     ) where
 
+#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic, Rep)
+#endif
 
 import           Prelude hiding (Show)
 
@@ -46,11 +50,13 @@ ioProperty = morallyDubiousIOProperty
 prop_matchesShow :: (S.Show a, T.Show a) => Int -> a -> Bool
 prop_matchesShow p x = showbPrec p (FromStringShow x) == showbPrec p x
 
+#if __GLASGOW_HASKELL__ >= 702
 -- | Verifies that a type's @Show@ instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
 prop_genericShow :: (T.Show a, Generic a, GShow (Rep a))
                  => Int -> a -> Bool
 prop_genericShow p x = showbPrec p x == genericShowbPrec p x
+#endif
 
 -- | Verifies that @read . show = id@.
 prop_readShow :: (Eq a, Read a, S.Show a) => Int -> a -> Bool

@@ -93,8 +93,10 @@ import qualified GHC.Generics as G (Fixity)
 import           GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
                                Associativity, Arity)
 #endif
+#if MIN_VERSION_base(4,4,0)
 import           GHC.IO.Encoding.Failure (CodingFailureMode)
 import           GHC.IO.Encoding.Types (CodingProgress)
+#endif
 #if MIN_VERSION_base(4,8,0)
 import           GHC.RTS.Flags
 import           GHC.StaticPtr (StaticPtrInfo)
@@ -575,11 +577,11 @@ spec = parallel $ do
         prop "(Maybe :+: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :+: Maybe) Int -> Bool)
         prop "(Maybe :*: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :*: Maybe) Int -> Bool)
         prop "(Maybe :.: Maybe) Int instance"          (prop_matchesShow :: Int -> (Maybe :.: Maybe) Int -> Bool)
+# if __GLASGOW_HASKELL__ >= 706
         prop "Fixity generic show"                     (prop_genericShow :: Int -> G.Fixity -> Bool)
         prop "Associativity generic show"              (prop_genericShow :: Int -> Associativity -> Bool)
         prop "Arity generic show"                      (prop_genericShow :: Int -> Arity -> Bool)
         prop "U1 Int generic show"                     (prop_genericShow :: Int -> U1 Int -> Bool)
-# if __GLASGOW_HASKELL__ >= 706
         prop "Par1 Int generic show"                   (prop_genericShow :: Int -> Par1 Int -> Bool)
         prop "Rec1 Maybe Int generic show"             (prop_genericShow :: Int -> Rec1 Maybe Int -> Bool)
         prop "K1 () Int () generic show"               (prop_genericShow :: Int -> K1 () Int () -> Bool)
@@ -635,8 +637,10 @@ spec = parallel $ do
         prop "HandlePosn instance"                     (prop_matchesShow :: Int -> HandlePosn -> Bool)
         prop "SeekMode instance"                       (prop_matchesShow :: Int -> SeekMode -> Bool)
         prop "TextEncoding instance"                   prop_showTextEncoding
+#if MIN_VERSION_base(4,4,0)
         prop "CodingProgress instance"                 (prop_matchesShow :: Int -> CodingProgress -> Bool)
         prop "CodingFailureMode instance"              (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
+#endif
         prop "Newline instance"                        (prop_matchesShow :: Int -> Newline -> Bool)
         prop "NewlineMode instance"                    (prop_matchesShow :: Int -> NewlineMode -> Bool)
 

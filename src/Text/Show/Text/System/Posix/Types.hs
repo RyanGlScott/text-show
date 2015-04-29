@@ -76,15 +76,12 @@ import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Foreign.C.Types ()
 
 #if !(MIN_VERSION_base(4,5,0))
+import Data.Int
+import Data.Word
+
 import GHC.Prim (unsafeCoerce#)
 
-import Text.Show.Text.Data.Integral ( showbInt32Prec
-                                    , showbInt64Prec
-                                    , showbWord8
-                                    , showbWord32
-                                    , showbWord64
-                                    )
-
+# include "HsBaseConfig.h"
 # include "inline.h"
 #endif
 
@@ -97,7 +94,7 @@ showbCDev :: CDev -> Builder
 showbCDev = showb
 {-# INLINE showbCDev #-}
 # else
-showbCDev c = showbWord64 $ unsafeCoerce# c
+showbCDev = unsafeCoerce# (showb :: HTYPE_DEV_T -> Builder)
 # endif
 #endif
 
@@ -110,7 +107,7 @@ showbCIno :: CIno -> Builder
 showbCIno = showb
 {-# INLINE showbCIno #-}
 # else
-showbCIno c = showbWord64 $ unsafeCoerce# c
+showbCIno = unsafeCoerce# (showb :: HTYPE_INO_T -> Builder)
 # endif
 #endif
 
@@ -123,7 +120,7 @@ showbCMode :: CMode -> Builder
 showbCMode = showb
 {-# INLINE showbCMode #-}
 # else
-showbCMode c = showbWord32 $ unsafeCoerce# c
+showbCMode = unsafeCoerce# (showb :: HTYPE_MODE_T -> Builder)
 # endif
 #endif
 
@@ -136,7 +133,7 @@ showbCOffPrec :: Int -> COff -> Builder
 showbCOffPrec = showbPrec
 {-# INLINE showbCOffPrec #-}
 # else
-showbCOffPrec p c = showbInt64Prec p $ unsafeCoerce# c
+showbCOffPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_OFF_T -> Builder)
 # endif
 #endif
 
@@ -149,7 +146,7 @@ showbCPidPrec :: Int -> CPid -> Builder
 showbCPidPrec = showbPrec
 {-# INLINE showbCPidPrec #-}
 # else
-showbCPidPrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCPidPrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_PID_T -> Builder)
 # endif
 #endif
 
@@ -162,7 +159,7 @@ showbCSsizePrec :: Int -> CSsize -> Builder
 showbCSsizePrec = showbPrec
 {-# INLINE showbCSsizePrec #-}
 # else
-showbCSsizePrec p c = showbInt32Prec p $ unsafeCoerce# c
+showbCSsizePrec = unsafeCoerce# (showbPrec :: Int -> HTYPE_SSIZE_T -> Builder)
 # endif
 #endif
 
@@ -175,7 +172,7 @@ showbCGid :: CGid -> Builder
 showbCGid = showb
 {-# INLINE showbCGid #-}
 # else
-showbCGid c = showbWord32 $ unsafeCoerce# c
+showbCGid = unsafeCoerce# (showb :: HTYPE_GID_T -> Builder)
 # endif
 #endif
 
@@ -188,7 +185,7 @@ showbCNlink :: CNlink -> Builder
 showbCNlink = showb
 {-# INLINE showbCNlink #-}
 # else
-showbCNlink c = showbWord32 $ unsafeCoerce# c
+showbCNlink = unsafeCoerce# (showb :: HTYPE_NLINK_T -> Builder)
 # endif
 #endif
 
@@ -201,7 +198,7 @@ showbCUid :: CUid -> Builder
 showbCUid = showb
 {-# INLINE showbCUid #-}
 # else
-showbCUid c = showbWord32 $ unsafeCoerce# c
+showbCUid = unsafeCoerce# (showb :: HTYPE_UID_T -> Builder)
 # endif
 #endif
 
@@ -214,7 +211,7 @@ showbCCc :: CCc -> Builder
 showbCCc = showb
 {-# INLINE showbCCc #-}
 # else
-showbCCc c = showbWord8 $ unsafeCoerce# c
+showbCCc = unsafeCoerce# (showb :: HTYPE_CC_T -> Builder)
 # endif
 #endif
 
@@ -227,7 +224,7 @@ showbCSpeed :: CSpeed -> Builder
 showbCSpeed = showb
 {-# INLINE showbCSpeed #-}
 # else
-showbCSpeed c = showbWord32 $ unsafeCoerce# c
+showbCSpeed = unsafeCoerce# (showb :: HTYPE_SPEED_T -> Builder)
 # endif
 #endif
 
@@ -240,7 +237,7 @@ showbCTcflag :: CTcflag -> Builder
 showbCTcflag = showb
 {-# INLINE showbCTcflag #-}
 # else
-showbCTcflag c = showbWord32 $ unsafeCoerce# c
+showbCTcflag = unsafeCoerce# (showb :: HTYPE_TCFLAG_T -> Builder)
 # endif
 #endif
 
@@ -253,7 +250,7 @@ showbCRLim :: CRLim -> Builder
 showbCRLim = showb
 {-# INLINE showbCRLim #-}
 # else
-showbCRLim c = showbWord64 $ unsafeCoerce# c
+showbCRLim = unsafeCoerce# (showb :: HTYPE_RLIM_T -> Builder)
 # endif
 #endif
 
