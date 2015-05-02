@@ -15,13 +15,13 @@ module Instances.Data.Typeable () where
 
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (TyCon(..), TypeRep(..))
+import Instances.Utils ((<@>))
 #else
 import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
 import Test.QuickCheck (Gen)
 #endif
 
 import Instances.GHC.Fingerprint ()
-import Instances.Utils ((<@>))
 
 import Prelude ()
 import Prelude.Compat

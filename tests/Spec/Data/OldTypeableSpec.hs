@@ -1,5 +1,9 @@
 {-# LANGUAGE CPP #-}
 
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
+#endif
+
 {-|
 Module:      Spec.Data.OldTypeableSpec
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -25,7 +29,7 @@ import Data.OldTypeable (TyCon, TypeRep)
 import Spec.Utils (prop_matchesShow)
 
 import Test.Hspec (describe)
-import Test.Hspec (prop)
+import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()

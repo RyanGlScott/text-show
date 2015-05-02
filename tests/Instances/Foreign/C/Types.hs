@@ -24,7 +24,10 @@ import Test.QuickCheck (Arbitrary(..))
 
 #if !(MIN_VERSION_base(4,5,0))
 import Data.Int
+# if MIN_VERSION_base(4,4,0)
 import Data.Word
+# endif
+
 import Test.QuickCheck (Gen, arbitrarySizedBoundedIntegral, arbitrarySizedFractional)
 import Unsafe.Coerce (unsafeCoerce)
 

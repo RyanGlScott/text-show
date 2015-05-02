@@ -1,5 +1,9 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+
+#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+{-# OPTIONS_GHC -fno-warn-orphans               #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
+#endif
 
 {-|
 Module:      Instances.Data.OldTypeable
