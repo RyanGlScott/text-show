@@ -22,6 +22,9 @@ import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
 import Instances.GHC.Fingerprint ()
 import Instances.Utils ((<@>))
 
+import Prelude ()
+import Prelude.Compat
+
 import Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary TypeRep where
