@@ -13,6 +13,10 @@ Portability: GHC
 module Instances.Data.Dynamic () where
 
 import Data.Dynamic (Dynamic, toDyn)
+
+import Prelude ()
+import Prelude.Compat
+
 import Test.QuickCheck (Arbitrary(..), Gen)
 
 instance Arbitrary Dynamic where
