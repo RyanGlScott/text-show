@@ -16,6 +16,7 @@ module Instances.Data.OldTypeable () where
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable.Internal (TyCon(..), TypeRep(..))
 
+import Instances.GHC.Fingerprint ()
 import Instances.Utils ((<@>))
 
 import Prelude ()

@@ -17,6 +17,7 @@ module Instances.Data.Typeable () where
 import Data.Typeable.Internal (TyCon(..), TypeRep(..))
 #else
 import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
+import Test.QuickCheck (Gen)
 #endif
 
 import Instances.GHC.Fingerprint ()

@@ -49,7 +49,7 @@ spec = parallel $
         prop "IsZero 0 instance"   (prop_matchesShow :: Int -> IsZero 0 -> Bool)
         prop "IsZero 1 instance"   (prop_matchesShow :: Int -> IsZero 1 -> Bool)
         prop "Sing 0 instance"     (prop_matchesShow :: Int -> Sing 0 -> Bool)
-        prop "Sing \"a\" instance" (prop_matchesShow :: Ing -> Sing "a" -> Bool)
+        prop "Sing \"a\" instance" (prop_matchesShow :: Int -> Sing "a" -> Bool)
 # endif
 #else
     pure ()

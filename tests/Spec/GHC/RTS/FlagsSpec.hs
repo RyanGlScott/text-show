@@ -17,14 +17,12 @@ import Instances.GHC.RTS.Flags ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesShow)
-
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,8,0)
 import GHC.RTS.Flags
 
-import Spec.Utils (ioProperty)
+import Spec.Utils (ioProperty, prop_matchesShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
