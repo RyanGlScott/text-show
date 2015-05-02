@@ -1,4 +1,9 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP       #-}
+
+#if MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
+{-# LANGUAGE PolyKinds #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|

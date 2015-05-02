@@ -158,10 +158,6 @@ library
   install-includes:    inline.h
                      , utils.h
 
---  if impl(ghc >= 7.8)
---    exposed-modules:   Text.Show.Text.Data.Type.Coercion
---                       Text.Show.Text.Data.Type.Equality
-
 test-suite text-show-spec
   type:                exitcode-stdio-1.0
   main-is:             Spec.hs

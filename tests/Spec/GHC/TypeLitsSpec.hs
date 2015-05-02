@@ -2,7 +2,6 @@
 
 #if MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
 #endif
 
 {-|
