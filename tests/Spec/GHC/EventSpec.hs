@@ -19,7 +19,7 @@ import Prelude.Compat
 
 import Test.Hspec (Spec, hspec, parallel)
 
-#if !(defined(__GHCJS__)) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
 import GHC.Event (Event)
 
 import Spec.Utils (prop_matchesShow)
@@ -34,7 +34,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $
-#if !(defined(__GHCJS__)) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
     describe "Text.Show.Text.GHC.Event" $ do
         prop "Event instance" (prop_matchesShow :: Int -> Event -> Bool)
 --         prop "FdKey instance" (prop_matchesShow :: Int -> FdKey -> Bool)

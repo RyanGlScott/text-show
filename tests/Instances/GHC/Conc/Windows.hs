@@ -14,8 +14,8 @@ Portability: GHC
 -}
 module Instances.GHC.Conc.Windows () where
 
-#if !(defined(__GHCJS__)) && defined(mingw32_HOST_OS)
-import GHC.Conc.Windows (ConsoleEvent)
+#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+import GHC.Conc.Windows (ConsoleEvent(..))
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 deriving instance Bounded ConsoleEvent
