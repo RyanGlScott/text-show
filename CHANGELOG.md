@@ -1,5 +1,6 @@
 # 0.8
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
+* Added `showbSingPrec` to `Text.Show.Text.GHC.TypeLits` (if using `base-4.6`)
 * Modules which were previously exported only if using a recent-enough version of GHC/`base` (e.g., `Text.Show.Text.GHC.Generics`) are now always exposed. If the functionality that the module provides is not available on a given version of GHC/`base`, the module will not expose anything.
 * Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
 * Added `showbUnicodeException`, `showbI16Prec`, `showbDecodingPrec`, and `showbSizePrec` functions (and corresponding `Show` instances) to `Text.Show.Text.Data.Text`
@@ -12,9 +13,7 @@
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
 * TODO: Have `base-compat` backport `showFFloatAlt` and `showGFloatAlt`, and use them in the test suite
-* TODO: Re-add `Arity`/`Associativity`/`Fixity`/`U1 p`/`(f :*: g) p` generic show tests once `base-orphans` gets fixed
 * TODO: Re-add `Proxy Int` generic show test once `tagged` gets fixed
-* TODO: Remove orphan Show Fingerprint instance after it has been added to base-orphans
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons

@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.BuilderSpec (main, spec) where
 
-import Instances.BaseAndFriends ()
+import Instances.Data.Text ()
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)

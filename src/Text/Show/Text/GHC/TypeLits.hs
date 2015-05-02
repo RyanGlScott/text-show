@@ -30,9 +30,10 @@ module Text.Show.Text.GHC.TypeLits (
       showbSomeNatPrec
     , showbSomeSymbol
     ) where
-#elif MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
+#elif MIN_VERSION_base(4,6,0)
       showbIsEven
     , showbIsZero
+    , showbSingPrec
     ) where
 #else
     ) where
@@ -90,6 +91,13 @@ showbIsZero :: IsZero n -> Builder
 showbIsZero IsZero     = s '0'
 showbIsZero (IsSucc n) = s '(' <> showb n <> " + 1)"
 {-# INLINE showbIsZero #-}
+
+-- | Convert a 'Sing' value to a 'Builder' with the given precedence.
+-- 
+-- /Since: 0.8/
+showbSingPrec :: (SingE (Kind :: k) rep, Show rep) => Int -> Sing (a :: k) -> Builder
+showbSingPrec p = showbPrec p . fromSing
+{-# INLINE showbSingPrec #-}
 # endif
 
 # if MIN_VERSION_base(4,7,0)
@@ -110,7 +118,7 @@ instance Show (IsZero n) where
     {-# INLINE showb #-}
 
 instance (SingE (Kind :: k) rep, Show rep) => Show (Sing (a :: k)) where
-    showbPrec p = showbPrec p . fromSing
+    showbPrec = showbSingPrec
     {-# INLINE showbPrec #-}
 # endif
 

@@ -65,7 +65,7 @@ library
                        Text.Show.Text.Debug.Trace
                        Text.Show.Text.Debug.Trace.TH
                        Text.Show.Text.TH
-                       
+
                        Text.Show.Text.Control.Applicative
                        Text.Show.Text.Control.Concurrent
                        Text.Show.Text.Control.Exception
@@ -101,32 +101,32 @@ library
                        Text.Show.Text.System.IO
                        Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Text.Read
-                       
+
                        -- Only exports functions if using Windows
                        Text.Show.Text.GHC.Conc.Windows
-                       
+
                        -- Only exports functions if base >= 4.4
                        Text.Show.Text.GHC.Fingerprint
                        -- Only exports functions if base >= 4.4 and not using Windows
                        Text.Show.Text.GHC.Event
-                       
+
                        -- Only exports functions if GHC >= 7.2
                        Text.Show.Text.Debug.Trace.Generic
                        Text.Show.Text.Generic
                        Text.Show.Text.GHC.Generics
-                       
+
                        -- Only exports functions if base >= 4.5
                        Text.Show.Text.GHC.Stats
-                       
+
                        -- Only exports functions if base >= 4.6
                        Text.Show.Text.GHC.TypeLits
-                       
+
                        -- Only exports functions if base >= 4.7
                        Text.Show.Text.Data.Type.Coercion
                        Text.Show.Text.Data.Type.Equality
                        -- Only exports functions if base >= 4.7 && < 4.8
                        Text.Show.Text.Data.OldTypeable
-                       
+
                        -- Only exports functions if base >= 4.8
                        Text.Show.Text.GHC.RTS.Flags
                        Text.Show.Text.GHC.StaticPtr
@@ -166,14 +166,132 @@ test-suite text-show-spec
   type:                exitcode-stdio-1.0
   main-is:             Spec.hs
   other-modules:       Derived
-                       Instances.BaseAndFriends
+
                        Instances.Derived
+                       Instances.FromStringTextShow
                        Instances.Utils
-                       Spec.BaseAndFriendsSpec
+
+                       Instances.Control.Applicative
+                       Instances.Control.Concurrent
+                       Instances.Control.Exception
+                       Instances.Control.Monad.ST
+                       Instances.Data.ByteString
+                       Instances.Data.Char
+                       Instances.Data.Data
+                       Instances.Data.Dynamic
+                       Instances.Data.Floating
+                       Instances.Data.Functor.Identity
+                       Instances.Data.Monoid
+                       Instances.Data.Ord
+                       Instances.Data.Proxy
+                       Instances.Data.Text
+                       Instances.Data.Tuple
+                       Instances.Data.Typeable
+                       Instances.Data.Version
+                       Instances.Foreign.C.Types
+                       Instances.Foreign.Ptr
+                       Instances.Numeric.Natural
+                       Instances.System.Exit
+                       Instances.System.IO
+                       Instances.System.Posix.Types
+                       Instances.Text.Read
+
+                       -- Only exports functions if using Windows
+                       Instances.GHC.Conc.Windows
+
+                       -- Only exports functions if base >= 4.4
+                       Instances.GHC.Fingerprint
+                       -- Only exports functions if base >= 4.4 and not using Windows
+                       Instances.GHC.Event
+
+                       -- Only exports functions if GHC >= 7.2
+                       Instances.Generic
+                       Instances.GHC.Generics
+
+                       -- Only exports functions if base >= 4.5
+                       Instances.GHC.Stats
+
+                       -- Only exports functions if base >= 4.6
+                       Instances.GHC.TypeLits
+
+                       -- Only exports functions if base >= 4.7
+                       Instances.Data.Type.Coercion
+                       Instances.Data.Type.Equality
+                       -- Only exports functions if base >= 4.7 && < 4.8
+                       Instances.Data.OldTypeable
+
+                       -- Only exports functions if base >= 4.8
+                       Instances.GHC.RTS.Flags
+                       Instances.GHC.StaticPtr
+
                        Spec.BuilderSpec
                        Spec.DerivedSpec
+                       Spec.FromStringTextShowSpec
                        Spec.MkShowSpec
                        Spec.Utils
+
+                       Spec.Control.ApplicativeSpec
+                       Spec.Control.ConcurrentSpec
+                       Spec.Control.ExceptionSpec
+                       Spec.Control.Monad.STSpec
+                       Spec.Data.ArraySpec
+                       Spec.Data.BoolSpec
+                       Spec.Data.ByteStringSpec
+                       Spec.Data.CharSpec
+                       Spec.Data.ComplexSpec
+                       Spec.Data.DataSpec
+                       Spec.Data.DynamicSpec
+                       Spec.Data.EitherSpec
+                       Spec.Data.FixedSpec
+                       Spec.Data.FloatingSpec
+                       Spec.Data.Functor.IdentitySpec
+                       Spec.Data.IntegralSpec
+                       Spec.Data.ListSpec
+                       Spec.Data.MaybeSpec
+                       Spec.Data.MonoidSpec
+                       Spec.Data.OrdSpec
+                       Spec.Data.ProxySpec
+                       Spec.Data.RatioSpec
+                       Spec.Data.TextSpec
+                       Spec.Data.TupleSpec
+                       Spec.Data.TypeableSpec
+                       Spec.Data.VersionSpec
+                       Spec.Foreign.C.TypesSpec
+                       Spec.Foreign.PtrSpec
+                       Spec.FunctionsSpec
+                       Spec.Numeric.NaturalSpec
+                       Spec.System.ExitSpec
+                       Spec.System.IOSpec
+                       Spec.System.Posix.TypesSpec
+                       Spec.Text.ReadSpec
+
+                       -- Only exports functions if using Windows
+                       Spec.GHC.Conc.WindowsSpec
+
+                       -- Only exports functions if base >= 4.4
+                       Spec.GHC.FingerprintSpec
+                       -- Only exports functions if base >= 4.4 and not using Windows
+                       Spec.GHC.EventSpec
+
+                       -- Only exports functions if GHC >= 7.2
+                       Spec.GenericSpec
+                       Spec.GHC.GenericsSpec
+
+                       -- Only exports functions if base >= 4.5
+                       Spec.GHC.StatsSpec
+
+                       -- Only exports functions if base >= 4.6
+                       Spec.GHC.TypeLitsSpec
+
+                       -- Only exports functions if base >= 4.7
+                       Spec.Data.Type.CoercionSpec
+                       Spec.Data.Type.EqualitySpec
+                       -- Only exports functions if base >= 4.7 && < 4.8
+                       Spec.Data.OldTypeableSpec
+
+                       -- Only exports functions if base >= 4.8
+                       Spec.GHC.RTS.FlagsSpec
+                       Spec.GHC.StaticPtrSpec
   build-depends:       array                >= 0.3    && < 0.6
                      , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.1  && < 1
@@ -199,4 +317,4 @@ test-suite text-show-spec
   includes:            overlap.h
                      , utils.h
   install-includes:    overlap.h
-                     , utils.h              
+                     , utils.h
