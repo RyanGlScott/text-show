@@ -29,6 +29,9 @@ import Text.Show.Text.Data.Integral ()
 
 -- | Convert a 'Ratio' to a 'Builder' with the given precedence.
 -- 
+-- Note that on @base-4.3.0.0@, this function must have a @('Show' a, 'Integral' a)@
+-- constraint instead of just a @('Show' a)@ constraint.
+-- 
 -- /Since: 0.5/
 showbRatioPrec ::
 #if MIN_VERSION_base(4,4,0)

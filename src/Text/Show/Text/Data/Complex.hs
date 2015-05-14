@@ -34,6 +34,8 @@ import Text.Show.Text.TH.Internal (mkShowbPrec)
 
 -- | Convert a 'Complex' value to a 'Builder' with the given precedence.
 -- 
+-- Note that on @base-4.3.0.0@, this function must have a @('Show' a, 'RealFloat' a)@
+-- constraint instead of just a @('Show' a)@ constraint.
 -- /Since: 0.5/
 #if MIN_VERSION_base(4,4,0)
 showbComplexPrec :: Show a
