@@ -1,5 +1,6 @@
 # 0.8
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
+* The `Show` instance for `Ratio a` now only requires a `Show a` constraint if using `base-4.4.0.0` or later (if using `base-4.3.0.0`, it requires a `(Show a, Integral a)` constraint)
 * Added `showbSingPrec` to `Text.Show.Text.GHC.TypeLits` (if using `base-4.6`)
 * Modules which were previously exported only if using a recent-enough version of GHC/`base` (e.g., `Text.Show.Text.GHC.Generics`) are now always exposed. If the functionality that the module provides is not available on a given version of GHC/`base`, the module will not expose anything.
 * Bump lower version bounds of `text` to 0.11.1 due to reexporting `FPFormat`
@@ -12,8 +13,6 @@
 * Changes test-suite to use `hspec`, which allows for it to be built on GHC 7.0 and 7.2
 
 * TODO: `Show1` and `Show2` classes a la `transformers`. Derivable?
-* TODO: Have `base-compat` backport `showFFloatAlt` and `showGFloatAlt`, and use them in the test suite
-* TODO: Re-add `Proxy Int` generic show test once `tagged` gets fixed
 
 ### 0.7.0.1
 * Disabled `print`-related tests, as they sporadically break referential transparency for unknown reasons

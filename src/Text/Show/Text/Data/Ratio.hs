@@ -16,10 +16,9 @@ Monomorphic 'Show' function for 'Ratio' values.
 module Text.Show.Text.Data.Ratio (showbRatioPrec) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Ratio (Ratio, numerator, denominator)
 import Data.Text.Lazy.Builder (Builder)
 
-import GHC.Real (ratioPrec, ratioPrec1)
+import GHC.Real (Ratio(..), ratioPrec, ratioPrec1)
 
 import Prelude hiding (Show)
 
@@ -32,20 +31,20 @@ import Text.Show.Text.Data.Integral ()
 -- 
 -- /Since: 0.5/
 showbRatioPrec ::
-#if MIN_VERSION_base(4,8,1)
+#if MIN_VERSION_base(4,4,0)
                   Show a
 #else
                   (Show a, Integral a)
 #endif
                => Int -> Ratio a -> Builder
-showbRatioPrec p q = showbParen (p > ratioPrec) $
-       showbPrec ratioPrec1 (numerator q)
+showbRatioPrec p (numer :% denom) = showbParen (p > ratioPrec) $
+       showbPrec ratioPrec1 numer
     <> " % "
-    <> showbPrec ratioPrec1 (denominator q)
+    <> showbPrec ratioPrec1 denom
 {-# INLINE showbRatioPrec #-}
 
 instance
-#if MIN_VERSION_base(4,8,1)
+#if MIN_VERSION_base(4,4,0)
          Show a
 #else
          (Show a, Integral a)

@@ -31,7 +31,7 @@ import Test.QuickCheck (getNonNegative)
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 import Test.QuickCheck.Instances ()
 
 instance Arbitrary Builder where
@@ -41,9 +41,7 @@ instance Arbitrary I16 where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary UnicodeException where
-    arbitrary = oneof [ DecodeError <$> arbitrary <*> arbitrary
-                      , EncodeError <$> arbitrary <*> arbitrary
-                      ]
+    arbitrary = DecodeError <$> arbitrary <*> arbitrary
 
 #if MIN_VERSION_text(1,0,0)
 instance Arbitrary Decoding where

@@ -3,6 +3,7 @@
 #if MIN_VERSION_text(0,9,0)
 {-# LANGUAGE TemplateHaskell   #-}
 #endif
+{-# OPTIONS_GHC -fno-warn-deprecations #-} -- TODO: Remove this later
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Text

@@ -16,7 +16,8 @@ import Data.Text.Lazy.Builder.RealFloat (FPFormat)
 
 import Instances.Data.Floating ()
 
-import Numeric (showEFloat, showFFloat, showGFloat)
+import Numeric.Compat (showEFloat, showFFloat, showGFloat,
+                       showFFloatAlt, showGFloatAlt)
 
 import Prelude ()
 import Prelude.Compat
@@ -28,12 +29,8 @@ import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck (Gen, arbitrary, suchThat)
 
 import Text.Show.Text (Builder, fromString)
-import Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat)
-
-#if MIN_VERSION_base(4,7,0)
-import Numeric (showFFloatAlt, showGFloatAlt)
-import Text.Show.Text.Data.Floating (showbFFloatAlt, showbGFloatAlt)
-#endif
+import Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat,
+                                     showbFFloatAlt, showbGFloatAlt)
 
 main :: IO ()
 main = hspec spec
@@ -45,10 +42,8 @@ spec = parallel . describe "Text.Show.Text.Data.Floating" $ do
     prop "showbEFloat output"    $ prop_showXFloat showEFloat showbEFloat
     prop "showbFFloat output"    $ prop_showXFloat showFFloat showbFFloat
     prop "showbGFloat output"    $ prop_showXFloat showGFloat showbGFloat
-#if MIN_VERSION_base(4,7,0)
     prop "showbFFloatAlt output" $ prop_showXFloat showFFloatAlt showbFFloatAlt
     prop "showbGFloatAlt output" $ prop_showXFloat showGFloatAlt showbGFloatAlt
-#endif
     prop "FPFormat instance"       (prop_matchesShow :: Int -> FPFormat -> Bool)
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
