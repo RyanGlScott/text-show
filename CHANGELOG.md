@@ -2,7 +2,7 @@
 * Retroactive `CHANGELOG` update
 
 ## 0.8.1
-* Fix test suite build with older versions of @QuickCheck@
+* Fix test suite build with older versions of `QuickCheck`
 
 # 0.8
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
