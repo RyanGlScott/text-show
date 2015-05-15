@@ -1,3 +1,9 @@
+### 0.8.1.1
+* Retroactive `CHANGELOG` update
+
+## 0.8.1
+* Fix test suite build with older versions of @QuickCheck@
+
 # 0.8
 * Exported `formatRealFloatB` and `formatRealFloatAltB` from `Text.Show.Text.Data.Floating`. Reexported `FPFormat` (from `text`) in the same module, and added a `Text` `Show` instance for it.
 * The `Show` instance for `Ratio a` now only requires a `Show a` constraint if using `base-4.4.0.0` or later (if using `base-4.3.0.0`, it requires a `(Show a, Integral a)` constraint)
