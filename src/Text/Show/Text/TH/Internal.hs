@@ -407,35 +407,33 @@ mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 -- 
 -- /Since: 0.5/
 data PragmaOptions = PragmaOptions {
-    inlineShowbPrec  :: Bool    -- ^ Whether to inline 'showbPrec'
-  , inlineShowb      :: Bool    -- ^ Whether to inline 'showb'
-  , inlineShowbList  :: Bool    -- ^ Whether to inline 'showbList'
-  , specializeTypes :: [Q Type] -- ^ Types for which to create specialized instance declarations
+    inlineFunctions :: [Name]   -- ^ Inline these functions
+  , specializeTypes :: [Q Type] -- ^ Create specialized instance declarations for these types
 }
 
 -- | Do not generate any pragmas with a 'T.Show' instance.
 -- 
 -- /Since: 0.5/
 defaultPragmaOptions :: PragmaOptions
-defaultPragmaOptions = PragmaOptions False False False []
+defaultPragmaOptions = PragmaOptions [] []
 
 -- | Inline the 'showbPrec' function in a 'T.Show' instance.
 -- 
 -- /Since: 0.5/
 defaultInlineShowbPrec :: PragmaOptions
-defaultInlineShowbPrec = defaultPragmaOptions { inlineShowbPrec = True }
+defaultInlineShowbPrec = defaultPragmaOptions { inlineFunctions = ['showbPrec] }
 
 -- | Inline the 'showb' function in a 'T.Show' instance.
 -- 
 -- /Since: 0.5/
 defaultInlineShowb :: PragmaOptions
-defaultInlineShowb = defaultPragmaOptions { inlineShowb = True }
+defaultInlineShowb = defaultPragmaOptions { inlineFunctions = ['showb] }
 
 -- | Inline the 'showbList' function in a 'T.Show' instance.
 -- 
 -- /Since: 0.5/
 defaultInlineShowbList :: PragmaOptions
-defaultInlineShowbList = defaultPragmaOptions { inlineShowbList = True }
+defaultInlineShowbList = defaultPragmaOptions { inlineFunctions = ['showbList] }
 
 -- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
@@ -697,33 +695,23 @@ showbPrecDecs _    cons =
                                (normalB $ consToShow cons)
                                []
                       ]
-    ] ++ inlineShowbPrecDec
-      ++ inlineShowbDec
-      ++ inlineShowbListDec
+    ] ++ inlineDecs
       ++ specializeDecs
   where
-    inlineShowbPrecDec, inlineShowbDec, inlineShowbListDec :: [Q Dec]
-#if __GLASGOW_HASKELL__ > 702
-    inlineShowbPrecDec = inline inlineShowbPrec 'showbPrec
-    inlineShowbDec     = inline inlineShowb 'showb
-    inlineShowbListDec = inline inlineShowbList 'showbList
+    inlineDecs :: [Q Dec]
+#if __GLASGOW_HASKELL__ <= 702
+    inlineDecs = []
 #else
-    inlineShowbPrecDec = []
-    inlineShowbDec     = []
-    inlineShowbListDec = []
-#endif
-          
-#if __GLASGOW_HASKELL__ > 702
-    inline :: (PragmaOptions -> Bool) -> Name -> [Q Dec]
-    inline isInlining funName
-        | isInlining opts = [ pragInlD funName
+    inlineDecs = map inline $ inlineFunctions opts
+
+    inline :: Name -> Q Dec
+    inline funName =
+        pragInlD funName
 # if MIN_VERSION_template_haskell(2,8,0)
-                                       Inline FunLike AllPhases
+                 Inline FunLike AllPhases
 # else
-                                       (inlineSpecNoPhase True False)
+                 (inlineSpecNoPhase True False)
 # endif
-                            ]
-        | otherwise       = []
 #endif
           
     specializeDecs :: [Q Dec]
