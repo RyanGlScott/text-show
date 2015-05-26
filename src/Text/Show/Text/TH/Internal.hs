@@ -56,6 +56,7 @@ import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
+import           Data.Traversable (forM)
 
 import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
@@ -211,25 +212,21 @@ deriveShowTyCon :: PragmaOptions
                 -> Q [Dec]
 deriveShowTyCon opts tyConName = withTyCon tyConName fromCons
   where
-    fromCons :: [TyVarBndr] -> [Con] -> Q [Dec]
-    fromCons tvbs cons = (:[]) <$>
-        instanceD (applyCon ''T.Show typeNames)
-                  (appT (conT ''T.Show) instanceType)
+    fromCons :: [Name] -> [Con] -> Q [Dec]
+    fromCons tyVarNames cons = (:[]) <$>
+        instanceD (return instanceCxt)
+                  (return $ AppT (ConT ''T.Show) instanceType)
                   (showbPrecDecs opts cons)
       where
-        typeNames :: [Name]
-        typeNames = map tvbName tvbs
-        
-        instanceType :: Q Type
-        instanceType = foldl' appT (conT tyConName) $ map varT typeNames
+        (instanceCxt, instanceType) = cxtAndTypeTyCon tyConName tyVarNames
 
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Generates a 'T.Show' instance declaration for a data family name.
 deriveShowDataFam :: PragmaOptions
                   -> Name
                   -> Q [Dec]
-deriveShowDataFam opts dataFamName = withDataFam dataFamName $ \tvbs decs ->
-    flip mapM decs $ deriveShowDataFamFromDec opts dataFamName tvbs
+deriveShowDataFam opts dataFamName = withDataFam dataFamName $ \tyVarNames decs ->
+    forM decs $ deriveShowDataFamFromDec opts dataFamName tyVarNames
 
 -- | Generates a 'T.Show' instance declaration for a data family instance constructor.
 deriveShowDataFamInst :: PragmaOptions
@@ -242,61 +239,15 @@ deriveShowDataFamInst opts dataFamInstName = (:[]) <$>
 -- code is used by 'deriveShowDataFam' and 'deriveShowDataFamInst' alike.
 deriveShowDataFamFromDec :: PragmaOptions
                          -> Name
-                         -> [TyVarBndr]
+                         -> [Name]
                          -> Dec
                          -> Q Dec
-deriveShowDataFamFromDec opts parentName tvbs dec =
-    instanceD (applyCon ''T.Show lhsTypeNames)
-              (appT (conT ''T.Show) instanceType)
+deriveShowDataFamFromDec opts parentName tyVarNames dec =
+    instanceD (return instanceCxt)
+              (return $ AppT (ConT ''T.Show) instanceType)
               (showbPrecDecs opts $ decCons [dec])
   where
-    typeNames :: [Name]
-    typeNames = map tvbName tvbs
-    
-    -- It seems that Template Haskell's representation of the type variable binders
-    -- in a data family instance declaration has changed considerably with each new
-    -- version. Yikes.
-    -- 
-    -- In @template-haskell-2.8.0.0@, only the TyVarBndrs up to the rightmost non-type
-    -- variable are provided, so we have to do some careful Name manipulation to get
-    -- the LHS of the instance context just right.
-    -- 
-    -- Other versions of @template-haskell@ seem a bit more sensible.
-    lhsTypeNames :: [Name]
-# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
-    lhsTypeNames = filterTyVars typeNames instTypes
-# else
-    lhsTypeNames = filterTyVars (take (length instTypes) typeNames) instTypes
-                ++ drop (length instTypes) typeNames
-# endif
-
-    filterTyVars :: [Name] -> [Type] -> [Name]
-    filterTyVars ns     (SigT t _:ts) = filterTyVars ns (t:ts)
-    filterTyVars (_:ns) (VarT n  :ts) = n : filterTyVars ns ts
-    filterTyVars (_:ns) (_       :ts) = filterTyVars ns ts
-    filterTyVars []     _             = []
-    filterTyVars _      []            = []
-
-    rhsTypes :: [Type]
-    rhsTypes = instTypes ++ drop (length instTypes) (map VarT typeNames)
-    
-    instTypes :: [Type]
-    instTypes = let tys = case dec of
-                              DataInstD    _ _ tys' _ _ -> tys'
-                              NewtypeInstD _ _ tys' _ _ -> tys'
-                              _ -> error "Text.Show.Text.TH.deriveShow: The impossible happened."
-# if MIN_VERSION_template_haskell(2,10,0)
-                in tys
-# else
-                -- If PolyKinds is enabled, the first entries in this list will be
-                -- kind signatures on early versions of GHC, so drop them
-                in if length tys > length tvbs
-                      then drop (length tvbs) tys
-                      else tys
-# endif
-
-    instanceType :: Q Type
-    instanceType = foldl' appT (conT parentName) $ map return rhsTypes
+    (instanceCxt, instanceType) = cxtAndTypeDataFamInstCon parentName tyVarNames dec
 #endif
 
 {- $mk
@@ -647,9 +598,9 @@ intConst = const
 
 -- | Extracts a plain type constructor's information.
 withTyCon :: Name -- ^ Name of the plain type constructor
-            -> ([TyVarBndr] -> [Con] -> Q a)
+            -> ([Name] -> [Con] -> Q a)
             -- ^ Function that generates the actual code. Will be applied
-            -- to the type variable binders and constructors extracted
+            -- to the type variable names and constructors extracted
             -- from the given 'Name'.
             -> Q a
             -- ^ Resulting value in the 'Q'uasi monad.
@@ -658,8 +609,8 @@ withTyCon name f = do
     case info of
         TyConI dec ->
             case dec of
-                DataD    _ _ tvbs cons _ -> f tvbs cons
-                NewtypeD _ _ tvbs con  _ -> f tvbs [con]
+                DataD    _ _ tvbs cons _ -> f (map tvbName tvbs) cons
+                NewtypeD _ _ tvbs con  _ -> f (map tvbName tvbs) [con]
                 other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data type or newtype."
         _ -> error $ ns ++ "The name must be of a plain type constructor."
   where
@@ -669,12 +620,12 @@ withTyCon name f = do
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Extracts a data family name's information.
 withDataFam :: Name
-            -> ([TyVarBndr] -> [Dec] -> Q a)
+            -> ([Name] -> [Dec] -> Q a)
             -> Q a
 withDataFam name f = do
     info <- reify name
     case info of
-        FamilyI (FamilyD DataFam _ tvbs _) decs -> f tvbs decs
+        FamilyI (FamilyD DataFam _ tvbs _) decs -> f (map tvbName tvbs) decs
         FamilyI (FamilyD TypeFam _ _    _) _    ->
             error $ ns ++ "Cannot use a type family name."
         other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family name."
@@ -684,7 +635,7 @@ withDataFam name f = do
 
 -- | Extracts a data family instance constructor's information.
 withDataFamInstCon :: Name
-                   -> (Name -> [TyVarBndr] -> Dec -> Q a)
+                   -> (Name -> [Name] -> Dec -> Q a)
                    -> Q a
 withDataFamInstCon dficName f = do
     dficInfo <- reify dficName
@@ -692,13 +643,13 @@ withDataFamInstCon dficName f = do
         DataConI _ _ parentName _ -> do
             parentInfo <- reify parentName
             case parentInfo of
-                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \tvbs decs ->
+                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \tyVarNames decs ->
                     let sameDefDec = fromJust . flip find decs $ \dec ->
                           case dec of
                               DataInstD    _ _ _ cons _ -> any ((dficName ==) . constructorName) cons 
                               NewtypeInstD _ _ _ con  _ -> dficName == constructorName con
                               _ -> error $ ns ++ "Must be a data or newtype instance."
-                    in f parentName tvbs sameDefDec
+                    in f parentName tyVarNames sameDefDec
                 _ -> error $ ns ++ "Data constructor " ++ S.show dficName ++ " is not from a data family instance."
         other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family instance constructor."
   where
@@ -728,8 +679,8 @@ tvbName (KindedTV name _) = name
 
 -- | Applies a typeclass to several type parameters to produce the type predicate of
 -- an instance declaration.
-applyCon :: Name -> [Name] -> Q [Pred]
-applyCon con typeNames = return $ map apply typeNames
+applyCon :: Name -> [Name] -> [Pred]
+applyCon con typeNames = map apply typeNames
   where
     apply :: Name -> Pred
     apply t =
@@ -793,6 +744,74 @@ showbPrecDecs _    cons =
                                    (specializeTypes opts)
 #else
     -- There doesn't appear to be an equivalent of SpecialiseInstP in early
-    -- versions Template Haskell.
+    -- versions of Template Haskell.
     specializeDecs = []
 #endif
+
+-- Fully applies a type constructor to its type variables.
+appConT :: Name -> [Type] -> Type
+appConT = foldl' AppT . ConT
+
+-- | Deduces the 'Show' instance context of a simple type constructor, as well
+-- as the type constructor fully applied to its type variables.
+cxtAndTypeTyCon :: Name -> [Name] -> (Cxt, Type)
+cxtAndTypeTyCon tyConName tyVarNames = (instanceCxt, instanceType)
+  where
+    instanceCxt :: Cxt
+    instanceCxt = applyCon ''T.Show tyVarNames
+
+    instanceType :: Type
+    instanceType = appConT tyConName $ map VarT tyVarNames
+
+-- | Deduces the 'Show' instance context of a data family instance constructor,
+-- as well as the type constructor fully applied to its type variables.
+cxtAndTypeDataFamInstCon :: Name -> [Name] -> Dec -> (Cxt, Type)
+cxtAndTypeDataFamInstCon parentName tyVarNames dec = (instanceCxt, instanceType)
+  where
+    instanceCxt :: Cxt
+    instanceCxt = applyCon ''T.Show lhsTypeNames
+
+    instanceType :: Type
+    instanceType = appConT parentName rhsTypes
+
+    -- It seems that Template Haskell's representation of the type variable binders
+    -- in a data family instance declaration has changed considerably with each new
+    -- version. Yikes.
+    --
+    -- In @template-haskell-2.8.0.0@, only the TyVarBndrs up to the rightmost non-type
+    -- variable are provided, so we have to do some careful Name manipulation to get
+    -- the LHS of the instance context just right.
+    --
+    -- Other versions of @template-haskell@ seem a bit more sensible.
+    lhsTypeNames :: [Name]
+# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
+    lhsTypeNames = filterTyVars tyVarNames instTypes
+# else
+    lhsTypeNames = filterTyVars (take (length instTypes) tyVarNames) instTypes
+                ++ drop (length instTypes) tyVarNames
+# endif
+
+    filterTyVars :: [Name] -> [Type] -> [Name]
+    filterTyVars ns     (SigT t _:ts) = filterTyVars ns (t:ts)
+    filterTyVars (_:ns) (VarT n  :ts) = n : filterTyVars ns ts
+    filterTyVars (_:ns) (_       :ts) = filterTyVars ns ts
+    filterTyVars []     _             = []
+    filterTyVars _      []            = []
+
+    rhsTypes :: [Type]
+    rhsTypes = instTypes ++ drop (length instTypes) (map VarT tyVarNames)
+
+    instTypes :: [Type]
+    instTypes = let tys = case dec of
+                              DataInstD    _ _ tys' _ _ -> tys'
+                              NewtypeInstD _ _ tys' _ _ -> tys'
+                              _ -> error "Text.Show.Text.TH.deriveShow: The impossible happened."
+# if MIN_VERSION_template_haskell(2,10,0)
+                in tys
+# else
+                -- If PolyKinds is enabled, the first entries in this list will be
+                -- kind signatures on early versions of GHC, so drop them
+                in if length tys > length tyVarNames
+                      then drop (length tyVarNames) tys
+                      else tys
+# endif
