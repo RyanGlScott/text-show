@@ -23,6 +23,7 @@ module Text.Show.Text.Data.Floating (
     , showbGFloat
     , showbFFloatAlt
     , showbGFloatAlt
+    , showbFPFormat
     , FPFormat(..)
     , formatRealFloatB
     , formatRealFloatAltB
@@ -38,7 +39,7 @@ import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 
 import           Prelude hiding (Show)
 
-import           Text.Show.Text.Classes (Show(showbPrec), showbParen)
+import           Text.Show.Text.Classes (Show(showb, showbPrec), showbParen)
 import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
 import           Text.Show.Text.Utils (i2d, s)
 
@@ -127,13 +128,12 @@ showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloatAlt d = formatRealFloatAltB Generic d True
 {-# INLINE showbGFloatAlt #-}
 
-instance Show Float where
-    showbPrec = showbFloatPrec
-    INLINE_INST_FUN(showbPrec)
-
-instance Show Double where
-    showbPrec = showbDoublePrec
-    INLINE_INST_FUN(showbPrec)
+-- | Convert an 'FPFormat' value to a 'Builder'.
+-- 
+-- /Since: 0.9/
+showbFPFormat :: FPFormat -> Builder
+showbFPFormat = showb
+{-# INLINE showbFPFormat #-}
 
 -------------------------------------------------------------------------------
 -- GHC.Float internal functions, adapted for Builders
@@ -403,7 +403,15 @@ expts10 :: Array Int Integer
 expts10 = array (minExpt,maxExpt10) [(n,10^n) | n <- [minExpt .. maxExpt10]]
 
 -------------------------------------------------------------------------------
--- Orphan instance for FPFormat
+-- Show instances
 -------------------------------------------------------------------------------
+
+instance Show Float where
+    showbPrec = showbFloatPrec
+    INLINE_INST_FUN(showbPrec)
+
+instance Show Double where
+    showbPrec = showbDoublePrec
+    INLINE_INST_FUN(showbPrec)
 
 $(deriveShowPragmas defaultInlineShowb ''FPFormat)

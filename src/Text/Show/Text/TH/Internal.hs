@@ -98,7 +98,7 @@ $('deriveShow' ''Box)    -- instance Show a => Show (Box a) where ...
 @
 
 If you are using @template-haskell-2.7.0.0@ or later, 'deriveShow' can also be used
-to derive 'T.Show' instances for data families. Some examples:
+to derive 'T.Show' instances for data family instances. Some examples:
 
 @
 &#123;-&#35; LANGUAGE FlexibleInstances, TemplateHaskell, TypeFamilies &#35;-&#125;
@@ -148,15 +148,17 @@ Note that at the moment, there are some limitations to this approach:
 
 -}
 
--- | Generates a 'T.Show' instance declaration for the given data type or family.
+-- | Generates a 'T.Show' instance declaration for the given data type, data
+-- family, or data family instance.
 -- 
 -- /Since: 0.3/
 deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
 deriveShow = deriveShowPragmas defaultPragmaOptions
 
--- | Generates a 'T.Show' instance declaration for the given data type or family.
--- You shouldn't need to use this function unless you know what you are doing.
+-- | Generates a 'T.Show' instance declaration for the given data type, data
+-- family, or data family instance. You shouldn't need to use this function unless
+-- you know what you are doing.
 -- 
 -- Unlike 'deriveShow', this function allows configuration of whether to inline
 -- 'showbPrec', 'showb', or 'showbList'. It also allows for specializing instances
@@ -251,10 +253,10 @@ deriveShowDataFamFromDec opts parentName tyVarNames dec =
 
 {- $mk
 
-There may be scenarios in which you want to show an arbitrary data type or family
-without having to make the type an instance of 'T.Show'. For these cases,
-"Text.Show.Text.TH" provide several functions (all prefixed with @mk@) that splice
-the appropriate lambda expression into your source code.
+There may be scenarios in which you want to show an arbitrary data type or data
+family instance without having to make the type an instance of 'T.Show'. For these
+cases, "Text.Show.Text.TH" provide several functions (all prefixed with @mk@) that
+splice the appropriate lambda expression into your source code.
 
 As an example, suppose you have @data ADT = ADT@, which is not an instance of 'T.Show'.
 With @mkShow@, you can still convert it to 'Text':
@@ -282,6 +284,9 @@ import Text.Show.Text.TH (mkShowbPrec)
 instance Show (f a) => Show (HigherKinded f a) where
     showbPrec = $(mkShowbPrec ''HigherKinded)
 @
+
+Note that `mk`-prefixed functions will not work with a data family name. Instead,
+you must use a data family instance constructor.
 
 -}
 
