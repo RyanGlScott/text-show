@@ -74,7 +74,6 @@ module Derived (
 #if MIN_VERSION_template_haskell(2,7,0)
     , AllShow(..)
     , NotAllShow(..)
-    , OneDataInstance(..)
     , AssocClass1(..)
     , AssocData1(..)
     , AssocClass2(..)
@@ -380,26 +379,6 @@ data family NotAllShow a b c d :: *
 data instance NotAllShow ()  ()  ()  d = NASNoShow
 data instance NotAllShow Int b   Int d = NASShow1 Int Int
                                        | NASShow2 b
-  deriving ( S.Show
-# if __GLASGOW_HASKELL__ >= 706
-           , Generic
-#  if defined(LANGUAGE_DeriveGeneric1TypeFamilies)
-           , Generic1
-#  endif
-# endif
-           )
-
-infix 1 `ODIInfix`
-data family OneDataInstance a b c d :: *
-data instance OneDataInstance a b c d = ODINullary
-                                      | ODIUnary a
-                                      | ODIProduct a b
-                                      | ODIRecord {
-                                          odiRecord1 :: a
-                                        , odiRecord2 :: b
-                                        , odiRecord3 :: c
-                                      }
-                                      | a `ODIInfix` b
   deriving ( S.Show
 # if __GLASGOW_HASKELL__ >= 706
            , Generic

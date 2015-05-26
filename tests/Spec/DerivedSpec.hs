@@ -64,7 +64,6 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "AllShow Char Double Int Int instance"            (prop_matchesShow :: Int -> AllShow Char Double Int Int -> Bool)
     prop "AllShow Float Ordering Int Int instance"         (prop_matchesShow :: Int -> AllShow Float Ordering Int Int -> Bool)
     prop "NotAllShow Int Int Int Int instance"             (prop_matchesShow :: Int -> NotAllShow Int Int Int Int -> Bool)
-    prop "OneDataInstance Int Int Int Int instance"        (prop_matchesShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
     prop "AssocData1 () instance"                          (prop_matchesShow :: Int -> AssocData1 () -> Bool)
     prop "AssocData2 () instance"                          (prop_matchesShow :: Int -> AssocData2 () Int Int -> Bool)
 # if __GLASGOW_HASKELL__ >= 708
@@ -109,7 +108,6 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "AllShow Char Double Int Int generic show"        (prop_matchesShow :: Int -> AllShow Char Double Int Int -> Bool)
     prop "AllShow Float Ordering Int Int generic show"     (prop_matchesShow :: Int -> AllShow Float Ordering Int Int -> Bool)
     prop "NotAllShow Int Int Int Int generic show"         (prop_genericShow :: Int -> NotAllShow Int Int Int Int -> Bool)
-    prop "OneDataInstance Int Int Int Int generic show"    (prop_genericShow :: Int -> OneDataInstance Int Int Int Int -> Bool)
     prop "AssocData1 () generic show"                      (prop_genericShow :: Int -> AssocData1 () -> Bool)
     prop "AssocData2 () generic show"                      (prop_genericShow :: Int -> AssocData2 () Int Int -> Bool)
 #  if __GLASGOW_HASKELL__ >= 708

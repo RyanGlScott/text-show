@@ -64,7 +64,6 @@ module Instances.Derived (
     , showbASRecordPrec
     , showbASInfixPrec
     , showbNASShowPrec
-    , showbOneDataInstancePrec
     , showbAssocData1Prec
     , showbAssocData2Prec
     -- , showbAssocData3Prec
@@ -181,10 +180,6 @@ showbASInfixPrec = showbPrec
 
 showbNASShowPrec :: (Show b, Show d) => Int -> NotAllShow Int b Int d -> Builder
 showbNASShowPrec = showbPrec
-
-showbOneDataInstancePrec :: (Show a, Show b, Show c, Show d)
-                         => Int -> OneDataInstance a b c d -> Builder
-showbOneDataInstancePrec = showbPrec
 
 showbAssocData1Prec :: Int -> AssocData1 () -> Builder
 showbAssocData1Prec = showbPrec
@@ -345,15 +340,6 @@ instance Arbitrary (AllShow Float Ordering c d) where
 $(deriveShow 'NASShow1)
 instance Arbitrary b => Arbitrary (NotAllShow Int b Int d) where
     arbitrary = oneof [NASShow1 <$> arbitrary <*> arbitrary, NASShow2 <$> arbitrary]
-
-$(deriveShow ''OneDataInstance)
-instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (OneDataInstance a b c d) where
-    arbitrary = oneof [ pure ODINullary
-                      , ODIUnary   <$> arbitrary
-                      , ODIProduct <$> arbitrary <*> arbitrary
-                      , ODIRecord  <$> arbitrary <*> arbitrary <*> arbitrary
-                      , ODIInfix   <$> arbitrary <*> arbitrary
-                      ]
 
 $(deriveShow ''AssocData1)
 deriving instance Arbitrary (AssocData1 ())

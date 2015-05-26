@@ -48,6 +48,7 @@ import           Data.List (foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
+import           Data.Traversable (forM)
 #endif
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS ()
@@ -56,7 +57,6 @@ import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
-import           Data.Traversable (forM)
 
 import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
@@ -197,7 +197,6 @@ deriveShowPragmas opts name = do
         DataConI{} -> deriveShowDataFamInst opts name
         FamilyI (FamilyD DataFam _ _ _) _ -> deriveShowDataFam opts name
         FamilyI (FamilyD TypeFam _ _ _) _ -> error $ ns ++ "Cannot use a type family name."
-        -- TODO: Figure out how this whole multiline string business works
         _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
 #else
         _ -> error $ ns ++ "The name must be of a plain type constructor."
@@ -351,10 +350,10 @@ mkShowbPrec name = do
 #if MIN_VERSION_template_haskell(2,7,0)
         DataConI{} -> withDataFamInstCon name $ \_ _ dec ->
             consToShow $ decCons [dec]
-        FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam name $ \_ decs ->
-            consToShow $ decCons decs
-        FamilyI (FamilyD TypeFam _ _ _) _ -> error $ ns ++ "Cannot use a type family name."
-        -- TODO: Figure out how this whole multiline string business works
+        FamilyI (FamilyD DataFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
+        FamilyI (FamilyD TypeFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a type family name."
         _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
 #else
         _ -> error $ ns ++ "The name must be of a plain type constructor."
@@ -677,24 +676,11 @@ tvbName :: TyVarBndr -> Name
 tvbName (PlainTV  name  ) = name
 tvbName (KindedTV name _) = name
 
--- | Applies a typeclass to several type parameters to produce the type predicate of
--- an instance declaration.
-applyCon :: Name -> [Name] -> [Pred]
-applyCon con typeNames = map apply typeNames
-  where
-    apply :: Name -> Pred
-    apply t =
-#if MIN_VERSION_template_haskell(2,10,0)
-        AppT (ConT con) (VarT t)
-#else
-        ClassP con [VarT t]
-#endif
-
 -- | Generates a declaration defining the 'showbPrec' function, followed by any custom
 -- pragma declarations specified by the 'PragmaOptions' argument.
 -- 
 -- The Template Haskell API for generating pragmas (as well as GHC's treatment of
--- pragmas themselves) have changed considerably over the years, so there's a lot of
+-- pragmas themselves) has changed considerably over the years, so there's a lot of
 -- CPP magic required to get this to work uniformly across different versions of GHC.
 showbPrecDecs :: PragmaOptions -> [Con] -> [Q Dec]
 #if __GLASGOW_HASKELL__ > 702
@@ -749,8 +735,16 @@ showbPrecDecs _    cons =
 #endif
 
 -- Fully applies a type constructor to its type variables.
-appConT :: Name -> [Type] -> Type
-appConT = foldl' AppT . ConT
+applyTyCon :: Name -> [Type] -> Type
+applyTyCon = foldl' AppT . ConT
+
+-- | Applies a typeclass constraint to a type.
+applyClass :: Name -> Name -> Pred
+#if MIN_VERSION_template_haskell(2,10,0)
+applyClass con t = AppT (ConT con) (VarT t)
+#else
+applyClass con t = ClassP con [VarT t]
+#endif
 
 -- | Deduces the 'Show' instance context of a simple type constructor, as well
 -- as the type constructor fully applied to its type variables.
@@ -758,10 +752,10 @@ cxtAndTypeTyCon :: Name -> [Name] -> (Cxt, Type)
 cxtAndTypeTyCon tyConName tyVarNames = (instanceCxt, instanceType)
   where
     instanceCxt :: Cxt
-    instanceCxt = applyCon ''T.Show tyVarNames
+    instanceCxt = map (applyClass ''T.Show) tyVarNames
 
     instanceType :: Type
-    instanceType = appConT tyConName $ map VarT tyVarNames
+    instanceType = applyTyCon tyConName $ map VarT tyVarNames
 
 -- | Deduces the 'Show' instance context of a data family instance constructor,
 -- as well as the type constructor fully applied to its type variables.
@@ -769,10 +763,10 @@ cxtAndTypeDataFamInstCon :: Name -> [Name] -> Dec -> (Cxt, Type)
 cxtAndTypeDataFamInstCon parentName tyVarNames dec = (instanceCxt, instanceType)
   where
     instanceCxt :: Cxt
-    instanceCxt = applyCon ''T.Show lhsTypeNames
+    instanceCxt = map (applyClass ''T.Show) lhsTypeNames
 
     instanceType :: Type
-    instanceType = appConT parentName rhsTypes
+    instanceType = applyTyCon parentName rhsTypes
 
     -- It seems that Template Haskell's representation of the type variable binders
     -- in a data family instance declaration has changed considerably with each new

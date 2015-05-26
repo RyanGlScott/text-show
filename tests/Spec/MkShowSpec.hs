@@ -26,7 +26,7 @@ module Spec.MkShowSpec (main, spec) where
 
 import           Derived (AllAtOnce)
 #if MIN_VERSION_template_haskell(2,7,0)
-import           Derived (NotAllShow(..), OneDataInstance)
+import           Derived (NotAllShow(..))
 #endif
 
 import           Instances.Derived ()
@@ -89,21 +89,6 @@ prop_mkShowbPrecTyCon = prop_mkShowbPrec $(mkShowbPrec ''AllAtOnce)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
--- This uses a data family name.
-prop_mkShowbPrecDataFam :: Int -> OneDataInstance Int Int Int Int -> Bool
-prop_mkShowbPrecDataFam = prop_mkShowbPrec $(mkShowbPrec ''OneDataInstance)
-
--- -- | Verifies 'mkPrint' produces the same output as 'print'.
--- -- This uses a data family name.
--- prop_mkPrintDataFam :: OneDataInstance Int Int Int Int -> Property
--- prop_mkPrintDataFam = prop_mkPrint $(mkPrint ''OneDataInstance)
--- 
--- -- | Verifies 'mkTraceShow' produces the same output as 'traceShow'.
--- -- This uses a data family name.
--- prop_mkTraceShowDataFam :: OneDataInstance Int Int Int Int -> Property
--- prop_mkTraceShowDataFam = prop_mkTraceShow $(mkTraceShow ''OneDataInstance)
-
--- | Verifies 'mkShowbPrec' produces the same output as 'showsPrec'.
 -- This uses a data family instance constructor.
 prop_mkShowbPrecDataFamInstCon :: Int -> NotAllShow Int Int Int Int -> Bool
 prop_mkShowbPrecDataFamInstCon = prop_mkShowbPrec $(mkShowbPrec 'NASShow1)
@@ -128,7 +113,4 @@ spec = parallel . describe "mkShow and related functions" $ do
     prop "$(mkShowbPrec ''NotAllShow) (a data family instance constructor)" prop_mkShowbPrecDataFamInstCon
 --     prop "$(mkPrint ''NotAllShow) (a data family instance constructor)"     prop_mkPrintDataFamInstCon
 --     prop "$(mkTraceShow ''NotAllShow) (a data family instance constructor)" prop_mkTraceShowDataFamInstCon
-    prop "$(mkShowbPrec ''OneDataInstance) (a data family name)"            prop_mkShowbPrecDataFam
---     prop "$(mkPrint ''OneDataInstance) (a data family name)"                prop_mkPrintDataFam
---     prop "$(mkTraceShow ''OneDataInstance) (a data family name)"            prop_mkTraceShowDataFam
 #endif
