@@ -20,7 +20,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
+import Text.Show.Text.Classes (Show(showbPrec), showbUnaryWith)
 
 #include "inline.h"
 
@@ -30,13 +30,13 @@ import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
 showbIdentityPrec :: Show a => Int -> Identity a -> Builder
 -- This would be equivalent to the derived instance of 'Identity' if the
 -- 'runIdentity' field were removed.
-showbIdentityPrec p (Identity x) = showbUnary "Identity" p x
+showbIdentityPrec p (Identity x) = showbUnaryWith showbPrec "Identity" p x
 {-# INLINE showbIdentityPrec #-}
 
 instance Show a => Show (Identity a) where
     showbPrec = showbIdentityPrec
     {-# INLINE showbPrec #-}
 
-instance Show1 Identity where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 Identity where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

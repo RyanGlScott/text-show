@@ -21,10 +21,12 @@ module Text.Show.Text (
     , showListLazy
     , showbParen
     , showbSpace
-    , showbUnary
     , Show1(..)
-    , showbUnary1
-    , showbBinary1
+    , showbPrec1
+    , showbUnaryWith
+    , Show2(..)
+    , showbPrec2
+    , showbBinaryWith
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString

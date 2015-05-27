@@ -19,7 +19,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
 #include "inline.h"
@@ -33,6 +33,6 @@ showbMaybePrec = showbPrec
 
 $(deriveShowPragmas defaultInlineShowbPrec ''Maybe)
 
-instance Show1 Maybe where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 Maybe where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

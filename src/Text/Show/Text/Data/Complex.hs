@@ -23,7 +23,7 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.Data.Floating ()
 #if MIN_VERSION_base(4,4,0)
-import Text.Show.Text.Classes (Show1(showbPrec1))
+-- import Text.Show.Text.Classes (Show1(showbPrec1))
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
                                    specializeTypes)
 #else
@@ -57,9 +57,9 @@ $(deriveShowPragmas defaultInlineShowbPrec {
                     }
                     ''Complex)
 
-instance Show1 Complex where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 Complex where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
 #else
 instance (RealFloat a, Show a) => Show (Complex a) where
     {-# SPECIALIZE instance Show (Complex Float)  #-}

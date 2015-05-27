@@ -30,7 +30,7 @@ import Data.Type.Coercion (Coercion(..))
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
 -- | Convert a representational equality value to a 'Builder'.
@@ -46,7 +46,7 @@ instance Show (Coercion a b) where
     showbPrec = $(mkShowbPrec ''Coercion)
     {-# INLINE showb #-}
 
-instance Show1 (Coercion a) where
-    showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+-- instance Show1 (Coercion a) where
+--     showbPrec1 = showbPrec
+--     {-# INLINE showbPrec1 #-}
 #endif

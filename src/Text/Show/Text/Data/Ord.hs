@@ -32,7 +32,7 @@ import Data.Ord (Down)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.TH.Internal (defaultInlineShowbPrec)
 #endif
 
@@ -60,7 +60,7 @@ $(deriveShowPragmas defaultInlineShowb ''Ordering)
 #if MIN_VERSION_base(4,6,0)
 $(deriveShowPragmas defaultInlineShowbPrec ''Down)
 
-instance Show1 Down where
-    showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+-- instance Show1 Down where
+--     showbPrec1 = showbPrec
+--     {-# INLINE showbPrec1 #-}
 #endif

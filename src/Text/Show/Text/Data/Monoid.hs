@@ -34,7 +34,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.Data.Bool ()
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
@@ -120,22 +120,22 @@ instance Show (f a) => Show (Alt f a) where
     {-# INLINE showbPrec #-}
 #endif
 
-instance Show1 Dual where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance Show1 First where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance Show1 Last where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance Show1 Product where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance Show1 Sum where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 Dual where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance Show1 First where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance Show1 Last where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance Show1 Product where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance Show1 Sum where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

@@ -35,7 +35,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude ()
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showb))
 import Text.Show.Text.TH.Internal (deriveShow)
 
 #include "inline.h"
@@ -176,65 +176,65 @@ $(deriveShow ''(,,,,,,,,,,,,))
 $(deriveShow ''(,,,,,,,,,,,,,))
 $(deriveShow ''(,,,,,,,,,,,,,,))
 
-instance Show a => Show1 ((,) a) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b) => Show1 ((,,) a b) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c) => Show1 ((,,,) a b c) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d) => Show1 ((,,,,) a b c d) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e) => Show1 ((,,,,,) a b c d e) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f) => Show1 ((,,,,,,) a b c d e f) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g) => Show1 ((,,,,,,,) a b c d e f g) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h) =>
-  Show1 ((,,,,,,,,) a b c d e f g h) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i) =>
-  Show1 ((,,,,,,,,,) a b c d e f g h i) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j) =>
-  Show1 ((,,,,,,,,,,) a b c d e f g h i j) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k) =>
-  Show1 ((,,,,,,,,,,,) a b c d e f g h i j k) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l) =>
-  Show1 ((,,,,,,,,,,,,) a b c d e f g h i j k l) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m) =>
-  Show1 ((,,,,,,,,,,,,,) a b c d e f g h i j k l m) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
-
-instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m, Show n) =>
-  Show1 ((,,,,,,,,,,,,,,) a b c d e f g h i j k l m n) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show a => Show1 ((,) a) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b) => Show1 ((,,) a b) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c) => Show1 ((,,,) a b c) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d) => Show1 ((,,,,) a b c d) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e) => Show1 ((,,,,,) a b c d e) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f) => Show1 ((,,,,,,) a b c d e f) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g) => Show1 ((,,,,,,,) a b c d e f g) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h) =>
+--   Show1 ((,,,,,,,,) a b c d e f g h) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i) =>
+--   Show1 ((,,,,,,,,,) a b c d e f g h i) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j) =>
+--   Show1 ((,,,,,,,,,,) a b c d e f g h i j) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k) =>
+--   Show1 ((,,,,,,,,,,,) a b c d e f g h i j k) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l) =>
+--   Show1 ((,,,,,,,,,,,,) a b c d e f g h i j k l) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m) =>
+--   Show1 ((,,,,,,,,,,,,,) a b c d e f g h i j k l m) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
+-- 
+-- instance (Show a, Show b, Show c, Show d, Show e, Show f, Show g, Show h, Show i, Show j, Show k, Show l, Show m, Show n) =>
+--   Show1 ((,,,,,,,,,,,,,,) a b c d e f g h i j k l m n) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

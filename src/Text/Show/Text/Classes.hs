@@ -72,6 +72,8 @@ import           Text.Show.Text.Utils (s, toString)
 
 #include "inline.h"
 
+-------------------------------------------------------------------------------
+
 -- | Conversion of values to @Text@. Because there are both strict and lazy @Text@
 -- variants, the 'Show' class deliberately avoids using @Text@ in its functions.
 -- Instead, 'showbPrec', 'showb', and 'showbList' all return 'Builder', an
@@ -123,19 +125,6 @@ class Show a where
     {-# MINIMAL showbPrec | showb #-}
 
 deriving instance Typeable Show
-#endif
-
--- | Lifting of the 'Show' class to unary type constructors.
--- 
--- /Since: 0.5/
-class Show1 f where
-    -- | 'Builder' conversion for values of a type that has a unary type constructor.
-    -- 
-    -- /Since: 0.5/
-    showbPrec1 :: Show a => Int -> f a -> Builder
-
-#if __GLASGOW_HASKELL__ >= 708
-deriving instance Typeable Show1
 #endif
 
 -- | Constructs a strict 'TS.Text' from a single value.
@@ -211,35 +200,6 @@ showbListWith showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
     go []     = s ']'                                    -- ..]"
 {-# INLINE showbListWith #-}
 
--- | @'showbUnary' n p x@ produces the 'Builder' representation of a unary data
--- constructor with name @n@ and argument @x@, in precedence context @p@.
--- 
--- /Since: 0.5/
-showbUnary :: Show a => Builder -> Int -> a -> Builder
-showbUnary nameB p x = showbParen (p > appPrec) $
-    nameB <> showbSpace <> showbPrec appPrec1 x
-{-# INLINE showbUnary #-}
-
--- | @'showbUnary1' n p x@ produces the 'Builder' representation of a unary data
--- constructor with name @n@ and argument @x@, in precedence context @p@.
--- 
--- /Since: 0.5/
-showbUnary1 :: (Show1 f, Show a) => Builder -> Int -> f a -> Builder
-showbUnary1 nameB p x = showbParen (p > appPrec) $
-    nameB <> showbSpace <> showbPrec1 appPrec1 x
-{-# INLINE showbUnary1 #-}
-
--- | @'showbBinary1' n p x y@ produces the 'Builder' representation of a binary
--- data constructor with name @n@ and arguments @x@ and @y@, in precedence
--- context @p@.
--- 
--- /Since: 0.5/
-showbBinary1 :: (Show1 f, Show1 g, Show a) => Builder -> Int -> f a -> g a -> Builder
-showbBinary1 nameB p x y = showbParen (p > appPrec) $ nameB
-    <> showbSpace <> showbPrec1 appPrec1 x
-    <> showbSpace <> showbPrec1 appPrec1 y
-{-# INLINE showbBinary1 #-}
-
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.
 -- 
@@ -271,6 +231,75 @@ hPrint h = TS.hPutStrLn h . show
 hPrintLazy :: Show a => Handle -> a -> IO ()
 hPrintLazy h = TL.hPutStrLn h . showLazy
 {-# INLINE hPrintLazy #-}
+
+-------------------------------------------------------------------------------
+
+-- | Lifting of the 'Show' class to unary type constructors.
+-- 
+-- /Since: 0.9/
+class Show1 f where
+    -- | Lifts a 'showbPrec' function through the type constructor.
+    -- 
+    -- /Since: 0.9/
+    showbPrecWith :: (Int -> a -> Builder) -> Int -> f a -> Builder
+
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable Show1
+#endif
+
+-- | Lift the standard 'showbPrec' function through the type constructor.
+-- 
+-- /Since: 0.9/
+showbPrec1 :: (Show1 f, Show a) => Int -> f a -> Builder
+showbPrec1 = showbPrecWith showbPrec
+{-# INLINE showbPrec1 #-}
+
+-- | @'showbUnaryWith' sp n p x@ produces the 'Builder' representation of a unary data
+-- constructor with name @n@ and argument @x@, in precedence context @p@, using the
+-- function @sp@ to show occurrences of the type argument.
+-- 
+-- /Since: 0.9/
+showbUnaryWith :: (Int -> a -> Builder) -> Builder -> Int -> a -> Builder
+showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
+    nameB <> showbSpace <> sp appPrec1 x
+{-# INLINE showbUnaryWith #-}
+
+-------------------------------------------------------------------------------
+
+-- | Lifting of the 'Show' class to binary type constructors.
+-- 
+-- /Since: 0.9/
+class Show2 f where
+    -- | Lifts 'showbPrec' functions through the type constructor.
+    -- 
+    -- /Since: 0.9/
+    showbPrecWith2 :: (Int -> a -> Builder) -> (Int -> b -> Builder) ->
+        Int -> f a b -> Builder
+
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable Show2
+#endif
+
+-- | Lift the standard 'showbPrec' function through the type constructor.
+-- 
+-- /Since: 0.9/
+showbPrec2 :: (Show2 f, Show a, Show b) => Int -> f a b -> Builder
+showbPrec2 = showbPrecWith2 showbPrec showbPrec
+{-# INLINE showbPrec2 #-}
+
+-- | @'showbBinaryWith' sp n p x y@ produces the 'Builder' representation of a binary
+-- data constructor with name @n@ and arguments @x@ and @y@, in precedence context
+-- @p@, using the functions @sp1@ and @sp2@ to show occurrences of the type arguments.
+-- 
+-- /Since: 0.9/
+showbBinaryWith :: (Int -> a -> Builder) -> (Int -> b -> Builder) ->
+    Builder -> Int -> a -> b -> Builder
+showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
+    <> showbSpace <> sp1 appPrec1 x
+    <> showbSpace <> sp2 appPrec1 y
+{-# INLINE showbBinaryWith #-}
+
+-------------------------------------------------------------------------------
 
 -- | The @Text@ 'T.Show' instance for 'FromStringShow' is based on its @String@
 -- 'S.Show' instance. That is,
@@ -409,7 +438,6 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , RealFloat
            , RealFrac
            , Semigroup
-           , Show
            , Storable
            , Traversable
            , Typeable
@@ -465,6 +493,10 @@ instance Show a => S.Show (FromTextShow a) where
     showsPrec p (FromTextShow x) str = toString (showbPrec p x) ++ str
     INLINE_INST_FUN(showsPrec)
 
+instance Show a => Show (FromTextShow a) where
+    showbPrec = showbPrec1
+    INLINE_INST_FUN(showbPrec)
+
 instance Show1 FromTextShow where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith sp p (FromTextShow x) = sp p x
+    INLINE_INST_FUN(showbPrecWith)

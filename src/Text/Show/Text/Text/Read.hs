@@ -29,7 +29,7 @@ import Text.Read.Lex (Lexeme(..))
 #if MIN_VERSION_base(4,7,0)
 import Text.Read.Lex (Number)
 #endif
-import Text.Show.Text.Classes (Show(showbPrec), showbUnary)
+import Text.Show.Text.Classes (Show(showbPrec), showbUnaryWith)
 #if MIN_VERSION_base(4,6,0)
 import Text.Show.Text.Classes (FromStringShow(..))
 #else
@@ -45,16 +45,16 @@ import Text.Show.Text.Data.List ()
 -- 
 -- /Since: 0.3/
 showbLexemePrec :: Int -> Lexeme -> Builder
-showbLexemePrec p (Char c)   = showbUnary "Char"   p c
-showbLexemePrec p (String s) = showbUnary "String" p s
-showbLexemePrec p (Punc pun) = showbUnary "Punc"   p pun
-showbLexemePrec p (Ident i)  = showbUnary "Ident"  p i
-showbLexemePrec p (Symbol s) = showbUnary "Symbol" p s
+showbLexemePrec p (Char c)   = showbUnaryWith showbPrec "Char"   p c
+showbLexemePrec p (String s) = showbUnaryWith showbPrec "String" p s
+showbLexemePrec p (Punc pun) = showbUnaryWith showbPrec "Punc"   p pun
+showbLexemePrec p (Ident i)  = showbUnaryWith showbPrec "Ident"  p i
+showbLexemePrec p (Symbol s) = showbUnaryWith showbPrec "Symbol" p s
 #if MIN_VERSION_base(4,6,0)
-showbLexemePrec p (Number n) = showbUnary "Number" p $ FromStringShow n
+showbLexemePrec p (Number n) = showbUnaryWith showbPrec "Number" p $ FromStringShow n
 #else
-showbLexemePrec p (Int i)    = showbUnary "Int" p i
-showbLexemePrec p (Rat r)    = showbUnary "Rat" p r
+showbLexemePrec p (Int i)    = showbUnaryWith showbPrec "Int" p i
+showbLexemePrec p (Rat r)    = showbUnaryWith showbPrec "Rat" p r
 #endif
 showbLexemePrec _ EOF        = "EOF"
 

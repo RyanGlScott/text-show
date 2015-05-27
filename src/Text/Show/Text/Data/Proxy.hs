@@ -21,7 +21,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude ()
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 
 #include "inline.h"
@@ -38,6 +38,6 @@ instance Show (Proxy s) where
     showbPrec = $(mkShowbPrec ''Proxy)
     INLINE_INST_FUN(showb)
 
-instance Show1 Proxy where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 Proxy where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

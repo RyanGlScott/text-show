@@ -17,7 +17,7 @@ module Text.Show.Text.Functions (showbFunction) where
 
 import Data.Text.Lazy.Builder (Builder)
 import Prelude ()
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showb))
 
 #include "inline.h"
 
@@ -32,6 +32,6 @@ instance Show (a -> b) where
     showb = showbFunction
     INLINE_INST_FUN(showb)
 
-instance Show1 ((->) a) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 ((->) a) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

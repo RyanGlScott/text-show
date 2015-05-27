@@ -18,7 +18,7 @@ module Text.Show.Text.Control.Monad.ST (showbST) where
 import Control.Monad.ST (ST)
 import Data.Text.Lazy.Builder (Builder)
 import Prelude ()
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Text.Show.Text.Classes (Show(showb))
 
 #include "inline.h"
 
@@ -33,6 +33,6 @@ instance Show (ST s a) where
     showb = showbST
     INLINE_INST_FUN(showb)
 
-instance Show1 (ST s) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 (ST s) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)

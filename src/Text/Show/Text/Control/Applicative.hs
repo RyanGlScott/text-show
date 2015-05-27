@@ -22,7 +22,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
+import Text.Show.Text.Classes (Show(showbPrec), showbUnaryWith)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 
@@ -32,7 +32,7 @@ import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
 -- 
 -- /Since: 0.7/
 showbConstPrec :: Show a => Int -> Const a b -> Builder
-showbConstPrec p (Const x) = showbUnary "Const" p x
+showbConstPrec p (Const x) = showbUnaryWith showbPrec "Const" p x
 {-# INLINE showbConstPrec #-}
 
 -- | Convert a 'ZipList' to a 'Builder' with the given precedence.
@@ -46,12 +46,12 @@ instance Show a => Show (Const a b) where
     showbPrec = showbConstPrec
     INLINE_INST_FUN(showbPrec)
 
-instance Show a => Show1 (Const a) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show a => Show1 (Const a) where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
 
 $(deriveShowPragmas defaultInlineShowbPrec ''ZipList)
 
-instance Show1 ZipList where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+-- instance Show1 ZipList where
+--     showbPrec1 = showbPrec
+--     INLINE_INST_FUN(showbPrec1)
