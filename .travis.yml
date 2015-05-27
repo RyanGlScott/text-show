@@ -28,7 +28,7 @@ install:
 script:
  - if [ -f configure.ac ]; then autoreconf -i; fi
  - cabal configure --enable-tests -v2
- - cabal build --ghc-option=-Werror
- - cabal test --show-details=always
+ - cabal build -j1 --ghc-option=-Werror
+ - cabal test -j1 --show-details=always
  - cabal check
  - cabal sdist
