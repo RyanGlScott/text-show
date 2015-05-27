@@ -25,9 +25,9 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Generic versions of 'Show' class functions, as an alternative to "Text.Show.Text.TH",
-which uses Template Haskell. This module only exports functions if the compiler
-supports generics (on GHC, 7.2 or above).
+Generic versions of 'Show' and 'Show1' class functions, as an alternative to
+"Text.Show.Text.TH", which uses Template Haskell. This module only exports functions
+if the compiler supports generics (on GHC, 7.2 or above).
 
 This implementation is based off of the @Generics.Deriving.Show@ module from the
 @generic-deriving@ library.
@@ -56,8 +56,11 @@ module Text.Show.Text.Generic (
     , genericPrintLazy
     , genericHPrint
     , genericHPrintLazy
-      -- * The 'GShow' class
+    , genericShowbPrecWith
+    , genericShowbPrec1
+      -- * The 'GShow' and 'GShow1' classes
     , GShow(..)
+    , GShow1(..)
     , ConType(..)
     ) where
 
@@ -80,10 +83,10 @@ import           System.IO (Handle)
 
 import qualified Text.Show as S (Show)
 import qualified Text.Show.Text.Classes as T
-import           Text.Show.Text.Classes (Show(showbPrec), showbListWith,
-                                         showbParen, showbSpace)
+import           Text.Show.Text.Classes (Show(showbPrec), Show1(..),
+                                         showbListWith, showbParen, showbSpace)
 import           Text.Show.Text.Instances ()
-import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s, toString)
+import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
 
 # include "inline.h"
 
@@ -215,19 +218,28 @@ genericHPrint h = TS.hPutStrLn h . genericShow
 genericHPrintLazy :: (Generic a, GShow (Rep a)) => Handle -> a -> IO ()
 genericHPrintLazy h = TL.hPutStrLn h . genericShowLazy
 
+-- | A 'Generic1' implementation of 'showbPrecWith'.
+-- 
+-- /Since: 0.9/
+genericShowbPrecWith :: (Generic1 f, GShow1 (Rep1 f))
+                     => (Int -> a -> Builder) -> Int -> f a -> Builder
+genericShowbPrecWith sp p = gShowbPrecWith Pref sp p . from1
+
+-- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
+-- 
+-- /Since: 0.9/
+genericShowbPrec1 :: (Generic a, Generic1 f, GShow (Rep a), GShow1 (Rep1 f))
+                  => Int -> f a -> Builder
+genericShowbPrec1 = genericShowbPrecWith genericShowbPrec
+
+-------------------------------------------------------------------------------
+
 -- | Whether a constructor is a record ('Rec'), a tuple ('Tup'), is prefix ('Pref'),
 -- or infix ('Inf').
 -- 
 -- /Since: 0.6/
-data ConType = Rec | Tup | Pref | Inf Builder
-  deriving ( Generic
-           , S.Show
-           , Typeable
-# if MIN_VERSION_text(0,11,1)
-           , Eq
-           , Ord
-# endif
-           )
+data ConType = Rec | Tup | Pref | Inf String
+  deriving (Eq, Generic, Ord, Read, S.Show, Typeable)
 
 instance T.Show ConType where
     showbPrec = genericShowbPrec
@@ -241,8 +253,8 @@ class GShow f where
     -- | This is used as the default generic implementation of 'showbPrec'.
     gShowbPrec :: ConType -> Int -> f a -> Builder
     -- | Whether a representation type has any constructors.
-    isNullary  :: f a -> Bool
-    isNullary = error "generic show (isNullary): unnecessary case"
+    isNullary :: f a -> Bool
+    isNullary = error "generic showbPrec (isNullary): unnecessary case"
 # if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL gShowbPrec #-}
 
@@ -257,87 +269,163 @@ instance T.Show c => GShow (K1 i c) where
     gShowbPrec _ n (K1 a) = showbPrec n a
     isNullary _ = False
 
-instance (Constructor c, GShow a) => GShow (M1 C c a) where
-    gShowbPrec _ n c@(M1 x) = case fixity of
-        Prefix -> showbParen ( n > appPrec
-                               && not ( isNullary x
-                                        || conIsTuple c
-# if __GLASGOW_HASKELL__ >= 711
-                                        || conIsRecord c
-# endif
-                                      )
-                             ) $
-               (if conIsTuple c
-                   then mempty
-                   else let cn = conName c
-                        in showbParen (isInfixTypeCon cn) $ fromString cn
-               )
-            <> (if isNullary x || conIsTuple c
-                   then mempty
-                   else s ' '
-               )
-            <> showbBraces t (gShowbPrec t appPrec1 x)
-        Infix _ m -> showbParen (n > m) . showbBraces t $ gShowbPrec t (m+1) x
-      where
-        fixity :: Fixity
-        fixity = conFixity c
-        
-        t :: ConType
-        t = if conIsRecord c
-            then Rec
-            else case conIsTuple c of
-                True  -> Tup
-                False -> case fixity of
-                    Prefix    -> Pref
-                    Infix _ _ -> Inf . fromString $ conName c
-        
-        showbBraces :: ConType -> Builder -> Builder
-        showbBraces Rec     b = s '{' <> b <> s '}'
-        showbBraces Tup     b = s '(' <> b <> s ')'
-        showbBraces Pref    b = b
-        showbBraces (Inf _) b = b
-        
-        conIsTuple :: M1 C c a b -> Bool
-        conIsTuple = isTupleString . conName
+instance (Constructor c, GShow f) => GShow (C1 c f) where
+    gShowbPrec = gShowbConstructor gShowbPrec isNullary
 
-instance (Selector s, GShow a) => GShow (M1 S s a) where
-    gShowbPrec t n sel@(M1 x)
-        | selName sel == "" = gShowbPrec t n x
-        | otherwise         = fromString (selName sel) <> " = " <> gShowbPrec t 0 x
+instance (Selector s, GShow f) => GShow (S1 s f) where
+    gShowbPrec = gShowbSelector gShowbPrec
     isNullary (M1 x) = isNullary x
 
-instance GShow a => GShow (M1 D d a) where
+instance GShow f => GShow (D1 d f) where
     gShowbPrec t n (M1 x) = gShowbPrec t n x
 
-instance (GShow a, GShow b) => GShow (a :+: b) where
+instance (GShow f, GShow g) => GShow (f :+: g) where
     gShowbPrec t n (L1 x) = gShowbPrec t n x
     gShowbPrec t n (R1 x) = gShowbPrec t n x
 
-instance (GShow a, GShow b) => GShow (a :*: b) where
-    gShowbPrec t@Rec _ (a :*: b) =
-           gShowbPrec t 0 a
-        <> ", "
-        <> gShowbPrec t 0 b
-    gShowbPrec t@(Inf o) n (a :*: b) =
-           gShowbPrec t n a
-        <> showbSpace
-        <> infixOp
-        <> showbSpace
-        <> gShowbPrec t n b
-      where
-        infixOp :: Builder
-        infixOp = if isInfixTypeCon (toString o)
-                     then o
-                     else s '`' <> o <> s '`'
-    gShowbPrec t@Tup _ (a :*: b) =
-           gShowbPrec t 0 a
-        <> s ','
-        <> gShowbPrec t 0 b
-    gShowbPrec t@Pref n (a :*: b) =
-           gShowbPrec t n a
-        <> showbSpace
-        <> gShowbPrec t n b
-    
+instance (GShow f, GShow g) => GShow (f :*: g) where
+    gShowbPrec = gShowbProduct gShowbPrec gShowbPrec
     -- If we have a product then it is not a nullary constructor
     isNullary _ = False
+
+-------------------------------------------------------------------------------
+
+-- | Class of generic representation types ('Rep1') that can be converted to
+-- a 'Builder' by lifting through a unary type constructor.
+-- 
+-- /Since: 0.9/
+class GShow1 f where
+    -- | This is used as the default generic implementation of 'showbPrecWith'.
+    gShowbPrecWith :: ConType -> (Int -> a -> Builder) -> Int -> f a -> Builder
+    -- | Whether a representation type has any constructors.
+    isNullary1 :: f a -> Bool
+    isNullary1 = error "generic showbPrecWith (isNullary): unnecessary case"
+# if __GLASGOW_HASKELL__ >= 708
+    {-# MINIMAL gShowbPrecWith #-}
+
+deriving instance Typeable GShow1
+# endif
+
+instance GShow1 U1 where
+    gShowbPrecWith _ _ _ U1 = mempty
+    isNullary1 _ = True
+
+instance GShow1 Par1 where
+    gShowbPrecWith _ sp n (Par1 p) = sp n p
+    isNullary1 _ = False
+
+instance T.Show c => GShow1 (K1 i c) where
+    gShowbPrecWith _ _ n (K1 a) = showbPrec n a
+    isNullary1 _ = False
+
+instance Show1 f => GShow1 (Rec1 f) where
+    gShowbPrecWith _ sp n (Rec1 r) = showbPrecWith sp n r
+    isNullary1 _ = False
+
+instance (Constructor c, GShow1 f) => GShow1 (C1 c f) where
+    gShowbPrecWith t sp = gShowbConstructor (flip gShowbPrecWith sp) isNullary1 t
+
+instance (Selector s, GShow1 f) => GShow1 (S1 s f) where
+    gShowbPrecWith t sp = gShowbSelector (flip gShowbPrecWith sp) t
+    isNullary1 (M1 x) = isNullary1 x
+
+instance GShow1 f => GShow1 (D1 d f) where
+    gShowbPrecWith t sp n (M1 x) = gShowbPrecWith t sp n x
+
+instance (GShow1 f, GShow1 g) => GShow1 (f :+: g) where
+    gShowbPrecWith t sp n (L1 x) = gShowbPrecWith t sp n x
+    gShowbPrecWith t sp n (R1 x) = gShowbPrecWith t sp n x
+
+instance (GShow1 f, GShow1 g) => GShow1 (f :*: g) where
+    gShowbPrecWith t sp = gShowbProduct (flip gShowbPrecWith sp) (flip gShowbPrecWith sp) t
+    -- If we have a product then it is not a nullary constructor
+    isNullary1 _ = False
+
+instance (Show1 f, GShow1 g) => GShow1 (f :.: g) where
+    gShowbPrecWith t sp n (Comp1 c) = showbPrecWith (gShowbPrecWith t sp) n c
+    isNullary1 _ = False
+
+-------------------------------------------------------------------------------
+-- Shared code between GShow and GShow1
+-------------------------------------------------------------------------------
+
+gShowbConstructor :: forall c f p. Constructor c
+                  => (ConType -> Int -> f p -> Builder)
+                  -> (f p -> Bool)
+                  -> ConType -> Int -> C1 c f p -> Builder
+gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
+    Prefix -> showbParen ( n > appPrec
+                           && not ( isNull x
+                                    || conIsTuple c
+# if __GLASGOW_HASKELL__ >= 711
+                                    || conIsRecord c
+# endif
+                                  )
+                         ) $
+           (if conIsTuple c
+               then mempty
+               else let cn = conName c
+                    in showbParen (isInfixTypeCon cn) $ fromString cn
+           )
+        <> (if isNull x || conIsTuple c
+               then mempty
+               else s ' '
+           )
+        <> showbBraces t (gs t appPrec1 x)
+    Infix _ m -> showbParen (n > m) . showbBraces t $ gs t (m+1) x
+  where
+    fixity :: Fixity
+    fixity = conFixity c
+
+    t :: ConType
+    t = if conIsRecord c
+        then Rec
+        else case conIsTuple c of
+            True  -> Tup
+            False -> case fixity of
+                Prefix    -> Pref
+                Infix _ _ -> Inf $ conName c
+
+    showbBraces :: ConType -> Builder -> Builder
+    showbBraces Rec     b = s '{' <> b <> s '}'
+    showbBraces Tup     b = s '(' <> b <> s ')'
+    showbBraces Pref    b = b
+    showbBraces (Inf _) b = b
+
+    conIsTuple :: C1 c f p -> Bool
+    conIsTuple = isTupleString . conName
+
+gShowbSelector :: Selector s
+               => (ConType -> Int -> f p -> Builder)
+               -> ConType -> Int -> S1 s f p -> Builder
+gShowbSelector gs t n sel@(M1 x)
+    | selName sel == "" = gs t n x
+    | otherwise         = fromString (selName sel) <> " = " <> gs t 0 x
+
+gShowbProduct :: (ConType -> Int -> f p -> Builder)
+              -> (ConType -> Int -> g p -> Builder)
+              -> ConType -> Int -> ((f :*: g) p) -> Builder
+gShowbProduct gsa gsb t@Rec _ (a :*: b) =
+       gsa t 0 a
+    <> ", "
+    <> gsb t 0 b
+gShowbProduct gsa gsb t@(Inf o) n (a :*: b) =
+       gsa t n a
+    <> showbSpace
+    <> infixOp
+    <> showbSpace
+    <> gsb t n b
+  where
+    infixOp :: Builder
+    infixOp = if isInfixTypeCon o
+                 then fromString o
+                 else s '`' <> fromString o <> s '`'
+gShowbProduct gsa gsb t@Tup _ (a :*: b) =
+       gsa t 0 a
+    <> s ','
+    <> gsb t 0 b
+gShowbProduct gsa gsb t@Pref n (a :*: b) =
+       gsa t n a
+    <> showbSpace
+    <> gsb t n b
 #endif
