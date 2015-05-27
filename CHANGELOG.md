@@ -1,5 +1,5 @@
 # 0.9
-* Removed the ability to call `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature as this will only work for a very limited number of data families, and it is probably not what you want. Call `mk-` functions on data family instance constructors instead.
+* Removed the ability to call `deriveShow` or `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature. If you want to derive `Show` for data family instances, use the corresponding `data instance` or `newtype instance` constructor name as an argument instead.
 * `PragmaOptions` (in `Text.Show.Text.TH`) combined all of its inlining-related fields into a single field, `inlineFunctions`, which takes a list of names of functions to inline.
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
 

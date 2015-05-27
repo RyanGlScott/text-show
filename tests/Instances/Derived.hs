@@ -326,7 +326,11 @@ instance Show (f (Fix f)) => Show (Fix f) where
 deriving instance Arbitrary (f (Fix f)) => Arbitrary (Fix f)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow ''AllShow)
+$(deriveShow 'ASNullary)
+$(deriveShow 'ASUnary)
+$(deriveShow 'ASProduct)
+$(deriveShow 'ASRecord)
+$(deriveShow 'ASInfix)
 instance Arbitrary (AllShow () () c d) where
     arbitrary = pure ASNullary
 deriving instance Arbitrary (AllShow Int b c d)
@@ -341,7 +345,7 @@ $(deriveShow 'NASShow1)
 instance Arbitrary b => Arbitrary (NotAllShow Int b Int d) where
     arbitrary = oneof [NASShow1 <$> arbitrary <*> arbitrary, NASShow2 <$> arbitrary]
 
-$(deriveShow ''AssocData1)
+$(deriveShow 'AssocCon1)
 deriving instance Arbitrary (AssocData1 ())
 
 $(deriveShow 'AssocCon2)

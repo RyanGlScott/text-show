@@ -7,9 +7,9 @@ Maintainer:  Ryan Scott
 Stability:   Experimental
 Portability: GHC
 
-Functions that splice traces into source code which take arbitrary data types or
-families as arguments (even if they are not instances of @Show@). You need to
-enable the @TemplateHaskell@ language extension in order to use this module.
+Functions that splice traces into source code which take an arbitrary data type or
+data family instance as an argument (even if it is not an instance of @Show@). You
+need to enable the @TemplateHaskell@ language extension in order to use this module.
 
 /Since: 0.5/
 -}

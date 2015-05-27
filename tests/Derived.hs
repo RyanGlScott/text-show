@@ -408,21 +408,6 @@ instance AssocClass2 () Int Int where
 # endif
                )
 
--- TODO: Uncomment this when smarter the typeclass instance context solver is implemented
--- 
--- class AssocClass3 a b c where
---     data AssocData3 a b c :: *
--- instance AssocClass3 () b c where
---     newtype AssocData3 () b c = AssocCon3 Int
---       deriving ( S.Show
--- # if __GLASGOW_HASKELL__ >= 706
---                , Generic
--- #  if defined(LANGUAGE_DeriveGeneric1TypeFamilies)
---                , Generic1
--- #  endif
--- # endif
---                )
-
 # if __GLASGOW_HASKELL__ >= 708
 class NullaryClass where
     data NullaryData

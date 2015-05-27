@@ -48,7 +48,6 @@ import           Data.List (foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
-import           Data.Traversable (forM)
 #endif
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS ()
@@ -77,9 +76,9 @@ import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
 {- $deriveShow
 
 'deriveShow' automatically generates a 'T.Show' instance declaration for a @data@
-type, a @newtype@, a data family instance, or a whole data family. This emulates what
-would (hypothetically) happen if you could attach a @deriving 'T.Show'@ clause to the
-end of a data declaration.
+type, a @newtype@, or a data family instance. This emulates what would
+(hypothetically) happen if you could attach a @deriving 'T.Show'@ clause to the end
+of a data declaration.
 
 Here are some examples of how to derive simple data types:
 
@@ -95,7 +94,10 @@ $('deriveShow' ''Box)    -- instance Show a => Show (Box a) where ...
 @
 
 If you are using @template-haskell-2.7.0.0@ or later, 'deriveShow' can also be used
-to derive 'T.Show' instances for data family instances. Some examples:
+to derive 'T.Show' instances for data family instances (which requires the
+@-XTypeFamilies@ extension). To do so, pass the name of a @data instance@ or @newtype
+instance@ constructor to 'deriveShow'.  Note that the generated code may require the
+@-XFlexibleInstances@ extension. Some examples:
 
 @
 &#123;-&#35; LANGUAGE FlexibleInstances, TemplateHaskell, TypeFamilies &#35;-&#125;
@@ -104,18 +106,13 @@ import Text.Show.Text.TH (deriveShow)
 class AssocClass a where
     data AssocData a
 instance AssocClass Int where
-    data AssocData Int = AssocDataInt Int Int
-instance AssocClass Char where
-    newtype AssocData Char = AssocDataChar Char
-$('deriveShow' 'AssocDataChar) -- Only one single quote!
--- Generates a Show instance for AssocDataChar, but not AssocDataInt
+    data AssocData Int = AssocDataInt1 Int | AssocDataInt2 Int Int
+$('deriveShow' 'AssocDataInt1) -- instance Show (AssocData Int) where ...
+-- Alternatively, one could use $(deriveShow 'AssocDataInt2)
 
-data family DataFam a
-data instance DataFam Int = DataFamInt Int Int
-newtype instance DataFam Char = DataFamChar Char
-$('deriveShow' ''DataFam) -- Two single quotes!
--- Generates Show instances for all data instances of DataFam
--- (DataFamInt and DataFamChar)
+data family DataFam a b
+newtype instance DataFam () b = DataFamB b
+$('deriveShow' 'DataFamB)      -- instance Show b => Show (DataFam () b)
 @
 
 Note that at the moment, there are some limitations to this approach:
@@ -145,21 +142,20 @@ Note that at the moment, there are some limitations to this approach:
 
 -}
 
--- | Generates a 'T.Show' instance declaration for the given data type, data
--- family, or data family instance.
+-- | Generates a 'T.Show' instance declaration for the given data type or data
+-- family instance.
 -- 
 -- /Since: 0.3/
 deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
 deriveShow = deriveShowPragmas defaultPragmaOptions
 
--- | Generates a 'T.Show' instance declaration for the given data type, data
--- family, or data family instance. You shouldn't need to use this function unless
--- you know what you are doing.
+-- | Generates a 'T.Show' instance declaration for the given data type or data family
+-- instance. You shouldn't need to use this function unless you know what you are doing.
 -- 
 -- Unlike 'deriveShow', this function allows configuration of whether to inline
--- 'showbPrec', 'showb', or 'showbList'. It also allows for specializing instances
--- certain types. For example:
+-- certain functions. It also allows for specializing instances for certain types.
+-- For example:
 -- 
 -- @
 -- &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
@@ -194,9 +190,11 @@ deriveShowPragmas opts name = do
         TyConI{} -> deriveShowTyCon opts name
 #if MIN_VERSION_template_haskell(2,7,0)
         DataConI{} -> deriveShowDataFamInst opts name
-        FamilyI (FamilyD DataFam _ _ _) _ -> deriveShowDataFam opts name
-        FamilyI (FamilyD TypeFam _ _ _) _ -> error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
+        FamilyI (FamilyD DataFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
+        FamilyI (FamilyD TypeFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a type family name."
+        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
 #else
         _ -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
@@ -219,33 +217,19 @@ deriveShowTyCon opts tyConName = withTyCon tyConName fromCons
         (instanceCxt, instanceType) = cxtAndTypeTyCon tyConName tyVarNames
 
 #if MIN_VERSION_template_haskell(2,7,0)
--- | Generates a 'T.Show' instance declaration for a data family name.
-deriveShowDataFam :: PragmaOptions
-                  -> Name
-                  -> Q [Dec]
-deriveShowDataFam opts dataFamName = withDataFam dataFamName $ \tyVarNames decs ->
-    forM decs $ deriveShowDataFamFromDec opts dataFamName tyVarNames
-
 -- | Generates a 'T.Show' instance declaration for a data family instance constructor.
 deriveShowDataFamInst :: PragmaOptions
                       -> Name
                       -> Q [Dec]
-deriveShowDataFamInst opts dataFamInstName = (:[]) <$>
-    withDataFamInstCon dataFamInstName (deriveShowDataFamFromDec opts)
-
--- | Generates a single 'T.Show' instance declaration for a data family instance. This
--- code is used by 'deriveShowDataFam' and 'deriveShowDataFamInst' alike.
-deriveShowDataFamFromDec :: PragmaOptions
-                         -> Name
-                         -> [Name]
-                         -> Dec
-                         -> Q Dec
-deriveShowDataFamFromDec opts parentName tyVarNames dec =
-    instanceD (return instanceCxt)
-              (return $ AppT (ConT ''T.Show) instanceType)
-              (showbPrecDecs opts $ decCons [dec])
+deriveShowDataFamInst opts dataFamInstName = withDataFamInstCon dataFamInstName fromDec
   where
-    (instanceCxt, instanceType) = cxtAndTypeDataFamInstCon parentName tyVarNames dec
+    fromDec :: Name -> [Name] -> Dec -> Q [Dec]
+    fromDec parentName tyVarNames dec = (:[]) <$>
+        instanceD (return instanceCxt)
+                  (return $ AppT (ConT ''T.Show) instanceType)
+                  (showbPrecDecs opts $ decCons [dec])
+      where
+        (instanceCxt, instanceType) = cxtAndTypeDataFamInstCon parentName tyVarNames dec
 #endif
 
 {- $mk
@@ -281,9 +265,6 @@ import Text.Show.Text.TH (mkShowbPrec)
 instance Show (f a) => Show (HigherKinded f a) where
     showbPrec = $(mkShowbPrec ''HigherKinded)
 @
-
-Note that `mk`-prefixed functions will not work with a data family name. Instead,
-you must use a data family instance constructor.
 
 -}
 
@@ -356,7 +337,7 @@ mkShowbPrec name = do
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
         FamilyI (FamilyD TypeFam _ _ _) _ ->
             error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor, data family, or data family instance constructor."
+        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
 #else
         _ -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
