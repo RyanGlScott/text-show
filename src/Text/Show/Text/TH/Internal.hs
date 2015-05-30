@@ -746,11 +746,7 @@ tvbName (KindedTV name _) = name
 -- pragmas themselves) has changed considerably over the years, so there's a lot of
 -- CPP magic required to get this to work uniformly across different versions of GHC.
 showbPrecDecs :: PragmaOptions -> Name -> Name -> [NameBase] -> [Con] -> [Q Dec]
-#if __GLASGOW_HASKELL__ > 702
-showbPrecDecs opts className funcName nbs cons =
-#else
-showbPrecDecs _    className funcName nbs cons =
-#endif
+showbPrecDecs _opts _className funcName nbs cons =
     [ funD funcName [ clause []
                              (normalB $ consToShow nbs cons)
                              []
@@ -762,7 +758,7 @@ showbPrecDecs _    className funcName nbs cons =
 #if __GLASGOW_HASKELL__ <= 702
     inlineDecs = []
 #else
-    inlineDecs = map inline $ inlineFunctions opts
+    inlineDecs = map inline $ inlineFunctions _opts
 
     inline :: Name -> Q Dec
     inline funName =
@@ -778,9 +774,9 @@ showbPrecDecs _    className funcName nbs cons =
 #if MIN_VERSION_template_haskell(2,8,0)
     specializeDecs = (fmap . fmap) (PragmaD
                                         . SpecialiseInstP
-                                        . AppT (ConT className)
+                                        . AppT (ConT _className)
                                    )
-                                   (specializeTypes opts)
+                                   (specializeTypes _opts)
 #else
     -- There doesn't appear to be an equivalent of SpecialiseInstP in early
     -- versions of Template Haskell.
