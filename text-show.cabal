@@ -140,6 +140,7 @@ library
                      , base-compat        >= 0.8.1   && < 1
                      , bytestring         >= 0.9     && < 0.11
                      , bytestring-builder
+                     , containers         >= 0.1     && < 0.6
                      , ghc-prim
                      , integer-gmp
                      , nats               >= 0.1     && < 2

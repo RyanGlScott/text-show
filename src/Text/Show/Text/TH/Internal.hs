@@ -20,7 +20,11 @@ module Text.Show.Text.TH.Internal (
       -- * @deriveShow@
       -- $deriveShow
       deriveShow
+    , deriveShow1
+    , deriveShow2
     , deriveShowPragmas
+    , deriveShow1Pragmas
+    , deriveShow2Pragmas
       -- * @mk@ functions
       -- $mk
     , mkShow
@@ -36,6 +40,10 @@ module Text.Show.Text.TH.Internal (
     , mkPrintLazy
     , mkHPrint
     , mkHPrintLazy
+    , mkShowbPrecWith
+    , mkShowbPrec1
+    , mkShowbPrecWith2
+--     , mkShowbPrec2
       -- * Advanced pragma options
     , PragmaOptions(..)
     , defaultPragmaOptions
@@ -44,12 +52,15 @@ module Text.Show.Text.TH.Internal (
     , defaultInlineShowbList
     ) where
 
+import           Data.Function (on)
 import           Data.List (foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Data.List (find)
 import           Data.Maybe (fromJust)
 #endif
 import           Data.Monoid.Compat ((<>))
+import qualified Data.Set as Set
+import           Data.Set (Set)
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -69,7 +80,8 @@ import           Prelude.Compat hiding (Show)
 
 import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T
-import           Text.Show.Text.Classes (showb, showbPrec, showbList,
+import           Text.Show.Text.Classes (Show1(..), Show2(..),
+                                         showb, showbPrec, showbList,
                                          showbListWith, showbParen, showbSpace)
 import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
 
@@ -150,6 +162,14 @@ deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
 deriveShow = deriveShowPragmas defaultPragmaOptions
 
+deriveShow1 :: Name
+            -> Q [Dec]
+deriveShow1 = deriveShow1Pragmas defaultPragmaOptions
+
+deriveShow2 :: Name
+            -> Q [Dec]
+deriveShow2 = deriveShow2Pragmas defaultPragmaOptions
+
 -- | Generates a 'T.Show' instance declaration for the given data type or data family
 -- instance. You shouldn't need to use this function unless you know what you are doing.
 -- 
@@ -184,12 +204,30 @@ deriveShow = deriveShowPragmas defaultPragmaOptions
 deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
                   -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
                   -> Q [Dec]
-deriveShowPragmas opts name = do
-    info <- reify name
+deriveShowPragmas = deriveShowNumber 0 ''T.Show 'showbPrec
+
+deriveShow1Pragmas :: PragmaOptions
+                   -> Name
+                   -> Q [Dec]
+deriveShow1Pragmas = deriveShowNumber 1 ''Show1 'showbPrecWith
+
+deriveShow2Pragmas :: PragmaOptions
+                   -> Name
+                   -> Q [Dec]
+deriveShow2Pragmas = deriveShowNumber 2 ''Show2 'showbPrecWith2
+
+deriveShowNumber :: Int
+                 -> Name
+                 -> Name
+                 -> PragmaOptions
+                 -> Name
+                 -> Q [Dec]
+deriveShowNumber numToDrop className funcName opts tyConName = do
+    info <- reify tyConName
     case info of
-        TyConI{} -> deriveShowTyCon opts name
+        TyConI{} -> deriveShowTyCon numToDrop className funcName opts tyConName
 #if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> deriveShowDataFamInst opts name
+        DataConI{} -> deriveShowDataFamInst numToDrop className funcName opts tyConName
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
         FamilyI (FamilyD TypeFam _ _ _) _ ->
@@ -203,33 +241,43 @@ deriveShowPragmas opts name = do
     ns = "Text.Show.Text.TH.deriveShow: "
 
 -- | Generates a 'T.Show' instance declaration for a plain type constructor.
-deriveShowTyCon :: PragmaOptions
+deriveShowTyCon :: Int
+                -> Name
+                -> Name
+                -> PragmaOptions
                 -> Name
                 -> Q [Dec]
-deriveShowTyCon opts tyConName = withTyCon tyConName fromCons
+deriveShowTyCon numToDrop className funcName opts tyConName =
+    withTyCon tyConName fromCons
   where
     fromCons :: [Name] -> [Con] -> Q [Dec]
     fromCons tyVarNames cons = (:[]) <$>
         instanceD (return instanceCxt)
-                  (return $ AppT (ConT ''T.Show) instanceType)
-                  (showbPrecDecs opts cons)
+                  (return $ AppT (ConT className) instanceType)
+                  (showbPrecDecs opts className funcName droppedNbs cons)
       where
-        (instanceCxt, instanceType) = cxtAndTypeTyCon tyConName tyVarNames
+        (instanceCxt, instanceType, droppedNbs) =
+            cxtAndTypeTyCon numToDrop tyConName tyVarNames
 
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Generates a 'T.Show' instance declaration for a data family instance constructor.
-deriveShowDataFamInst :: PragmaOptions
+deriveShowDataFamInst :: Int
+                      -> Name
+                      -> Name
+                      -> PragmaOptions
                       -> Name
                       -> Q [Dec]
-deriveShowDataFamInst opts dataFamInstName = withDataFamInstCon dataFamInstName fromDec
+deriveShowDataFamInst numToDrop className funcName opts dataFamInstName =
+    withDataFamInstCon dataFamInstName fromDec
   where
     fromDec :: Name -> [Name] -> Dec -> Q [Dec]
     fromDec parentName tyVarNames dec = (:[]) <$>
         instanceD (return instanceCxt)
-                  (return $ AppT (ConT ''T.Show) instanceType)
-                  (showbPrecDecs opts $ decCons [dec])
+                  (return $ AppT (ConT className) instanceType)
+                  (showbPrecDecs opts className funcName droppedNbs $ decCons [dec])
       where
-        (instanceCxt, instanceType) = cxtAndTypeDataFamInstCon parentName tyVarNames dec
+        (instanceCxt, instanceType, droppedNbs) =
+            cxtAndTypeDataFamInstCon numToDrop parentName tyVarNames dec
 #endif
 
 {- $mk
@@ -326,13 +374,31 @@ mkShowb name = mkShowbPrec name `appE` [| zero |]
 -- 
 -- /Since: 0.3.1/
 mkShowbPrec :: Name -> Q Exp
-mkShowbPrec name = do
-    info <- reify name
+mkShowbPrec = mkShowbPrecNumber 0
+
+mkShowbPrecWith :: Name -> Q Exp
+mkShowbPrecWith = mkShowbPrecNumber 1
+
+mkShowbPrec1 :: Name -> Q Exp
+mkShowbPrec1 name = [| $(mkShowbPrecWith name) $(mkShowbPrec name) |]
+
+mkShowbPrecWith2 :: Name -> Q Exp
+mkShowbPrecWith2 = mkShowbPrecNumber 2
+
+-- mkShowbPrec2 :: Name -> Q Exp
+-- mkShowbPrec2 name = [| $(mkShowbPrecWith2 name) $(mkShowbPrec name) |]
+
+mkShowbPrecNumber :: Int -> Name -> Q Exp
+mkShowbPrecNumber numToDrop tyConName = do
+    info <- reify tyConName
     case info of
-        TyConI{} -> withTyCon name $ \_ decs -> consToShow decs
+        TyConI{} -> withTyCon tyConName $ \tyVarNames decs ->
+            let (_, _, nbs) = cxtAndTypeTyCon numToDrop tyConName tyVarNames
+             in consToShow nbs decs
 #if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> withDataFamInstCon name $ \_ _ dec ->
-            consToShow $ decCons [dec]
+        DataConI{} -> withDataFamInstCon tyConName $ \parentName tyVarNames dec ->
+            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName tyVarNames dec
+             in consToShow nbs $ decCons [dec]
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
         FamilyI (FamilyD TypeFam _ _ _) _ ->
@@ -415,37 +481,39 @@ defaultInlineShowbList = defaultPragmaOptions { inlineFunctions = ['showbList] }
 
 -- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
-consToShow :: [Con] -> Q Exp
-consToShow []   = error "Text.Show.Text.TH.consToShow: Not a single constructor given!"
-consToShow cons = do
+consToShow :: [NameBase] -> [Con] -> Q Exp
+consToShow _   []   = error "Text.Show.Text.TH.consToShow: Not a single constructor given!"
+consToShow nbs cons = do
     p     <- newName "p"
     value <- newName "value"
-    lam1E (varP p)
-        . lam1E (varP value)
+    sps   <- mapM newName ["sp" ++ S.show n | (_, n) <- zip nbs [(1 :: Int) ..]]
+    let tvbs = zipWith TyVarInfo nbs sps
+    lamE (map varP $ sps ++ [p, value])
         . caseE (varE value)
-        $ map (encodeArgs p) cons
+        $ map (encodeArgs p tvbs) cons
 
 -- | Generates code to generate the 'T.Show' encoding of a single constructor.
-encodeArgs :: Name -> Con -> Q Match
-encodeArgs p (NormalC conName [])
+encodeArgs :: Name -> [TyVarInfo] -> Con -> Q Match
+encodeArgs p _ (NormalC conName [])
     = match (conP conName [])
             (normalB [| intConst (fromString $(stringE (parenInfixConName conName ""))) $(varE p) |])
             []
-encodeArgs p (NormalC conName [(_, argTy)]) = do
+encodeArgs p tvis (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
     
-    let showArg  = showbPrecPrim appPrec1 argTy arg
+    let showArg  = showbPrecPrim appPrec1 tvis argTy arg
         namedArg = [| fromString $(stringE (parenInfixConName conName " ")) <> $(showArg) |] 
     
     match (conP conName [varP arg])
           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArg) |])
           []
-encodeArgs p (NormalC conName ts) = do
-    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
+encodeArgs p tvis (NormalC conName ts) = do
+    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [(1 :: Int) ..]]
     
     if isNonUnitTuple conName
        then do
-           let showArgs       = map (appE [| showb |] . varE) args
+           let showArgs       = map (\(arg, (_, argTy)) -> showbPrecPrim 0 tvis argTy arg)
+                                    (zip args ts)
                parenCommaArgs = [| s '(' |] : intersperse [| s ',' |] showArgs
                mappendArgs    = foldr (`infixApp` [| (<>) |])
                                       [| s ')' |]
@@ -455,7 +523,7 @@ encodeArgs p (NormalC conName ts) = do
                  (normalB [| intConst $(mappendArgs) $(varE p) |])
                  []
        else do
-           let showArgs = map (\(arg, (_, argTy)) -> showbPrecPrim appPrec1 argTy arg)
+           let showArgs = map (\(arg, (_, argTy)) -> showbPrecPrim appPrec1 tvis argTy arg)
                               (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
                namedArgs   = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
@@ -463,13 +531,13 @@ encodeArgs p (NormalC conName ts) = do
            match (conP conName $ map varP args)
                  (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
                  []
-encodeArgs p (RecC conName []) = encodeArgs p $ NormalC conName []
-encodeArgs p (RecC conName ts) = do
+encodeArgs p tvis (RecC conName []) = encodeArgs p tvis $ NormalC conName []
+encodeArgs p tvis (RecC conName ts) = do
     args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
     
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
                                       -> [ [| fromString $(stringE (nameBase argName ++ " = ")) |]
-                                         , showbPrecPrim 0 argTy arg
+                                         , showbPrecPrim 0 tvis argTy arg
                                          , [| fromString ", "                                   |]
                                          ]
                                    )
@@ -489,7 +557,7 @@ encodeArgs p (RecC conName ts) = do
 #endif
           )
           []
-encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
+encodeArgs p tvis (InfixC (_, alTy) conName (_, arTy)) = do
     al   <- newName "argL"
     ar   <- newName "argR"
     info <- reify conName
@@ -504,13 +572,13 @@ encodeArgs p (InfixC (_, alTy) conName (_, arTy)) = do
     
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
-                          [| $(showbPrecPrim (conPrec + 1) alTy al)
+                          [| $(showbPrecPrim (conPrec + 1) tvis alTy al)
                           <> $(infixOpE)
-                          <> $(showbPrecPrim (conPrec + 1) arTy ar)
+                          <> $(showbPrecPrim (conPrec + 1) tvis arTy ar)
                           |]
           )
           []
-encodeArgs p (ForallC _ _ con) = encodeArgs p con
+encodeArgs p tvis (ForallC tvbs _ con) = encodeArgs p (removeForalled tvbs tvis) con
 
 -------------------------------------------------------------------------------
 -- Utility functions
@@ -526,15 +594,15 @@ parenInfixConName conName =
 -- | Checks if an type variable has an unlifted type that can be shown. If so,
 -- wrap it in its corresponding constructor and show it. Otherwise, only show
 -- the type variable.
-showbPrecPrim :: Int -> Type -> Name -> Q Exp
+showbPrecPrim :: Int -> [TyVarInfo] -> Type -> Name -> Q Exp
 #if __GLASGOW_HASKELL__ >= 711
 -- Starting with GHC 7.10, data types containing unlifted types with derived @Show@
 -- instances show hashed literals with actual hash signs, and negative hashed
 -- literals are not surrounded with parentheses.
-showbPrecPrim p (ConT tyName) tyVarName = showE
+showbPrecPrim p _ (ConT tyName) tyExpName = showE
   where
     tyVarE :: Q Exp
-    tyVarE = varE tyVarName
+    tyVarE = varE tyExpName
     
     showE :: Q Exp
     showE | tyName == ''Char#   = [| showbPrec 0 (C# $(tyVarE)) <> s '#'           |]
@@ -544,10 +612,10 @@ showbPrecPrim p (ConT tyName) tyVarName = showE
           | tyName == ''Word#   = [| showbPrec 0 (W# $(tyVarE)) <> fromString "##" |]
           | otherwise = [| showbPrec p $(tyVarE) |]
 #else
-showbPrecPrim p (ConT tyName) tyVarName = [| showbPrec p $(expr) |]
+showbPrecPrim p _ (ConT tyName) tyExpName = [| showbPrec p $(expr) |]
   where
     tyVarE :: Q Exp
-    tyVarE = varE tyVarName
+    tyVarE = varE tyExpName
     
     expr :: Q Exp
     expr | tyName == ''Char#   = [| C# $(tyVarE) |]
@@ -557,7 +625,22 @@ showbPrecPrim p (ConT tyName) tyVarName = [| showbPrec p $(expr) |]
          | tyName == ''Word#   = [| W# $(tyVarE) |]
          | otherwise = tyVarE
 #endif
-showbPrecPrim p _ tyVarName = [| showbPrec p $(varE tyVarName) |]
+showbPrecPrim p tvis (VarT tyName) tyExpName =
+    case find ((== NameBase tyName) . tyVarNameBase) tvis of
+         Just (TyVarInfo _ spExp) -> [| $(varE spExp) p $(tyVarE) |]
+         Nothing                  -> [| showbPrec p $(tyVarE) |]
+  where
+    tyVarE :: Q Exp
+    tyVarE = varE tyExpName
+showbPrecPrim p tvis (SigT ty _)         tyExpName = showbPrecPrim p tvis ty tyExpName
+showbPrecPrim p tvis (ForallT tvbs _ ty) tyExpName = showbPrecPrim p (removeForalled tvbs tvis) ty tyExpName
+showbPrecPrim p _     _                  tyExpName = [| showbPrec p $(varE tyExpName) |]
+
+removeForalled :: [TyVarBndr] -> [TyVarInfo] -> [TyVarInfo]
+removeForalled tvbs = filter (not . foralled tvbs)
+  where
+    foralled :: [TyVarBndr] -> TyVarInfo -> Bool
+    foralled tvbs' tvi = tyVarNameBase tvi `elem` map (NameBase . tvbName) tvbs'
 
 -- | Checks if a 'Name' represents a tuple type constructor (other than '()')
 isNonUnitTuple :: Name -> Bool
@@ -663,16 +746,16 @@ tvbName (KindedTV name _) = name
 -- The Template Haskell API for generating pragmas (as well as GHC's treatment of
 -- pragmas themselves) has changed considerably over the years, so there's a lot of
 -- CPP magic required to get this to work uniformly across different versions of GHC.
-showbPrecDecs :: PragmaOptions -> [Con] -> [Q Dec]
+showbPrecDecs :: PragmaOptions -> Name -> Name -> [NameBase] -> [Con] -> [Q Dec]
 #if __GLASGOW_HASKELL__ > 702
-showbPrecDecs opts cons =
+showbPrecDecs opts className funcName nbs cons =
 #else
-showbPrecDecs _    cons =
+showbPrecDecs _    className funcName nbs cons =
 #endif
-    [ funD 'showbPrec [ clause []
-                               (normalB $ consToShow cons)
-                               []
-                      ]
+    [ funD funcName [ clause []
+                             (normalB $ consToShow nbs cons)
+                             []
+                    ]
     ] ++ inlineDecs
       ++ specializeDecs
   where
@@ -696,7 +779,7 @@ showbPrecDecs _    cons =
 #if MIN_VERSION_template_haskell(2,8,0)
     specializeDecs = (fmap . fmap) (PragmaD
                                         . SpecialiseInstP
-                                        . AppT (ConT ''T.Show)
+                                        . AppT (ConT className)
                                    )
                                    (specializeTypes opts)
 #else
@@ -717,27 +800,110 @@ applyClass con t = AppT (ConT con) (VarT t)
 applyClass con t = ClassP con [VarT t]
 #endif
 
+canEtaReduce :: [Type] -> [Type] -> Bool
+canEtaReduce remaining dropped =
+       all isTyVar dropped
+    && allDistinct dropped
+    && not (any (`mentionsNameBase` nbs) remaining)
+  where
+    nbs :: [NameBase]
+    nbs = map varTToNameBase dropped
+
+varTToName :: Type -> Name
+varTToName (VarT n)   = n
+varTToName (SigT t _) = varTToName t
+varTToName _          = error "Not a type variable!"
+
+varTToNameBase :: Type -> NameBase
+varTToNameBase = NameBase . varTToName
+
+isTyVar :: Type -> Bool
+isTyVar (VarT _)   = True
+isTyVar (SigT t _) = isTyVar t
+isTyVar _          = False
+
+allDistinct :: Ord a => [a] -> Bool
+allDistinct = allDistinct' Set.empty
+  where
+    allDistinct' :: Ord a => Set a -> [a] -> Bool
+    allDistinct' uniqs (x:xs)
+        | x `Set.member` uniqs = False
+        | otherwise            = allDistinct' (Set.insert x uniqs) xs
+    allDistinct' _ _           = True
+
+mentionsNameBase :: Type -> [NameBase] -> Bool
+mentionsNameBase = go Set.empty
+  where
+    go :: Set NameBase -> Type -> [NameBase] -> Bool
+    go foralls (ForallT tvbs _ t) nbs =
+        go (foralls `Set.union` Set.fromList (map (NameBase . tvbName) tvbs)) t nbs
+    go foralls (AppT t1 t2) nbs = go foralls t1 nbs || go foralls t2 nbs
+    go foralls (SigT t _)   nbs = go foralls t nbs
+    go foralls (VarT n)     nbs = nb `elem` nbs && not (nb `Set.member` foralls)
+      where
+        nb = NameBase n
+    go _       _            _   = False
+
+newtype NameBase = NameBase { getName :: Name }
+
+getNameBase :: NameBase -> String
+getNameBase = nameBase . getName
+
+instance Eq NameBase where
+    (==) = (==) `on` getNameBase
+
+instance Ord NameBase where
+    compare = compare `on` getNameBase
+
+data TyVarInfo = TyVarInfo {
+    tyVarNameBase   :: NameBase
+  , _tyVarShowsPrec :: Name
+}
+
 -- | Deduces the 'Show' instance context of a simple type constructor, as well
 -- as the type constructor fully applied to its type variables.
-cxtAndTypeTyCon :: Name -> [Name] -> (Cxt, Type)
-cxtAndTypeTyCon tyConName tyVarNames = (instanceCxt, instanceType)
+cxtAndTypeTyCon :: Int -> Name -> [Name] -> (Cxt, Type, [NameBase])
+cxtAndTypeTyCon numToDrop tyConName tyVarNames = 
+    if remainingLength >= 0 -- If we have enough type variables
+       then (instanceCxt, instanceType, droppedNbs)
+       else error "TODOERRORMESSAGE"
   where
     instanceCxt :: Cxt
-    instanceCxt = map (applyClass ''T.Show) tyVarNames
+    instanceCxt = map (applyClass ''T.Show) remaining
 
     instanceType :: Type
-    instanceType = applyTyCon tyConName $ map VarT tyVarNames
+    instanceType = applyTyCon tyConName $ map VarT remaining
+
+    remainingLength :: Int
+    remainingLength = length tyVarNames - numToDrop
+
+    (remaining, dropped) = splitAt remainingLength tyVarNames
+
+    droppedNbs :: [NameBase]
+    droppedNbs = map NameBase dropped
 
 -- | Deduces the 'Show' instance context of a data family instance constructor,
 -- as well as the type constructor fully applied to its type variables.
-cxtAndTypeDataFamInstCon :: Name -> [Name] -> Dec -> (Cxt, Type)
-cxtAndTypeDataFamInstCon parentName tyVarNames dec = (instanceCxt, instanceType)
+cxtAndTypeDataFamInstCon :: Int -> Name -> [Name] -> Dec -> (Cxt, Type, [NameBase])
+cxtAndTypeDataFamInstCon numToDrop parentName tyVarNames dec =
+    if remainingLength >= 0                -- If we have enough type variables
+         && canEtaReduce remaining dropped -- If it is safe to drop the type variables
+       then (instanceCxt, instanceType, droppedNbs)
+       else error "TODOERRORMESSAGE"
   where
     instanceCxt :: Cxt
-    instanceCxt = map (applyClass ''T.Show) lhsTypeNames
+    instanceCxt = map (applyClass ''T.Show) $ take remainingLength lhsTypeNames
 
     instanceType :: Type
-    instanceType = applyTyCon parentName rhsTypes
+    instanceType = applyTyCon parentName remaining
+
+    remainingLength :: Int
+    remainingLength = length rhsTypes - numToDrop
+
+    (remaining, dropped) = splitAt remainingLength rhsTypes
+
+    droppedNbs :: [NameBase]
+    droppedNbs = map varTToNameBase dropped
 
     -- It seems that Template Haskell's representation of the type variable binders
     -- in a data family instance declaration has changed considerably with each new
