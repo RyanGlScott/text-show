@@ -53,9 +53,8 @@ module Text.Show.Text.TH.Internal (
     ) where
 
 import           Data.Function (on)
-import           Data.List (foldl', intersperse)
+import           Data.List (find, foldl', intersperse)
 #if MIN_VERSION_template_haskell(2,7,0)
-import           Data.List (find)
 import           Data.Maybe (fromJust)
 #endif
 import           Data.Monoid.Compat ((<>))
