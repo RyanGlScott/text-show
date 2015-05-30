@@ -803,7 +803,8 @@ applyClass con t = ClassP con [VarT t]
 canEtaReduce :: [Type] -> [Type] -> Bool
 canEtaReduce remaining dropped =
        all isTyVar dropped
-    && allDistinct dropped
+    && allDistinct nbs -- Make sure not to pass something of type [Type], since Type
+                       -- didn't have an Ord instance until template-haskell-2.10.0.0
     && not (any (`mentionsNameBase` nbs) remaining)
   where
     nbs :: [NameBase]

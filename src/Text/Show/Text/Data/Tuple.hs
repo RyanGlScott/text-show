@@ -36,7 +36,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude ()
 
 import Text.Show.Text.Classes (Show(showb))
-import Text.Show.Text.TH.Internal (deriveShow)
+import Text.Show.Text.TH.Internal (deriveShow, deriveShow1, deriveShow2)
 
 #include "inline.h"
 
@@ -175,6 +175,9 @@ $(deriveShow ''(,,,,,,,,,,,))
 $(deriveShow ''(,,,,,,,,,,,,))
 $(deriveShow ''(,,,,,,,,,,,,,))
 $(deriveShow ''(,,,,,,,,,,,,,,))
+
+$(deriveShow1 ''(,))
+$(deriveShow2 ''(,,))
 
 -- instance Show a => Show1 ((,) a) where
 --     showbPrec1 = showbPrec
