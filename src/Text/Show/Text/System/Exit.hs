@@ -20,13 +20,13 @@ import System.Exit (ExitCode)
 
 import Text.Show.Text.Classes (showbPrec)
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert an 'ExitCode' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbExitCodePrec :: Int -> ExitCode -> Builder
 showbExitCodePrec = showbPrec
 {-# INLINE showbExitCodePrec #-}
 
-$(deriveShowPragmas inlineShowbPrec ''ExitCode)
+$(deriveShow ''ExitCode)

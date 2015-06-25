@@ -40,13 +40,13 @@ import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
+import           Text.Show.Text.TH.Internal (deriveShow)
 import           Text.Show.Text.Utils (i2d, s)
 
 #include "inline.h"
 
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder
 showbRealFloatPrec p x
@@ -55,14 +55,14 @@ showbRealFloatPrec p x
 {-# INLINE showbRealFloatPrec #-}
 
 -- | Convert a 'Float' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbFloatPrec :: Int -> Float -> Builder
 showbFloatPrec = showbRealFloatPrec
 {-# INLINE showbFloatPrec #-}
 
 -- | Convert a 'Double' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbDoublePrec :: Int -> Double -> Builder
 showbDoublePrec = showbRealFloatPrec
@@ -70,11 +70,11 @@ showbDoublePrec = showbRealFloatPrec
 
 -- | Show a signed 'RealFloat' value
 -- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
--- 
+--
 -- In the call @'showbEFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbEFloat = formatRealFloatB Exponent
@@ -82,11 +82,11 @@ showbEFloat = formatRealFloatB Exponent
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
--- 
+--
 -- In the call @'showbFFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloat = formatRealFloatB Fixed
@@ -95,11 +95,11 @@ showbFFloat = formatRealFloatB Fixed
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
--- 
+--
 -- In the call @'showbGFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloat = formatRealFloatB Generic
@@ -107,10 +107,10 @@ showbGFloat = formatRealFloatB Generic
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
--- 
+--
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
--- 
+--
 -- /Since: 0.3/
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloatAlt d = formatRealFloatAltB Fixed d True
@@ -119,17 +119,17 @@ showbFFloatAlt d = formatRealFloatAltB Fixed d True
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
--- 
+--
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
--- 
+--
 -- /Since: 0.3/
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloatAlt d = formatRealFloatAltB Generic d True
 {-# INLINE showbGFloatAlt #-}
 
 -- | Convert an 'FPFormat' value to a 'Builder'.
--- 
+--
 -- /Since: 0.9/
 showbFPFormat :: FPFormat -> Builder
 showbFPFormat = showb
@@ -141,7 +141,7 @@ showbFPFormat = showb
 
 -- | Like 'formatRealFloatAltB', except that the decimal is only shown for arguments
 -- whose absolute value is between @0.1@ and @9,999,999@.
--- 
+--
 -- /Since: 0.8/
 formatRealFloatB :: RealFloat a
                  => FPFormat  -- ^ What notation to use.
@@ -153,7 +153,7 @@ formatRealFloatB fmt decs = formatRealFloatAltB fmt decs False
 
 -- | Converts a 'RealFloat' value to a Builder, specifying if a decimal point
 -- should always be shown.
--- 
+--
 -- /Since: 0.8/
 formatRealFloatAltB :: RealFloat a
                     => FPFormat  -- ^ What notation to use.
@@ -410,4 +410,4 @@ instance Show Double where
     showbPrec = showbDoublePrec
     INLINE_INST_FUN(showbPrec)
 
-$(deriveShowPragmas inlineShowb ''FPFormat)
+$(deriveShow ''FPFormat)

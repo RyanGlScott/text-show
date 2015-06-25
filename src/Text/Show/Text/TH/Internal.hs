@@ -1,12 +1,7 @@
 {-# LANGUAGE BangPatterns       #-}
 {-# LANGUAGE CPP                #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE MagicHash          #-}
 {-# LANGUAGE TemplateHaskell    #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric      #-}
-#endif
 {-|
 Module:      Text.Show.Text.TH.Internal
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -28,9 +23,6 @@ module Text.Show.Text.TH.Internal (
       deriveShow
     , deriveShow1
     , deriveShow2
-    , deriveShowPragmas
-    , deriveShow1Pragmas
-    , deriveShow2Pragmas
       -- * @mk@ functions
       -- $mk
     , mkShow
@@ -50,14 +42,6 @@ module Text.Show.Text.TH.Internal (
     , mkShowbPrec1
     , mkShowbPrecWith2
     , mkShowbPrec2
-      -- * Advanced pragma options
-    , PragmaOptions(..)
-    , defaultPragmaOptions
-    , inlineShowbPrec
-    , inlineShowb
-    , inlineShowbList
-    , inlineShowbPrecWith
-    , inlineShowbPrecWith2
     ) where
 
 import           Data.Function (on)
@@ -76,12 +60,8 @@ import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
-import           Data.Typeable (Typeable)
 
 import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
-#if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic)
-#endif
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
@@ -94,8 +74,7 @@ import           Prelude.Compat hiding (Show)
 
 import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T
-import           Text.Show.Text.Classes (Show1(..), Show2(..),
-                                         showb, showbPrec, showbList,
+import           Text.Show.Text.Classes (Show1(..), Show2(..), showbPrec,
                                          showbListWith, showbParen, showbSpace)
 import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
 
@@ -174,72 +153,25 @@ Note that at the moment, there are some limitations to this approach:
 -- /Since: 0.3/
 deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
-deriveShow = deriveShowPragmas defaultPragmaOptions
+deriveShow = deriveShowNumber Show
 
 deriveShow1 :: Name
             -> Q [Dec]
-deriveShow1 = deriveShow1Pragmas defaultPragmaOptions
+deriveShow1 = deriveShowNumber Show1
 
 deriveShow2 :: Name
             -> Q [Dec]
-deriveShow2 = deriveShow2Pragmas defaultPragmaOptions
-
--- | Generates a 'T.Show' instance declaration for the given data type or data family
--- instance. You shouldn't need to use this function unless you know what you are doing.
---
--- Unlike 'deriveShow', this function allows configuration of whether to inline
--- certain functions. It also allows for specializing instances for certain types.
--- For example:
---
--- @
--- &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
--- import Text.Show.Text.TH
---
--- data ADT a = ADT a
--- $(deriveShowPragmas 'defaultInlineShowbPrec' {
---                         specializeTypes = [ [t| ADT Int |] ]
---                      }
---                      ''ADT)
--- @
---
--- This declararation would produce code like this:
---
--- @
--- instance Show a => Show (ADT a) where
---     &#123;-&#35; INLINE showbPrec &#35;-&#125;
---     &#123;-&#35; SPECIALIZE instance Show (ADT Int) &#35;-&#125;
---     showbPrec = ...
--- @
---
--- Beware: 'deriveShow' can generate extremely long code splices, so it may be unwise
--- to inline in some cases. Use with caution.
---
--- /Since: 0.5/
-deriveShowPragmas :: PragmaOptions -- ^ Specifies what pragmas to generate with this instance
-                  -> Name          -- ^ Name of the data type to make an instance of 'T.Show'
-                  -> Q [Dec]
-deriveShowPragmas = deriveShowNumber Show
-
-deriveShow1Pragmas :: PragmaOptions
-                   -> Name
-                   -> Q [Dec]
-deriveShow1Pragmas = deriveShowNumber Show1
-
-deriveShow2Pragmas :: PragmaOptions
-                   -> Name
-                   -> Q [Dec]
-deriveShow2Pragmas = deriveShowNumber Show2
+deriveShow2 = deriveShowNumber Show2
 
 deriveShowNumber :: ShowClass
-                 -> PragmaOptions
                  -> Name
                  -> Q [Dec]
-deriveShowNumber numToDrop opts tyConName = do
+deriveShowNumber numToDrop tyConName = do
     info <- reify tyConName
     case info of
-        TyConI{} -> deriveShowTyCon numToDrop opts tyConName
+        TyConI{} -> deriveShowTyCon numToDrop tyConName
 #if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> deriveShowDataFamInst numToDrop opts tyConName
+        DataConI{} -> deriveShowDataFamInst numToDrop tyConName
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
         FamilyI (FamilyD TypeFam _ _ _) _ ->
@@ -254,10 +186,9 @@ deriveShowNumber numToDrop opts tyConName = do
 
 -- | Generates a 'T.Show' instance declaration for a plain type constructor.
 deriveShowTyCon :: ShowClass
-                -> PragmaOptions
                 -> Name
                 -> Q [Dec]
-deriveShowTyCon numToDrop opts tyConName =
+deriveShowTyCon numToDrop tyConName =
     withTyCon tyConName fromCons
   where
     className :: Name
@@ -267,7 +198,7 @@ deriveShowTyCon numToDrop opts tyConName =
     fromCons ctxt tvbs cons = (:[]) <$>
         instanceD (return instanceCxt)
                   (return $ AppT (ConT className) instanceType)
-                  (showbPrecDecs opts droppedNbs cons)
+                  (showbPrecDecs droppedNbs cons)
       where
         (instanceCxt, instanceType, droppedNbs) =
             cxtAndTypeTyCon numToDrop tyConName ctxt tvbs
@@ -275,10 +206,9 @@ deriveShowTyCon numToDrop opts tyConName =
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Generates a 'T.Show' instance declaration for a data family instance constructor.
 deriveShowDataFamInst :: ShowClass
-                      -> PragmaOptions
                       -> Name
                       -> Q [Dec]
-deriveShowDataFamInst numToDrop opts dataFamInstName =
+deriveShowDataFamInst numToDrop dataFamInstName =
     withDataFamInstCon dataFamInstName fromDec
   where
     className :: Name
@@ -288,7 +218,7 @@ deriveShowDataFamInst numToDrop opts dataFamInstName =
     fromDec tvbs ctxt parentName tys cons = (:[]) <$>
         instanceD (return instanceCxt)
                   (return $ AppT (ConT className) instanceType)
-                  (showbPrecDecs opts droppedNbs cons)
+                  (showbPrecDecs droppedNbs cons)
       where
         (instanceCxt, instanceType, droppedNbs) =
             cxtAndTypeDataFamInstCon numToDrop parentName ctxt tvbs tys
@@ -460,65 +390,6 @@ mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 mkHPrintLazy :: Name -> Q Exp
 mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
--- | Options that specify what @INLINE@ or @SPECIALIZE@ pragmas to generate with
--- a 'T.Show' instance.
---
--- /Since: 0.5/
-data PragmaOptions = PragmaOptions {
-    inlineFunctions :: [Name]   -- ^ Inline these functions
-  , specializeTypes :: [Q Type] -- ^ Create specialized instance declarations for these types
-} deriving ( Typeable
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
-           )
-
--- | Do not generate any pragmas with a 'T.Show' instance.
---
--- /Since: 0.5/
-defaultPragmaOptions :: PragmaOptions
-defaultPragmaOptions = PragmaOptions [] []
-
--- | Inline the 'showbPrec' function in a 'T.Show' instance.
---
--- /Since: 0.9/
-inlineShowbPrec :: PragmaOptions
-inlineShowbPrec = defaultPragmaOptions {
-    inlineFunctions = ['showbPrec]
-}
-
--- | Inline the 'showb' function in a 'T.Show' instance.
---
--- /Since: 0.9/
-inlineShowb :: PragmaOptions
-inlineShowb = defaultPragmaOptions {
-    inlineFunctions = ['showb]
-}
-
--- | Inline the 'showbList' function in a 'T.Show' instance.
---
--- /Since: 0.9/
-inlineShowbList :: PragmaOptions
-inlineShowbList = defaultPragmaOptions {
-    inlineFunctions = ['showbList]
-}
-
--- | Inline the 'showbPrecWith' function in a 'Show1' instance.
---
--- /Since: 0.9/
-inlineShowbPrecWith :: PragmaOptions
-inlineShowbPrecWith = defaultPragmaOptions {
-    inlineFunctions = ['showbPrecWith]
-}
-
--- | Inline the 'showbPrecWith2' function in a 'Show2' instance.
---
--- /Since: 0.9/
-inlineShowbPrecWith2 :: PragmaOptions
-inlineShowbPrecWith2 = defaultPragmaOptions {
-    inlineFunctions = ['showbPrecWith2]
-}
-
 -- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
 consToShow :: [NameBase] -> [Con] -> Q Exp
@@ -576,7 +447,7 @@ encodeArgs p sClass tvis (NormalC conName ts) = do
                  (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
                  []
 encodeArgs p sClass tvis (RecC conName []) = encodeArgs p sClass tvis $ NormalC conName []
-encodeArgs p sClass tvis (RecC conName ts) = do
+encodeArgs _p sClass tvis (RecC conName ts) = do
     args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
 
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
@@ -597,7 +468,7 @@ encodeArgs p sClass tvis (RecC conName ts) = do
 #if __GLASGOW_HASKELL__ >= 711
                     namedArgs
 #else
-                    [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |]
+                    [| showbParen ($(varE _p) > $(lift appPrec)) $(namedArgs) |]
 #endif
           )
           []
@@ -857,44 +728,17 @@ tvbKind (KindedTV _ k) = k
 -- The Template Haskell API for generating pragmas (as well as GHC's treatment of
 -- pragmas themselves) has changed considerably over the years, so there's a lot of
 -- CPP magic required to get this to work uniformly across different versions of GHC.
-showbPrecDecs :: PragmaOptions -> [NameBase] -> [Con] -> [Q Dec]
-showbPrecDecs opts nbs cons =
+showbPrecDecs :: [NameBase] -> [Con] -> [Q Dec]
+showbPrecDecs nbs cons =
     [ funD classFuncName
            [ clause []
                     (normalB $ consToShow nbs cons)
                     []
            ]
-    ] ++ inlineDecs opts
-      ++ specializeDecs opts
+    ]
   where
     classFuncName :: Name
     classFuncName  = showFuncTable . toEnum $ length nbs
-
-inlineDecs :: PragmaOptions -> [Q Dec]
-#if __GLASGOW_HASKELL__ <= 702
-inlineDecs _ = []
-#else
-inlineDecs = map inline . inlineFunctions
-  where
-    inline :: Name -> Q Dec
-    inline funcName =
-        pragInlD funcName
-# if MIN_VERSION_template_haskell(2,8,0)
-                 Inline FunLike AllPhases
-# else
-                 (inlineSpecNoPhase True False)
-# endif
-#endif
-
-specializeDecs :: PragmaOptions -> [Q Dec]
-#if !(MIN_VERSION_template_haskell(2,8,0))
--- There doesn't appear to be an equivalent of SpecialiseInstP in early
--- versions of Template Haskell.
-specializeDecs _ = []
-#else
-specializeDecs =
-    (fmap . fmap) (PragmaD . SpecialiseInstP) . specializeTypes
-#endif
 
 -- | Applies a typeclass constraint to a type.
 applyClass :: Name -> Name -> Pred

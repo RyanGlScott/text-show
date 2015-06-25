@@ -29,20 +29,20 @@ import Text.Show.Text.Classes (showb, showbPrec)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils (s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbVersionPrec :: Int -> Version -> Builder
 showbVersionPrec = showbPrec
 {-# INLINE showbVersionPrec #-}
 
 -- | Provides one possible concrete representation for 'Version'.  For
--- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags' 
+-- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags'
 -- @= [\"tag1\",\"tag2\"]@, the output will be @1.2.3-tag1-tag2@.
--- 
+--
 -- /Since: 0.3/
 showbVersionConcrete :: Version -> Builder
 showbVersionConcrete (Version branch tags)
@@ -50,4 +50,4 @@ showbVersionConcrete (Version branch tags)
         mconcat (map ((s '-' <>) . fromString) tags)
 {-# INLINE showbVersionConcrete #-}
 
-$(deriveShowPragmas inlineShowbPrec ''Version)
+$(deriveShow ''Version)

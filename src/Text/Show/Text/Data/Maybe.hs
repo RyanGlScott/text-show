@@ -20,17 +20,16 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (showbPrecWith)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, deriveShow1Pragmas,
-                                   inlineShowbPrec, inlineShowbPrecWith)
+import Text.Show.Text.TH.Internal (deriveShow, deriveShow1)
 
 #include "inline.h"
 
 -- | Convert a 'Maybe' value to a 'Builder' with the given show function and precedence.
--- 
+--
 -- /Since: 1/
 showbMaybePrecWith :: (Int -> a -> Builder) -> Int -> Maybe a -> Builder
 showbMaybePrecWith = showbPrecWith
 {-# INLINE showbMaybePrecWith #-}
 
-$(deriveShowPragmas  inlineShowbPrec     ''Maybe)
-$(deriveShow1Pragmas inlineShowbPrecWith ''Maybe)
+$(deriveShow  ''Maybe)
+$(deriveShow1 ''Maybe)

@@ -17,13 +17,13 @@ module Text.Show.Text.Data.Bool (showbBool) where
 import Data.Text.Lazy.Builder (Builder)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'Bool' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbBool :: Bool -> Builder
 showbBool = showb
 {-# INLINE showbBool #-}
 
-$(deriveShowPragmas inlineShowb ''Bool)
+$(deriveShow ''Bool)

@@ -13,11 +13,8 @@
 -- Deriving Show1 and Show2 via Template Haskell
 * `Show1` instances can be created generically using the `genericShowbPrecWith` function in `Text.Show.Text.Generics`. A `genericShowbPrec1` was also added.
 * Removed the ability to call `deriveShow` or `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature. If you want to derive `Show` for data family instances, use the corresponding `data instance` or `newtype instance` constructor name as an argument instead.
-* `PragmaOptions` (in `Text.Show.Text.TH`) combined all of its inlining-related fields into a single field, `inlineFunctions`, which takes a list of names of functions to inline.
- * `specializeTypes` now expects each `Q Type` value to mention `Show` (i.e., use `specializeTypes = [t| Show Int |]`, not `specializeTypes = [t| Int |]`).
-* Renamed `defaultInlineShowbPrec`, `defaultInlineShowb`, and `defaultInlineShowbList` to `inlineShowbPrec`, `inlineShowb`, and `inlineShowbList`, respectively. Also added `inlineShowbPrecWith` and `inlineShowbPrecWith2`.
+ * Removed `PragmaOptions`, `deriveShowPragmas`, `defaultInlineShowbPrec`, `defaultInlineShowb`, and `defaultInlineShowbList`, as it was impossible to make Template Haskell-generated pragmas work consistently across different versions of GHC. If you really want to use `INLINE` and `SPECIALIZE instance` pragmas with your Template Haskell-generated code, create manual instances with `mkShowbPrec` and family.
 * `ConType` (in `Text.Show.Text.Generics`) now has an `Inf String` constructor instead of `Inf Builder`. As a result, `ConType` now always an `Eq` and `Ord` instance, and a `Read ConType` instance was added.
-* `Generic` and `Typeable` instances for `PragmaOptions`
 * `Typeable` instances for the promoted data constructors `'FromStringShow` and `'FromTextShow`
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
 

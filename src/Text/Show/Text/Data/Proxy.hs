@@ -22,7 +22,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbPrecWith)
-import Text.Show.Text.TH.Internal (deriveShow1Pragmas, inlineShowbPrecWith)
+import Text.Show.Text.TH.Internal (deriveShow1)
 
 #include "inline.h"
 
@@ -38,4 +38,4 @@ instance Show (Proxy s) where
     showbPrec = showbPrecWith undefined
     INLINE_INST_FUN(showb)
 
-$(deriveShow1Pragmas inlineShowbPrecWith ''Proxy)
+$(deriveShow1 ''Proxy)

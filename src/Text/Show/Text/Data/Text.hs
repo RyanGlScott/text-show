@@ -42,7 +42,7 @@ import           Prelude hiding (Show)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.Data.Char (showbString)
 import           Text.Show.Text.Data.Integral (showbHex)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowbPrec)
+import           Text.Show.Text.TH.Internal (deriveShow)
 
 #if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding(..))
@@ -54,7 +54,6 @@ import           Text.Show.Text.Data.ByteString (showbByteStringStrict)
 
 #if MIN_VERSION_text(1,1,0)
 import           Data.Text.Internal.Fusion.Size (Size)
-import           Text.Show.Text.TH.Internal (deriveShow)
 #endif
 
 #include "inline.h"
@@ -62,7 +61,7 @@ import           Text.Show.Text.TH.Internal (deriveShow)
 -- | Convert a strict 'TS.Text' to a 'Builder'.
 -- 'showbText' should not be confused with @fromText@, as 'showbText' escapes
 -- certain characters (such as double quotes).
--- 
+--
 -- /Since: 0.5/
 showbText :: TS.Text -> Builder
 showbText = showbString . TS.unpack
@@ -71,7 +70,7 @@ showbText = showbString . TS.unpack
 -- | Convert a lazy 'TL.Text' to a 'Builder'.
 -- 'showbTextLazy' should not be confused with @fromTextLazy@, as 'showbTextLazy'
 -- escapes certain characters (such as double quotes).
--- 
+--
 -- /Since: 0.3/
 showbTextLazy :: TL.Text -> Builder
 showbTextLazy = showbString . TL.unpack
@@ -79,21 +78,21 @@ showbTextLazy = showbString . TL.unpack
 
 -- | Show a 'Builder' as if it were a 'String' (i.e., escape certain characters,
 -- such as double quotes).
--- 
+--
 -- /Since: 0.5/
 showbBuilder :: Builder -> Builder
 showbBuilder = showbTextLazy . toLazyText
 {-# INLINE showbBuilder #-}
 
 -- | Convert an 'I16' value to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.8/
 showbI16Prec :: Int -> I16 -> Builder
 showbI16Prec = showbPrec
 {-# INLINE showbI16Prec #-}
 
 -- | Convert a 'UnicodeException' to a 'Builder'.
--- 
+--
 -- /Since: 0.8/
 showbUnicodeException :: UnicodeException -> Builder
 showbUnicodeException (DecodeError desc (Just w))
@@ -108,7 +107,7 @@ showbUnicodeException (EncodeError desc Nothing)
 #if MIN_VERSION_text(1,0,0)
 -- | Convert a 'Decoding' value to a 'Builder' with the given precedence.
 -- This function is only available with @text-1.0.0.0@ or later.
--- 
+--
 -- /Since: 0.8/
 showbDecodingPrec :: Int -> Decoding -> Builder
 showbDecodingPrec p (Some t bs _) = showbParen (p > appPrec) $
@@ -121,7 +120,7 @@ showbDecodingPrec p (Some t bs _) = showbParen (p > appPrec) $
 #if MIN_VERSION_text(1,1,0)
 -- | Convert a 'Size' value to a 'Builder' with the given precedence.
 -- This function is only available with @text-1.1.0.0@ or later.
--- 
+--
 -- /Since: 0.8/
 showbSizePrec :: Int -> Size -> Builder
 showbSizePrec = showbPrec
@@ -140,7 +139,7 @@ instance Show Builder where
     showb = showbBuilder
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas inlineShowbPrec ''I16)
+$(deriveShow ''I16)
 
 instance Show UnicodeException where
     showb = showbUnicodeException

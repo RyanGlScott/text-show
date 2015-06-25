@@ -47,14 +47,13 @@ import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
-import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
-                                   inlineShowb, inlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow)
 import Text.Show.Text.Utils (s)
 
 #include "inline.h"
 
 -- | Convert a 'Handle' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbHandle :: Handle -> Builder
 showbHandle (FileHandle   file _)   = showbHandleFilePath file
@@ -67,21 +66,21 @@ showbHandleFilePath file = "{handle: " <> fromString file <> s '}'
 {-# INLINE showbHandleFilePath #-}
 
 -- | Convert an 'IOMode' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbIOMode :: IOMode -> Builder
 showbIOMode = showb
 {-# INLINE showbIOMode #-}
 
 -- | Convert a 'BufferMode' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbBufferModePrec :: Int -> BufferMode -> Builder
 showbBufferModePrec = showbPrec
 {-# INLINE showbBufferModePrec #-}
 
 -- | Convert a 'HandlePosn' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbHandlePosn :: HandlePosn -> Builder
 showbHandlePosn (HandlePosn h pos)
@@ -89,14 +88,14 @@ showbHandlePosn (HandlePosn h pos)
 {-# INLINE showbHandlePosn #-}
 
 -- | Convert a 'SeekMode' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbSeekMode :: SeekMode -> Builder
 showbSeekMode = showb
 {-# INLINE showbSeekMode #-}
 
 -- | Convert a 'TextEncoding' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbTextEncoding :: TextEncoding -> Builder
 showbTextEncoding = fromString . textEncodingName
@@ -105,7 +104,7 @@ showbTextEncoding = fromString . textEncodingName
 #if MIN_VERSION_base(4,4,0)
 -- | Convert a 'CodingProgress' to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later.
--- 
+--
 -- /Since: 0.3/
 showbCodingProgress :: CodingProgress -> Builder
 showbCodingProgress = showb
@@ -113,7 +112,7 @@ showbCodingProgress = showb
 
 -- | Convert a 'CodingFailureMode' value to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later.
--- 
+--
 -- /Since: 0.3/
 showbCodingFailureMode :: CodingFailureMode -> Builder
 showbCodingFailureMode = showb
@@ -121,14 +120,14 @@ showbCodingFailureMode = showb
 #endif
 
 -- | Convert a 'Newline' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbNewline :: Newline -> Builder
 showbNewline = showb
 {-# INLINE showbNewline #-}
 
 -- | Convert a 'NewlineMode' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbNewlineModePrec :: Int -> NewlineMode -> Builder
 showbNewlineModePrec = showbPrec
@@ -138,23 +137,23 @@ instance Show Handle where
     showb = showbHandle
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas inlineShowb     ''IOMode)
-$(deriveShow                        ''BufferMode)
+$(deriveShow ''IOMode)
+$(deriveShow ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas inlineShowb     ''SeekMode)
+$(deriveShow ''SeekMode)
 
 instance Show TextEncoding where
     showb = showbTextEncoding
     INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,4,0)
-$(deriveShowPragmas inlineShowb     ''CodingProgress)
-$(deriveShowPragmas inlineShowb     ''CodingFailureMode)
+$(deriveShow ''CodingProgress)
+$(deriveShow ''CodingFailureMode)
 #endif
 
-$(deriveShowPragmas inlineShowb     ''Newline)
-$(deriveShowPragmas inlineShowbPrec ''NewlineMode)
+$(deriveShow ''Newline)
+$(deriveShow ''NewlineMode)
