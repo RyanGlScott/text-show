@@ -25,7 +25,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb, inlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
 
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down)
@@ -33,7 +33,8 @@ import Data.Ord (Down)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (showbPrecWith)
-import Text.Show.Text.TH.Internal (deriveShow1Pragmas, inlineShowbPrecWith)
+import Text.Show.Text.TH.Internal
+    (deriveShow1Pragmas, inlineShowbPrec, inlineShowbPrecWith)
 #endif
 
 #include "inline.h"

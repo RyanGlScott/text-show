@@ -85,8 +85,9 @@ import           GHC.Generics (Generic)
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
-import           Language.Haskell.TH
-import           Language.Haskell.TH.Syntax (lift)
+import           Language.Haskell.TH.Lib
+import           Language.Haskell.TH.Ppr hiding (appPrec)
+import           Language.Haskell.TH.Syntax
 
 import           Prelude ()
 import           Prelude.Compat hiding (Show)
