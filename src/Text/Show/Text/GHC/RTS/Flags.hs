@@ -34,7 +34,7 @@ module Text.Show.Text.GHC.RTS.Flags (
     ) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder)
+import Data.Text.Lazy.Builder (Builder, singleton)
 
 import GHC.RTS.Flags
 
@@ -47,7 +47,6 @@ import Text.Show.Text.Data.Floating (showbDoublePrec)
 import Text.Show.Text.Data.Integral (showbIntPrec, showbWord, showbWord64)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Maybe (showbMaybePrecWith)
-import Text.Show.Text.Utils (s)
 import Text.Show.Text.TH.Internal (deriveShow)
 
 # if __GLASGOW_HASKELL__ < 711
@@ -123,7 +122,7 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
     <> showbWord (heapBase gcfs)
     <> ", allocLimitGrace = "
     <> showbWord (allocLimitGrace gcfs)
-    <> s '}'
+    <> singleton '}'
 
 -- | Convert a 'ConcFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -164,7 +163,7 @@ showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
     <> showbIntPrec 0 (profilerTicks ccfs)
     <> ", msecsPerTick = "
     <> showbIntPrec 0 (msecsPerTick ccfs)
-    <> s '}'
+    <> singleton '}'
 
 -- | Convert a 'ProfFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -204,7 +203,7 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
     <> showbMaybePrecWith showbPrec 0 (retainerSelector pfs)
     <> ", bioSelector = "
     <> showbMaybePrecWith showbPrec 0 (bioSelector pfs)
-    <> s '}'
+    <> singleton '}'
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
@@ -230,7 +229,7 @@ showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
     <> showbBool (sparksFull tfs)
     <> ", user = "
     <> showbBool (user tfs)
-    <> s '}'
+    <> singleton '}'
 
 -- | Convert a 'TickyFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.

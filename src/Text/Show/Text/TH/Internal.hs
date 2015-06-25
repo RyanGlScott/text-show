@@ -18,12 +18,13 @@ This implementation is loosely based off of the @Data.Aeson.TH@ module from the
 @aeson@ library.
 -}
 module Text.Show.Text.TH.Internal (
-      -- * @deriveShow@
+      -- * 'deriveShow'
       -- $deriveShow
       deriveShow
-      -- * @deriveShow1@
+      -- * 'deriveShow1'
       -- $deriveShow1
     , deriveShow1
+      -- * 'deriveShow2'
       -- $deriveShow2
     , deriveShow2
       -- * @mk@ functions
@@ -60,7 +61,7 @@ import           Data.Set (Set)
 import qualified Data.Text    as TS ()
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
 import qualified Data.Text.Lazy    as TL ()
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
@@ -79,7 +80,7 @@ import qualified Text.Show as S (Show(show))
 import qualified Text.Show.Text.Classes as T
 import           Text.Show.Text.Classes (Show1(..), Show2(..), showbPrec,
                                          showbListWith, showbParen, showbSpace)
-import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
+import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString)
 
 {- $deriveShow
 
@@ -215,6 +216,57 @@ some caveats:
 deriveShow1 :: Name -- ^ Name of the data type to make an instance of 'Show1'
             -> Q [Dec]
 deriveShow1 = deriveShowNumber Show1
+
+{- $deriveShow2
+
+'deriveShow2' automatically generates a 'Show2' instance declaration for a @data@
+type, a @newtype@, or a data family instance that has at least two type variables.
+This emulates what would (hypothetically) happen if you could attach a @deriving
+'Show2'@ clause to the end of a data declaration. Examples:
+
+@
+&#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
+import Text.Show.Text.TH (deriveShow2)
+
+data OneOrNone a b = OneL a | OneR b | None
+$('deriveShow2' ''OneOrNone)        -- instance Show2 OneOrNone where ...
+
+newtype WrappedBifunctor f a b = WrapBifunctor (f a b)
+$('deriveShow2' ''WrappedBifunctor) -- instance Show2 f => Show2 (WrappedBifunctor f) where ...
+@
+
+The same restrictions that apply to 'deriveShow' also apply to 'deriveShow2', with
+some caveats:
+
+* With 'deriveShow2', the last type variables must both be of kind @*@. For other ones,
+  type variables of kind @*@ are assumed to require a 'T.Show' constraint, type
+  variables of kind @* -> *@ are assumed to require a 'Show1' constraint, and type
+  variables of kind @* -> * -> *@ are assumed to require a 'Show2' constraint. For more
+  complicated scenarios, use 'mkShowbPrecWith2'.
+
+* If using @DatatypeContexts@, a datatype constraint cannot mention either of the last
+  two type variables. For example, @data Show a => Illegal a b = Illegal a b@ cannot
+  have a derived 'Show2' instance.
+
+* If either of the last two type variables is used within a data field of a constructor,
+  it must only be used in the last two arguments of the data type constructor. For
+  example, @data Legal a b = Legal (Int, Int, a, b)@ can have a derived 'Show2'
+  instance, but @data Illegal a b = Illegal (a, b, a, b)@ cannot.
+
+* Data family instances must be able to eta-reduce the last two type variables. In other
+  words, if you have a instance of the form:
+
+  @
+  data family Family a1 ... an t1 t2
+  data instance Family e1 ... e2 v1 v2 = ...
+  @
+
+  Then the following conditions must hold:
+
+  1. @v1@ and @v2@ must be distinct type variables.
+  2. Neither @v1@ not @v2@ must be mentioned in any of @e1@, ..., @e2@.
+
+-}
 
 -- | Generates a 'Show2' instance declaration for the given data type or data
 -- family instance.
@@ -381,15 +433,31 @@ mkShowb name = mkShowbPrec name `appE` [| zero |]
 mkShowbPrec :: Name -> Q Exp
 mkShowbPrec = mkShowbPrecNumber Show
 
+-- | Generates a lambda expression which behaves like 'T.showbPrecWith' (without
+-- requiring a 'Show1' instance).
+--
+-- /Since: 1/
 mkShowbPrecWith :: Name -> Q Exp
 mkShowbPrecWith = mkShowbPrecNumber Show1
 
+-- | Generates a lambda expression which behaves like 'T.showbPrec1' (without
+-- requiring a 'Show1' instance).
+--
+-- /Since: 1/
 mkShowbPrec1 :: Name -> Q Exp
 mkShowbPrec1 name = [| $(mkShowbPrecWith name) $(mkShowbPrec name) |]
 
+-- | Generates a lambda expression which behaves like 'T.showbPrecWith2' (without
+-- requiring a 'Show2' instance).
+--
+-- /Since: 1/
 mkShowbPrecWith2 :: Name -> Q Exp
 mkShowbPrecWith2 = mkShowbPrecNumber Show2
 
+-- | Generates a lambda expression which behaves like 'T.showbPrecWith2' (without
+-- requiring a 'Show2' instance).
+--
+-- /Since: 1/
 mkShowbPrec2 :: Name -> Q Exp
 mkShowbPrec2 name = [| $(mkShowbPrecWith2 name) showbPrec showbPrec |]
 
@@ -459,12 +527,12 @@ consToShow nbs cons = do
     p     <- newName "p"
     value <- newName "value"
     sps   <- mapM newName ["sp" ++ S.show n | (_, n) <- zip nbs [(1 :: Int) ..]]
-    let tvbs   = zipWith TyVarInfo nbs sps
+    let tvis   = zip nbs sps
         sClass = toEnum $ length nbs
     lamE (map varP $ sps ++ [p, value])
         . appsE
         $ [ varE $ constTable sClass
-          , caseE (varE value) $ map (encodeArgs p sClass tvbs) cons
+          , caseE (varE value) $ map (encodeArgs p sClass tvis) cons
           ] ++ map varE sps
             ++ [varE p, varE value]
 
@@ -490,9 +558,9 @@ encodeArgs p sClass tvis (NormalC conName ts) = do
        then do
            let showArgs       = map (\(arg, (_, argTy)) -> showbPrecTy 0 sClass (nameBase conName) tvis argTy arg)
                                     (zip args ts)
-               parenCommaArgs = [| s '(' |] : intersperse [| s ',' |] showArgs
+               parenCommaArgs = [| singleton '(' |] : intersperse [| singleton ',' |] showArgs
                mappendArgs    = foldr (`infixApp` [| (<>) |])
-                                      [| s ')' |]
+                                      [| singleton ')' |]
                                       parenCommaArgs
 
            match (conP conName $ map varP args)
@@ -518,9 +586,9 @@ encodeArgs _p sClass tvis (RecC conName ts) = do
                                          ]
                                    )
                                    (zip args ts)
-        braceCommaArgs = [| s '{' |] : take (length showArgs - 1) showArgs
+        braceCommaArgs = [| singleton '{' |] : take (length showArgs - 1) showArgs
         mappendArgs    = foldr (`infixApp` [| (<>) |])
-                           [| s '}' |]
+                           [| singleton '}' |]
                            braceCommaArgs
         namedArgs      = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
 
@@ -617,9 +685,9 @@ makeShowExp :: ShowClass
             -> Type
             -> Q Exp
 makeShowExp _ _ tvis (VarT tyName) =
-    case find ((== NameBase tyName) . tyVarNameBase) tvis of
-         Just (TyVarInfo _ spExp) -> varE spExp
-         Nothing                  -> [| showbPrec |]
+    case lookup (NameBase tyName) tvis of
+         Just spExp -> varE spExp
+         Nothing    -> [| showbPrec |]
 makeShowExp sClass conName tvis (SigT ty _)         = makeShowExp sClass conName tvis ty
 makeShowExp sClass conName tvis (ForallT tvbs _ ty) = makeShowExp sClass conName (removeForalled tvbs tvis) ty
 makeShowExp sClass conName tvis ty =
@@ -633,7 +701,7 @@ makeShowExp sClass conName tvis ty =
         (lhsArgs, rhsArgs) = splitAt (length tyArgs - numLastArgs) tyArgs
 
         tyVarNameBases :: [NameBase]
-        tyVarNameBases = map tyVarNameBase tvis
+        tyVarNameBases = map fst tvis
 
     in if any (`mentionsNameBase` tyVarNameBases) lhsArgs
           then outOfPlaceTyVarError conName tyVarNameBases numLastArgs
@@ -651,7 +719,7 @@ removeForalled :: [TyVarBndr] -> [TyVarInfo] -> [TyVarInfo]
 removeForalled tvbs = filter (not . foralled tvbs)
   where
     foralled :: [TyVarBndr] -> TyVarInfo -> Bool
-    foralled tvbs' tvi = tyVarNameBase tvi `elem` map (NameBase . tvbName) tvbs'
+    foralled tvbs' tvi = fst tvi `elem` map (NameBase . tvbName) tvbs'
 
 -- | Checks if a 'Name' represents a tuple type constructor (other than '()')
 isNonUnitTuple :: Name -> Bool
@@ -876,10 +944,11 @@ instance Ord NameBase where
 instance S.Show NameBase where
     showsPrec p = showsPrec p . nameBase . getName
 
-data TyVarInfo = TyVarInfo {
-    tyVarNameBase   :: NameBase
-  , _tyVarShowsPrec :: Name
-}
+-- data TyVarInfo = TyVarInfo {
+--     tyVarNameBase   :: NameBase
+--   , _tyVarShowsPrec :: Name
+-- }
+type TyVarInfo = (NameBase, Name)
 
 -- numTyArrows :: Type -> Int
 -- numTyArrows t = length (uncurryTy t) - 1

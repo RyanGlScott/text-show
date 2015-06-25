@@ -4,7 +4,6 @@
 * The `showbPrec1` function is no longer a class method of `Show1`, but is now a standalone function defined in terms of `showbPrecWith`. `showbPrec1` can be useful for defining `Show` instances. A similar `showbPrec2` function was also added.
 * TODO: Everything related to Show1 and Show2, including
 * TODO: Document the changes in the monomorphic functions, including the new `-PrecWith` and `-PrecWith2` suffixes
-* TODO: Fix that one table in `Text.Show.Text.TH` to be `Int -> Name` instead of `Name -> Name` (it may be redundant, even)
 * TODO: Mention that `Alt`, `Rec1`, `M1`, `(:+:)`, `(:*:)`, and `(:.:)` have `Show1` instances
 * TODO: FromStringShow1/FromTextShow1 and FromStringShow2/FromTextShow2
 -- What they are
@@ -18,6 +17,7 @@
 * `ConType` (in `Text.Show.Text.Generics`) now has an `Inf String` constructor instead of `Inf Builder`. As a result, `ConType` now always an `Eq` and `Ord` instance, and a `Read ConType` instance was added.
 * `Typeable` instances for the promoted data constructors `'FromStringShow` and `'FromTextShow`
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
+* Revamped test suite
 
 ### 0.8.1.1
 * Retroactive `CHANGELOG` update

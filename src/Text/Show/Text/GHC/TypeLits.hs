@@ -51,15 +51,15 @@ import Text.Show.Text.Data.Char (showbString)
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 # else
 import Data.Monoid.Compat ((<>))
+import Data.Text.Lazy.Builder (singleton)
 import GHC.TypeLits (IsEven(..), IsZero(..), Kind, Sing, SingE(fromSing))
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Utils (s)
 # endif
 
 # if MIN_VERSION_base(4,7,0)
 -- | Convert a 'SomeNat' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.7.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbSomeNatPrec :: Int -> SomeNat -> Builder
 showbSomeNatPrec p (SomeNat x) = showbIntegerPrec p $ natVal x
@@ -67,7 +67,7 @@ showbSomeNatPrec p (SomeNat x) = showbIntegerPrec p $ natVal x
 
 -- | Convert a 'SomeSymbol' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.7.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbSomeSymbol :: SomeSymbol -> Builder
 showbSomeSymbol (SomeSymbol x) = showbString $ symbolVal x
@@ -75,25 +75,25 @@ showbSomeSymbol (SomeSymbol x) = showbString $ symbolVal x
 # else
 -- | Convert an 'IsEven' value to a 'Builder'.
 -- This function is only available with @base-4.6@.
--- 
+--
 -- /Since: 0.5/
 showbIsEven :: IsEven n -> Builder
-showbIsEven IsEvenZero = s '0'
-showbIsEven (IsEven x) = "(2 * " <> showb x <> s ')'
+showbIsEven IsEvenZero = singleton '0'
+showbIsEven (IsEven x) = "(2 * " <> showb x <> singleton ')'
 showbIsEven (IsOdd  x) = "(2 * " <> showb x <> " + 1)"
 {-# INLINE showbIsEven #-}
 
 -- | Convert an 'IsZero' value to a 'Builder'.
 -- This function is only available with @base-4.6@.
--- 
+--
 -- /Since: 0.5/
 showbIsZero :: IsZero n -> Builder
-showbIsZero IsZero     = s '0'
-showbIsZero (IsSucc n) = s '(' <> showb n <> " + 1)"
+showbIsZero IsZero     = singleton '0'
+showbIsZero (IsSucc n) = singleton '(' <> showb n <> " + 1)"
 {-# INLINE showbIsZero #-}
 
 -- | Convert a 'Sing' value to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.8/
 showbSingPrec :: (SingE (Kind :: k) rep, Show rep) => Int -> Sing (a :: k) -> Builder
 showbSingPrec p = showbPrec p . fromSing

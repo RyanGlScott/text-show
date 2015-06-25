@@ -23,4 +23,5 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Text.Show.Text.Functions" $
-    prop "Int -> Int instance" (prop_matchesShow :: Int -> (Int -> Int) -> Bool)
+    describe "Int -> Int" $
+        prop "Show instance" (prop_matchesShow :: Int -> (Int -> Int) -> Bool)

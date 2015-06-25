@@ -19,10 +19,7 @@ import Data.Orphans ()
 
 import Instances.Data.Ord ()
 
-import Spec.Utils (prop_matchesShow)
-#if __GLASGOW_HASKELL__ >= 702
-import Spec.Utils (prop_genericShow)
-#endif
+import Spec.Utils (prop_matchesShow, prop_genericShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -33,9 +30,7 @@ main = hspec spec
 spec :: Spec
 spec = parallel . describe "Text.Show.Text.Data.Ord" $ do
     prop "Ordering instance"     (prop_matchesShow :: Int -> Ordering -> Bool)
-#if __GLASGOW_HASKELL__ >= 702
     prop "Ordering generic show" (prop_genericShow :: Int -> Ordering -> Bool)
-#endif
 #if MIN_VERSION_base(4,6,0)
     prop "Down Int instance"     (prop_matchesShow :: Int -> Down Int -> Bool)
 #endif

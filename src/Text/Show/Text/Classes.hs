@@ -34,7 +34,7 @@ import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
 
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
@@ -51,7 +51,7 @@ import           System.IO (Handle)
 
 import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show as S (Show(..))
-import           Text.Show.Text.Utils (s, toString)
+import           Text.Show.Text.Utils (toString)
 
 #include "inline.h"
 
@@ -156,7 +156,7 @@ showListLazy = toLazyText . showbList
 --
 -- /Since: 0.1/
 showbParen :: Bool -> Builder -> Builder
-showbParen p builder | p         = s '(' <> builder <> s ')'
+showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
                      | otherwise = builder
 {-# INLINE showbParen #-}
 
@@ -164,7 +164,7 @@ showbParen p builder | p         = s '(' <> builder <> s ')'
 --
 -- /Since: 0.5/
 showbSpace :: Builder
-showbSpace = s ' '
+showbSpace = singleton ' '
 
 -- | Converts a list of values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. The function argument
@@ -176,10 +176,10 @@ showbSpace = s ' '
 -- /Since: 0.7/
 showbListWith :: (a -> Builder) -> [a] -> Builder
 showbListWith _      []     = "[]"
-showbListWith showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
+showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
   where
-    go (y:ys) = s ',' <> showbx y <> go ys               -- ..,..
-    go []     = s ']'                                    -- ..]"
+    go (y:ys) = singleton ',' <> showbx y <> go ys               -- ..,..
+    go []     = singleton ']'                                    -- ..]"
 {-# INLINE showbListWith #-}
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
@@ -354,7 +354,7 @@ instance Read a => Read (FromTextShow a) where
     INLINE_INST_FUN(readListPrec)
 
 instance Show a => S.Show (FromTextShow a) where
-    showsPrec p (FromTextShow x) str = toString (showbPrec p x) ++ str
+    showsPrec p (FromTextShow x) = showString . toString $ showbPrec p x
     INLINE_INST_FUN(showsPrec)
 
 instance Show a => Show (FromTextShow a) where

@@ -19,7 +19,7 @@ module Text.Show.Text.Data.Version (
 
 import Data.List (intersperse)
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import Data.Version (Version(..))
 
 import Prelude ()
@@ -30,7 +30,6 @@ import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.TH.Internal (deriveShow)
-import Text.Show.Text.Utils (s)
 
 -- | Convert a 'Version' to a 'Builder' with the given precedence.
 --
@@ -46,8 +45,8 @@ showbVersionPrec = showbPrec
 -- /Since: 0.3/
 showbVersionConcrete :: Version -> Builder
 showbVersionConcrete (Version branch tags)
-    = mconcat (intersperse (s '.') $ map showb branch) <>
-        mconcat (map ((s '-' <>) . fromString) tags)
+    = mconcat (intersperse (singleton '.') $ map showb branch) <>
+        mconcat (map ((singleton '-' <>) . fromString) tags)
 {-# INLINE showbVersionConcrete #-}
 
 $(deriveShow ''Version)

@@ -17,10 +17,7 @@ import Data.Orphans ()
 
 import Instances.Data.Monoid ()
 
-import Spec.Utils (prop_matchesShow)
-#if __GLASGOW_HASKELL__ >= 702
-import Spec.Utils (prop_genericShow)
-#endif
+import Spec.Utils (prop_matchesShow, prop_genericShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -40,7 +37,6 @@ spec = parallel . describe "Text.Show.Text.Data.Monoid" $ do
 #if MIN_VERSION_base(4,8,0)
     prop "Alt Maybe Int instance"         (prop_matchesShow :: Int -> Alt Maybe Int -> Bool)
 #endif
-#if __GLASGOW_HASKELL__ >= 702
     prop "All generic show"               (prop_genericShow :: Int -> All -> Bool)
     prop "Any generic show"               (prop_genericShow :: Int -> Any -> Bool)
     prop "Dual Int generic show"          (prop_genericShow :: Int -> Dual Int -> Bool)
@@ -48,7 +44,6 @@ spec = parallel . describe "Text.Show.Text.Data.Monoid" $ do
     prop "Last (Maybe Int) generic show"  (prop_genericShow :: Int -> Last (Maybe Int) -> Bool)
     prop "Product Int generic show"       (prop_genericShow :: Int -> Product Int -> Bool)
     prop "Sum Int generic show"           (prop_genericShow :: Int -> Sum Int -> Bool)
-#endif
 #if MIN_VERSION_base(4,8,0)
     prop "Alt Maybe Int generic show"     (prop_genericShow :: Int -> Alt Maybe Int -> Bool)
 #endif

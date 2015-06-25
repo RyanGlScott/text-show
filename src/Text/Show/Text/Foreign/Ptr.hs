@@ -24,7 +24,7 @@ module Text.Show.Text.Foreign.Ptr (
 
 import Data.Monoid.Compat ((<>))
 import Data.Semigroup (timesN)
-import Data.Text.Lazy.Builder (Builder)
+import Data.Text.Lazy.Builder (Builder, singleton)
 
 import Foreign.ForeignPtr (ForeignPtr)
 import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
@@ -38,7 +38,7 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(..))
 import Text.Show.Text.Data.Integral (showbHex, showbIntPrec, showbWord)
-import Text.Show.Text.Utils (lengthB, s)
+import Text.Show.Text.Utils (lengthB)
 
 #include "MachDeps.h"
 #include "inline.h"
@@ -88,8 +88,8 @@ instance Show1 Ptr where
       where
         padOut :: Builder -> Builder
         padOut ls =
-             s '0' <> s 'x'
-          <> timesN (fromIntegral . max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (s '0')
+             singleton '0' <> singleton 'x'
+          <> timesN (fromIntegral . max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (singleton '0')
           <> ls
 
 instance Show (FunPtr a) where

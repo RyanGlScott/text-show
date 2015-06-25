@@ -14,10 +14,7 @@ import Data.Proxy (Proxy)
 
 import Instances.Data.Proxy ()
 
-import Spec.Utils (prop_matchesShow)
--- #if __GLASGOW_HASKELL__ >= 702
--- import Spec.Utils (prop_genericShow)
--- #endif
+import Spec.Utils (prop_matchesShow {-, prop_genericShow -})
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)

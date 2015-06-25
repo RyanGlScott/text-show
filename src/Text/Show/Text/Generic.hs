@@ -69,7 +69,7 @@ import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS (Text)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
 import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Typeable (Typeable)
@@ -87,7 +87,7 @@ import qualified Text.Show.Text.Classes as T
 import           Text.Show.Text.Classes (Show(showbPrec), Show1(..),
                                          showbListWith, showbParen, showbSpace)
 import           Text.Show.Text.Instances ()
-import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString, s)
+import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString)
 
 # include "inline.h"
 
@@ -368,7 +368,7 @@ gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
            )
         <> (if isNull x || conIsTuple c
                then mempty
-               else s ' '
+               else singleton ' '
            )
         <> showbBraces t (gs t appPrec1 x)
     Infix _ m -> showbParen (n > m) . showbBraces t $ gs t (m+1) x
@@ -386,8 +386,8 @@ gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
                 Infix _ _ -> Inf $ conName c
 
     showbBraces :: ConType -> Builder -> Builder
-    showbBraces Rec     b = s '{' <> b <> s '}'
-    showbBraces Tup     b = s '(' <> b <> s ')'
+    showbBraces Rec     b = singleton '{' <> b <> singleton '}'
+    showbBraces Tup     b = singleton '(' <> b <> singleton ')'
     showbBraces Pref    b = b
     showbBraces (Inf _) b = b
 
@@ -418,10 +418,10 @@ gShowbProduct gsa gsb t@(Inf o) n (a :*: b) =
     infixOp :: Builder
     infixOp = if isInfixTypeCon o
                  then fromString o
-                 else s '`' <> fromString o <> s '`'
+                 else singleton '`' <> fromString o <> singleton '`'
 gShowbProduct gsa gsb t@Tup _ (a :*: b) =
        gsa t 0 a
-    <> s ','
+    <> singleton ','
     <> gsb t 0 b
 gShowbProduct gsa gsb t@Pref n (a :*: b) =
        gsa t n a

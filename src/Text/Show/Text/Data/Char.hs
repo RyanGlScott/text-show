@@ -26,7 +26,7 @@ module Text.Show.Text.Data.Char (
 import           Data.Array (Array, (!), listArray)
 import           Data.Char (GeneralCategory, isDigit, ord)
 import           Data.Monoid.Compat ((<>))
-import           Data.Text.Lazy.Builder (Builder)
+import           Data.Text.Lazy.Builder (Builder, singleton)
 
 import           Prelude ()
 import           Prelude.Compat hiding (Show)
@@ -34,12 +34,11 @@ import           Prelude.Compat hiding (Show)
 import           Text.Show.Text.Classes (Show(..))
 import           Text.Show.Text.Data.Integral (showbIntPrec)
 import           Text.Show.Text.TH.Internal (deriveShow)
-import           Text.Show.Text.Utils (s)
 
 #include "inline.h"
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
--- 
+--
 -- /Since: 0.5/
 asciiTabB :: Array Int Builder
 asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
@@ -49,21 +48,21 @@ asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", 
                                "SP"]
 
 -- | Convert a 'Char' to a 'Builder' (surrounded by single quotes).
--- 
+--
 -- /Since: 0.3/
 showbChar :: Char -> Builder
 showbChar '\'' = "'\\''"
-showbChar c    = s '\'' <> showbLitChar c <> s '\''
+showbChar c    = singleton '\'' <> showbLitChar c <> singleton '\''
 {-# INLINE showbChar #-}
 
 -- | Convert a 'Char' to a 'Builder' (without single quotes).
--- 
+--
 -- /Since: 0.3/
 showbLitChar :: Char -> Builder
-showbLitChar c | c > '\DEL' = s '\\' <> showbIntPrec 0 (ord c)
+showbLitChar c | c > '\DEL' = singleton '\\' <> showbIntPrec 0 (ord c)
 showbLitChar '\DEL'         = "\\DEL"
 showbLitChar '\\'           = "\\\\"
-showbLitChar c | c >= ' '   = s c
+showbLitChar c | c >= ' '   = singleton c
 showbLitChar '\a'           = "\\a"
 showbLitChar '\b'           = "\\b"
 showbLitChar '\f'           = "\\f"
@@ -72,28 +71,29 @@ showbLitChar '\r'           = "\\r"
 showbLitChar '\t'           = "\\t"
 showbLitChar '\v'           = "\\v"
 showbLitChar '\SO'          = "\\SO"
-showbLitChar c              = s '\\' <> (asciiTabB ! ord c)
+showbLitChar c              = singleton '\\' <> (asciiTabB ! ord c)
 
 -- | Convert a 'String' to a 'Builder' (surrounded by double quotes).
--- 
+--
 -- /Since: 0.3/
 showbString :: String -> Builder
-showbString cs = s '"' <> showbLitString cs <> s '"'
+showbString cs = singleton '"' <> showbLitString cs <> singleton '"'
 {-# INLINE showbString #-}
 
 -- | Convert a 'String' to a 'Builder' (without double quotes).
--- 
+--
 -- /Since: 0.3/
 showbLitString :: String -> Builder
 showbLitString []             = mempty
 showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
 showbLitString ('"':cs)       = "\\\"" <> showbLitString cs
 showbLitString (c:d:cs)
-    | c > '\DEL' && isDigit d = s '\\' <> showbIntPrec 0 (ord c) <> "\\&" <> s d <> showbLitString cs
+    | c > '\DEL' && isDigit d = singleton '\\' <> showbIntPrec 0 (ord c) <> "\\&"
+                             <> singleton d <> showbLitString cs
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbGeneralCategory :: GeneralCategory -> Builder
 showbGeneralCategory = showb
@@ -102,7 +102,7 @@ showbGeneralCategory = showb
 instance Show Char where
     showb = showbChar
     INLINE_INST_FUN(showb)
-    
+
     showbList = showbString
     INLINE_INST_FUN(showbList)
 

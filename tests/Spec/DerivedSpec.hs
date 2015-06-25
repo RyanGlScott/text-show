@@ -18,10 +18,7 @@ import Derived
 
 import Instances.Derived ()
 
-import Spec.Utils (prop_matchesShow)
-#if __GLASGOW_HASKELL__ >= 702
-import Spec.Utils (prop_genericShow)
-#endif
+import Spec.Utils (prop_matchesShow, prop_genericShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -57,7 +54,7 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "HigherKindedTypeParams Maybe Int instance"       (prop_matchesShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
     prop "RestrictedContext Int instance"                  (prop_matchesShow :: Int -> RestrictedContext Int -> Bool)
     prop "Fix Maybe instance"                              (prop_matchesShow :: Int -> Fix Maybe -> Bool)
-#if MIN_VERSION_template_haskell(2,7,0)                                  
+#if MIN_VERSION_template_haskell(2,7,0)
     prop "AllShow () () Int Int instance"                  (prop_matchesShow :: Int -> AllShow () () Int Int -> Bool)
     prop "AllShow Int Int Int Int instance"                (prop_matchesShow :: Int -> AllShow Int Int Int Int -> Bool)
     prop "AllShow Bool Bool Int Int instance"              (prop_matchesShow :: Int -> AllShow Bool Bool Int Int -> Bool)
@@ -75,7 +72,6 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "GADTFam Ordering Int Int instance"               (prop_matchesShow :: Int -> GADTFam Ordering Int Int -> Bool)
     prop "GADTFam Int Int Int instance"                    (prop_matchesShow :: Int -> GADTFam Int Int Int -> Bool)
 #endif
-#if __GLASGOW_HASKELL__ >= 702
     prop "Nullary generic show"                            (prop_genericShow :: Int -> Nullary -> Bool)
     prop "PhantomNullary Int generic show"                 (prop_genericShow :: Int -> PhantomNullary Int -> Bool)
     prop "MonomorphicUnary generic show"                   (prop_genericShow :: Int -> MonomorphicUnary -> Bool)
@@ -101,7 +97,7 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "HigherKindedTypeParams Maybe Int generic show"   (prop_genericShow :: Int -> HigherKindedTypeParams Maybe Int -> Bool)
     prop "RestrictedContext Int generic show"              (prop_genericShow :: Int -> RestrictedContext Int -> Bool)
     prop "Fix Maybe generic show"                          (prop_genericShow :: Int -> Fix Maybe -> Bool)
-# if MIN_VERSION_template_haskell(2,7,0) && __GLASGOW_HASKELL__ >= 706
+#if MIN_VERSION_template_haskell(2,7,0) && __GLASGOW_HASKELL__ >= 706
     prop "AllShow () () Int Int generic show"              (prop_matchesShow :: Int -> AllShow () () Int Int -> Bool)
     prop "AllShow Int Int Int Int generic show"            (prop_matchesShow :: Int -> AllShow Int Int Int Int -> Bool)
     prop "AllShow Bool Bool Int Int generic show"          (prop_matchesShow :: Int -> AllShow Bool Bool Int Int -> Bool)
@@ -110,8 +106,7 @@ spec = parallel . describe "Template Haskell-derived data types" $ do
     prop "NotAllShow Int Int Int Int generic show"         (prop_genericShow :: Int -> NotAllShow Int Int Int Int -> Bool)
     prop "AssocData1 () generic show"                      (prop_genericShow :: Int -> AssocData1 () -> Bool)
     prop "AssocData2 () generic show"                      (prop_genericShow :: Int -> AssocData2 () Int Int -> Bool)
-#  if __GLASGOW_HASKELL__ >= 708
+# if __GLASGOW_HASKELL__ >= 708
     prop "NullaryData generic show"                        (prop_genericShow :: Int -> NullaryData -> Bool)
-#  endif
 # endif
 #endif

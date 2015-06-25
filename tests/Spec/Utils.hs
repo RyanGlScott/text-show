@@ -13,15 +13,14 @@ Testing-related utility functions.
 module Spec.Utils (
       ioProperty
     , prop_matchesShow
-#if __GLASGOW_HASKELL__ >= 702
+    , prop_matchesShow1
+    , prop_matchesShow2
     , prop_genericShow
-#endif
-    , prop_readShow
-    , prop_showEq
+    , prop_genericShow1
     ) where
 
 #if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic, Rep)
+import           GHC.Generics (Generic, Generic1, Rep, Rep1)
 import           Text.Show.Text.Generic
 #endif
 
@@ -35,8 +34,9 @@ import           Test.QuickCheck (morallyDubiousIOProperty)
 import           Test.QuickCheck (Property, Testable)
 
 import qualified Text.Show as S (Show)
-import qualified Text.Show.Text as T (Show)
-import           Text.Show.Text hiding (Show)
+import           Text.Show.Text as T
+
+import           TransformersCompat as S
 
 ioProperty :: Testable prop => IO prop -> Property
 #if MIN_VERSION_QuickCheck(2,7,0)
@@ -50,19 +50,42 @@ ioProperty = morallyDubiousIOProperty
 prop_matchesShow :: (S.Show a, T.Show a) => Int -> a -> Bool
 prop_matchesShow p x = showbPrec p (FromStringShow x) == showbPrec p x
 
-#if __GLASGOW_HASKELL__ >= 702
+-- | Verifies that a type's @Show1@ instances coincide for both 'String's and 'Text',
+-- irrespective of precedence.
+prop_matchesShow1 :: (S.Show1 f, T.Show1 f) => Int -> f a -> Bool
+prop_matchesShow1 p x = showbPrecWith showb27Prec p (FromStringShow1 x)
+                       == showbPrecWith showb27Prec p x
+
+-- | Verifies that a type's @Show2@ instances coincide for both 'String's and 'Text',
+-- irrespective of precedence.
+prop_matchesShow2 :: (S.Show2 f, T.Show2 f) => Int -> f a b -> Bool
+prop_matchesShow2 p x = showbPrecWith2 showb27Prec showb27Prec p (FromStringShow2 x)
+                       == showbPrecWith2 showb27Prec showb27Prec p x
+
+-- | Show the number 27, which certain parody singer-songwriters find humorous.
+-- Useful for testing higher-order @Show@ classes.
+showb27Prec :: Int -> a -> Builder
+showb27Prec p _ = showbPrec p $ Just (27 :: Int)
+
 -- | Verifies that a type's @Show@ instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
+#if __GLASGOW_HASKELL__ >= 702
 prop_genericShow :: (T.Show a, Generic a, GShow (Rep a))
                  => Int -> a -> Bool
 prop_genericShow p x = showbPrec p x == genericShowbPrec p x
+#else
+prop_genericShow :: Int -> a -> Bool
+prop_genericShow _ _ = True
 #endif
 
--- | Verifies that @read . show = id@.
-prop_readShow :: (Eq a, Read a, S.Show a) => Int -> a -> Bool
-prop_readShow p x = read (showsPrec p x "") == x
-
--- | Verifies that two type's @Show@ instances produce identical output, where the first
--- type is a wrapper around the second type.
-prop_showEq :: (T.Show a, T.Show b) => (a -> b) -> Int -> a -> Bool
-prop_showEq f p x = showbPrec p (f x) == showbPrec p x
+-- | Verifies that a type's @Show1@ instance coincides with the output produced
+-- by the equivalent 'Generic1' functions.
+#if __GLASGOW_HASKELL__ >= 702
+prop_genericShow1 :: (T.Show1 f, Generic1 f, GShow1 (Rep1 f))
+                  => Int -> f a -> Bool
+prop_genericShow1 p x = showbPrecWith showb27Prec p x
+                        == genericShowbPrecWith showb27Prec p x
+#else
+prop_genericShow1 :: Int -> f a -> Bool
+prop_genericShow1 _ _ = True
+#endif

@@ -6,8 +6,8 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Functions to mechanically derive @Show@ instances or splice
-@show@-related expressions into Haskell source code. You need to enable
+Functions to mechanically derive 'T.Show', 'Show1', or 'Show2' instances, or to
+splice @show@-related expressions into Haskell source code. You need to enable
 the @TemplateHaskell@ language extension in order to use this module.
 
 /Since: 0.3/

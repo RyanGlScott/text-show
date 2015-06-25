@@ -34,9 +34,10 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if __GLASGOW_HASKELL__ >= 702
-    describe "Text.Show.Text.Generic" $ do
-        prop "ConType instance"     (prop_matchesShow :: Int -> ConType -> Bool)
-        prop "ConType generic show" (prop_genericShow :: Int -> ConType -> Bool)
+    describe "Text.Show.Text.Generic" $
+        describe "ConType" $ do
+            prop "Show instance" (prop_matchesShow :: Int -> ConType -> Bool)
+            prop "generic show"  (prop_genericShow :: Int -> ConType -> Bool)
 #else
     pure ()
 #endif

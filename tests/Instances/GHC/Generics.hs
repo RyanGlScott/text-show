@@ -34,18 +34,17 @@ import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
 instance Arbitrary (U1 p) where
     arbitrary = pure U1
 
-deriving instance Arbitrary p => Arbitrary (Par1 p)
-deriving instance Arbitrary (f p) => Arbitrary (Rec1 f p)
-deriving instance Arbitrary c => Arbitrary (K1 i c p)
-deriving instance Arbitrary (f p) => Arbitrary (M1 i c f p)
+deriving instance Arbitrary p         => Arbitrary (Par1 p)
+deriving instance Arbitrary (f p)     => Arbitrary (Rec1 f p)
+deriving instance Arbitrary c         => Arbitrary (K1 i c p)
+deriving instance Arbitrary (f p)     => Arbitrary (M1 i c f p)
+deriving instance Arbitrary (f (g p)) => Arbitrary ((f :.: g) p)
 
 instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :+: g) p) where
     arbitrary = oneof [L1 <$> arbitrary, R1 <$> arbitrary]
 
 instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :*: g) p) where
     arbitrary = (:*:) <$> arbitrary <*> arbitrary
-
-deriving instance Arbitrary (f (g p)) => Arbitrary ((f :.: g) p)
 
 instance Arbitrary Fixity where
     arbitrary = oneof [pure Prefix, Infix <$> arbitrary <*> arbitrary]

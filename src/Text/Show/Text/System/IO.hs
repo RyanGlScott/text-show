@@ -30,7 +30,7 @@ module Text.Show.Text.System.IO (
     ) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 
 import GHC.IO.Encoding.Types (TextEncoding(textEncodingName))
 #if MIN_VERSION_base(4,4,0)
@@ -48,7 +48,6 @@ import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShow)
-import Text.Show.Text.Utils (s)
 
 #include "inline.h"
 
@@ -62,7 +61,7 @@ showbHandle (DuplexHandle file _ _) = showbHandleFilePath file
 
 -- | Convert a 'Handle`'s 'FilePath' to a 'Builder'.
 showbHandleFilePath :: FilePath -> Builder
-showbHandleFilePath file = "{handle: " <> fromString file <> s '}'
+showbHandleFilePath file = "{handle: " <> fromString file <> singleton '}'
 {-# INLINE showbHandleFilePath #-}
 
 -- | Convert an 'IOMode' to a 'Builder'.
