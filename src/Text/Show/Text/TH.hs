@@ -3,7 +3,7 @@ Module:      Text.Show.Text.TH
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Functions to mechanically derive @Show@ instances or splice

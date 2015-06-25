@@ -11,7 +11,7 @@ Module:      Text.Show.Text.GHC.Generics
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for generics-related data types.
@@ -214,7 +214,6 @@ instance (Show (f p), Show (g p)) => Show ((f :*: g) p) where
     showbPrec = $(mkShowbPrec ''(:*:))
 $(deriveShow1 ''(:*:))
 
--- TODO: Derive with TH once it can detect higher-kinded types properly
 instance Show (f (g p)) => Show ((f :.: g) p) where
     showbPrec = $(mkShowbPrec ''(:.:))
 $(deriveShow1 ''(:.:))

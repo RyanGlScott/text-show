@@ -7,21 +7,24 @@ Module:      Text.Show.Text.TH.Internal
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
-Functions to mechanically derive 'T.Show' instances or splice
-@show@-related expressions into Haskell source code. You need to enable
+Functions to mechanically derive 'T.Show', 'Show1', or 'Show2' instances, or to
+splice @show@-related expressions into Haskell source code. You need to enable
 the @TemplateHaskell@ language extension in order to use this module.
 
-This implementation is based off of the @Data.Aeson.TH@ module from the
+This implementation is loosely based off of the @Data.Aeson.TH@ module from the
 @aeson@ library.
 -}
 module Text.Show.Text.TH.Internal (
       -- * @deriveShow@
       -- $deriveShow
       deriveShow
+      -- * @deriveShow1@
+      -- $deriveShow1
     , deriveShow1
+      -- $deriveShow2
     , deriveShow2
       -- * @mk@ functions
       -- $mk
@@ -120,11 +123,11 @@ newtype instance DataFam () b = DataFamB b
 $('deriveShow' 'DataFamB)      -- instance Show b => Show (DataFam () b)
 @
 
-Note that at the moment, there are some limitations to this approach:
+Note that at the moment, there are some limitations:
 
 * The 'Name' argument to 'deriveShow' must not be a type synonym.
 
-* 'deriveShow' makes the assumption that all type variables in a data type require a
+* 'deriveShow' makes the assumption that all type variables of kind @*@ require a
   'T.Show' constraint when creating the type context. For example, if you have @data
   Phantom a = Phantom@, then @('deriveShow' ''Phantom)@ will generate @instance
   'T.Show' a => 'T.Show' (Phantom a) where@, even though @'T.Show' a@ is not required.
@@ -155,11 +158,69 @@ deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
            -> Q [Dec]
 deriveShow = deriveShowNumber Show
 
-deriveShow1 :: Name
+{- $deriveShow1
+
+'deriveShow1' automatically generates a 'Show1' instance declaration for a @data@
+type, a @newtype@, or a data family instance that has at least one type variable.
+This emulates what would (hypothetically) happen if you could attach a @deriving
+'Show1'@ clause to the end of a data declaration. Examples:
+
+@
+&#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
+import Text.Show.Text.TH (deriveShow1)
+
+data Stream a = Stream a (Stream a)
+$('deriveShow1' ''Stream)         -- instance Show1 Stream where ...
+
+newtype WrappedFunctor f a = WrapFunctor (f a)
+$('deriveShow1' ''WrappedFunctor) -- instance Show1 f => Show1 (WrappedFunctor f) where ...
+@
+
+The same restrictions that apply to 'deriveShow' also apply to 'deriveShow1', with
+some caveats:
+
+* With 'deriveShow1', the last type variable must be of kind @*@. For other ones, type
+  variables of kind @*@ are assumed to require a 'T.Show' context, and type variables
+  of kind @* -> *@ are assumed to require a 'Show1' context. For more complicated
+  scenarios, use 'mkShowbPrecWith'.
+
+* If using @DatatypeContexts@, a datatype constraint cannot mention the last type
+  variable. For example, @data Show a => Illegal a = Illegal a@ cannot have a derived
+  'Show1' instance.
+
+* If the last type variable is used within a data field of a constructor, it must only
+  be used in the last argument of the data type constructor. For example, @data Legal a
+  = Legal (Either Int a)@ can have a derived 'Show1' instance, but @data Illegal a =
+  Illegal (Either a a)@ cannot.
+
+* Data family instances must be able to eta-reduce the last type variable. In other
+  words, if you have a instance of the form:
+
+  @
+  data family Family a1 ... an t
+  data instance Family e1 ... e2 v = ...
+  @
+
+  Then the following conditions must hold:
+
+  1. @v@ must be a type variable.
+  2. @v@ must not be mentioned in any of @e1@, ..., @e2@.
+
+-}
+
+-- | Generates a 'Show1' instance declaration for the given data type or data
+-- family instance.
+--
+-- /Since: 1/
+deriveShow1 :: Name -- ^ Name of the data type to make an instance of 'Show1'
             -> Q [Dec]
 deriveShow1 = deriveShowNumber Show1
 
-deriveShow2 :: Name
+-- | Generates a 'Show2' instance declaration for the given data type or data
+-- family instance.
+--
+-- /Since: 1/
+deriveShow2 :: Name -- ^ Name of the data type to make an instance of 'Show2'
             -> Q [Dec]
 deriveShow2 = deriveShowNumber Show2
 

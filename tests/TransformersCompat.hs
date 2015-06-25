@@ -3,7 +3,7 @@ Module:      TransformersCompat
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Defines the 'Show1' and 'Show2' classes for @String@s. This module will be removed

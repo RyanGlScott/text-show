@@ -41,7 +41,7 @@ Module:      Derived
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Defines data types with derived 'Show' instances (using "Text.Show.Text.TH")

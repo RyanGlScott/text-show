@@ -48,7 +48,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Ryan Scott
 maintainer:          Ryan Scott <ryan.gl.scott@ku.edu>
-stability:           Experimental
+stability:           Provisional
 copyright:           (C) 2014-2015 Ryan Scott
 category:            Text
 build-type:          Simple

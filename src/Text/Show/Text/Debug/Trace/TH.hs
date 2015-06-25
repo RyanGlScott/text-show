@@ -4,7 +4,7 @@ Module:      Text.Show.Text.Debug.Trace.TH
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Functions that splice traces into source code which take an arbitrary data type or

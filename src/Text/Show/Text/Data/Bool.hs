@@ -5,7 +5,7 @@ Module:      Text.Show.Text.Data.Bool
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Bool' values.

@@ -5,7 +5,7 @@ Module:      Spec.GHC.StatsSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for 'GCStats'.

@@ -3,7 +3,7 @@ Module:      Text.Show.Text.Instances
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Imports all orphan 'Show' instance covered by @text-show@ (except for the instance

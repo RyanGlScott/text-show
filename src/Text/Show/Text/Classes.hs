@@ -3,7 +3,6 @@
 {-# LANGUAGE DeriveFoldable             #-}
 {-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE DeriveTraversable          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
 #if __GLASGOW_HASKELL__ >= 702
@@ -15,34 +14,21 @@
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TypeFamilies               #-}
 #endif
 {-|
 Module:      Text.Show.Text.Classes
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
-The 'Show' and 'Show1' typeclasses.
+The 'Show', 'Show1', and 'Show2' typeclasses.
 -}
 module Text.Show.Text.Classes where
 
-import           Control.Monad.Fix (MonadFix(..))
-#if MIN_VERSION_base(4,4,0)
-import           Control.Monad.Zip (MonadZip(..))
-#endif
-
-import           Data.Bits (Bits)
-#if MIN_VERSION_base(4,7,0)
-import           Data.Bits (FiniteBits)
-#endif
 import           Data.Data (Data, Typeable)
-import           Data.Ix (Ix)
 import           Data.Monoid.Compat ((<>))
-import           Data.Semigroup (Semigroup)
-import           Data.String (IsString)
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text)
@@ -50,11 +36,6 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 
-import           Foreign.Storable (Storable)
-
-#if __GLASGOW_HASKELL__ >= 708
-import           GHC.Exts (IsList(Item, fromList, toList))
-#endif
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
 # if __GLASGOW_HASKELL__ >= 706
@@ -68,7 +49,6 @@ import           Prelude.Compat hiding (Show(..))
 
 import           System.IO (Handle)
 
-import           Text.Printf (PrintfArg, PrintfType)
 import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show as S (Show(..))
 import           Text.Show.Text.Utils (s, toString)
@@ -312,17 +292,9 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
 --
 -- /Since: 0.5/
 newtype FromStringShow a = FromStringShow { fromStringShow :: a }
-  deriving ( Bits
-           , Bounded
-           , Data
-           , Enum
+  deriving ( Data
            , Eq
-#if MIN_VERSION_base(4,7,0)
-           , FiniteBits
-#endif
-           , Floating
            , Foldable
-           , Fractional
            , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
@@ -330,61 +302,10 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Generic1
 # endif
 #endif
-           , Integral
-           , IsString
-           , Ix
-           , Monoid
-           , Num
            , Ord
-           , PrintfArg
-           , PrintfType
-           , Real
-           , RealFloat
-           , RealFrac
-           , Semigroup
-           , Storable
            , Traversable
            , Typeable
            )
-
-instance Applicative FromStringShow where
-    pure = FromStringShow
-    INLINE_INST_FUN(pure)
-
-    FromStringShow f <*> FromStringShow x = FromStringShow $ f x
-    INLINE_INST_FUN((<*>))
-
-#if __GLASGOW_HASKELL__ >= 708
-instance IsList a => IsList (FromStringShow a) where
-    type Item (FromStringShow a) = Item a
-    fromList = FromStringShow . fromList
-    {-# INLINE fromList #-}
-    toList = toList . fromStringShow
-    {-# INLINE toList #-}
-#endif
-
-instance Monad FromStringShow where
-    return = FromStringShow
-    INLINE_INST_FUN(return)
-
-    FromStringShow a >>= f = f a
-    INLINE_INST_FUN((>>=))
-
-instance MonadFix FromStringShow where
-    mfix f = FromStringShow $ let FromStringShow a = f a in a
-    INLINE_INST_FUN(mfix)
-
-#if MIN_VERSION_base(4,4,0)
-instance MonadZip FromStringShow where
-    mzip (FromStringShow a) (FromStringShow b) = FromStringShow (a, b)
-    INLINE_INST_FUN(mzip)
-
-    mzipWith f (FromStringShow a) (FromStringShow b) = FromStringShow $ f a b
-    INLINE_INST_FUN(mzipWith)
-
-    munzip (FromStringShow (a, b)) = (FromStringShow a, FromStringShow b)
-    INLINE_INST_FUN(munzip)
-#endif
 
 instance Read a => Read (FromStringShow a) where
     readPrec = FromStringShow <$> readPrec
@@ -410,17 +331,9 @@ instance S.Show a => S.Show (FromStringShow a) where
 --
 -- /Since: 0.6/
 newtype FromTextShow a = FromTextShow { fromTextShow :: a }
-  deriving ( Bits
-           , Bounded
-           , Data
-           , Enum
+  deriving ( Data
            , Eq
-#if MIN_VERSION_base(4,7,0)
-           , FiniteBits
-#endif
-           , Floating
            , Foldable
-           , Fractional
            , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
@@ -428,61 +341,10 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , Generic1
 # endif
 #endif
-           , Integral
-           , IsString
-           , Ix
-           , Monoid
-           , Num
            , Ord
-           , PrintfArg
-           , PrintfType
-           , Real
-           , RealFloat
-           , RealFrac
-           , Semigroup
-           , Storable
            , Traversable
            , Typeable
            )
-
-instance Applicative FromTextShow where
-    pure = FromTextShow
-    INLINE_INST_FUN(pure)
-
-    FromTextShow f <*> FromTextShow x = FromTextShow $ f x
-    INLINE_INST_FUN((<*>))
-
-#if __GLASGOW_HASKELL__ >= 708
-instance IsList a => IsList (FromTextShow a) where
-    type Item (FromTextShow a) = Item a
-    fromList = FromTextShow . fromList
-    {-# INLINE fromList #-}
-    toList = toList . fromTextShow
-    {-# INLINE toList #-}
-#endif
-
-instance Monad FromTextShow where
-    return = FromTextShow
-    INLINE_INST_FUN(return)
-
-    FromTextShow a >>= f = f a
-    INLINE_INST_FUN((>>=))
-
-instance MonadFix FromTextShow where
-    mfix f = FromTextShow $ let FromTextShow a = f a in a
-    INLINE_INST_FUN(mfix)
-
-#if MIN_VERSION_base(4,4,0)
-instance MonadZip FromTextShow where
-    mzip (FromTextShow a) (FromTextShow b) = FromTextShow (a, b)
-    INLINE_INST_FUN(mzip)
-
-    mzipWith f (FromTextShow a) (FromTextShow b) = FromTextShow $ f a b
-    INLINE_INST_FUN(mzipWith)
-
-    munzip (FromTextShow (a, b)) = (FromTextShow a, FromTextShow b)
-    INLINE_INST_FUN(munzip)
-#endif
 
 instance Read a => Read (FromTextShow a) where
     readPrec = FromTextShow <$> readPrec

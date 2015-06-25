@@ -7,7 +7,7 @@ Module:      Text.Show.Text.Data.Proxy
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Proxy' values.
@@ -33,7 +33,6 @@ showbProxy :: Proxy s -> Builder
 showbProxy = showb
 {-# INLINE showbProxy #-}
 
--- TODO: Derive with TH once it can detect phantom types properly
 instance Show (Proxy s) where
     showbPrec = showbPrecWith undefined
     INLINE_INST_FUN(showb)
