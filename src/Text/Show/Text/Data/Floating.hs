@@ -40,7 +40,7 @@ import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
 import           Text.Show.Text.Utils (i2d, s)
 
 #include "inline.h"
@@ -369,18 +369,15 @@ roundTo d is =
        i'     = c + i
 #endif
 
-
 -- Exponentiation with a cache for the most common numbers.
 
 -- | The minimum exponent in the cache.
 minExpt :: Int
 minExpt = 0
-{-# INLINE minExpt #-}
 
 -- | The maximum exponent (of 2) in the cache.
 maxExpt :: Int
 maxExpt = 1100
-{-# INLINE maxExpt #-}
 
 -- | Exponentiate an 'Integer', using a cache if possible.
 expt :: Integer -> Int -> Integer
@@ -396,7 +393,6 @@ expts = array (minExpt,maxExpt) [(n,2^n) | n <- [minExpt .. maxExpt]]
 -- | The maximum exponent (of 10) in the cache.
 maxExpt10 :: Int
 maxExpt10 = 324
-{-# INLINE maxExpt10 #-}
 
 -- | Cached powers of 10.
 expts10 :: Array Int Integer
@@ -414,4 +410,4 @@ instance Show Double where
     showbPrec = showbDoublePrec
     INLINE_INST_FUN(showbPrec)
 
-$(deriveShowPragmas defaultInlineShowb ''FPFormat)
+$(deriveShowPragmas inlineShowb ''FPFormat)

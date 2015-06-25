@@ -17,7 +17,7 @@ module Text.Show.Text.Data.Bool (showbBool) where
 import Data.Text.Lazy.Builder (Builder)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
 
 -- | Convert a 'Bool' to a 'Builder'.
 -- 
@@ -26,4 +26,4 @@ showbBool :: Bool -> Builder
 showbBool = showb
 {-# INLINE showbBool #-}
 
-$(deriveShowPragmas defaultInlineShowb ''Bool)
+$(deriveShowPragmas inlineShowb ''Bool)

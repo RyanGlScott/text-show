@@ -42,7 +42,7 @@ import           Prelude hiding (Show)
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
 import           Text.Show.Text.Data.Char (showbString)
 import           Text.Show.Text.Data.Integral (showbHex)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowbPrec)
 
 #if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding(..))
@@ -140,7 +140,7 @@ instance Show Builder where
     showb = showbBuilder
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas defaultInlineShowbPrec ''I16)
+$(deriveShowPragmas inlineShowbPrec ''I16)
 
 instance Show UnicodeException where
     showb = showbUnicodeException

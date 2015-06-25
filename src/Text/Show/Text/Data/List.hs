@@ -14,7 +14,7 @@ module Text.Show.Text.Data.List (showbListWith) where
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbList), showbListWith)
+import Text.Show.Text.Classes (Show(showb, showbList), Show1(..), showbListWith)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 
@@ -27,6 +27,6 @@ instance Show a => Show [a] where
     showb = showbList
     INLINE_INST_FUN(showb)
 
--- instance Show1 [] where
---     showbPrec1 = showbPrec
---     INLINE_INST_FUN(showbPrec1)
+instance Show1 [] where
+    showbPrecWith sp _ = showbListWith (sp 0)
+    INLINE_INST_FUN(showbPrecWith)

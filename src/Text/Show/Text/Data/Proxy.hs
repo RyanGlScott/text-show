@@ -19,15 +19,15 @@ module Text.Show.Text.Data.Proxy (showbProxy) where
 import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude ()
+import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec))
-import Text.Show.Text.TH.Internal (mkShowbPrec)
+import Text.Show.Text.Classes (Show(showb, showbPrec), showbPrecWith)
+import Text.Show.Text.TH.Internal (deriveShow1Pragmas, inlineShowbPrecWith)
 
 #include "inline.h"
 
 -- | Convert a 'Proxy' type to a 'Builder'.
--- 
+--
 -- /Since: 0.4/
 showbProxy :: Proxy s -> Builder
 showbProxy = showb
@@ -35,9 +35,7 @@ showbProxy = showb
 
 -- TODO: Derive with TH once it can detect phantom types properly
 instance Show (Proxy s) where
-    showbPrec = $(mkShowbPrec ''Proxy)
+    showbPrec = showbPrecWith undefined
     INLINE_INST_FUN(showb)
 
--- instance Show1 Proxy where
---     showbPrec1 = showbPrec
---     INLINE_INST_FUN(showbPrec1)
+$(deriveShow1Pragmas inlineShowbPrecWith ''Proxy)

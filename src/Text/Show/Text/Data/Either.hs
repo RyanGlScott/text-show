@@ -13,26 +13,28 @@ Monomorphic 'Show' function for 'Either' values.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.Data.Either (showbEitherPrec) where
+module Text.Show.Text.Data.Either (showbEitherPrecWith2) where
 
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.Classes (showbPrecWith2)
+import Text.Show.Text.TH.Internal
+    (deriveShowPragmas, deriveShow1Pragmas, deriveShow2Pragmas,
+     inlineShowbPrec, inlineShowbPrecWith, inlineShowbPrecWith2)
 
 #include "inline.h"
 
--- | Convert a 'Either' value to a 'Builder' with the given precedence.
+-- | Convert a 'Either' value to a 'Builder' with the given show functions
+-- and precedence.
 -- 
--- /Since: 0.3/
-showbEitherPrec :: (Show a, Show b) => Int -> Either a b -> Builder
-showbEitherPrec = showbPrec
-{-# INLINE showbEitherPrec #-}
+-- /Since: 1/
+showbEitherPrecWith2 :: (Int -> a -> Builder) -> (Int -> b -> Builder)
+                     -> Int -> Either a b -> Builder
+showbEitherPrecWith2 = showbPrecWith2
+{-# INLINE showbEitherPrecWith2 #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''Either)
-
--- instance Show a => Show1 (Either a) where
---     showbPrec1 = showbPrec
---     INLINE_INST_FUN(showbPrec1)
+$(deriveShowPragmas  inlineShowbPrec      ''Either)
+$(deriveShow1Pragmas inlineShowbPrecWith  ''Either)
+$(deriveShow2Pragmas inlineShowbPrecWith2 ''Either)

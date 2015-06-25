@@ -1,15 +1,24 @@
-# 0.9
+# 1
 * The `Show1` class has been completely overhauled. `Show1` now uses the function `showbPrecWith`, which takes as an argument a function of type `Int -> a -> Builder` to show occurrences of the type parameter (instead of requiring the type parameter to be a `Show` instance). This matches the new implementation of `Show1` in `transformers-VERSIONNUMBER?`. A similar `Show2` class (with the function `showbPrecWith2`) was also added.
 * As a consequence, `Show1` instances can no longer be defined in terms of `showbPrec`; rather, `Show` instances can be defined in terms of `showbPrecWith` or `showbPrecWith2`, and `Show1` instances can be defined in terms of `showbPrecWith2`.
 * The `showbPrec1` function is no longer a class method of `Show1`, but is now a standalone function defined in terms of `showbPrecWith`. `showbPrec1` can be useful for defining `Show` instances. A similar `showbPrec2` function was also added.
 * TODO: Everything related to Show1 and Show2, including
+* TODO: Document the changes in the monomorphic functions, including the new `-PrecWith` and `-PrecWith2` suffixes
+* TODO: Fix that one table in `Text.Show.Text.TH` to be `Int -> Name` instead of `Name -> Name` (it may be redundant, even)
+* TODO: Mention that `Alt`, `Rec1`, `M1`, `(:+:)`, `(:*:)`, and `(:.:)` have `Show1` instances
+* TODO: Replace "Experimental" with "Provisional"
 -- What they are
+-- `Show1 Ratio` instance
 -- GShow1 in Text.Show.Text.Generics, as well as its generic methods (DONE)
 -- Deriving Show1 and Show2 via Template Haskell
 * `Show1` instances can be created generically using the `genericShowbPrecWith` function in `Text.Show.Text.Generics`. A `genericShowbPrec1` was also added.
 * Removed the ability to call `deriveShow` or `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature. If you want to derive `Show` for data family instances, use the corresponding `data instance` or `newtype instance` constructor name as an argument instead.
 * `PragmaOptions` (in `Text.Show.Text.TH`) combined all of its inlining-related fields into a single field, `inlineFunctions`, which takes a list of names of functions to inline.
+ * `specializeTypes` now expects each `Q Type` value to mention `Show` (i.e., use `specializeTypes = [t| Show Int |]`, not `specializeTypes = [t| Int |]`).
+* Renamed `defaultInlineShowbPrec`, `defaultInlineShowb`, and `defaultInlineShowbList` to `inlineShowbPrec`, `inlineShowb`, and `inlineShowbList`, respectively. Also added `inlineShowbPrecWith` and `inlineShowbPrecWith2`.
 * `ConType` (in `Text.Show.Text.Generics`) now has an `Inf String` constructor instead of `Inf Builder`. As a result, `ConType` now always an `Eq` and `Ord` instance, and a `Read ConType` instance was added.
+* `Generic` and `Typeable` instances for `PragmaOptions`
+* `Typeable` instances for the promoted data constructors `'FromStringShow` and `'FromTextShow`
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
 
 ### 0.8.1.1

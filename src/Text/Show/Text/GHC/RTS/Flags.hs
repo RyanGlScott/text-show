@@ -46,7 +46,7 @@ import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Floating (showbDoublePrec)
 import Text.Show.Text.Data.Integral (showbIntPrec, showbWord, showbWord64)
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.Data.Maybe (showbMaybePrec)
+import Text.Show.Text.Data.Maybe (showbMaybePrecWith)
 import Text.Show.Text.Utils (s)
 import Text.Show.Text.TH.Internal (deriveShow)
 
@@ -57,7 +57,7 @@ import Text.Show.Text.Classes (showbParen)
 
 -- | Convert an 'RTSFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbRTSFlagsPrec :: Int -> RTSFlags -> Builder
 showbRTSFlagsPrec = showbPrec
@@ -65,7 +65,7 @@ showbRTSFlagsPrec = showbPrec
 
 -- | Convert a 'GCFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbGCFlagsPrec :: Int -> GCFlags -> Builder
 # if __GLASGOW_HASKELL__ >= 711
@@ -74,7 +74,7 @@ showbGCFlagsPrec _ gcfs =
 showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
 # endif
        "GCFlags {statsFile = "
-    <> showbMaybePrec 0 (statsFile gcfs)
+    <> showbMaybePrecWith showbPrec 0 (statsFile gcfs)
     <> ", giveStats = "
     <> showb (FromStringShow $ giveStats gcfs)
     <> ", maxStkSize = "
@@ -127,7 +127,7 @@ showbGCFlagsPrec p gcfs = showbParen (p > appPrec) $
 
 -- | Convert a 'ConcFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbConcFlagsPrec :: Int -> ConcFlags -> Builder
 showbConcFlagsPrec = showbPrec
@@ -135,14 +135,14 @@ showbConcFlagsPrec = showbPrec
 
 -- | Convert a 'MiscFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbMiscFlagsPrec :: Int -> MiscFlags -> Builder
 showbMiscFlagsPrec = showbPrec
 {-# INLINE showbMiscFlagsPrec #-}
 
 -- | Convert a 'DebugFlags' value to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.5/
 showbDebugFlagsPrec :: Int -> DebugFlags -> Builder
 showbDebugFlagsPrec = showbPrec
@@ -150,7 +150,7 @@ showbDebugFlagsPrec = showbPrec
 
 -- | Convert a 'CCFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbCCFlagsPrec :: Int -> CCFlags -> Builder
 # if __GLASGOW_HASKELL__ >= 711
@@ -168,7 +168,7 @@ showbCCFlagsPrec p ccfs = showbParen (p > appPrec) $
 
 -- | Convert a 'ProfFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbProfFlagsPrec :: Int -> ProfFlags -> Builder
 # if __GLASGOW_HASKELL__ >= 711
@@ -191,24 +191,24 @@ showbProfFlagsPrec p pfs = showbParen (p > appPrec) $
     <> ", ccsLength = "
     <> showbWord (ccsLength pfs)
     <> ", modSelector = "
-    <> showbMaybePrec 0 (modSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (modSelector pfs)
     <> ", descrSelector = "
-    <> showbMaybePrec 0 (descrSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (descrSelector pfs)
     <> ", typeSelector = "
-    <> showbMaybePrec 0 (typeSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (typeSelector pfs)
     <> ", ccSelector = "
-    <> showbMaybePrec 0 (ccSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (ccSelector pfs)
     <> ", ccsSelector = "
-    <> showbMaybePrec 0 (ccsSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (ccsSelector pfs)
     <> ", retainerSelector = "
-    <> showbMaybePrec 0 (retainerSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (retainerSelector pfs)
     <> ", bioSelector = "
-    <> showbMaybePrec 0 (bioSelector pfs)
+    <> showbMaybePrecWith showbPrec 0 (bioSelector pfs)
     <> s '}'
 
 -- | Convert a 'TraceFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbTraceFlagsPrec :: Int -> TraceFlags -> Builder
 # if __GLASGOW_HASKELL__ >= 711
@@ -234,7 +234,7 @@ showbTraceFlagsPrec p tfs = showbParen (p > appPrec) $
 
 -- | Convert a 'TickyFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
--- 
+--
 -- /Since: 0.5/
 showbTickyFlagsPrec :: Int -> TickyFlags -> Builder
 showbTickyFlagsPrec = showbPrec

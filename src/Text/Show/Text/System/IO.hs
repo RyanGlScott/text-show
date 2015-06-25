@@ -48,7 +48,7 @@ import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.Integral (showbIntegerPrec)
 import Text.Show.Text.Data.Maybe ()
 import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
-                                   defaultInlineShowb, defaultInlineShowbPrec)
+                                   inlineShowb, inlineShowbPrec)
 import Text.Show.Text.Utils (s)
 
 #include "inline.h"
@@ -138,23 +138,23 @@ instance Show Handle where
     showb = showbHandle
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas defaultInlineShowb     ''IOMode)
-$(deriveShow                               ''BufferMode)
+$(deriveShowPragmas inlineShowb     ''IOMode)
+$(deriveShow                        ''BufferMode)
 
 instance Show HandlePosn where
     showb = showbHandlePosn
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas defaultInlineShowb     ''SeekMode)
+$(deriveShowPragmas inlineShowb     ''SeekMode)
 
 instance Show TextEncoding where
     showb = showbTextEncoding
     INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,4,0)
-$(deriveShowPragmas defaultInlineShowb     ''CodingProgress)
-$(deriveShowPragmas defaultInlineShowb     ''CodingFailureMode)
+$(deriveShowPragmas inlineShowb     ''CodingProgress)
+$(deriveShowPragmas inlineShowb     ''CodingFailureMode)
 #endif
 
-$(deriveShowPragmas defaultInlineShowb     ''Newline)
-$(deriveShowPragmas defaultInlineShowbPrec ''NewlineMode)
+$(deriveShowPragmas inlineShowb     ''Newline)
+$(deriveShowPragmas inlineShowbPrec ''NewlineMode)

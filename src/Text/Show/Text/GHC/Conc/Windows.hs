@@ -29,7 +29,7 @@ import Data.Text.Lazy.Builder (Builder)
 import GHC.Conc.Windows (ConsoleEvent)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
 
 -- | Convert a 'ConsoleEvent' to a 'Builder'.
 -- 
@@ -38,5 +38,5 @@ showbConsoleEvent :: ConsoleEvent -> Builder
 showbConsoleEvent = showb
 {-# INLINE showbConsoleEvent #-}
 
-$(deriveShowPragmas defaultInlineShowb ''ConsoleEvent)
+$(deriveShowPragmas inlineShowb ''ConsoleEvent)
 #endif

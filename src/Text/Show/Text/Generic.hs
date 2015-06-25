@@ -40,7 +40,7 @@ module Text.Show.Text.Generic (
 #else
       -- * Generic @show@ functions
       -- $generics
-      
+
       -- ** Understanding a compiler error
       -- $generic_err
       genericShow
@@ -141,93 +141,93 @@ simply to add the missing \"@deriving 'Generic'@\" clause.
 -}
 
 -- | A 'Generic' implementation of 'T.show'.
--- 
+--
 -- /Since: 0.6/
 genericShow :: (Generic a, GShow (Rep a)) => a -> TS.Text
 genericShow = toStrict . genericShowLazy
 
 -- | A 'Generic' implementation of 'T.showLazy'.
--- 
+--
 -- /Since: 0.6/
 genericShowLazy :: (Generic a, GShow (Rep a)) => a -> TL.Text
 genericShowLazy = toLazyText . genericShowb
 
 -- | A 'Generic' implementation of 'T.showPrec'.
--- 
+--
 -- /Since: 0.6/
 genericShowPrec :: (Generic a, GShow (Rep a)) => Int -> a -> TS.Text
 genericShowPrec p = toStrict . genericShowPrecLazy p
 
 -- | A 'Generic' implementation of 'T.showPrecLazy'.
--- 
+--
 -- /Since: 0.6/
 genericShowPrecLazy :: (Generic a, GShow (Rep a)) => Int -> a -> TL.Text
 genericShowPrecLazy p = toLazyText . genericShowbPrec p
 
 -- | A 'Generic' implementation of 'T.showList'.
--- 
+--
 -- /Since: 0.6/
 genericShowList :: (Generic a, GShow (Rep a)) => [a] -> TS.Text
 genericShowList = toStrict . genericShowListLazy
 
 -- | A 'Generic' implementation of 'T.showListLazy'.
--- 
+--
 -- /Since: 0.6/
 genericShowListLazy :: (Generic a, GShow (Rep a)) => [a] -> TL.Text
 genericShowListLazy = toLazyText . genericShowbList
 
 -- | A 'Generic' implementation of 'T.showb'.
--- 
+--
 -- /Since: 0.6/
 genericShowb :: (Generic a, GShow (Rep a)) => a -> Builder
 genericShowb = genericShowbPrec 0
 
 -- | A 'Generic' implementation of 'T.showbPrec'.
--- 
+--
 -- /Since: 0.6/
 genericShowbPrec :: (Generic a, GShow (Rep a)) => Int -> a -> Builder
 genericShowbPrec p = gShowbPrec Pref p . from
 
 -- | A 'Generic' implementation of 'T.showbList'.
--- 
+--
 -- /Since: 0.6/
 genericShowbList :: (Generic a, GShow (Rep a)) => [a] -> Builder
 genericShowbList = showbListWith genericShowb
 
 -- | A 'Generic' implementation of 'T.print'.
--- 
+--
 -- /Since: 0.6/
 genericPrint :: (Generic a, GShow (Rep a)) => a -> IO ()
 genericPrint = TS.putStrLn . genericShow
 
 -- | A 'Generic' implementation of 'T.printLazy'.
--- 
+--
 -- /Since: 0.6/
 genericPrintLazy :: (Generic a, GShow (Rep a)) => a -> IO ()
 genericPrintLazy = TL.putStrLn . genericShowLazy
 
 -- | A 'Generic' implementation of 'T.hPrint'.
--- 
+--
 -- /Since: 0.6/
 genericHPrint :: (Generic a, GShow (Rep a)) => Handle -> a -> IO ()
 genericHPrint h = TS.hPutStrLn h . genericShow
 
 -- | A 'Generic' implementation of 'T.hPrintLazy'.
--- 
+--
 -- /Since: 0.6/
 genericHPrintLazy :: (Generic a, GShow (Rep a)) => Handle -> a -> IO ()
 genericHPrintLazy h = TL.hPutStrLn h . genericShowLazy
 
 -- | A 'Generic1' implementation of 'showbPrecWith'.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 genericShowbPrecWith :: (Generic1 f, GShow1 (Rep1 f))
                      => (Int -> a -> Builder) -> Int -> f a -> Builder
 genericShowbPrecWith sp p = gShowbPrecWith Pref sp p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 genericShowbPrec1 :: (Generic a, Generic1 f, GShow (Rep a), GShow1 (Rep1 f))
                   => Int -> f a -> Builder
 genericShowbPrec1 = genericShowbPrecWith genericShowbPrec
@@ -236,7 +236,7 @@ genericShowbPrec1 = genericShowbPrecWith genericShowbPrec
 
 -- | Whether a constructor is a record ('Rec'), a tuple ('Tup'), is prefix ('Pref'),
 -- or infix ('Inf').
--- 
+--
 -- /Since: 0.6/
 data ConType = Rec | Tup | Pref | Inf String
   deriving (Eq, Generic, Ord, Read, S.Show, Typeable)
@@ -247,7 +247,7 @@ instance T.Show ConType where
 
 -- | Class of generic representation types ('Rep') that can be converted to
 -- a 'Builder'.
--- 
+--
 -- /Since: 0.6/
 class GShow f where
     -- | This is used as the default generic implementation of 'showbPrec'.
@@ -292,14 +292,14 @@ instance (GShow f, GShow g) => GShow (f :*: g) where
 
 -- | Class of generic representation types ('Rep1') that can be converted to
 -- a 'Builder' by lifting through a unary type constructor.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 class GShow1 f where
     -- | This is used as the default generic implementation of 'showbPrecWith'.
     gShowbPrecWith :: ConType -> (Int -> a -> Builder) -> Int -> f a -> Builder
     -- | Whether a representation type has any constructors.
     isNullary1 :: f a -> Bool
-    isNullary1 = error "generic showbPrecWith (isNullary): unnecessary case"
+    isNullary1 = error "generic showbPrecWith (isNullary1): unnecessary case"
 # if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL gShowbPrecWith #-}
 

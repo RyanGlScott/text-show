@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      Text.Show.Text.Data.Void
@@ -21,16 +20,12 @@ import Prelude ()
 
 import Text.Show.Text.Classes (Show(showb))
 
-#include "inline.h"
-
 -- | Since 'Void' values logically don't exist, attempting to convert one to a
 -- 'Builder' will never terminate.
 -- 
 -- /Since: 0.5/
 showbVoid :: Void -> Builder
 showbVoid = absurd
-{-# INLINE showbVoid #-}
 
 instance Show Void where
     showb = showbVoid
-    INLINE_INST_FUN(showb)

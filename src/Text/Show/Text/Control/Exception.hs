@@ -50,7 +50,7 @@ import Prelude ()
 import Prelude.Compat hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowb)
 
 #include "inline.h"
 
@@ -296,4 +296,4 @@ instance Show ErrorCall where
     showb = showbErrorCall
     INLINE_INST_FUN(showb)
 
-$(deriveShowPragmas defaultInlineShowb ''MaskingState)
+$(deriveShowPragmas inlineShowb ''MaskingState)

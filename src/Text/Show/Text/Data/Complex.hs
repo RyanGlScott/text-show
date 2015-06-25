@@ -11,6 +11,9 @@ Portability: GHC
 
 Monomorphic 'Show' function for 'Ratio' values.
 
+Due to use of the @DatatypeContexts@ extension, there is no @Show1 Complex@
+instance on @base-4.3.0.0@.
+
 /Since: 0.5/
 -}
 module Text.Show.Text.Data.Complex (showbComplexPrec) where
@@ -24,8 +27,9 @@ import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.Data.Floating ()
 #if MIN_VERSION_base(4,4,0)
 -- import Text.Show.Text.Classes (Show1(showbPrec1))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
-                                   specializeTypes)
+import Text.Show.Text.TH.Internal
+  (deriveShowPragmas, deriveShow1Pragmas, inlineShowbPrec,
+   inlineShowbPrecWith, specializeTypes)
 #else
 import Text.Show.Text.TH.Internal (mkShowbPrec)
 #endif
@@ -50,16 +54,13 @@ showbComplexPrec = showbPrec
 
 -- TODO: Only use TH when context solver is improved
 #if MIN_VERSION_base(4,4,0)
-$(deriveShowPragmas defaultInlineShowbPrec {
-                        specializeTypes = [ [t| Complex Float  |]
-                                          , [t| Complex Double |]
-                                          ]
-                    }
-                    ''Complex)
-
--- instance Show1 Complex where
---     showbPrec1 = showbPrec
---     INLINE_INST_FUN(showbPrec1)
+$(deriveShowPragmas inlineShowbPrec {
+    specializeTypes = [ [t| Show (Complex Float)  |]
+                      , [t| Show (Complex Double) |]
+                      ]
+  }
+  ''Complex)
+$(deriveShow1Pragmas inlineShowbPrecWith ''Complex)
 #else
 instance (RealFloat a, Show a) => Show (Complex a) where
     {-# SPECIALIZE instance Show (Complex Float)  #-}

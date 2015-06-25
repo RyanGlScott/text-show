@@ -69,7 +69,6 @@ showbTypeRepPrec p tyrep =
 -- | The list 'TyCon'.
 listTc :: TyCon
 listTc = typeRepTyCon $ typeOf [()]
-{-# INLINE listTc #-}
 
 -- | The function (@->@) 'TyCon'.
 funTc :: TyCon

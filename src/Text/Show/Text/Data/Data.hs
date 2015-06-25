@@ -30,7 +30,7 @@ import Text.Show.Text.Classes (Show(showb, showbPrec))
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Ratio ()
 import Text.Show.Text.TH.Internal (deriveShow, deriveShowPragmas,
-                                   defaultInlineShowbPrec, defaultInlineShowb)
+                                   inlineShowbPrec, inlineShowb)
 
 #include "inline.h"
 
@@ -69,10 +69,10 @@ showbConstrRepPrec :: Int -> ConstrRep -> Builder
 showbConstrRepPrec = showbPrec
 {-# INLINE showbConstrRepPrec #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''DataType)
-$(deriveShow                               ''DataRep)
-$(deriveShow                               ''ConstrRep)
-$(deriveShowPragmas defaultInlineShowb     ''Fixity)
+$(deriveShowPragmas inlineShowbPrec ''DataType)
+$(deriveShow                        ''DataRep)
+$(deriveShow                        ''ConstrRep)
+$(deriveShowPragmas inlineShowb     ''Fixity)
 
 instance Show Constr where
     showb = showbConstr

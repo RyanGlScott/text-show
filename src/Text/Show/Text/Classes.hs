@@ -6,11 +6,14 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
-#if MIN_VERSION_base(4,4,0)
+#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric              #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE AutoDeriveTypeable         #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeFamilies               #-}
 #endif
@@ -52,7 +55,7 @@ import           Foreign.Storable (Storable)
 #if __GLASGOW_HASKELL__ >= 708
 import           GHC.Exts (IsList(Item, fromList, toList))
 #endif
-#if MIN_VERSION_base(4,4,0)
+#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
 # if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
@@ -78,48 +81,48 @@ import           Text.Show.Text.Utils (s, toString)
 -- variants, the 'Show' class deliberately avoids using @Text@ in its functions.
 -- Instead, 'showbPrec', 'showb', and 'showbList' all return 'Builder', an
 -- efficient intermediate form that can be converted to either kind of @Text@.
--- 
+--
 -- 'Builder' is a 'Monoid', so it is useful to use the 'mappend' (or '<>') function
 -- to combine 'Builder's when creating 'Show' instances. As an example:
--- 
+--
 -- @
 -- import Text.Show.Text
--- 
+--
 -- data Example = Example Int Int
 -- instance Show Example where
 --     showb (Example i1 i2) = showb i1 <> showbSpace <> showb i2
 -- @
--- 
+--
 -- If you do not want to create 'Show' instances manually, you can alternatively
 -- use the "Text.Show.Text.TH" module to automatically generate default 'Show'
 -- instances using Template Haskell, or the "Text.Show.Text.Generic" module to
 -- quickly define 'Show' instances using 'genericShowbPrec'.
--- 
+--
 -- /Since: 0.1/
 class Show a where
     -- | Convert a value to a 'Builder' with the given predence.
-    -- 
+    --
     -- /Since: 0.1/
     showbPrec :: Int -- ^ The operator precedence of the enclosing context (a number
                      -- from @0@ to @11@). Function application has precedence @10@.
               -> a   -- ^ The value to be converted to a 'String'.
               -> Builder
-    
+
     -- | A specialized variant of 'showbPrec' using precedence context zero.
-    -- 
+    --
     -- /Since: 0.1/
     showb :: a -> Builder
-    
+
     -- | Allows for specialized display of lists. This is used, for example, when
     -- showing lists of 'Char's.
-    -- 
+    --
     -- /Since: 0.1/
     showbList :: [a] -> Builder
-    
+
     showbPrec _ = showb
-    
+
     showb = showbPrec 0
-    
+
     showbList = showbListWith showb
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
@@ -128,49 +131,49 @@ deriving instance Typeable Show
 #endif
 
 -- | Constructs a strict 'TS.Text' from a single value.
--- 
+--
 -- /Since: 0.1/
 show :: Show a => a -> TS.Text
 show = toStrict . showLazy
 {-# INLINE show #-}
 
 -- | Constructs a lazy 'TL.Text' from a single value.
--- 
+--
 -- /Since: 0.3/
 showLazy :: Show a => a -> TL.Text
 showLazy = toLazyText . showb
 {-# INLINE showLazy #-}
 
 -- | Constructs a strict 'TS.Text' from a single value with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showPrec :: Show a => Int -> a -> TS.Text
 showPrec p = toStrict . showPrecLazy p
 {-# INLINE showPrec #-}
 
 -- | Constructs a lazy 'TL.Text' from a single value with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showPrecLazy :: Show a => Int -> a -> TL.Text
 showPrecLazy p = toLazyText . showbPrec p
 {-# INLINE showPrecLazy #-}
 
 -- | Construct a strict 'TS.Text' from a list of values.
--- 
+--
 -- /Since: 0.3.1/
 showList :: Show a => [a] -> TS.Text
 showList = toStrict . showListLazy
 {-# INLINE showList #-}
 
 -- | Construct a lazy 'TL.Text' from a list of values.
--- 
+--
 -- /Since: 0.3.1/
 showListLazy :: Show a => [a] -> TL.Text
 showListLazy = toLazyText . showbList
 {-# INLINE showListLazy #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
--- 
+--
 -- /Since: 0.1/
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = s '(' <> builder <> s ')'
@@ -178,11 +181,10 @@ showbParen p builder | p         = s '(' <> builder <> s ')'
 {-# INLINE showbParen #-}
 
 -- | Construct a 'Builder' containing a single space character.
--- 
+--
 -- /Since: 0.5/
 showbSpace :: Builder
 showbSpace = s ' '
-{-# INLINE showbSpace #-}
 
 -- | Converts a list of values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. The function argument
@@ -190,7 +192,7 @@ showbSpace = s ' '
 
 -- @'showbListWith' 'showb'@ is the default implementation of 'showbList' save for
 -- a few special cases (e.g., 'String').
--- 
+--
 -- /Since: 0.7/
 showbListWith :: (a -> Builder) -> [a] -> Builder
 showbListWith _      []     = "[]"
@@ -202,7 +204,7 @@ showbListWith showbx (x:xs) = s '[' <> showbx x <> go xs -- "[..
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.
--- 
+--
 -- /Since: 0.1/
 print :: Show a => a -> IO ()
 print = TS.putStrLn . show
@@ -210,7 +212,7 @@ print = TS.putStrLn . show
 
 -- | Writes a value's lazy 'TL.Text' representation to the standard output, followed
 --   by a newline.
--- 
+--
 -- /Since: 0.3/
 printLazy :: Show a => a -> IO ()
 printLazy = TL.putStrLn . showLazy
@@ -218,7 +220,7 @@ printLazy = TL.putStrLn . showLazy
 
 -- | Writes a value's strict 'TS.Text' representation to a file handle, followed
 --   by a newline.
--- 
+--
 -- /Since: 0.3/
 hPrint :: Show a => Handle -> a -> IO ()
 hPrint h = TS.hPutStrLn h . show
@@ -226,7 +228,7 @@ hPrint h = TS.hPutStrLn h . show
 
 -- | Writes a value's lazy 'TL.Text' representation to a file handle, followed
 --   by a newline.
--- 
+--
 -- /Since: 0.3/
 hPrintLazy :: Show a => Handle -> a -> IO ()
 hPrintLazy h = TL.hPutStrLn h . showLazy
@@ -235,12 +237,12 @@ hPrintLazy h = TL.hPutStrLn h . showLazy
 -------------------------------------------------------------------------------
 
 -- | Lifting of the 'Show' class to unary type constructors.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 class Show1 f where
     -- | Lifts a 'showbPrec' function through the type constructor.
-    -- 
-    -- /Since: 0.9/
+    --
+    -- /Since: 1/
     showbPrecWith :: (Int -> a -> Builder) -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
@@ -248,8 +250,8 @@ deriving instance Typeable Show1
 #endif
 
 -- | Lift the standard 'showbPrec' function through the type constructor.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 showbPrec1 :: (Show1 f, Show a) => Int -> f a -> Builder
 showbPrec1 = showbPrecWith showbPrec
 {-# INLINE showbPrec1 #-}
@@ -257,8 +259,8 @@ showbPrec1 = showbPrecWith showbPrec
 -- | @'showbUnaryWith' sp n p x@ produces the 'Builder' representation of a unary data
 -- constructor with name @n@ and argument @x@, in precedence context @p@, using the
 -- function @sp@ to show occurrences of the type argument.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 showbUnaryWith :: (Int -> a -> Builder) -> Builder -> Int -> a -> Builder
 showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
     nameB <> showbSpace <> sp appPrec1 x
@@ -267,12 +269,12 @@ showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
 -------------------------------------------------------------------------------
 
 -- | Lifting of the 'Show' class to binary type constructors.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 class Show2 f where
     -- | Lifts 'showbPrec' functions through the type constructor.
-    -- 
-    -- /Since: 0.9/
+    --
+    -- /Since: 1/
     showbPrecWith2 :: (Int -> a -> Builder) -> (Int -> b -> Builder) ->
         Int -> f a b -> Builder
 
@@ -280,9 +282,9 @@ class Show2 f where
 deriving instance Typeable Show2
 #endif
 
--- | Lift the standard 'showbPrec' function through the type constructor.
--- 
--- /Since: 0.9/
+-- | Lift two 'showbPrec' functions through the type constructor.
+--
+-- /Since: 1/
 showbPrec2 :: (Show2 f, Show a, Show b) => Int -> f a b -> Builder
 showbPrec2 = showbPrecWith2 showbPrec showbPrec
 {-# INLINE showbPrec2 #-}
@@ -290,8 +292,8 @@ showbPrec2 = showbPrecWith2 showbPrec showbPrec
 -- | @'showbBinaryWith' sp n p x y@ produces the 'Builder' representation of a binary
 -- data constructor with name @n@ and arguments @x@ and @y@, in precedence context
 -- @p@, using the functions @sp1@ and @sp2@ to show occurrences of the type arguments.
--- 
--- /Since: 0.9/
+--
+-- /Since: 1/
 showbBinaryWith :: (Int -> a -> Builder) -> (Int -> b -> Builder) ->
     Builder -> Int -> a -> b -> Builder
 showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
@@ -303,11 +305,11 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
 
 -- | The @Text@ 'T.Show' instance for 'FromStringShow' is based on its @String@
 -- 'S.Show' instance. That is,
--- 
+--
 -- @
 -- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
 -- @
--- 
+--
 -- /Since: 0.5/
 newtype FromStringShow a = FromStringShow { fromStringShow :: a }
   deriving ( Bits
@@ -322,7 +324,7 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Foldable
            , Fractional
            , Functor
-#if MIN_VERSION_base(4,4,0)
+#if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if __GLASGOW_HASKELL__ >= 706
            , Generic1
@@ -348,7 +350,7 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
 instance Applicative FromStringShow where
     pure = FromStringShow
     INLINE_INST_FUN(pure)
-    
+
     FromStringShow f <*> FromStringShow x = FromStringShow $ f x
     INLINE_INST_FUN((<*>))
 
@@ -364,7 +366,7 @@ instance IsList a => IsList (FromStringShow a) where
 instance Monad FromStringShow where
     return = FromStringShow
     INLINE_INST_FUN(return)
-    
+
     FromStringShow a >>= f = f a
     INLINE_INST_FUN((>>=))
 
@@ -376,10 +378,10 @@ instance MonadFix FromStringShow where
 instance MonadZip FromStringShow where
     mzip (FromStringShow a) (FromStringShow b) = FromStringShow (a, b)
     INLINE_INST_FUN(mzip)
-    
+
     mzipWith f (FromStringShow a) (FromStringShow b) = FromStringShow $ f a b
     INLINE_INST_FUN(mzipWith)
-    
+
     munzip (FromStringShow (a, b)) = (FromStringShow a, FromStringShow b)
     INLINE_INST_FUN(munzip)
 #endif
@@ -387,7 +389,7 @@ instance MonadZip FromStringShow where
 instance Read a => Read (FromStringShow a) where
     readPrec = FromStringShow <$> readPrec
     INLINE_INST_FUN(readPrec)
-    
+
     readListPrec = readListPrecDefault
     INLINE_INST_FUN(readListPrec)
 
@@ -401,11 +403,11 @@ instance S.Show a => S.Show (FromStringShow a) where
 
 -- | The @String@ 'S.Show' instance for 'FromTextShow' is based on its @Text@
 -- 'T.Show' instance. That is,
--- 
+--
 -- @
 -- showsPrec p ('FromTextShow' x) str = 'toString' (showbPrec p x) ++ str
 -- @
--- 
+--
 -- /Since: 0.6/
 newtype FromTextShow a = FromTextShow { fromTextShow :: a }
   deriving ( Bits
@@ -420,7 +422,7 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , Foldable
            , Fractional
            , Functor
-#if MIN_VERSION_base(4,4,0)
+#if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if __GLASGOW_HASKELL__ >= 706
            , Generic1
@@ -446,7 +448,7 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
 instance Applicative FromTextShow where
     pure = FromTextShow
     INLINE_INST_FUN(pure)
-    
+
     FromTextShow f <*> FromTextShow x = FromTextShow $ f x
     INLINE_INST_FUN((<*>))
 
@@ -462,7 +464,7 @@ instance IsList a => IsList (FromTextShow a) where
 instance Monad FromTextShow where
     return = FromTextShow
     INLINE_INST_FUN(return)
-    
+
     FromTextShow a >>= f = f a
     INLINE_INST_FUN((>>=))
 
@@ -474,10 +476,10 @@ instance MonadFix FromTextShow where
 instance MonadZip FromTextShow where
     mzip (FromTextShow a) (FromTextShow b) = FromTextShow (a, b)
     INLINE_INST_FUN(mzip)
-    
+
     mzipWith f (FromTextShow a) (FromTextShow b) = FromTextShow $ f a b
     INLINE_INST_FUN(mzipWith)
-    
+
     munzip (FromTextShow (a, b)) = (FromTextShow a, FromTextShow b)
     INLINE_INST_FUN(munzip)
 #endif
@@ -485,7 +487,7 @@ instance MonadZip FromTextShow where
 instance Read a => Read (FromTextShow a) where
     readPrec = FromTextShow <$> readPrec
     INLINE_INST_FUN(readPrec)
-    
+
     readListPrec = readListPrecDefault
     INLINE_INST_FUN(readListPrec)
 

@@ -32,7 +32,7 @@ import           Prelude hiding (Show(show))
 import           Text.Show.Text.Classes (Show(showb, showbPrec), FromStringShow(..))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import           Text.Show.Text.TH.Internal (deriveShowPragmas, inlineShowbPrec)
 #endif
 
 #include "inline.h"
@@ -84,7 +84,7 @@ instance Show BL.ByteString where
     showbPrec = showbByteStringLazyPrec
     INLINE_INST_FUN(showbPrec)
 #else
-$(deriveShowPragmas defaultInlineShowbPrec ''BL.ByteString)
+$(deriveShowPragmas inlineShowbPrec ''BL.ByteString)
 #endif
 
 instance Show ShortByteString where

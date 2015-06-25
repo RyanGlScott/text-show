@@ -148,17 +148,17 @@ showbQuestionMarkPrec :: (Show a, Show b) => Int -> a :?: b -> Builder
 showbQuestionMarkPrec = showbPrec
 
 -- TODO: Uncomment when these type signatures are generated via Template Haskell
--- 
+--
 -- showbHigherKindedTypeParamsPrec :: Show (f a)
 --                                 => Int -> HigherKindedTypeParams f a -> Builder
 -- showbHigherKindedTypeParamsPrec = showbPrec
--- 
+--
 -- showbRestrictionPrec :: (Read a, Show a) => Int -> Restriction a -> Builder
 -- showbRestrictionPrec = showbPrec
--- 
+--
 -- showbRestrictedContextPrec :: (Read a, Show a) => Int -> RestrictedContext a -> Builder
 -- showbRestrictedContextPrec = showbPrec
--- 
+--
 -- showbFixPrec :: Show (f (Fix f)) => Int -> Fix f -> Builder
 -- showbFixPrec = showbPrec
 

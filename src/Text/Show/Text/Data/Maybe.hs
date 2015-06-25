@@ -13,26 +13,24 @@ Monomorphic 'Show' function for 'Maybe' values.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.Data.Maybe (showbMaybePrec) where
+module Text.Show.Text.Data.Maybe (showbMaybePrecWith) where
 
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.Classes (showbPrecWith)
+import Text.Show.Text.TH.Internal (deriveShowPragmas, deriveShow1Pragmas,
+                                   inlineShowbPrec, inlineShowbPrecWith)
 
 #include "inline.h"
 
--- | Convert a 'Maybe' value to a 'Builder' with the given precedence.
+-- | Convert a 'Maybe' value to a 'Builder' with the given show function and precedence.
 -- 
--- /Since: 0.3/
-showbMaybePrec :: Show a => Int -> Maybe a -> Builder
-showbMaybePrec = showbPrec
-{-# INLINE showbMaybePrec #-}
+-- /Since: 1/
+showbMaybePrecWith :: (Int -> a -> Builder) -> Int -> Maybe a -> Builder
+showbMaybePrecWith = showbPrecWith
+{-# INLINE showbMaybePrecWith #-}
 
-$(deriveShowPragmas defaultInlineShowbPrec ''Maybe)
-
--- instance Show1 Maybe where
---     showbPrec1 = showbPrec
---     INLINE_INST_FUN(showbPrec1)
+$(deriveShowPragmas  inlineShowbPrec     ''Maybe)
+$(deriveShow1Pragmas inlineShowbPrecWith ''Maybe)
