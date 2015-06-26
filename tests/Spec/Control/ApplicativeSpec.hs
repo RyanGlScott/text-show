@@ -16,7 +16,8 @@ import Data.Orphans ()
 
 import Instances.Control.Applicative ()
 
-import Spec.Utils (prop_matchesShow, prop_genericShow)
+import Spec.Utils (prop_matchesShow, prop_matchesShow2,
+                   prop_genericShow, prop_genericShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,7 +26,10 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Control.Applicative" $ do
-    prop "Const Int Int instance"   (prop_matchesShow :: Int -> Const Int Int -> Bool)
-    prop "ZipList Int instance"     (prop_matchesShow :: Int -> ZipList Int -> Bool)
-    prop "ZipList Int generic show" (prop_genericShow :: Int -> ZipList Int -> Bool)
+spec = parallel $ do
+    describe "Const Int Int" $
+        prop "Show2 instance" (prop_matchesShow2 :: Int -> Const Int Int -> Bool)
+    describe "ZipList Int" $ do
+        prop "Show instance"  (prop_matchesShow  :: Int -> ZipList Int -> Bool)
+        prop "generic Show"   (prop_genericShow  :: Int -> ZipList Int -> Bool)
+        prop "generic Show1"  (prop_genericShow1 :: Int -> ZipList Int -> Bool)

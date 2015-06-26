@@ -36,8 +36,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,4,0)
-    describe "Text.Show.Text.GHC.Fingerprint" $
-        prop "Fingerprint instance" (prop_matchesShow :: Int -> Fingerprint -> Bool)
+    describe "Fingerprint" $
+        prop "Show instance" (prop_matchesShow :: Int -> Fingerprint -> Bool)
 #else
     pure ()
 #endif

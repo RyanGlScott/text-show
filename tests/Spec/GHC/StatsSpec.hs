@@ -34,8 +34,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,5,0)
-    describe "Text.Show.Text.GHC.Stats" $
-        prop "GCStats instance" (prop_matchesShow :: Int -> GCStats -> Bool)
+    describe "GCStats" $
+        prop "Show instance" (prop_matchesShow :: Int -> GCStats -> Bool)
 #else
     pure ()
 #endif

@@ -33,11 +33,12 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
-    describe "Text.Show.Text.GHC.Event" $ do
-        prop "Event instance" (prop_matchesShow :: Int -> Event -> Bool)
---         prop "FdKey instance" (prop_matchesShow :: Int -> FdKey -> Bool)
+    describe "Event" $
+        prop "Show instance" (prop_matchesShow :: Int -> Event -> Bool)
+--     describe "FdKey" $
+--         prop "Show instance" (prop_matchesShow :: Int -> FdKey -> Bool)
 #else
     pure ()
 #endif

@@ -23,5 +23,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Numeric.Natural" $
-    prop "Natural instance" (prop_matchesShow :: Int -> Natural -> Bool)
+spec = parallel . describe "Natural" $
+    prop "Show instance" (prop_matchesShow :: Int -> Natural -> Bool)

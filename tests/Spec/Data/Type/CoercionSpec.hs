@@ -35,8 +35,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
-    describe "Text.Show.Text.Data.Type.Coercion" $
-        prop "Coercion instance" (prop_matchesShow :: Int -> Coercion All Bool -> Bool)
+    describe "Coercion All Bool" $
+        prop "Show instance" (prop_matchesShow :: Int -> Coercion All Bool -> Bool)
 #else
     pure ()
 #endif

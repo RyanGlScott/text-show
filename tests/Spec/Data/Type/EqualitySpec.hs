@@ -35,8 +35,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
-    describe "Text.Show.Text.Data.Type.Equality" $
-        prop "(:~:) instance"                          (prop_matchesShow :: Int -> Int :~: Int -> Bool)
+    describe "Int :~: Int" $
+        prop "Show instance" (prop_matchesShow :: Int -> Int :~: Int -> Bool)
 #else
     pure ()
 #endif

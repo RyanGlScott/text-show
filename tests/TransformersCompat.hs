@@ -37,6 +37,9 @@ module TransformersCompat (
     FromStringShow2(..)
     ) where
 
+#include "generic.h"
+#include "inline.h"
+
 import            Control.Applicative (Const(..))
 
 -- #if __GLASGOW_HASKELL__ >= 708
@@ -47,7 +50,7 @@ import            Data.Text.Lazy.Builder (Builder)
 
 #if __GLASGOW_HASKELL__ >= 702
 import            GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 708
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
 import            GHC.Generics (Generic1)
 # endif
 #endif
@@ -59,8 +62,6 @@ import           Text.Read (Read(..), readListPrecDefault)
 import qualified Text.Show.Text as T (Show, Show1, Show2)
 import           Text.Show.Text (fromString, showbPrec, showbPrecWith,
                                  showbPrecWith2, toString)
-
-#include "inline.h"
 
 -- | Lifting of the 'Show' class to unary type constructors.
 class Show1 f where
@@ -77,7 +78,7 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
            , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if __GLASGOW_HASKELL__ >= 708
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
 #endif
@@ -136,7 +137,7 @@ newtype FromStringShow2 f a b = FromStringShow2 (f a b)
            , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if __GLASGOW_HASKELL__ >= 708
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
 #endif

@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module:      Spec.Derived.ExistentialQuantificationSpec
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -21,8 +23,10 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Data types with existentially quantified type variables" $ do
+spec = parallel $ do
     describe "TyCon Int Int Int Int" $
         prop "Show2 instance" (prop_matchesShow2 :: Int -> TyCon Int Int Int Int -> Bool)
+#if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int Int Int" $
         prop "Show2 instance" (prop_matchesShow2 :: Int -> TyFamily Int Int Int Int -> Bool)
+#endif

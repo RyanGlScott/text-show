@@ -12,7 +12,7 @@ module Spec.Data.EitherSpec (main, spec) where
 
 import Data.Orphans ()
 
-import Spec.Utils (prop_matchesShow, prop_genericShow)
+import Spec.Utils (prop_matchesShow2, prop_genericShow, prop_genericShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -21,6 +21,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Either" $ do
-    prop "Either Int Int instance"     (prop_matchesShow :: Int -> Either Int Int -> Bool)
-    prop "Either Int Int generic show" (prop_genericShow :: Int -> Either Int Int -> Bool)
+spec = parallel . describe "Either Int Int" $ do
+    prop "Show2 instance" (prop_matchesShow2 :: Int -> Either Int Int -> Bool)
+    prop "generic Show"   (prop_genericShow  :: Int -> Either Int Int -> Bool)
+    prop "generic Show1"  (prop_genericShow1 :: Int -> Either Int Int -> Bool)

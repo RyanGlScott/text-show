@@ -21,6 +21,6 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Bool" $ do
-    prop "Bool instance"     (prop_matchesShow :: Int -> Bool -> Bool)
-    prop "Bool generic show" (prop_genericShow :: Int -> Bool -> Bool)
+spec = parallel . describe "Bool" $ do
+    prop "Show instance" (prop_matchesShow :: Int -> Bool -> Bool)
+    prop "generic Show"  (prop_genericShow :: Int -> Bool -> Bool)

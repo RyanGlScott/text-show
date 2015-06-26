@@ -49,7 +49,10 @@ module Text.Show.Text.TH.Internal (
     ) where
 
 import           Data.Function (on)
-import           Data.List.Compat (find, foldl', intersperse)
+import           Data.List.Compat (foldl', intersperse)
+#if MIN_VERSION_template_haskell(2,7,0)
+import           Data.List.Compat (find)
+#endif
 import qualified Data.List.NonEmpty as NE
 import           Data.List.NonEmpty (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, lookup)
@@ -656,10 +659,10 @@ showbPrecTy' p _ _ _ (ConT tyName) tyExpName =
     tyVarE = varE tyExpName
 
     showE :: Q Exp
-    showE | tyName == ''Char#   = [| showbPrec 0 (C# $(tyVarE)) <> s '#'           |]
+    showE | tyName == ''Char#   = [| showbPrec 0 (C# $(tyVarE)) <> singleton '#'   |]
           | tyName == ''Double# = [| showbPrec 0 (D# $(tyVarE)) <> fromString "##" |]
-          | tyName == ''Float#  = [| showbPrec 0 (F# $(tyVarE)) <> s '#'           |]
-          | tyName == ''Int#    = [| showbPrec 0 (I# $(tyVarE)) <> s '#'           |]
+          | tyName == ''Float#  = [| showbPrec 0 (F# $(tyVarE)) <> singleton '#'   |]
+          | tyName == ''Int#    = [| showbPrec 0 (I# $(tyVarE)) <> singleton '#'   |]
           | tyName == ''Word#   = [| showbPrec 0 (W# $(tyVarE)) <> fromString "##" |]
           | otherwise = [| showbPrec p $(tyVarE) |]
 #else
@@ -1067,6 +1070,7 @@ cxtAndTypeTyCon numToDrop tyConName dataCxt tvbs =
     remainingLength :: Int
     remainingLength = length tvbs - fromEnum numToDrop
 
+    remaining, dropped :: [TyVarBndr]
     (remaining, dropped) = splitAt remainingLength tvbs
 
     droppedKinds :: [Kind]
@@ -1104,6 +1108,7 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt tvbs instTypesWithKinds =
     remainingLength :: Int
     remainingLength = length rhsTypes - fromEnum numToDrop
 
+    remaining, dropped :: [Type]
     (remaining, dropped) = splitAt remainingLength rhsTypes
 
     droppedKinds :: [Kind]

@@ -36,11 +36,12 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
-    describe "Text.Show.Text.Data.OldTypeable" $ do
-        prop "TypeRep instance" (prop_matchesShow :: Int -> TypeRep -> Bool)
-        prop "TyCon instance"   (prop_matchesShow :: Int -> TyCon -> Bool)
+    describe "TypeRep" $
+        prop "Show instance" (prop_matchesShow :: Int -> TypeRep -> Bool)
+    describe "TyCon" $
+        prop "Show instance" (prop_matchesShow :: Int -> TyCon -> Bool)
 #else
     pure ()
 #endif

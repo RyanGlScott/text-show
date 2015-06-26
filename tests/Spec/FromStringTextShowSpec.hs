@@ -23,12 +23,12 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text" $ do
+spec = parallel $ do
     describe "FromStringShow Int" $
-        prop "Show instance" (prop_matchesShow :: Int -> FromStringShow Int -> Bool)
+        prop "Show instance" (prop_matchesShow  :: Int -> FromStringShow Int -> Bool)
     describe "FromStringShow String" $
         prop "Show instance" (prop_matchesShow :: Int -> FromStringShow String -> Bool)
     describe "FromTextShow Int" $
-        prop "Show instance" (prop_matchesShow :: Int -> FromTextShow Int -> Bool)
+        prop "Show instance" (prop_matchesShow  :: Int -> FromTextShow Int -> Bool)
     describe "FromTextShow String" $
-        prop "Show instance" (prop_matchesShow :: Int -> FromTextShow String -> Bool)
+        prop "Show instance" (prop_matchesShow  :: Int -> FromTextShow String -> Bool)

@@ -23,5 +23,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Dynamic" $
-    prop "Dynamic instance" (prop_matchesShow :: Int -> Dynamic -> Bool)
+spec = parallel . describe "Dynamic" $
+    prop "Show instance" (prop_matchesShow :: Int -> Dynamic -> Bool)

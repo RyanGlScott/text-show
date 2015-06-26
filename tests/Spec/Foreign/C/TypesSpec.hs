@@ -25,31 +25,56 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Foreign.C.Types" $ do
-    prop "CChar instance"      (prop_matchesShow :: Int -> CChar -> Bool)
-    prop "CSChar instance"     (prop_matchesShow :: Int -> CSChar -> Bool)
-    prop "CUChar instance"     (prop_matchesShow :: Int -> CUChar -> Bool)
-    prop "CShort instance"     (prop_matchesShow :: Int -> CShort -> Bool)
-    prop "CUShort instance"    (prop_matchesShow :: Int -> CUShort -> Bool)
-    prop "CInt instance"       (prop_matchesShow :: Int -> CInt -> Bool)
-    prop "CUInt instance"      (prop_matchesShow :: Int -> CUInt -> Bool)
-    prop "CLong instance"      (prop_matchesShow :: Int -> CLong -> Bool)
-    prop "CULong instance"     (prop_matchesShow :: Int -> CULong -> Bool)
-    prop "CPtrdiff instance"   (prop_matchesShow :: Int -> CPtrdiff -> Bool)
-    prop "CSize instance"      (prop_matchesShow :: Int -> CSize -> Bool)
-    prop "CWchar instance"     (prop_matchesShow :: Int -> CWchar -> Bool)
-    prop "CSigAtomic instance" (prop_matchesShow :: Int -> CSigAtomic -> Bool)
-    prop "CLLong instance"     (prop_matchesShow :: Int -> CLLong -> Bool)
-    prop "CULLong instance"    (prop_matchesShow :: Int -> CULLong -> Bool)
-    prop "CIntPtr instance"    (prop_matchesShow :: Int -> CIntPtr -> Bool)
-    prop "CUIntPtr instance"   (prop_matchesShow :: Int -> CUIntPtr -> Bool)
-    prop "CIntMax instance"    (prop_matchesShow :: Int -> CIntMax -> Bool)
-    prop "CUIntMax instance"   (prop_matchesShow :: Int -> CUIntMax -> Bool)
-    prop "CClock instance"     (prop_matchesShow :: Int -> CClock -> Bool)
-    prop "CTime instance"      (prop_matchesShow :: Int -> CTime -> Bool)
+spec = parallel $ do
+    describe "CChar" $
+        prop "Show instance" (prop_matchesShow :: Int -> CChar -> Bool)
+    describe "CSChar" $
+        prop "Show instance" (prop_matchesShow :: Int -> CSChar -> Bool)
+    describe "CUChar" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUChar -> Bool)
+    describe "CShort" $
+        prop "Show instance" (prop_matchesShow :: Int -> CShort -> Bool)
+    describe "CUShort" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUShort -> Bool)
+    describe "CInt" $
+        prop "Show instance" (prop_matchesShow :: Int -> CInt -> Bool)
+    describe "CUInt" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUInt -> Bool)
+    describe "CLong" $
+        prop "Show instance" (prop_matchesShow :: Int -> CLong -> Bool)
+    describe "CULong" $
+        prop "Show instance" (prop_matchesShow :: Int -> CULong -> Bool)
+    describe "CPtrdiff" $
+        prop "Show instance" (prop_matchesShow :: Int -> CPtrdiff -> Bool)
+    describe "CSize" $
+        prop "Show instance" (prop_matchesShow :: Int -> CSize -> Bool)
+    describe "CWchar" $
+        prop "Show instance" (prop_matchesShow :: Int -> CWchar -> Bool)
+    describe "CSigAtomic" $
+        prop "Show instance" (prop_matchesShow :: Int -> CSigAtomic -> Bool)
+    describe "CLLong" $
+        prop "Show instance" (prop_matchesShow :: Int -> CLLong -> Bool)
+    describe "CULLong" $
+        prop "Show instance" (prop_matchesShow :: Int -> CULLong -> Bool)
+    describe "CIntPtr" $
+        prop "Show instance" (prop_matchesShow :: Int -> CIntPtr -> Bool)
+    describe "CUIntPtr" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUIntPtr -> Bool)
+    describe "CIntMax" $
+        prop "Show instance" (prop_matchesShow :: Int -> CIntMax -> Bool)
+    describe "CUIntMax" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUIntMax -> Bool)
+    describe "CClock" $
+        prop "Show instance" (prop_matchesShow :: Int -> CClock -> Bool)
+    describe "CTime" $
+        prop "Show instance" (prop_matchesShow :: Int -> CTime -> Bool)
 #if MIN_VERSION_base(4,4,0)
-    prop "CUSeconds instance"  (prop_matchesShow :: Int -> CUSeconds -> Bool)
-    prop "CSUSeconds instance" (prop_matchesShow :: Int -> CSUSeconds -> Bool)
+    describe "CUSeconds" $
+        prop "Show instance" (prop_matchesShow :: Int -> CUSeconds -> Bool)
+    describe "CSUSeconds" $
+        prop "Show instance" (prop_matchesShow :: Int -> CSUSeconds -> Bool)
 #endif
-    prop "CFloat instance"     (prop_matchesShow :: Int -> CFloat -> Bool)
-    prop "CDouble instance"    (prop_matchesShow :: Int -> CDouble -> Bool)
+    describe "CFloat" $
+        prop "Show instance" (prop_matchesShow :: Int -> CFloat -> Bool)
+    describe "CDouble" $
+        prop "Show instance" (prop_matchesShow :: Int -> CDouble -> Bool)

@@ -34,8 +34,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
-    describe "Text.Show.Text.GHC.Conc.Windows" $
-        prop "ConsoleEvent instance" (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+    describe "ConsoleEvent" $
+        prop "Show instance" (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
 #else
     pure ()
 #endif

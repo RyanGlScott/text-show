@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -111,6 +112,8 @@ $(deriveShow  ''TyCon)
 $(deriveShow1 ''TyCon)
 $(deriveShow2 ''TyCon)
 
+#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveShow  'TyFamilyClassConstraints)
 $(deriveShow1 'TyFamilyEqualityConstraints)
 $(deriveShow2 'TyFamilyTypeRefinement)
+#endif

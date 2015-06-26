@@ -313,7 +313,9 @@ test-suite text-show-spec
   default-language:    Haskell2010
   ghc-options:         -Wall -threaded -rtsopts
   include-dirs:        include
-  includes:            overlap.h
+  includes:            generic.h
+                     , overlap.h
                      , utils.h
-  install-includes:    overlap.h
+  install-includes:    generic.h
+                     , overlap.h
                      , utils.h

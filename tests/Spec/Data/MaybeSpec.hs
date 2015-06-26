@@ -12,7 +12,7 @@ module Spec.Data.MaybeSpec (main, spec) where
 
 import Data.Orphans ()
 
-import Spec.Utils (prop_matchesShow, prop_genericShow)
+import Spec.Utils (prop_matchesShow1, prop_genericShow, prop_genericShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -21,6 +21,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Maybe" $ do
-    prop "Maybe Int instance"     (prop_matchesShow :: Int -> Maybe Int -> Bool)
-    prop "Maybe Int generic show" (prop_genericShow :: Int -> Maybe Int -> Bool)
+spec = parallel . describe "Maybe Int" $ do
+    prop "Show1 instance" (prop_matchesShow1 :: Int -> Maybe Int -> Bool)
+    prop "generic Show"   (prop_genericShow  :: Int -> Maybe Int -> Bool)
+    prop "generic Show1"  (prop_genericShow1 :: Int -> Maybe Int -> Bool)

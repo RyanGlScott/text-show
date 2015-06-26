@@ -32,12 +32,13 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why these tests diverge on Windows
-    describe "Text.Show.Text.Data.Array" $ do
-        prop "Array Int Int instance"  (prop_matchesShow :: Int -> Array Int Int -> Bool)
-        prop "UArray Int Int instance" (prop_matchesShow :: Int -> UArray Int Int -> Bool)
+    describe "Array Int Int" $
+        prop "Show instance" (prop_matchesShow :: Int -> Array Int Int -> Bool)
+    describe "UArray Int Int" $
+        prop "Show instance" (prop_matchesShow :: Int -> UArray Int Int -> Bool)
 #else
     pure ()
 #endif

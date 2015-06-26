@@ -28,9 +28,11 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Ord" $ do
-    prop "Ordering instance"     (prop_matchesShow :: Int -> Ordering -> Bool)
-    prop "Ordering generic show" (prop_genericShow :: Int -> Ordering -> Bool)
+spec = parallel $ do
+    describe "Ordering" $ do
+        prop "Show instance" (prop_matchesShow :: Int -> Ordering -> Bool)
+        prop "generic Show"  (prop_genericShow :: Int -> Ordering -> Bool)
 #if MIN_VERSION_base(4,6,0)
-    prop "Down Int instance"     (prop_matchesShow :: Int -> Down Int -> Bool)
+    describe "Down Int" $ do
+        prop "Show instance" (prop_matchesShow :: Int -> Down Int -> Bool)
 #endif

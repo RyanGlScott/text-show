@@ -36,21 +36,27 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
-#if MIN_VERSION_base(4,6,0)
-    describe "Text.Show.Text.GHC.TypeLits" $ do
-# if MIN_VERSION_base(4,7,0)
-        prop "SomeNat instance"    (prop_matchesShow :: Int -> SomeNat -> Bool)
-        prop "SomeSymbol instance" (prop_matchesShow :: Int -> SomeSymbol -> Bool)
-# else
-        prop "IsEven 0 instance"   (prop_matchesShow :: Int -> IsEven 0 -> Bool)
-        prop "IsEven 1 instance"   (prop_matchesShow :: Int -> IsEven 1 -> Bool)
-        prop "IsEven 2 instance"   (prop_matchesShow :: Int -> IsEven 2 -> Bool)
-        prop "IsZero 0 instance"   (prop_matchesShow :: Int -> IsZero 0 -> Bool)
-        prop "IsZero 1 instance"   (prop_matchesShow :: Int -> IsZero 1 -> Bool)
-        prop "Sing 0 instance"     (prop_matchesShow :: Int -> Sing 0 -> Bool)
-        prop "Sing \"a\" instance" (prop_matchesShow :: Int -> Sing "a" -> Bool)
-# endif
+spec = parallel $ do
+#if MIN_VERSION_base(4,7,0)
+    describe "SomeNat" $
+        prop "Show instance" (prop_matchesShow :: Int -> SomeNat -> Bool)
+    describe "SomeSymbol" $
+        prop "Show instance" (prop_matchesShow :: Int -> SomeSymbol -> Bool)
+#elif MIN_VERSION_base(4,6,0)
+    describe "IsEven 0" $
+        prop "Show instance" (prop_matchesShow :: Int -> IsEven 0 -> Bool)
+    describe "IsEven 1" $
+        prop "Show instance" (prop_matchesShow :: Int -> IsEven 1 -> Bool)
+    describe "IsEven 2" $
+        prop "Show instance" (prop_matchesShow :: Int -> IsEven 2 -> Bool)
+    describe "IsZero 0" $
+        prop "Show instance" (prop_matchesShow :: Int -> IsZero 0 -> Bool)
+    describe "IsZero 1" $
+        prop "Show instance" (prop_matchesShow :: Int -> IsZero 1 -> Bool)
+    describe "Sing 0" $
+        prop "Show instance" (prop_matchesShow :: Int -> Sing 0 -> Bool)
+    describe "Sing \"a\"" $
+        prop "Show instance" (prop_matchesShow :: Int -> Sing "a" -> Bool)
 #else
     pure ()
 #endif

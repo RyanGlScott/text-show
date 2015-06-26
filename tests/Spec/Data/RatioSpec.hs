@@ -21,5 +21,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Ratio" $ do
-    prop "Ratio Int instance" (prop_matchesShow :: Int -> Ratio Int -> Bool)
+spec = parallel . describe "Ratio Int" $ do
+    prop "Show instance" (prop_matchesShow :: Int -> Ratio Int -> Bool)

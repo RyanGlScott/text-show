@@ -23,9 +23,14 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Data" $ do
-    prop "Constr instance"    (prop_matchesShow :: Int -> Constr -> Bool)
-    prop "ConstrRep instance" (prop_matchesShow :: Int -> ConstrRep -> Bool)
-    prop "DataRep instance"   (prop_matchesShow :: Int -> DataRep -> Bool)
-    prop "DataType instance"  (prop_matchesShow :: Int -> DataType -> Bool)
-    prop "Fixity instance"    (prop_matchesShow :: Int -> Fixity -> Bool)
+spec = parallel $ do
+    describe "Constr" $
+        prop "Show instance" (prop_matchesShow :: Int -> Constr -> Bool)
+    describe "ConstrRep" $
+        prop "Show instance" (prop_matchesShow :: Int -> ConstrRep -> Bool)
+    describe "DataRep" $
+        prop "Show instance" (prop_matchesShow :: Int -> DataRep -> Bool)
+    describe "DataType" $
+        prop "Show instance" (prop_matchesShow :: Int -> DataType -> Bool)
+    describe "Fixity" $
+        prop "Show instance" (prop_matchesShow :: Int -> Fixity -> Bool)

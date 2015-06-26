@@ -24,15 +24,23 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Fixed" $ do
-    prop "Fixed E0 instance"  (prop_matchesShow :: Int -> Fixed E0 -> Bool)
-    prop "Fixed E1 instance"  (prop_matchesShow :: Int -> Fixed E1 -> Bool)
-    prop "Fixed E2 instance"  (prop_matchesShow :: Int -> Fixed E2 -> Bool)
-    prop "Fixed E3 instance"  (prop_matchesShow :: Int -> Fixed E3 -> Bool)
-    prop "Fixed E6 instance"  (prop_matchesShow :: Int -> Fixed E6 -> Bool)
-    prop "Fixed E9 instance"  (prop_matchesShow :: Int -> Fixed E9 -> Bool)
-    prop "Fixed E12 instance" (prop_matchesShow :: Int -> Fixed E12 -> Bool)
-    prop "showFixed output"   prop_showFixed
+spec = parallel $ do
+    describe "Fixed E0" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E0 -> Bool)
+    describe "Fixed E1" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E1 -> Bool)
+    describe "Fixed E2" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E2 -> Bool)
+    describe "Fixed E3" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E3 -> Bool)
+    describe "Fixed E6" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E6 -> Bool)
+    describe "Fixed E9" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E9 -> Bool)
+    describe "Fixed E12" $
+        prop "Show instance"                    (prop_matchesShow :: Int -> Fixed E12 -> Bool)
+    describe "showbFixed" $
+        prop "has the same output as showFixed" prop_showFixed
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
 prop_showFixed :: Bool -> Fixed E12 -> Bool

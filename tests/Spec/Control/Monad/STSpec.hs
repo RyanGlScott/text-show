@@ -13,5 +13,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Control.Monad.ST" $
-    prop "ST instance" (prop_matchesShow :: Int -> ST Int Int -> Bool)
+spec = parallel . describe "ST Int Int" $
+    prop "Show instance" (prop_matchesShow :: Int -> ST Int Int -> Bool)

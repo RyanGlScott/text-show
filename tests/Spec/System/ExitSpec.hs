@@ -23,5 +23,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.System.Exit" $
-    prop "ExitCode instance" (prop_matchesShow :: Int -> ExitCode -> Bool)
+spec = parallel . describe "ExitCode" $
+    prop "Show instance" (prop_matchesShow :: Int -> ExitCode -> Bool)

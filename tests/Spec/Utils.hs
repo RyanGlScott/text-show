@@ -38,6 +38,8 @@ import           Text.Show.Text as T
 
 import           TransformersCompat as S
 
+#include "generic.h"
+
 ioProperty :: Testable prop => IO prop -> Property
 #if MIN_VERSION_QuickCheck(2,7,0)
 ioProperty = QC.ioProperty
@@ -59,13 +61,18 @@ prop_matchesShow1 p x = showbPrecWith showb27Prec p (FromStringShow1 x)
 -- | Verifies that a type's @Show2@ instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 prop_matchesShow2 :: (S.Show2 f, T.Show2 f) => Int -> f a b -> Bool
-prop_matchesShow2 p x = showbPrecWith2 showb27Prec showb27Prec p (FromStringShow2 x)
-                       == showbPrecWith2 showb27Prec showb27Prec p x
+prop_matchesShow2 p x = showbPrecWith2 showb27Prec showb42Prec p (FromStringShow2 x)
+                       == showbPrecWith2 showb27Prec showb42Prec p x
 
 -- | Show the number 27, which certain parody singer-songwriters find humorous.
 -- Useful for testing higher-order @Show@ classes.
 showb27Prec :: Int -> a -> Builder
 showb27Prec p _ = showbPrec p $ Just (27 :: Int)
+
+-- | Show the number 42, which is said to be the answer to something or other.
+-- Useful for testing higher-order @Show@ classes.
+showb42Prec :: Int -> a -> Builder
+showb42Prec p _ = showbPrec p $ Just (42 :: Int)
 
 -- | Verifies that a type's @Show@ instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
@@ -80,7 +87,7 @@ prop_genericShow _ _ = True
 
 -- | Verifies that a type's @Show1@ instance coincides with the output produced
 -- by the equivalent 'Generic1' functions.
-#if __GLASGOW_HASKELL__ >= 702
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 prop_genericShow1 :: (T.Show1 f, Generic1 f, GShow1 (Rep1 f))
                   => Int -> f a -> Bool
 prop_genericShow1 p x = showbPrecWith showb27Prec p x

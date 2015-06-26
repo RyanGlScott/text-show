@@ -21,5 +21,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Complex" $
-    prop "Complex Double instance" (prop_matchesShow :: Int -> Complex Double -> Bool)
+spec = parallel . describe "Complex Double" $
+    prop "Show instance" (prop_matchesShow :: Int -> Complex Double -> Bool)

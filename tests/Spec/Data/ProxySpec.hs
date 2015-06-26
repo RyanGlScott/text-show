@@ -23,7 +23,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Proxy" $ do
-    prop "Proxy Int instance"     (prop_matchesShow :: Int -> Proxy Int -> Bool)
+spec = parallel . describe "Proxy Int" $ do
+    prop "Show instance" (prop_matchesShow :: Int -> Proxy Int -> Bool)
     -- TODO: Uncomment this once tagged is fixed
---     prop "Proxy Int generic show" (prop_genericShow :: Int -> Proxy Int -> Bool)
+--     prop "generic show"  (prop_genericShow :: Int -> Proxy Int -> Bool)
