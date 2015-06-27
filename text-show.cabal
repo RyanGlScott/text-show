@@ -163,7 +163,14 @@ test-suite text-show-spec
   type:                exitcode-stdio-1.0
   main-is:             Spec.hs
   other-modules:       Derived
+                       Derived.DataFamilies
+                       Derived.DatatypeContexts
                        Derived.ExistentialQuantification
+                      -- Derived.Infix
+                      -- Derived.MagicHash
+                      -- Derived.PolyKinds
+                      -- Derived.RankNTypes
+                       Derived.Records
 
                        Instances.Derived
                        Instances.FromStringTextShow
@@ -194,31 +201,31 @@ test-suite text-show-spec
                        Instances.System.Posix.Types
                        Instances.Text.Read
 
-                       -- Only exports functions if using Windows
+                       -- Only exports instances if using Windows
                        Instances.GHC.Conc.Windows
 
-                       -- Only exports functions if base >= 4.4
+                       -- Only exports instances if base >= 4.4
                        Instances.GHC.Fingerprint
-                       -- Only exports functions if base >= 4.4 and not using Windows
+                       -- Only exports instances if base >= 4.4 and not using Windows
                        Instances.GHC.Event
 
-                       -- Only exports functions if GHC >= 7.2
+                       -- Only exports instances if GHC >= 7.2
                        Instances.Generic
                        Instances.GHC.Generics
 
-                       -- Only exports functions if base >= 4.5
+                       -- Only exports instances if base >= 4.5
                        Instances.GHC.Stats
 
-                       -- Only exports functions if base >= 4.6
+                       -- Only exports instances if base >= 4.6
                        Instances.GHC.TypeLits
 
-                       -- Only exports functions if base >= 4.7
+                       -- Only exports instances if base >= 4.7
                        Instances.Data.Type.Coercion
                        Instances.Data.Type.Equality
-                       -- Only exports functions if base >= 4.7 && < 4.8
+                       -- Only exports instances if base >= 4.7 && < 4.8
                        Instances.Data.OldTypeable
 
-                       -- Only exports functions if base >= 4.8
+                       -- Only exports instances if base >= 4.8
                        Instances.GHC.RTS.Flags
                        Instances.GHC.StaticPtr
 
@@ -253,7 +260,13 @@ test-suite text-show-spec
                        Spec.Data.TupleSpec
                        Spec.Data.TypeableSpec
                        Spec.Data.VersionSpec
+                       Spec.Derived.DatatypeContextsSpec
                        Spec.Derived.ExistentialQuantificationSpec
+                      -- Spec.Derived.Infix
+                      -- Spec.Derived.MagicHash
+                      -- Spec.Derived.PolyKinds
+                      -- Spec.Derived.RankNTypes
+                       Spec.Derived.RecordsSpec
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
                        Spec.FunctionsSpec
@@ -263,31 +276,34 @@ test-suite text-show-spec
                        Spec.System.Posix.TypesSpec
                        Spec.Text.ReadSpec
 
-                       -- Only exports functions if using Windows
+                       -- Only exports tests if using Windows
                        Spec.GHC.Conc.WindowsSpec
 
-                       -- Only exports functions if base >= 4.4
+                       -- Only exports tests if base >= 4.4
                        Spec.GHC.FingerprintSpec
-                       -- Only exports functions if base >= 4.4 and not using Windows
+                       -- Only exports tests if base >= 4.4 and not using Windows
                        Spec.GHC.EventSpec
 
-                       -- Only exports functions if GHC >= 7.2
+                       -- Only exports tests if GHC >= 7.2
                        Spec.GenericSpec
                        Spec.GHC.GenericsSpec
 
-                       -- Only exports functions if base >= 4.5
+                       -- Only exports tests if base >= 4.5
                        Spec.GHC.StatsSpec
 
-                       -- Only exports functions if base >= 4.6
+                       -- Only exports tests if template-haskell >= 2.7
+                       Spec.Derived.DataFamiliesSpec
+
+                       -- Only exports tests if base >= 4.6
                        Spec.GHC.TypeLitsSpec
 
-                       -- Only exports functions if base >= 4.7
+                       -- Only exports tests if base >= 4.7
                        Spec.Data.Type.CoercionSpec
                        Spec.Data.Type.EqualitySpec
-                       -- Only exports functions if base >= 4.7 && < 4.8
+                       -- Only exports tests if base >= 4.7 && < 4.8
                        Spec.Data.OldTypeableSpec
 
-                       -- Only exports functions if base >= 4.8
+                       -- Only exports tests if base >= 4.8
                        Spec.GHC.RTS.FlagsSpec
                        Spec.GHC.StaticPtrSpec
 

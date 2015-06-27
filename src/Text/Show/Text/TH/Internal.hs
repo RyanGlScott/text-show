@@ -330,14 +330,14 @@ deriveShowDataFamInst numToDrop dataFamInstName =
     className :: Name
     className = showClassTable numToDrop
 
-    fromDec :: [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
-    fromDec tvbs ctxt parentName tys cons = (:[]) <$>
+    fromDec :: [TyVarBndr] -> [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
+    fromDec famTvbs instTvbs ctxt parentName tys cons = (:[]) <$>
         instanceD (return instanceCxt)
                   (return $ AppT (ConT className) instanceType)
                   (showbPrecDecs droppedNbs cons)
       where
         (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypeDataFamInstCon numToDrop parentName ctxt tvbs tys
+            cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTvbs tys
 #endif
 
 {- $mk
@@ -472,8 +472,8 @@ mkShowbPrecNumber numToDrop tyConName = do
             let (_, _, nbs) = cxtAndTypeTyCon numToDrop tyConName ctxt tvbs
              in consToShow nbs decs
 #if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> withDataFamInstCon tyConName $ \tvbs ctxt parentName tys cons ->
-            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName ctxt tvbs tys
+        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs instTvbs ctxt parentName tys cons ->
+            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTvbs tys
              in consToShow nbs cons
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
@@ -801,26 +801,31 @@ withDataFam name f = do
 
 -- | Extracts a data family instance constructor's information.
 withDataFamInstCon :: Name
-                   -> ([TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q a)
+                   -> ([TyVarBndr] -> [TyVarBndr] -> Cxt
+                           -> Name -> [Type] -> [Con] -> Q a)
                    -> Q a
 withDataFamInstCon dficName f = do
     dficInfo <- reify dficName
     case dficInfo of
-        DataConI _ _ parentName _ -> do
+        DataConI _ ty parentName _ -> do
             parentInfo <- reify parentName
             case parentInfo of
-                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \tvbs decs ->
+                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \famTvbs decs ->
                     let sameDefDec = flip find decs $ \dec ->
                           case dec of
                               DataInstD    _ _ _ cons' _ -> any ((dficName ==) . constructorName) cons'
                               NewtypeInstD _ _ _ con   _ -> dficName == constructorName con
                               _ -> error $ ns ++ "Must be a data or newtype instance."
 
-                        (ctxt, tys, cons) = case sameDefDec of
-                              Just (DataInstD    ctxt' _ tys' cons' _) -> (ctxt', tys', cons')
-                              Just (NewtypeInstD ctxt' _ tys' con   _) -> (ctxt', tys', [con])
+                        (ctxt, etaReducedTys, cons) = case sameDefDec of
+                              Just (DataInstD    ctxt' _ erTys cons' _) -> (ctxt', erTys, cons')
+                              Just (NewtypeInstD ctxt' _ erTys con   _) -> (ctxt', erTys, [con])
                               _ -> error $ ns ++ "Could not find data or newtype instance constructor."
-                    in f tvbs ctxt parentName tys cons
+
+                        instTvbs = case ty of
+                              ForallT tvbs _ _ -> tvbs
+                              _                -> []
+                    in f famTvbs instTvbs ctxt parentName etaReducedTys cons
                 _ -> error $ ns ++ "Data constructor " ++ S.show dficName ++ " is not from a data family instance."
         other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family instance constructor."
   where
@@ -1031,17 +1036,11 @@ canRealizeKindStar k = case uncurryKind k of
                      _ -> False
     _ -> False
 
-filterTyVars :: [TyVarBndr] -> [Type] -> [TyVarBndr]
-filterTyVars tvbs       (SigT t _:ts) = filterTyVars tvbs (t:ts)
-filterTyVars (tvb:tvbs) (VarT _  :ts) = tvb : filterTyVars tvbs ts
-filterTyVars (_:tvbs)   (_       :ts) = filterTyVars tvbs ts
-filterTyVars []         _             = []
-filterTyVars _          []            = []
-
-replaceVarT :: TyVarBndr -> Type -> Type
-replaceVarT tvb (SigT t _) = replaceVarT tvb t
-replaceVarT tvb (VarT _)   = VarT $ tvbName tvb
-replaceVarT _   ty         = ty
+replaceTyVarName :: TyVarBndr -> Type -> TyVarBndr
+replaceTyVarName tvb            (SigT t _) = replaceTyVarName tvb t
+replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
+replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
+replaceTyVarName tvb            _          = tvb
 
 -- | Of form k1 -> k2 -> ... -> kn, where k is either a single kind variable or *.
 canRealizeKindStarChain :: Kind -> Bool
@@ -1062,7 +1061,8 @@ cxtAndTypeTyCon numToDrop tyConName dataCxt tvbs =
     else (instanceCxt, instanceType, droppedNbs)
   where
     instanceCxt :: Cxt
-    instanceCxt = map applyConstraint $ filter (needsConstraint numToDrop) remaining
+    instanceCxt = map applyConstraint
+                $ filter (needsConstraint numToDrop) remaining
 
     instanceType :: Type
     instanceType = applyTyCon tyConName $ map (VarT . tvbName) remaining
@@ -1086,9 +1086,10 @@ cxtAndTypeDataFamInstCon :: ShowClass
                          -> Name
                          -> Cxt
                          -> [TyVarBndr]
+                         -> [TyVarBndr]
                          -> [Type]
                          -> (Cxt, Type, [NameBase])
-cxtAndTypeDataFamInstCon numToDrop parentName dataCxt tvbs instTypesWithKinds =
+cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs _instTvbs etaReducedTys =
     if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
        then derivingKindError numToDrop parentName
     else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
@@ -1099,51 +1100,57 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt tvbs instTypesWithKinds =
   where
     instanceCxt :: Cxt
     instanceCxt = map applyConstraint
-        . filter (needsConstraint numToDrop)
-        $ take remainingLength lhsTvbs
+                $ filter (needsConstraint numToDrop) lhsTvbs
 
     instanceType :: Type
     instanceType = applyTyCon parentName remaining
 
     remainingLength :: Int
-    remainingLength = length rhsTypes - fromEnum numToDrop
+    remainingLength = length famTvbs - fromEnum numToDrop
 
     remaining, dropped :: [Type]
     (remaining, dropped) = splitAt remainingLength rhsTypes
 
     droppedKinds :: [Kind]
-    droppedKinds = map tvbKind . snd $ splitAt remainingLength tvbs
+    droppedKinds = map tvbKind . snd $ splitAt remainingLength famTvbs
 
     droppedNbs :: [NameBase]
     droppedNbs = map varTToNameBase dropped
 
-    -- It seems that Template Haskell's representation of the type variable binders
-    -- in a data family instance declaration has changed considerably with each new
-    -- version. Yikes.
-    --
-    -- In @template-haskell-2.9.0.0@, only the TyVarBndrs up to the rightmost non-type
-    -- variable are provided, so we have to do some careful Name manipulation to get
-    -- the LHS of the instance context just right.
-    --
-    -- Other versions of @template-haskell@ seem a bit more sensible.
-    lhsTvbs :: [TyVarBndr]
-    lhsTvbs = filterTyVars tvbs instTypes
-        ++ drop (length instTypes) tvbs
-
-    rhsTypes :: [Type]
-    rhsTypes = zipWith replaceVarT tvbs instTypes
-        ++ drop (length instTypes) (map (VarT . tvbName) tvbs)
-
     instTypes :: [Type]
     instTypes =
 # if MIN_VERSION_template_haskell(2,10,0)
-        instTypesWithKinds
+        etaReducedTys
 # else
         -- If PolyKinds is enabled, the first entries in this list will be
         -- kind signatures on early versions of GHC, so drop them
-        if length instTypesWithKinds > length tvbs
-              then drop (length tvbs) instTypesWithKinds
-              else instTypesWithKinds
+        if length etaReducedTys > length famTvbs
+              then drop (length famTvbs) etaReducedTys
+              else etaReducedTys
+# endif
+
+    lhsTvbs :: [TyVarBndr]
+    lhsTvbs = map (uncurry replaceTyVarName)
+        . filter (isTyVar . snd)
+        . take remainingLength
+        $ zip famTvbs rhsTypes
+
+    -- In @template-haskell-2.9.0.0@, only the @Type@s up to the rightmost
+    -- non-eta-reduced variable in @instTypes@ are provided, so we have to do some
+    -- careful type manipulation to get the LHS of the instance context just right.
+    -- For more info on this bug, see https://ghc.haskell.org/trac/ghc/ticket/9692
+    --
+    -- Other versions of @template-haskell@ seem a bit more sensible.
+    rhsTypes :: [Type]
+# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
+    rhsTypes = instTypes
+# else
+    rhsTypes = instTypes ++ map (VarT . tvbName)
+                                (drop (length _instTvbs
+                                        - length famTvbs
+                                        + length instTypes
+                                      )
+                                      _instTvbs)
 # endif
 #endif
 

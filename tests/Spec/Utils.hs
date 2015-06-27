@@ -16,11 +16,17 @@ module Spec.Utils (
     , prop_matchesShow1
     , prop_matchesShow2
     , prop_genericShow
+    , prop_genericShow'
     , prop_genericShow1
     ) where
 
+#include "generic.h"
+
 #if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic, Generic1, Rep, Rep1)
+import           GHC.Generics (Generic, Rep)
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+import           GHC.Generics (Generic1, Rep1)
+# endif
 import           Text.Show.Text.Generic
 #endif
 
@@ -37,8 +43,6 @@ import qualified Text.Show as S (Show)
 import           Text.Show.Text as T
 
 import           TransformersCompat as S
-
-#include "generic.h"
 
 ioProperty :: Testable prop => IO prop -> Property
 #if MIN_VERSION_QuickCheck(2,7,0)
@@ -83,6 +87,18 @@ prop_genericShow p x = showbPrec p x == genericShowbPrec p x
 #else
 prop_genericShow :: Int -> a -> Bool
 prop_genericShow _ _ = True
+#endif
+
+-- | Behaves exactly like 'prop_genericShow', except only for GHC 7.6 and above.
+-- This is useful with type families, which couldn't properly have derived 'Generic'
+-- instances until GHC 7.6 due to a bug.
+#if __GLASGOW_HASKELL__ >= 706
+prop_genericShow' :: (T.Show a, Generic a, GShow (Rep a))
+                   => Int -> a -> Bool
+prop_genericShow' = prop_genericShow
+#else
+prop_genericShow' :: Int -> f a -> Bool
+prop_genericShow' _ _ = True
 #endif
 
 -- | Verifies that a type's @Show1@ instance coincides with the output produced

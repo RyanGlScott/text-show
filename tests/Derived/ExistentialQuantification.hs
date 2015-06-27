@@ -1,8 +1,8 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE CPP                #-}
+{-# LANGUAGE GADTs              #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
 
 {-|
 Module:      Derived.ExistentialQuantification
@@ -12,21 +12,21 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Defines data tpes with existentially quantified type variables.
+Defines data types with existentially quantified type variables.
 -}
 module Derived.ExistentialQuantification (TyCon(..), TyFamily(..)) where
 
-import           GHC.Show (appPrec, appPrec1, showSpace)
+import GHC.Show (appPrec, appPrec1, showSpace)
 
-import           Prelude ()
-import           Prelude.Compat hiding (Show)
+import Prelude ()
+import Prelude.Compat hiding (Show)
 
-import           Test.QuickCheck (Arbitrary(..), oneof)
+import Test.QuickCheck (Arbitrary(..), oneof)
 
-import           Text.Show as S (Show)
-import           Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import Text.Show as S (Show)
+import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
 
-import           TransformersCompat as S (Show1(..), Show2(..), showsBinaryWith)
+import TransformersCompat as S (Show1(..), Show2(..), showsBinaryWith)
 
 -------------------------------------------------------------------------------
 

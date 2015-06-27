@@ -1,15 +1,18 @@
 {-# LANGUAGE CPP                        #-}
+-- {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveFoldable             #-}
 {-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 
 #if __GLASGOW_HASKELL__ >= 702
--- {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveGeneric              #-}
+#endif
+
+#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds                  #-}
--- {-# LANGUAGE StandaloneDeriving         #-}
 #endif
 
 {-|
@@ -74,8 +77,6 @@ showsPrec1 = showsPrecWith showsPrec
 
 newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
   deriving ( Eq
-           , Foldable
-           , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -84,9 +85,11 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
 #endif
            , Ord
            , Show1
-           , Traversable
            )
 
+deriving instance Functor     f => Functor     (FromStringShow1 f)
+deriving instance Foldable    f => Foldable    (FromStringShow1 f)
+deriving instance Traversable f => Traversable (FromStringShow1 f)
 -- #if __GLASGOW_HASKELL__ >= 708
 -- deriving instance Typeable FromStringShow1
 -- deriving instance (Data (f a), Typeable f, Typeable a) =>
@@ -133,8 +136,6 @@ showsPrec2 = showsPrecWith2 showsPrec showsPrec
 
 newtype FromStringShow2 f a b = FromStringShow2 (f a b)
   deriving ( Eq
-           , Foldable
-           , Functor
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -143,9 +144,11 @@ newtype FromStringShow2 f a b = FromStringShow2 (f a b)
 #endif
            , Ord
            , Show2
-           , Traversable
            )
 
+deriving instance Functor     (f a) => Functor     (FromStringShow2 f a)
+deriving instance Foldable    (f a) => Foldable    (FromStringShow2 f a)
+deriving instance Traversable (f a) => Traversable (FromStringShow2 f a)
 -- #if __GLASGOW_HASKELL__ >= 708
 -- deriving instance Typeable FromStringShow2
 -- deriving instance (Data (f a b), Typeable f, Typeable a, Typeable b) =>
