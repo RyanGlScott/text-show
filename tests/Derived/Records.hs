@@ -108,9 +108,9 @@ instance S.Show2 TyFamily where
 
 showsRecord :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
             -> String -> String -> String -> Int -> a -> b -> ShowS
-showsRecord sp1 sp2 con rec1 rec2 p a b =
+showsRecord sp1 sp2 con rec1 rec2 _p a b =
 #if __GLASGOW_HASKELL__ < 711
-    showParen (p > appPrec) $
+    showParen (_p > appPrec) $
 #endif
           showString con . showSpace
         . showChar '{'

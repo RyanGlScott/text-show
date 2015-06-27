@@ -312,7 +312,8 @@ deriveShowNumber numToDrop tyConName = do
             error $ ns ++ "Cannot use a type family name."
         _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
 #else
-        _ -> error $ ns ++ "The name must be of a plain type constructor."
+        DataConI{} -> dataConIError
+        _          -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
   where
     ns :: String
@@ -499,7 +500,8 @@ mkShowbPrecNumber numToDrop tyConName = do
             error $ ns ++ "Cannot use a type family name."
         _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
 #else
-        _ -> error $ ns ++ "The name must be of a plain type constructor."
+        DataConI{} -> dataConIError
+        _          -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
   where
     ns :: String
@@ -711,9 +713,9 @@ makeShowExp _ _ tvis (VarT tyName) =
          Nothing    -> [| showbPrec |]
 makeShowExp sClass conName tvis (SigT ty _)         = makeShowExp sClass conName tvis ty
 makeShowExp sClass conName tvis (ForallT tvbs _ ty) = makeShowExp sClass conName (removeForalled tvbs tvis) ty
-makeShowExp sClass conName tvis ty =
+makeShowExp sClass conName tvis ty = do
     let tyArgs :: [Type]
-        _ :| tyArgs = unapplyTy ty
+        tyCon :| tyArgs = unapplyTy ty
 
         numLastArgs :: Int
         numLastArgs = min (fromEnum sClass) (length tyArgs)
@@ -724,7 +726,9 @@ makeShowExp sClass conName tvis ty =
         tyVarNameBases :: [NameBase]
         tyVarNameBases = map fst tvis
 
-    in if any (`mentionsNameBase` tyVarNameBases) lhsArgs
+    itf <- isTyFamily tyCon
+    if any (`mentionsNameBase` tyVarNameBases) lhsArgs
+          || itf && any (`mentionsNameBase` tyVarNameBases) tyArgs
           then outOfPlaceTyVarError conName tyVarNameBases numLastArgs
           else appsE $ [ varE . showFuncTable $ toEnum numLastArgs]
                     ++ map (makeShowExp sClass conName tvis) rhsArgs
@@ -921,6 +925,18 @@ isTyVar :: Type -> Bool
 isTyVar (VarT _)   = True
 isTyVar (SigT t _) = isTyVar t
 isTyVar _          = False
+
+isTyFamily :: Type -> Q Bool
+isTyFamily (ConT n) = do
+    info <- reify n
+    return $ case info of
+#if MIN_VERSION_template_haskell(2,7,0)
+         FamilyI (FamilyD TypeFam _ _ _) _ -> True
+#else
+         TyConI  (FamilyD TypeFam _ _ _)   -> True
+#endif
+         _ -> False
+isTyFamily _ = return False
 
 allDistinct :: Ord a => [a] -> Bool
 allDistinct = allDistinct' Set.empty
@@ -1187,6 +1203,15 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
 # endif
 #endif
 
+#if !(MIN_VERSION_template_haskell(2,7,0))
+dataConIError :: a
+dataConIError = error
+    . showString "Cannot use a data constructor."
+    . showString "\n\t(Note: if you are trying to derive Show for a type family,"
+    . showString "\n\tuse GHC >= 7.4 instead.)"
+    $ ""
+#endif
+
 derivingKindError :: ShowClass -> Name -> a
 derivingKindError numToDrop tyConName = error
     . showString "Cannot derive well-kinded instance of form ‘"
@@ -1234,13 +1259,13 @@ datatypeContextError numToDrop instanceType = error
     className = nameBase $ showClassTable numToDrop
 
 outOfPlaceTyVarError :: String -> [NameBase] -> Int -> a
-outOfPlaceTyVarError conName tyVarName numLastArgs = error
+outOfPlaceTyVarError conName tyVarNames numLastArgs = error
     . showString "Constructor ‘"
     . showString conName
     . showString "‘ must use the type variable"
     . plural id (showChar 's')
     . showString " "
-    . showsPrec 0 tyVarName
+    . showsPrec 0 tyVarNames
     . showString " only in the last "
     . plural id (showsPrec 0 numLastArgs)
     . showString "argument"
