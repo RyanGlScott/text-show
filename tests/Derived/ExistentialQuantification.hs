@@ -44,19 +44,24 @@ data TyCon a b c d where
 
 -------------------------------------------------------------------------------
 
-data family TyFamily a b c d :: *
+data family TyFamily 
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+    a b c d :: *
+#else
+    w x y z :: *
+#endif
 
 data instance TyFamily a b c d where
-    TyFamilyClassConstraints    :: (Ord a, Ord b, Ord c, Ord d)
-                                => a -> b -> c -> d
-                                -> TyFamily a b c d
+    TyFamilyClassConstraints    :: (Ord m, Ord n, Ord o, Ord p)
+                                => m -> n -> o -> p
+                                -> TyFamily m n o p
 
-    TyFamilyEqualityConstraints :: (a ~ c, b ~ d, a ~ b)
-                                => a -> b -> c -> d
-                                -> TyFamily a b c d
+    TyFamilyEqualityConstraints :: (e ~ g, f ~ h, e ~ f)
+                                => e -> f -> g -> h
+                                -> TyFamily e f g h
 
-    TyFamilyTypeRefinement      :: Int -> d
-                                -> TyFamily Int d Int d
+    TyFamilyTypeRefinement      :: Int -> z
+                                -> TyFamily Int z Int z
 
 -------------------------------------------------------------------------------
 

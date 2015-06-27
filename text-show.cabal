@@ -171,6 +171,7 @@ test-suite text-show-spec
                       -- Derived.PolyKinds
                       -- Derived.RankNTypes
                        Derived.Records
+                      -- Derived.TypeSynonyms
 
                        Instances.Derived
                        Instances.FromStringTextShow
@@ -267,6 +268,7 @@ test-suite text-show-spec
                       -- Spec.Derived.PolyKinds
                       -- Spec.Derived.RankNTypes
                        Spec.Derived.RecordsSpec
+                      -- Spec.Derived.TypeSynonyms
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
                        Spec.FunctionsSpec

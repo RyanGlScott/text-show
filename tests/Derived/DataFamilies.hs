@@ -35,7 +35,7 @@ module Derived.DataFamilies (
 
 #include "generic.h"
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
 import GHC.Generics (Generic)
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
 import GHC.Generics (Generic1)
@@ -57,11 +57,16 @@ import TransformersCompat as S
 
 -------------------------------------------------------------------------------
 
-data family NotAllShow w x y z :: *
+data family NotAllShow
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKEL__ < 710
+    a b c d :: *
+#else
+    w x y z :: *
+#endif
 
 data instance NotAllShow ()  ()  () d = NASNoShow
-data instance NotAllShow Int c   a  b = NASShow1 a c
-                                      | NASShow2 b
+data instance NotAllShow Int b   c  d = NASShow1 c b
+                                      | NASShow2 d
   deriving ( S.Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic

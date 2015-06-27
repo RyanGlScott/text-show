@@ -26,7 +26,10 @@ import GHC.Generics (Generic)
 import GHC.Generics (Generic1)
 # endif
 #endif
-import GHC.Show (appPrec, showSpace)
+import GHC.Show (showSpace)
+#if __GLASGOW_HASKELL__ < 711
+import GHC.Show (appPrec)
+#endif
 
 import Prelude ()
 import Prelude.Compat hiding (Show)
@@ -54,7 +57,12 @@ data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
 
 -------------------------------------------------------------------------------
 
-data family TyFamily a b :: *
+data family TyFamily
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+    a b :: *
+#else
+    y z :: *
+#endif
 
 infixl 4 :!:
 data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2 :: b }

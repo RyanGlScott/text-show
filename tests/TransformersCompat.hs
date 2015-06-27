@@ -84,9 +84,9 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
 # endif
 #endif
            , Ord
-           , Show1
            )
 
+deriving instance Show1       f => Show1       (FromStringShow1 f)
 deriving instance Functor     f => Functor     (FromStringShow1 f)
 deriving instance Foldable    f => Foldable    (FromStringShow1 f)
 deriving instance Traversable f => Traversable (FromStringShow1 f)
@@ -143,9 +143,9 @@ newtype FromStringShow2 f a b = FromStringShow2 (f a b)
 # endif
 #endif
            , Ord
-           , Show2
            )
 
+deriving instance Show2       f     => Show2       (FromStringShow2 f)
 deriving instance Functor     (f a) => Functor     (FromStringShow2 f a)
 deriving instance Foldable    (f a) => Foldable    (FromStringShow2 f a)
 deriving instance Traversable (f a) => Traversable (FromStringShow2 f a)

@@ -14,8 +14,10 @@ module Spec.Derived.RecordsSpec (main, spec) where
 
 import Derived.Records
 
-import Spec.Utils (prop_matchesShow2, prop_genericShow,
-                   prop_genericShow', prop_genericShow1)
+import Spec.Utils (prop_matchesShow2, prop_genericShow, prop_genericShow1)
+#if MIN_VERSION_template_haskell(2,7,0)
+import Spec.Utils (prop_genericShow')
+#endif
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)

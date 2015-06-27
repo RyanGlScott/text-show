@@ -15,14 +15,14 @@ module Spec.Derived.DataFamiliesSpec (main, spec) where
 import Prelude ()
 import Prelude.Compat
 
-import Test.Hspec (Spec, parallel)
+import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 import Derived.DataFamilies (NotAllShow)
 
 import Spec.Utils (prop_matchesShow2, prop_genericShow', prop_genericShow1)
 
-import Test.Hspec (describe, hspec)
+import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
 
 # if __GLASGOW_HASKELL__ >= 708

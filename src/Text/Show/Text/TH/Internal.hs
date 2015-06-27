@@ -210,6 +210,24 @@ some caveats:
   1. @v@ must be a type variable.
   2. @v@ must not be mentioned in any of @e1@, ..., @e2@.
 
+* In GHC 7.8, a bug exists that can cause problems when a data family declaration and
+  one of its data instances use different type variables, e.g.,
+
+  @
+  data family Foo a b c
+  data instance Foo Int y z = Foo Int y z
+  $(deriveShow1 'Foo)
+  @
+
+  To avoid this issue, it is recommened that you use the same type variables in the
+  same positions in which they appeared in the data family declaration:
+
+  @
+  data family Foo a b c
+  data instance Foo Int b c = Foo Int b c
+  $(deriveShow 'Foo)
+  @
+
 -}
 
 -- | Generates a 'Show1' instance declaration for the given data type or data
@@ -238,8 +256,8 @@ newtype WrappedBifunctor f a b = WrapBifunctor (f a b)
 $('deriveShow2' ''WrappedBifunctor) -- instance Show2 f => Show2 (WrappedBifunctor f) where ...
 @
 
-The same restrictions that apply to 'deriveShow' also apply to 'deriveShow2', with
-some caveats:
+The same restrictions that apply to 'deriveShow' and 'deriveShow1' also apply to
+'deriveShow2', with some caveats:
 
 * With 'deriveShow2', the last type variables must both be of kind @*@. For other ones,
   type variables of kind @*@ are assumed to require a 'T.Show' constraint, type
@@ -330,14 +348,14 @@ deriveShowDataFamInst numToDrop dataFamInstName =
     className :: Name
     className = showClassTable numToDrop
 
-    fromDec :: [TyVarBndr] -> [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
-    fromDec famTvbs instTvbs ctxt parentName tys cons = (:[]) <$>
+    fromDec :: [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
+    fromDec famTvbs ctxt parentName instTys cons = (:[]) <$>
         instanceD (return instanceCxt)
                   (return $ AppT (ConT className) instanceType)
                   (showbPrecDecs droppedNbs cons)
       where
         (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTvbs tys
+            cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTys
 #endif
 
 {- $mk
@@ -472,8 +490,8 @@ mkShowbPrecNumber numToDrop tyConName = do
             let (_, _, nbs) = cxtAndTypeTyCon numToDrop tyConName ctxt tvbs
              in consToShow nbs decs
 #if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs instTvbs ctxt parentName tys cons ->
-            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTvbs tys
+        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs ctxt parentName instTys cons ->
+            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTys
              in consToShow nbs cons
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
@@ -801,13 +819,12 @@ withDataFam name f = do
 
 -- | Extracts a data family instance constructor's information.
 withDataFamInstCon :: Name
-                   -> ([TyVarBndr] -> [TyVarBndr] -> Cxt
-                           -> Name -> [Type] -> [Con] -> Q a)
+                   -> ([TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q a)
                    -> Q a
 withDataFamInstCon dficName f = do
     dficInfo <- reify dficName
     case dficInfo of
-        DataConI _ ty parentName _ -> do
+        DataConI _ _ parentName _ -> do
             parentInfo <- reify parentName
             case parentInfo of
                 FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \famTvbs decs ->
@@ -817,15 +834,12 @@ withDataFamInstCon dficName f = do
                               NewtypeInstD _ _ _ con   _ -> dficName == constructorName con
                               _ -> error $ ns ++ "Must be a data or newtype instance."
 
-                        (ctxt, etaReducedTys, cons) = case sameDefDec of
-                              Just (DataInstD    ctxt' _ erTys cons' _) -> (ctxt', erTys, cons')
-                              Just (NewtypeInstD ctxt' _ erTys con   _) -> (ctxt', erTys, [con])
+                        (ctxt, instTys, cons) = case sameDefDec of
+                              Just (DataInstD    ctxt' _ instTys' cons' _) -> (ctxt', instTys', cons')
+                              Just (NewtypeInstD ctxt' _ instTys' con   _) -> (ctxt', instTys', [con])
                               _ -> error $ ns ++ "Could not find data or newtype instance constructor."
-
-                        instTvbs = case ty of
-                              ForallT tvbs _ _ -> tvbs
-                              _                -> []
-                    in f famTvbs instTvbs ctxt parentName etaReducedTys cons
+                    
+                    in f famTvbs ctxt parentName instTys cons
                 _ -> error $ ns ++ "Data constructor " ++ S.show dficName ++ " is not from a data family instance."
         other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family instance constructor."
   where
@@ -1086,10 +1100,9 @@ cxtAndTypeDataFamInstCon :: ShowClass
                          -> Name
                          -> Cxt
                          -> [TyVarBndr]
-                         -> [TyVarBndr]
                          -> [Type]
                          -> (Cxt, Type, [NameBase])
-cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs _instTvbs etaReducedTys =
+cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
        then derivingKindError numToDrop parentName
     else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
@@ -1119,14 +1132,15 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs _instTvbs etaReduc
 
     instTypes :: [Type]
     instTypes =
-# if MIN_VERSION_template_haskell(2,10,0)
-        etaReducedTys
+# if __GLASGOW_HASKELL__ >= 710
+        -- Since GHC 7.10, kinds aren't in this list
+        instTysAndKinds
 # else
         -- If PolyKinds is enabled, the first entries in this list will be
         -- kind signatures on early versions of GHC, so drop them
-        if length etaReducedTys > length famTvbs
-              then drop (length famTvbs) etaReducedTys
-              else etaReducedTys
+        if length instTysAndKinds > length famTvbs
+              then drop (length famTvbs) instTysAndKinds
+              else instTysAndKinds
 # endif
 
     lhsTvbs :: [TyVarBndr]
@@ -1135,22 +1149,41 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs _instTvbs etaReduc
         . take remainingLength
         $ zip famTvbs rhsTypes
 
-    -- In @template-haskell-2.9.0.0@, only the @Type@s up to the rightmost
-    -- non-eta-reduced variable in @instTypes@ are provided, so we have to do some
-    -- careful type manipulation to get the LHS of the instance context just right.
-    -- For more info on this bug, see https://ghc.haskell.org/trac/ghc/ticket/9692
+    -- In GHC 7.8, only the @Type@s up to the rightmost non-eta-reduced type variable
+    -- in @instTypes@ are provided (as a result of this extremely annoying bug:
+    -- https://ghc.haskell.org/trac/ghc/ticket/9692). This is pretty inconvenient,
+    -- as it makes it impossible to come up with the correct 'Show1' or 'Show2'
+    -- instances in some cases. For example, consider the following code:
     --
-    -- Other versions of @template-haskell@ seem a bit more sensible.
+    -- @
+    -- data family Foo a b c
+    -- data instance Foo Int y z = Foo Int y z
+    -- $(deriveShow2 'Foo)
+    -- @
+    --
+    -- Due to the aformentioned bug, Template Haskell doesn't tell us the names of
+    -- either of type variables in the data instance (@y@ and @z@). As a result, we
+    -- won't know which fields of the 'Foo' constructor to apply the show functions,
+    -- which will result in an incorrect instance. Urgh.
+    --
+    -- A workaround is to ensure that you use the exact same type variables, in the
+    -- exact same order, in the data family declaration and any data or newtype
+    -- instances:
+    --
+    -- @
+    -- data family Foo a b c
+    -- data instance Foo Int b c = Foo Int b c
+    -- $(deriveShow2 'Foo)
+    -- @
+    --
+    -- Thankfully, other versions of GHC don't seem to have this bug.
     rhsTypes :: [Type]
-# if !(MIN_VERSION_template_haskell(2,9,0)) || MIN_VERSION_template_haskell(2,10,0)
-    rhsTypes = instTypes
-# else
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
     rhsTypes = instTypes ++ map (VarT . tvbName)
-                                (drop (length _instTvbs
-                                        - length famTvbs
-                                        + length instTypes
-                                      )
-                                      _instTvbs)
+                                (drop (length instTypes)
+                                      famTvbs)
+# else
+    rhsTypes = instTypes
 # endif
 #endif
 
