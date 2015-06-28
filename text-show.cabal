@@ -162,14 +162,13 @@ library
 test-suite text-show-spec
   type:                exitcode-stdio-1.0
   main-is:             Spec.hs
-  other-modules:       Derived
-                       Derived.DataFamilies
+  other-modules:       Derived.DataFamilies
                        Derived.DatatypeContexts
                        Derived.ExistentialQuantification
                       -- Derived.Infix
                        Derived.MagicHash
                        Derived.PolyKinds
-                      -- Derived.RankNTypes
+                       Derived.RankNTypes
                        Derived.Records
                       -- Derived.TypeSynonyms
 
@@ -231,10 +230,6 @@ test-suite text-show-spec
                        Instances.GHC.StaticPtr
 
                        Spec.BuilderSpec
-                       Spec.DerivedSpec
-                       Spec.FromStringTextShowSpec
-                       Spec.Utils
-
                        Spec.Control.ApplicativeSpec
                        Spec.Control.ConcurrentSpec
                        Spec.Control.ExceptionSpec
@@ -266,17 +261,19 @@ test-suite text-show-spec
                       -- Spec.Derived.InfixSpec
                        Spec.Derived.MagicHashSpec
                        Spec.Derived.PolyKindsSpec
-                      -- Spec.Derived.RankNTypesSpec
+                       Spec.Derived.RankNTypesSpec
                        Spec.Derived.RecordsSpec
                       -- Spec.Derived.TypeSynonymsSpec
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
+                       Spec.FromStringTextShowSpec
                        Spec.FunctionsSpec
                        Spec.Numeric.NaturalSpec
                        Spec.System.ExitSpec
                        Spec.System.IOSpec
                        Spec.System.Posix.TypesSpec
                        Spec.Text.ReadSpec
+                       Spec.Utils
 
                        -- Only exports tests if using Windows
                        Spec.GHC.Conc.WindowsSpec
