@@ -56,7 +56,7 @@ import TransformersCompat as S (Show1(..), Show2(..))
 
 newtype TyConCompose f g h j k a b =
     TyConCompose (f (g (j a) (k a)) (h (j a) (k b)))
-#if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 702
   deriving Generic
 #endif
 
@@ -139,8 +139,10 @@ deriving instance S.Show (f (g (j a) (k a)) (h (j a) (k b))) =>
 data family TyFamilyProxy
 #if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
                           (a :: k1) (b :: k2) :: *
-#else
+#elif __GLASGOW_HASKELL__ >= 706
                           (x :: k1) (y :: k2) :: *
+#else
+                          (x :: *)  (y :: *)  :: *
 #endif
 
 
