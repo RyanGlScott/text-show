@@ -223,6 +223,7 @@ $(deriveShow  ''TyConProxy)
 $(deriveShow1 ''TyConProxy)
 $(deriveShow2 ''TyConProxy)
 
+#if MIN_VERSION_template_haskell(2,7,0)
 instance T.Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   T.Show (TyFamilyCompose f g h j k a b) where
     showbPrec = $(mkShowbPrec 'TyFamilyCompose)
@@ -234,3 +235,4 @@ $(deriveShow2 'TyFamilyCompose)
 $(deriveShow  'TyFamilyProxy)
 $(deriveShow1 'TyFamilyProxy)
 $(deriveShow2 'TyFamilyProxy)
+#endif
