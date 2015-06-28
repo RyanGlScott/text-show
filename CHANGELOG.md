@@ -1,6 +1,6 @@
 # 1
 * The `Show1` class has been completely overhauled. `Show1` now uses the function `showbPrecWith`, which takes as an argument a function of type `Int -> a -> Builder` to show occurrences of the type parameter (instead of requiring the type parameter to be a `Show` instance). This matches the new implementation of `Show1` in `transformers-TODO: VERSION NUMBER?`. A similar `Show2` class (with the function `showbPrecWith2`) was also added.
-* As a consequence, `Show1` instances can no longer be defined in terms of `showbPrec`; rather, `Show` instances can be defined in terms of `showbPrecWith` or `showbPrecWith2`, and `Show1` instances can be defined in terms of `showbPrecWith2`.
+* As a consequence, `Show1` instances should no longer be defined in terms of `showbPrec`; rather, `Show` instances should be defined in terms of `showbPrecWith` or `showbPrecWith2`, and `Show1` instances can be defined in terms of `showbPrecWith2`.
 * The `showbPrec1` function is no longer a class method of `Show1`, but is now a standalone function defined in terms of `showbPrecWith`. `showbPrec1` can be useful for defining `Show` instances. A similar `showbPrec2` function was also added.
 * The monomorphic functions in the many submodules of this package have been generalized (where possible) to use `Show1` and `Show2` instances. These functions have `-PrecWith` and `-PrecWith2` suffixes, respectively.
 * Because of the generality of the new `showPrecWith` function, `Show1` instances are now possible for `Ratio`, `Alt`, `Rec1`, `M1`, `(:+:)`, `(:*:)`, and `(:.:)`.
@@ -15,7 +15,6 @@
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
 * Revamped test suite
 * TODO: Add `transformers-TODO: VERSION NUMBER?` to test suite
-* TODO: Add prop_matchesShow' for type families (to get around CPP)
 
 ### 0.8.1.1
 * Retroactive `CHANGELOG` update

@@ -14,7 +14,7 @@ import Data.Proxy (Proxy)
 
 import Instances.Data.Proxy ()
 
-import Spec.Utils (prop_matchesShow {-, prop_genericShow -})
+import Spec.Utils (prop_matchesShow, prop_genericShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,5 +25,4 @@ main = hspec spec
 spec :: Spec
 spec = parallel . describe "Proxy Int" $ do
     prop "Show instance" (prop_matchesShow :: Int -> Proxy Int -> Bool)
-    -- TODO: Uncomment this once tagged is fixed
---     prop "generic show"  (prop_genericShow :: Int -> Proxy Int -> Bool)
+    prop "generic show"  (prop_genericShow :: Int -> Proxy Int -> Bool)

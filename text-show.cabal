@@ -168,7 +168,7 @@ test-suite text-show-spec
                        Derived.ExistentialQuantification
                       -- Derived.Infix
                        Derived.MagicHash
-                      -- Derived.PolyKinds
+                       Derived.PolyKinds
                       -- Derived.RankNTypes
                        Derived.Records
                       -- Derived.TypeSynonyms
@@ -265,7 +265,7 @@ test-suite text-show-spec
                        Spec.Derived.ExistentialQuantificationSpec
                       -- Spec.Derived.InfixSpec
                        Spec.Derived.MagicHashSpec
-                      -- Spec.Derived.PolyKindsSpec
+                       Spec.Derived.PolyKindsSpec
                       -- Spec.Derived.RankNTypesSpec
                        Spec.Derived.RecordsSpec
                       -- Spec.Derived.TypeSynonymsSpec
@@ -321,7 +321,7 @@ test-suite text-show-spec
                      , nats                 >= 0.1    && < 2
                      , QuickCheck           >= 2.5    && < 3
                      , quickcheck-instances >= 0.1    && < 0.4
-                     , tagged               >= 0.4.4  && < 1
+                     , tagged               >= 0.8.1  && < 1
                      , text                 >= 0.11.1 && < 1.3
                      , text-show            == 1
                      , transformers         >= 0.2.1  && < 0.5

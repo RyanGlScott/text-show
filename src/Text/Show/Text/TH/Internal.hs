@@ -883,9 +883,9 @@ replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
 replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
 replaceTyVarName tvb            _          = tvb
 
-overTyKind :: (Kind -> Kind) -> Type -> Type
-overTyKind f (SigT t k) = SigT t (f k)
-overTyKind _ t          = t
+-- overTyKind :: (Kind -> Kind) -> Type -> Type
+-- overTyKind f (SigT t k) = SigT t (f k)
+-- overTyKind _ t          = t
 
 -- | Generates a declaration defining the 'showbPrec' function, followed by any custom
 -- pragma declarations specified by the 'PragmaOptions' argument.
@@ -930,6 +930,10 @@ varTToName _          = error "Not a type variable!"
 
 varTToNameBase :: Type -> NameBase
 varTToNameBase = NameBase . varTToName
+
+unSigT :: Type -> Type
+unSigT (SigT t _) = t
+unSigT t          = t
 
 isTyVar :: Type -> Bool
 isTyVar (VarT _)   = True
@@ -1063,16 +1067,16 @@ wellKinded = all canRealizeKindStar
 canRealizeKindStarChain :: Kind -> Bool
 canRealizeKindStarChain = all canRealizeKindStar . uncurryKind
 
-starifyKindChain :: Kind -> Kind
-#if MIN_VERSION_template_haskell(2,8,0)
-starifyKindChain (AppT (AppT ArrowT k1) k2) =
-    AppT (AppT ArrowT (starifyKindChain k1)) $ starifyKindChain k2
-starifyKindChain (SigT k _) = starifyKindChain k
-starifyKindChain (VarT _)   = starK
-starifyKindChain k          = k
-#else
-starifyKindChain = id -- Kind variables weren't possible in Template Haskell prior to 2.8.0.0
-#endif
+-- starifyKindChain :: Kind -> Kind
+-- #if MIN_VERSION_template_haskell(2,8,0)
+-- starifyKindChain (AppT (AppT ArrowT k1) k2) =
+--     AppT (AppT ArrowT (starifyKindChain k1)) $ starifyKindChain k2
+-- starifyKindChain (SigT k _) = starifyKindChain k
+-- starifyKindChain (VarT _)   = starK
+-- starifyKindChain k          = k
+-- #else
+-- starifyKindChain = id -- Kind variables weren't possible in Template Haskell prior to 2.8.0.0
+-- #endif
 
 canRealizeKindStar :: Kind -> Bool
 -- canRealizeKindStar k = numKindArrows k == 0
@@ -1167,8 +1171,17 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     instanceCxt = map (applyConstraint)
                 $ filter (needsConstraint numToDrop . tvbKind) lhsTvbs
 
+    -- We need to make sure that type variables in the instance head which have
+    -- Show constrains aren't poly-kinded, e.g.,
+    --
+    -- @
+    -- instance Show a => Show (Foo (a :: k)) where
+    -- @
+    --
+    -- To do this, we remove every kind ascription (i.e., strip off every 'SigT').
     instanceType :: Type
-    instanceType = applyTyCon parentName remaining
+    instanceType = applyTyCon parentName
+                 $ map unSigT remaining
 
     remainingLength :: Int
     remainingLength = length famTvbs - fromEnum numToDrop
@@ -1236,16 +1249,6 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     -- Thankfully, other versions of GHC don't seem to have this bug.
     rhsTypes :: [Type]
     rhsTypes =
-        -- We need to make sure that type variables in the instance head which have
-        -- Show constrains aren't poly-kinded, e.g.,
-        --
-        -- @
-        -- instance Show a => Show (Foo (a :: k)) where
-        -- @
-        --
-        -- To do this, we inspect every 'SigT' type, and if we are going to apply a
-        -- constraint to it, we replace every kind variable with @*@.
-        map (overTyKind starifyKindChain) $
 # if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
             instTypes ++ map tvbToType
                              (drop (length instTypes)

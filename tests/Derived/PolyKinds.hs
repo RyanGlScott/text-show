@@ -47,8 +47,7 @@ import Test.QuickCheck (Arbitrary)
 
 import Text.Show as S (Show)
 import Text.Show.Text as T (Show(..), Show1(..))
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2,
-                          mkShowbPrec, mkShowbPrecWith)
+import Text.Show.Text.TH (deriveShow2, mkShowbPrec, mkShowbPrecWith)
 
 import TransformersCompat as S (Show1(..), Show2(..))
 
@@ -66,7 +65,6 @@ deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
-                  , Functor k
                   ) => Generic1 (TyConCompose f g h j k a)
 # endif
 
@@ -127,7 +125,6 @@ deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
-                  , Functor k
                   ) => Generic1 (TyFamilyCompose f g h j k a)
 # endif
 
@@ -219,8 +216,10 @@ instance (T.Show1 (f (g (j a) (k a))), T.Show1 (h (j a)), T.Show1 k) =>
     showbPrecWith = $(mkShowbPrecWith ''TyConCompose)
 $(deriveShow2 ''TyConCompose)
 
-$(deriveShow  ''TyConProxy)
-$(deriveShow1 ''TyConProxy)
+instance T.Show (TyConProxy a b) where
+    showbPrec = $(mkShowbPrec ''TyConProxy)
+instance T.Show1 (TyConProxy a) where
+    showbPrecWith = $(mkShowbPrecWith ''TyConProxy)
 $(deriveShow2 ''TyConProxy)
 
 instance T.Show (f (g (j a) (k a)) (h (j a) (k b))) =>
@@ -231,6 +230,8 @@ instance (T.Show1 (f (g (j a) (k a))), T.Show1 (h (j a)), T.Show1 k) =>
     showbPrecWith = $(mkShowbPrecWith 'TyFamilyCompose)
 $(deriveShow2 'TyFamilyCompose)
 
-$(deriveShow  'TyFamilyProxy)
-$(deriveShow1 'TyFamilyProxy)
+instance T.Show (TyFamilyProxy a b) where
+    showbPrec = $(mkShowbPrec 'TyFamilyProxy)
+instance T.Show1 (TyFamilyProxy a) where
+    showbPrecWith = $(mkShowbPrecWith 'TyFamilyProxy)
 $(deriveShow2 'TyFamilyProxy)
