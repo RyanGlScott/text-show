@@ -167,7 +167,7 @@ test-suite text-show-spec
                        Derived.DatatypeContexts
                        Derived.ExistentialQuantification
                       -- Derived.Infix
-                      -- Derived.MagicHash
+                       Derived.MagicHash
                       -- Derived.PolyKinds
                       -- Derived.RankNTypes
                        Derived.Records
@@ -263,12 +263,12 @@ test-suite text-show-spec
                        Spec.Data.VersionSpec
                        Spec.Derived.DatatypeContextsSpec
                        Spec.Derived.ExistentialQuantificationSpec
-                      -- Spec.Derived.Infix
-                      -- Spec.Derived.MagicHash
-                      -- Spec.Derived.PolyKinds
-                      -- Spec.Derived.RankNTypes
+                      -- Spec.Derived.InfixSpec
+                       Spec.Derived.MagicHashSpec
+                      -- Spec.Derived.PolyKindsSpec
+                      -- Spec.Derived.RankNTypesSpec
                        Spec.Derived.RecordsSpec
-                      -- Spec.Derived.TypeSynonyms
+                      -- Spec.Derived.TypeSynonymsSpec
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
                        Spec.FunctionsSpec

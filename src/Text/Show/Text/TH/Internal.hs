@@ -842,7 +842,7 @@ withDataFamInstCon dficName f = do
                               Just (DataInstD    ctxt' _ instTys' cons' _) -> (ctxt', instTys', cons')
                               Just (NewtypeInstD ctxt' _ instTys' con   _) -> (ctxt', instTys', [con])
                               _ -> error $ ns ++ "Could not find data or newtype instance constructor."
-                    
+
                     in f famTvbs ctxt parentName instTys cons
                 _ -> error $ ns ++ "Data constructor " ++ S.show dficName ++ " is not from a data family instance."
         other -> error $ ns ++ "Unsupported type " ++ S.show other ++ ". Must be a data family instance constructor."
@@ -876,6 +876,16 @@ tvbName (KindedTV name _) = name
 tvbKind :: TyVarBndr -> Kind
 tvbKind (PlainTV  _)   = starK
 tvbKind (KindedTV _ k) = k
+
+replaceTyVarName :: TyVarBndr -> Type -> TyVarBndr
+replaceTyVarName tvb            (SigT t _) = replaceTyVarName tvb t
+replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
+replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
+replaceTyVarName tvb            _          = tvb
+
+overTyKind :: (Kind -> Kind) -> Type -> Type
+overTyKind f (SigT t k) = SigT t (f k)
+overTyKind _ t          = t
 
 -- | Generates a declaration defining the 'showbPrec' function, followed by any custom
 -- pragma declarations specified by the 'PragmaOptions' argument.
@@ -1022,12 +1032,9 @@ unapplyTy = NE.reverse . go
     go t            = t :| []
 
 uncurryTy :: Type -> NonEmpty Type
-uncurryTy = NE.reverse . go
-  where
-    go :: Type -> NonEmpty Type
-    go (AppT (AppT ArrowT t1) t2) = t2 <| go t1
-    go (SigT t _)                 = go t
-    go t                          = t :| []
+uncurryTy (AppT (AppT ArrowT t1) t2) = t1 <| uncurryTy t2
+uncurryTy (SigT t _)                 = uncurryTy t
+uncurryTy t                          = t :| []
 
 uncurryKind :: Kind -> NonEmpty Kind
 #if MIN_VERSION_template_haskell(2,8,0)
@@ -1044,14 +1051,28 @@ applyConstraint (KindedTV name kind) = applyClass showClass name
     showClass :: Name
     showClass = showClassTable . toEnum $ numKindArrows kind
 
-needsConstraint :: ShowClass -> TyVarBndr -> Bool
-needsConstraint showClass (PlainTV _) = showClass >= Show
-needsConstraint showClass (KindedTV _ kind) =
+needsConstraint :: ShowClass -> Kind -> Bool
+needsConstraint showClass kind =
        showClass >= toEnum (numKindArrows kind)
     && canRealizeKindStarChain kind
 
 wellKinded :: [Kind] -> Bool
 wellKinded = all canRealizeKindStar
+
+-- | Of form k1 -> k2 -> ... -> kn, where k is either a single kind variable or *.
+canRealizeKindStarChain :: Kind -> Bool
+canRealizeKindStarChain = all canRealizeKindStar . uncurryKind
+
+starifyKindChain :: Kind -> Kind
+#if MIN_VERSION_template_haskell(2,8,0)
+starifyKindChain (AppT (AppT ArrowT k1) k2) =
+    AppT (AppT ArrowT (starifyKindChain k1)) $ starifyKindChain k2
+starifyKindChain (SigT k _) = starifyKindChain k
+starifyKindChain (VarT _)   = starK
+starifyKindChain k          = k
+#else
+starifyKindChain = id -- Kind variables weren't possible in Template Haskell prior to 2.8.0.0
+#endif
 
 canRealizeKindStar :: Kind -> Bool
 -- canRealizeKindStar k = numKindArrows k == 0
@@ -1066,15 +1087,30 @@ canRealizeKindStar k = case uncurryKind k of
                      _ -> False
     _ -> False
 
-replaceTyVarName :: TyVarBndr -> Type -> TyVarBndr
-replaceTyVarName tvb            (SigT t _) = replaceTyVarName tvb t
-replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
-replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
-replaceTyVarName tvb            _          = tvb
+createKindChain :: Int -> Kind
+createKindChain = go starK
+  where
+    go :: Kind -> Int -> Kind
+    go k !0 = k
+#if MIN_VERSION_template_haskell(2,8,0)
+    go k !n = go (AppT (AppT ArrowT StarT) k) (n - 1)
+#else
+    go k !n = go (ArrowK StarK k) (n - 1)
+#endif
 
--- | Of form k1 -> k2 -> ... -> kn, where k is either a single kind variable or *.
-canRealizeKindStarChain :: Kind -> Bool
-canRealizeKindStarChain = all canRealizeKindStar . uncurryKind
+# if MIN_VERSION_template_haskell(2,8,0) && __GLASGOW_HASKELL__ < 710
+distinctKindVars :: Kind -> Set Name
+distinctKindVars (AppT k1 k2) = distinctKindVars k1 `Set.union` distinctKindVars k2
+distinctKindVars (SigT k _)   = distinctKindVars k
+distinctKindVars (VarT k)     = Set.singleton k
+distinctKindVars _            = Set.empty
+#endif
+
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+tvbToType :: TyVarBndr -> Type
+tvbToType (PlainTV n)    = VarT n
+tvbToType (KindedTV n k) = SigT (VarT n) k
+#endif
 
 -- | Deduces the 'Show' instance context of a simple type constructor, as well
 -- as the type constructor fully applied to its type variables.
@@ -1091,8 +1127,8 @@ cxtAndTypeTyCon numToDrop tyConName dataCxt tvbs =
     else (instanceCxt, instanceType, droppedNbs)
   where
     instanceCxt :: Cxt
-    instanceCxt = map applyConstraint
-                $ filter (needsConstraint numToDrop) remaining
+    instanceCxt = map (applyConstraint)
+                $ filter (needsConstraint numToDrop . tvbKind) remaining
 
     instanceType :: Type
     instanceType = applyTyCon tyConName $ map (VarT . tvbName) remaining
@@ -1128,8 +1164,8 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     else etaReductionError instanceType
   where
     instanceCxt :: Cxt
-    instanceCxt = map applyConstraint
-                $ filter (needsConstraint numToDrop) lhsTvbs
+    instanceCxt = map (applyConstraint)
+                $ filter (needsConstraint numToDrop . tvbKind) lhsTvbs
 
     instanceType :: Type
     instanceType = applyTyCon parentName remaining
@@ -1146,24 +1182,29 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     droppedNbs :: [NameBase]
     droppedNbs = map varTToNameBase dropped
 
+    -- We need to mindful of an old GHC bug which causes kind variables appear in
+    -- @instTysAndKinds@ (as the name suggests) if (1) @PolyKinds@ is enabled, and
+    -- (2) either GHC 7.6 or 7.8 is being used (for more info, see
+    -- https://ghc.haskell.org/trac/ghc/ticket/9692).
+    --
+    -- Since Template Haskell doesn't seem to have a mechanism for detecting which
+    -- language extensions are enabled, we do the next-best thing by counting
+    -- the number of distinct kind variables in the data family declaration, and
+    -- then dropping that number of entries from @instTysAndKinds@
     instTypes :: [Type]
     instTypes =
-# if __GLASGOW_HASKELL__ >= 710
-        -- Since GHC 7.10, kinds aren't in this list
+# if __GLASGOW_HASKELL__ >= 710 || !(MIN_VERSION_template_haskell(2,8,0))
         instTysAndKinds
 # else
-        -- If PolyKinds is enabled, the first entries in this list will be
-        -- kind signatures on early versions of GHC, so drop them
-        if length instTysAndKinds > length famTvbs
-              then drop (length famTvbs) instTysAndKinds
-              else instTysAndKinds
+        drop (Set.size . Set.unions $ map (distinctKindVars . tvbKind) famTvbs)
+             instTysAndKinds
 # endif
 
     lhsTvbs :: [TyVarBndr]
     lhsTvbs = map (uncurry replaceTyVarName)
-        . filter (isTyVar . snd)
-        . take remainingLength
-        $ zip famTvbs rhsTypes
+            . filter (isTyVar . snd)
+            . take remainingLength
+            $ zip famTvbs rhsTypes
 
     -- In GHC 7.8, only the @Type@s up to the rightmost non-eta-reduced type variable
     -- in @instTypes@ are provided (as a result of this extremely annoying bug:
@@ -1194,12 +1235,23 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
     --
     -- Thankfully, other versions of GHC don't seem to have this bug.
     rhsTypes :: [Type]
+    rhsTypes =
+        -- We need to make sure that type variables in the instance head which have
+        -- Show constrains aren't poly-kinded, e.g.,
+        --
+        -- @
+        -- instance Show a => Show (Foo (a :: k)) where
+        -- @
+        --
+        -- To do this, we inspect every 'SigT' type, and if we are going to apply a
+        -- constraint to it, we replace every kind variable with @*@.
+        map (overTyKind starifyKindChain) $
 # if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    rhsTypes = instTypes ++ map (VarT . tvbName)
-                                (drop (length instTypes)
-                                      famTvbs)
+            instTypes ++ map tvbToType
+                             (drop (length instTypes)
+                                   famTvbs)
 # else
-    rhsTypes = instTypes
+            instTypes
 # endif
 #endif
 
@@ -1224,22 +1276,11 @@ derivingKindError numToDrop tyConName = error
     . showString "‘\n\tClass "
     . showString className
     . showString " expects an argument of kind "
-    . showString (pprint . createKind $ fromEnum numToDrop)
+    . showString (pprint . createKindChain $ fromEnum numToDrop)
     $ ""
   where
     className :: String
     className = nameBase $ showClassTable numToDrop
-
-    createKind :: Int -> Kind
-    createKind = go starK
-      where
-        go :: Kind -> Int -> Kind
-        go k !0 = k
-#if MIN_VERSION_template_haskell(2,8,0)
-        go k !n = go (AppT (AppT ArrowT StarT) k) (n - 1)
-#else
-        go k !n = go (ArrowK StarK k) (n - 1)
-#endif
 
 etaReductionError :: Type -> a
 etaReductionError instanceType = error $
@@ -1282,7 +1323,7 @@ outOfPlaceTyVarError conName tyVarNames numLastArgs = error
 -- Expanding type synonyms
 -------------------------------------------------------------------------------
 
--- Expands all type synonyms in a type. Written by Dan Rosén in the
+-- | Expands all type synonyms in a type. Written by Dan Rosén in the
 -- @genifunctors@ package (licensed under BSD3).
 expandSyn :: Type -> Q Type
 expandSyn (ForallT tvs ctx t) = fmap (ForallT tvs ctx) $ expandSyn t
