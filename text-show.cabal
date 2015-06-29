@@ -165,12 +165,12 @@ test-suite text-show-spec
   other-modules:       Derived.DataFamilies
                        Derived.DatatypeContexts
                        Derived.ExistentialQuantification
-                      -- Derived.Infix
+                       Derived.Infix
                        Derived.MagicHash
                        Derived.PolyKinds
                        Derived.RankNTypes
                        Derived.Records
-                      -- Derived.TypeSynonyms
+                       Derived.TypeSynonyms
 
                        Instances.Derived
                        Instances.FromStringTextShow
@@ -258,12 +258,12 @@ test-suite text-show-spec
                        Spec.Data.VersionSpec
                        Spec.Derived.DatatypeContextsSpec
                        Spec.Derived.ExistentialQuantificationSpec
-                      -- Spec.Derived.InfixSpec
+                       Spec.Derived.InfixSpec
                        Spec.Derived.MagicHashSpec
                        Spec.Derived.PolyKindsSpec
                        Spec.Derived.RankNTypesSpec
                        Spec.Derived.RecordsSpec
-                      -- Spec.Derived.TypeSynonymsSpec
+                       Spec.Derived.TypeSynonymsSpec
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
                        Spec.FromStringTextShowSpec
