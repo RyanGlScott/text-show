@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.EitherSpec (main, spec) where
 
-import Data.Orphans ()
+import Generics.Deriving.Instances ()
 
 import Spec.Utils (prop_matchesShow2, prop_genericShow, prop_genericShow1)
 

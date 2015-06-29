@@ -10,6 +10,7 @@
 * Removed the ability to call `deriveShow` or `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature. If you want to derive `Show` for data family instances, use the corresponding `data instance` or `newtype instance` constructor name as an argument instead.
  * Removed `PragmaOptions`, `deriveShowPragmas`, `defaultInlineShowbPrec`, `defaultInlineShowb`, and `defaultInlineShowbList`, as it was impossible to make Template Haskell-generated pragmas work consistently across different versions of GHC. If you really want to use `INLINE` and `SPECIALIZE instance` pragmas with your Template Haskell-generated code, create manual instances with `mkShowbPrec` and family.
 * `Show1` instances can now be created generically using the `genericShowbPrecWith` function in `Text.Show.Text.Generics`. A `genericShowbPrec1` was also added.
+* Added `generic-deriving` as a dependency, which allows generics-related code to be exported on more versions of GHC
 * `ConType` (in `Text.Show.Text.Generics`) now has an `Inf String` constructor instead of `Inf Builder`. As a result, `ConType` now always an `Eq` and `Ord` instance, and a `Read ConType` instance was added.
 * `Typeable` instances for the promoted data constructors `'FromStringShow` and `'FromTextShow`
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`

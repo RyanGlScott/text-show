@@ -14,6 +14,8 @@ import Control.Applicative (Const, ZipList)
 
 import Data.Orphans ()
 
+import Generics.Deriving.Instances ()
+
 import Instances.Control.Applicative ()
 
 import Spec.Utils (prop_matchesShow, prop_matchesShow2,

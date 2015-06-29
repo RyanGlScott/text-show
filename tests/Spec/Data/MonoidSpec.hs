@@ -13,7 +13,8 @@ Portability: GHC
 module Spec.Data.MonoidSpec (main, spec) where
 
 import Data.Monoid
-import Data.Orphans ()
+
+import Generics.Deriving.Instances ()
 
 import Instances.Data.Monoid ()
 

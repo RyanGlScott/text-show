@@ -1,12 +1,7 @@
-{-# LANGUAGE CPP                        #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeOperators              #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -21,10 +16,9 @@ Portability: GHC
 -}
 module Instances.GHC.Generics () where
 
-#if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (U1(..), Par1(..), Rec1(..), K1(..),
-                     M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                     Fixity(..), Associativity(..), Arity(..))
+import Generics.Deriving.Base (U1(..), Par1(..), Rec1(..), K1(..),
+                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
+                               Fixity(..), Associativity(..), Arity(..))
 
 import Prelude ()
 import Prelude.Compat
@@ -56,4 +50,3 @@ instance Arbitrary Associativity where
 
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
-#endif

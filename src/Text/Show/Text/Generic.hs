@@ -1,13 +1,13 @@
 {-# LANGUAGE CPP                 #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveDataTypeable  #-}
-{-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators       #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric       #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
@@ -27,8 +27,7 @@ Portability: GHC
 
 Generic versions of 'Show' and 'Show1' class functions, as an alternative to
 "Text.Show.Text.TH", which uses Template Haskell. Because there is no 'Generic2'
-class, 'T.Show2' cannot be implemented generically. This module only exports
-functions if the compiler supports generics (on GHC, 7.2 or above).
+class, 'T.Show2' cannot be implemented generically.
 
 This implementation is based off of the @Generics.Deriving.Show@ module from the
 @generic-deriving@ library.
@@ -36,9 +35,6 @@ This implementation is based off of the @Generics.Deriving.Show@ module from the
 /Since: 0.6/
 -}
 module Text.Show.Text.Generic (
-#if __GLASGOW_HASKELL__ < 702
-    ) where
-#else
       -- * Generic @show@ functions
       -- $generics
 
@@ -74,7 +70,7 @@ import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Typeable (Typeable)
 
-import           GHC.Generics
+import           Generics.Deriving.Base
 import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude ()
@@ -89,7 +85,7 @@ import           Text.Show.Text.Classes (Show(showbPrec), Show1(..),
 import           Text.Show.Text.Instances ()
 import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString)
 
-# include "inline.h"
+#include "inline.h"
 
 {- $generics
 
@@ -238,7 +234,15 @@ genericShowbPrec1 = genericShowbPrecWith genericShowbPrec
 --
 -- /Since: 0.6/
 data ConType = Rec | Tup | Pref | Inf String
-  deriving (Eq, Generic, Ord, Read, S.Show, Typeable)
+  deriving ( Eq
+           , Ord
+           , Read
+           , S.Show
+           , Typeable
+#if __GLASGOW_HASKELL__ >= 702
+           , Generic
+#endif
+           )
 
 instance T.Show ConType where
     showbPrec = genericShowbPrec
@@ -254,11 +258,11 @@ class GShow f where
     -- | Whether a representation type has any constructors.
     isNullary :: f a -> Bool
     isNullary = error "generic showbPrec (isNullary): unnecessary case"
-# if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL gShowbPrec #-}
 
 deriving instance Typeable GShow
-# endif
+#endif
 
 instance GShow U1 where
     gShowbPrec _ _ U1 = mempty
@@ -299,11 +303,11 @@ class GShow1 f where
     -- | Whether a representation type has any constructors.
     isNullary1 :: f a -> Bool
     isNullary1 = error "generic showbPrecWith (isNullary1): unnecessary case"
-# if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL gShowbPrecWith #-}
 
 deriving instance Typeable GShow1
-# endif
+#endif
 
 instance GShow1 U1 where
     gShowbPrecWith _ _ _ U1 = mempty
@@ -356,9 +360,9 @@ gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
     Prefix -> showbParen ( n > appPrec
                            && not ( isNull x
                                     || conIsTuple c
-# if __GLASGOW_HASKELL__ >= 711
+#if __GLASGOW_HASKELL__ >= 711
                                     || conIsRecord c
-# endif
+#endif
                                   )
                          ) $
            (if conIsTuple c
@@ -427,4 +431,3 @@ gShowbProduct gsa gsb t@Pref n (a :*: b) =
        gsa t n a
     <> showbSpace
     <> gsb t n b
-#endif

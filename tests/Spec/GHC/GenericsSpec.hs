@@ -1,8 +1,4 @@
-{-# LANGUAGE CPP           #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE TypeOperators #-}
-#endif
 
 {-|
 Module:      Spec.GHC.GenericsSpec
@@ -18,29 +14,22 @@ module Spec.GHC.GenericsSpec (main, spec) where
 
 import Data.Orphans ()
 
+import Generics.Deriving.Base (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
+                               Fixity, Associativity, Arity)
+import Generics.Deriving.Instances ()
+
 import Instances.GHC.Generics ()
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.Hspec (Spec, hspec, parallel)
-
-#if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
-                     Fixity, Associativity, Arity)
 
 import Spec.Utils (prop_matchesShow, prop_genericShow)
 
-import Test.Hspec (describe)
+import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
-#endif
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if __GLASGOW_HASKELL__ >= 702
     describe "Fixity" $ do
         prop "Show instance" (prop_matchesShow  :: Int -> Fixity -> Bool)
         prop "generic Show"  (prop_genericShow  :: Int -> Fixity -> Bool)
@@ -74,6 +63,3 @@ spec = parallel $ do
     describe "(Maybe :.: Maybe) Int " $ do
         prop "Show instance" (prop_matchesShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
         prop "generic Show"  (prop_genericShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
-#else
-    pure ()
-#endif

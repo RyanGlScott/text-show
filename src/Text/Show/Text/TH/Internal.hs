@@ -85,6 +85,10 @@ import           Text.Show.Text.Classes (Show1(..), Show2(..), showbPrec,
                                          showbListWith, showbParen, showbSpace)
 import           Text.Show.Text.Utils (isInfixTypeCon, isTupleString)
 
+-------------------------------------------------------------------------------
+-- User-facing API
+-------------------------------------------------------------------------------
+
 {- $deriveShow
 
 'deriveShow' automatically generates a 'T.Show' instance declaration for a @data@
@@ -158,9 +162,8 @@ Note that at the moment, there are some limitations:
 -- family instance.
 --
 -- /Since: 0.3/
-deriveShow :: Name -- ^ Name of the data type to make an instance of 'T.Show'
-           -> Q [Dec]
-deriveShow = deriveShowNumber Show
+deriveShow :: Name -> Q [Dec]
+deriveShow = deriveShowClass Show
 
 {- $deriveShow1
 
@@ -234,9 +237,8 @@ some caveats:
 -- family instance.
 --
 -- /Since: 1/
-deriveShow1 :: Name -- ^ Name of the data type to make an instance of 'Show1'
-            -> Q [Dec]
-deriveShow1 = deriveShowNumber Show1
+deriveShow1 :: Name -> Q [Dec]
+deriveShow1 = deriveShowClass Show1
 
 {- $deriveShow2
 
@@ -293,71 +295,8 @@ The same restrictions that apply to 'deriveShow' and 'deriveShow1' also apply to
 -- family instance.
 --
 -- /Since: 1/
-deriveShow2 :: Name -- ^ Name of the data type to make an instance of 'Show2'
-            -> Q [Dec]
-deriveShow2 = deriveShowNumber Show2
-
-deriveShowNumber :: ShowClass
-                 -> Name
-                 -> Q [Dec]
-deriveShowNumber numToDrop tyConName = do
-    info <- reify tyConName
-    case info of
-        TyConI{} -> deriveShowTyCon numToDrop tyConName
-#if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> deriveShowDataFamInst numToDrop tyConName
-        FamilyI (FamilyD DataFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
-        FamilyI (FamilyD TypeFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
-#else
-        DataConI{} -> dataConIError
-        _          -> error $ ns ++ "The name must be of a plain type constructor."
-#endif
-  where
-    ns :: String
-    ns = "Text.Show.Text.TH.deriveShow: "
-
--- | Generates a 'T.Show' instance declaration for a plain type constructor.
-deriveShowTyCon :: ShowClass
-                -> Name
-                -> Q [Dec]
-deriveShowTyCon numToDrop tyConName =
-    withTyCon tyConName fromCons
-  where
-    className :: Name
-    className = showClassTable numToDrop
-
-    fromCons :: Cxt -> [TyVarBndr] -> [Con] -> Q [Dec]
-    fromCons ctxt tvbs cons = (:[]) <$>
-        instanceD (return instanceCxt)
-                  (return $ AppT (ConT className) instanceType)
-                  (showbPrecDecs droppedNbs cons)
-      where
-        (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypeTyCon numToDrop tyConName ctxt tvbs
-
-#if MIN_VERSION_template_haskell(2,7,0)
--- | Generates a 'T.Show' instance declaration for a data family instance constructor.
-deriveShowDataFamInst :: ShowClass
-                      -> Name
-                      -> Q [Dec]
-deriveShowDataFamInst numToDrop dataFamInstName =
-    withDataFamInstCon dataFamInstName fromDec
-  where
-    className :: Name
-    className = showClassTable numToDrop
-
-    fromDec :: [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
-    fromDec famTvbs ctxt parentName instTys cons = (:[]) <$>
-        instanceD (return instanceCxt)
-                  (return $ AppT (ConT className) instanceType)
-                  (showbPrecDecs droppedNbs cons)
-      where
-        (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTys
-#endif
+deriveShow2 :: Name -> Q [Dec]
+deriveShow2 = deriveShowClass Show2
 
 {- $mk
 
@@ -453,28 +392,28 @@ mkShowb name = mkShowbPrec name `appE` [| zero |]
 --
 -- /Since: 0.3.1/
 mkShowbPrec :: Name -> Q Exp
-mkShowbPrec = mkShowbPrecNumber Show
+mkShowbPrec = mkShowbPrecClass Show
 
 -- | Generates a lambda expression which behaves like 'T.showbPrecWith' (without
 -- requiring a 'Show1' instance).
 --
 -- /Since: 1/
 mkShowbPrecWith :: Name -> Q Exp
-mkShowbPrecWith = mkShowbPrecNumber Show1
+mkShowbPrecWith = mkShowbPrecClass Show1
 
 -- | Generates a lambda expression which behaves like 'T.showbPrec1' (without
 -- requiring a 'Show1' instance).
 --
 -- /Since: 1/
 mkShowbPrec1 :: Name -> Q Exp
-mkShowbPrec1 name = [| $(mkShowbPrecWith name) $(mkShowbPrec name) |]
+mkShowbPrec1 name = [| $(mkShowbPrecWith name) showbPrec |]
 
 -- | Generates a lambda expression which behaves like 'T.showbPrecWith2' (without
 -- requiring a 'Show2' instance).
 --
 -- /Since: 1/
 mkShowbPrecWith2 :: Name -> Q Exp
-mkShowbPrecWith2 = mkShowbPrecNumber Show2
+mkShowbPrecWith2 = mkShowbPrecClass Show2
 
 -- | Generates a lambda expression which behaves like 'T.showbPrecWith2' (without
 -- requiring a 'Show2' instance).
@@ -482,30 +421,6 @@ mkShowbPrecWith2 = mkShowbPrecNumber Show2
 -- /Since: 1/
 mkShowbPrec2 :: Name -> Q Exp
 mkShowbPrec2 name = [| $(mkShowbPrecWith2 name) showbPrec showbPrec |]
-
-mkShowbPrecNumber :: ShowClass -> Name -> Q Exp
-mkShowbPrecNumber numToDrop tyConName = do
-    info <- reify tyConName
-    case info of
-        TyConI{} -> withTyCon tyConName $ \ctxt tvbs decs ->
-            let (_, _, nbs) = cxtAndTypeTyCon numToDrop tyConName ctxt tvbs
-             in consToShow nbs decs
-#if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs ctxt parentName instTys cons ->
-            let (_, _, nbs) = cxtAndTypeDataFamInstCon numToDrop parentName ctxt famTvbs instTys
-             in consToShow nbs cons
-        FamilyI (FamilyD DataFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
-        FamilyI (FamilyD TypeFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
-#else
-        DataConI{} -> dataConIError
-        _          -> error $ ns ++ "The name must be of a plain type constructor."
-#endif
-  where
-    ns :: String
-    ns = "Text.Show.Text.TH.mk: "
 
 -- | Generates a lambda expression which behaves like 'T.showbList' (without requiring a
 -- 'T.Show' instance).
@@ -542,10 +457,114 @@ mkHPrint name = [| \h -> TS.hPutStrLn h . $(mkShow name) |]
 mkHPrintLazy :: Name -> Q Exp
 mkHPrintLazy name = [| \h -> TL.hPutStrLn h . $(mkShowLazy name) |]
 
+-------------------------------------------------------------------------------
+-- Code generation
+-------------------------------------------------------------------------------
+
+-- | Derive a Show/Show1/Show2 instance declaration (depending on the ShowClass
+-- argument's value).
+deriveShowClass :: ShowClass -> Name -> Q [Dec]
+deriveShowClass sClass tyConName = do
+    info <- reify tyConName
+    case info of
+        TyConI{} -> deriveShowTyCon sClass tyConName
+#if MIN_VERSION_template_haskell(2,7,0)
+        DataConI{} -> deriveShowDataFamInst sClass tyConName
+        FamilyI (FamilyD DataFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
+        FamilyI (FamilyD TypeFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a type family name."
+        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
+#else
+        DataConI{} -> dataConIError
+        _          -> error $ ns ++ "The name must be of a plain type constructor."
+#endif
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.deriveShow: "
+
+-- | Generates a Show/Show1/Show2 instance declaration for a plain type constructor.
+deriveShowTyCon :: ShowClass -> Name -> Q [Dec]
+deriveShowTyCon sClass tyConName =
+    withTyCon tyConName fromCons
+  where
+    className :: Name
+    className = showClassNameTable sClass
+
+    fromCons :: Cxt -> [TyVarBndr] -> [Con] -> Q [Dec]
+    fromCons ctxt tvbs cons = (:[]) <$>
+        instanceD (return instanceCxt)
+                  (return $ AppT (ConT className) instanceType)
+                  (showbPrecDecs droppedNbs cons)
+      where
+        (instanceCxt, instanceType, droppedNbs) =
+            cxtAndTypeTyCon sClass tyConName ctxt tvbs
+
+#if MIN_VERSION_template_haskell(2,7,0)
+-- | Generates a Show/Show1/Show2 instance declaration for a data family instance
+-- constructor.
+deriveShowDataFamInst :: ShowClass -> Name -> Q [Dec]
+deriveShowDataFamInst sClass dataFamInstName =
+    withDataFamInstCon dataFamInstName fromDec
+  where
+    className :: Name
+    className = showClassNameTable sClass
+
+    fromDec :: [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
+    fromDec famTvbs ctxt parentName instTys cons = (:[]) <$>
+        instanceD (return instanceCxt)
+                  (return $ AppT (ConT className) instanceType)
+                  (showbPrecDecs droppedNbs cons)
+      where
+        (instanceCxt, instanceType, droppedNbs) =
+            cxtAndTypeDataFamInstCon sClass parentName ctxt famTvbs instTys
+#endif
+
+-- | Generates a declaration defining the primary function corresponding to a
+-- particular class (showbPrec for Show, showbPrecWith for Show1, and showbPrecWith2
+-- for Show2).
+showbPrecDecs :: [NameBase] -> [Con] -> [Q Dec]
+showbPrecDecs nbs cons =
+    [ funD classFuncName
+           [ clause []
+                    (normalB $ consToShow nbs cons)
+                    []
+           ]
+    ]
+  where
+    classFuncName :: Name
+    classFuncName  = showbPrecNameTable . toEnum $ length nbs
+
+-- | Generates a lambda expression which behaves like showbPrec (for Show),
+-- showbPrecWith (for Show1), or showbPrecWth2 (for Show2).
+mkShowbPrecClass :: ShowClass -> Name -> Q Exp
+mkShowbPrecClass sClass tyConName = do
+    info <- reify tyConName
+    case info of
+        TyConI{} -> withTyCon tyConName $ \ctxt tvbs decs ->
+            let (_, _, nbs) = cxtAndTypeTyCon sClass tyConName ctxt tvbs
+             in consToShow nbs decs
+#if MIN_VERSION_template_haskell(2,7,0)
+        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs ctxt parentName instTys cons ->
+            let (_, _, nbs) = cxtAndTypeDataFamInstCon sClass parentName ctxt famTvbs instTys
+             in consToShow nbs cons
+        FamilyI (FamilyD DataFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
+        FamilyI (FamilyD TypeFam _ _ _) _ ->
+            error $ ns ++ "Cannot use a type family name."
+        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
+#else
+        DataConI{} -> dataConIError
+        _          -> error $ ns ++ "The name must be of a plain type constructor."
+#endif
+  where
+    ns :: String
+    ns = "Text.Show.Text.TH.mkShowbPrec: "
+
 -- | Generates code to generate the 'T.Show' encoding of a number of constructors.
 -- All constructors must be from the same type.
 consToShow :: [NameBase] -> [Con] -> Q Exp
-consToShow _   []   = error "Text.Show.Text.TH.consToShow: Not a single constructor given!"
+consToShow _   []   = error "Must have at least one data constructor"
 consToShow nbs cons = do
     p     <- newName "p"
     value <- newName "value"
@@ -554,7 +573,7 @@ consToShow nbs cons = do
         sClass = toEnum $ length nbs
     lamE (map varP $ sps ++ [p, value])
         . appsE
-        $ [ varE $ constTable sClass
+        $ [ varE $ showbPrecConstNameTable sClass
           , caseE (varE value) $ map (encodeArgs p sClass tvis) cons
           ] ++ map varE sps
             ++ [varE p, varE value]
@@ -729,69 +748,18 @@ makeShowExp sClass conName tvis ty = do
     itf <- isTyFamily tyCon
     if any (`mentionsNameBase` tyVarNameBases) lhsArgs
           || itf && any (`mentionsNameBase` tyVarNameBases) tyArgs
-          then outOfPlaceTyVarError conName tyVarNameBases numLastArgs
-          else appsE $ [ varE . showFuncTable $ toEnum numLastArgs]
-                    ++ map (makeShowExp sClass conName tvis) rhsArgs
+       then outOfPlaceTyVarError conName tyVarNameBases numLastArgs
+       else appsE $ [ varE . showbPrecNameTable $ toEnum numLastArgs]
+                  ++ map (makeShowExp sClass conName tvis) rhsArgs
 
 -------------------------------------------------------------------------------
--- Utilities
+-- Template Haskell reifying and AST manipulation
 -------------------------------------------------------------------------------
-
-data ShowClass = Show | Show1 | Show2
-  deriving (Enum, Eq, Ord)
-
-removeForalled :: [TyVarBndr] -> [TyVarInfo] -> [TyVarInfo]
-removeForalled tvbs = filter (not . foralled tvbs)
-  where
-    foralled :: [TyVarBndr] -> TyVarInfo -> Bool
-    foralled tvbs' tvi = fst tvi `elem` map (NameBase . tvbName) tvbs'
-
--- | Checks if a 'Name' represents a tuple type constructor (other than '()')
-isNonUnitTuple :: Name -> Bool
-isNonUnitTuple = isTupleString . nameBase
-
--- | Parenthesize an infix constructor name if it is being applied as a prefix
--- function (e.g., data Amp a = (:&) a a)
-parenInfixConName :: Name -> ShowS
-parenInfixConName conName =
-    let conNameBase = nameBase conName
-     in showParen (isInfixTypeCon conNameBase) $ showString conNameBase
-
--- | A type-restricted version of 'const'. This is useful when generating the lambda
--- expression in 'mkShowbPrec' for a data type with only nullary constructors (since
--- the expression wouldn't depend on the precedence). For example, if you had @data
--- Nullary = Nullary@ and attempted to run @$(mkShowbPrec ''Nullary) Nullary@, simply
--- ignoring the precedence argument would cause the type signature of @$(mkShowbPrec
--- ''Nullary)@ to be @a -> Nullary -> Builder@, not @Int -> Nullary -> Builder@.
---
--- To avoid this problem, after computing the 'Builder' @b@, we call @intConst b p@,
--- where @p@ is the precedence argument. This forces @p :: Int@.
-showbPrecConst :: Builder -> Int -> a -> Builder
-showbPrecConst = const . const
-{-# INLINE showbPrecConst #-}
-
-showbPrecWithConst :: Builder -> (Int -> a -> Builder) -> Int -> f a -> Builder
-showbPrecWithConst = const . const . const
-{-# INLINE showbPrecWithConst #-}
-
-showbPrecWith2Const :: Builder -> (Int -> a -> Builder) -> (Int -> b -> Builder)
-                    -> Int -> f a b -> Builder
-showbPrecWith2Const = const . const . const . const
-{-# INLINE showbPrecWith2Const #-}
-
-constTable :: ShowClass -> Name
-constTable Show  = 'showbPrecConst
-constTable Show1 = 'showbPrecWithConst
-constTable Show2 = 'showbPrecWith2Const
 
 -- | Extracts a plain type constructor's information.
 withTyCon :: Name -- ^ Name of the plain type constructor
             -> (Cxt -> [TyVarBndr] -> [Con] -> Q a)
-            -- ^ Function that generates the actual code. Will be applied
-            -- to the type variable binders and constructors extracted
-            -- from the given 'Name'.
             -> Q a
-            -- ^ Resulting value in the 'Q'uasi monad.
 withTyCon name f = do
     info <- reify name
     case info of
@@ -807,7 +775,7 @@ withTyCon name f = do
 
 #if MIN_VERSION_template_haskell(2,7,0)
 -- | Extracts a data family name's information.
-withDataFam :: Name
+withDataFam :: Name -- ^ Name of the data family
             -> ([TyVarBndr] -> [Dec] -> Q a)
             -> Q a
 withDataFam name f = do
@@ -822,7 +790,7 @@ withDataFam name f = do
     ns = "Text.Show.Text.TH.withDataFam: "
 
 -- | Extracts a data family instance constructor's information.
-withDataFamInstCon :: Name
+withDataFamInstCon :: Name -- ^ Name of the data family instance constructor
                    -> ([TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q a)
                    -> Q a
 withDataFamInstCon dficName f = do
@@ -849,296 +817,31 @@ withDataFamInstCon dficName f = do
   where
     ns :: String
     ns = "Text.Show.Text.TH.withDataFamInstCon: "
-
--- | Extracts the name of a constructor.
-constructorName :: Con -> Name
-constructorName (NormalC name      _  ) = name
-constructorName (RecC    name      _  ) = name
-constructorName (InfixC  _    name _  ) = name
-constructorName (ForallC _    _    con) = constructorName con
 #endif
 
-showClassTable :: ShowClass -> Name
-showClassTable Show  = ''T.Show
-showClassTable Show1 = ''Show1
-showClassTable Show2 = ''Show2
-
-showFuncTable :: ShowClass -> Name
-showFuncTable Show  = 'showbPrec
-showFuncTable Show1 = 'showbPrecWith
-showFuncTable Show2 = 'showbPrecWith2
-
--- | Extracts the name from a type variable binder.
-tvbName :: TyVarBndr -> Name
-tvbName (PlainTV  name)   = name
-tvbName (KindedTV name _) = name
-
-tvbKind :: TyVarBndr -> Kind
-tvbKind (PlainTV  _)   = starK
-tvbKind (KindedTV _ k) = k
-
-replaceTyVarName :: TyVarBndr -> Type -> TyVarBndr
-replaceTyVarName tvb            (SigT t _) = replaceTyVarName tvb t
-replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
-replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
-replaceTyVarName tvb            _          = tvb
-
--- overTyKind :: (Kind -> Kind) -> Type -> Type
--- overTyKind f (SigT t k) = SigT t (f k)
--- overTyKind _ t          = t
-
--- | Generates a declaration defining the 'showbPrec' function, followed by any custom
--- pragma declarations specified by the 'PragmaOptions' argument.
---
--- The Template Haskell API for generating pragmas (as well as GHC's treatment of
--- pragmas themselves) has changed considerably over the years, so there's a lot of
--- CPP magic required to get this to work uniformly across different versions of GHC.
-showbPrecDecs :: [NameBase] -> [Con] -> [Q Dec]
-showbPrecDecs nbs cons =
-    [ funD classFuncName
-           [ clause []
-                    (normalB $ consToShow nbs cons)
-                    []
-           ]
-    ]
-  where
-    classFuncName :: Name
-    classFuncName  = showFuncTable . toEnum $ length nbs
-
--- | Applies a typeclass constraint to a type.
-applyClass :: Name -> Name -> Pred
-#if MIN_VERSION_template_haskell(2,10,0)
-applyClass con t = AppT (ConT con) (VarT t)
-#else
-applyClass con t = ClassP con [VarT t]
-#endif
-
-canEtaReduce :: [Type] -> [Type] -> Bool
-canEtaReduce remaining dropped =
-       all isTyVar dropped
-    && allDistinct nbs -- Make sure not to pass something of type [Type], since Type
-                       -- didn't have an Ord instance until template-haskell-2.10.0.0
-    && not (any (`mentionsNameBase` nbs) remaining)
-  where
-    nbs :: [NameBase]
-    nbs = map varTToNameBase dropped
-
-varTToName :: Type -> Name
-varTToName (VarT n)   = n
-varTToName (SigT t _) = varTToName t
-varTToName _          = error "Not a type variable!"
-
-varTToNameBase :: Type -> NameBase
-varTToNameBase = NameBase . varTToName
-
-unSigT :: Type -> Type
-unSigT (SigT t _) = t
-unSigT t          = t
-
-isTyVar :: Type -> Bool
-isTyVar (VarT _)   = True
-isTyVar (SigT t _) = isTyVar t
-isTyVar _          = False
-
-isTyFamily :: Type -> Q Bool
-isTyFamily (ConT n) = do
-    info <- reify n
-    return $ case info of
-#if MIN_VERSION_template_haskell(2,7,0)
-         FamilyI (FamilyD TypeFam _ _ _) _ -> True
-#else
-         TyConI  (FamilyD TypeFam _ _ _)   -> True
-#endif
-         _ -> False
-isTyFamily _ = return False
-
-allDistinct :: Ord a => [a] -> Bool
-allDistinct = allDistinct' Set.empty
-  where
-    allDistinct' :: Ord a => Set a -> [a] -> Bool
-    allDistinct' uniqs (x:xs)
-        | x `Set.member` uniqs = False
-        | otherwise            = allDistinct' (Set.insert x uniqs) xs
-    allDistinct' _ _           = True
-
-mentionsNameBase :: Type -> [NameBase] -> Bool
-mentionsNameBase = go Set.empty
-  where
-    go :: Set NameBase -> Type -> [NameBase] -> Bool
-    go foralls (ForallT tvbs _ t) nbs =
-        go (foralls `Set.union` Set.fromList (map (NameBase . tvbName) tvbs)) t nbs
-    go foralls (AppT t1 t2) nbs = go foralls t1 nbs || go foralls t2 nbs
-    go foralls (SigT t _)   nbs = go foralls t nbs
-    go foralls (VarT n)     nbs = varNb `elem` nbs && not (varNb `Set.member` foralls)
-      where
-        varNb = NameBase n
-    go _       _            _   = False
-
-predMentionsNameBase :: Pred -> [NameBase] -> Bool
-#if MIN_VERSION_template_haskell(2,10,0)
-predMentionsNameBase = mentionsNameBase
-#else
-predMentionsNameBase (ClassP _ tys) nbs = any (`mentionsNameBase` nbs) tys
-predMentionsNameBase (EqualP t1 t2) nbs = mentionsNameBase t1 nbs || mentionsNameBase t2 nbs
-#endif
-
-newtype NameBase = NameBase { getName :: Name }
-
-getNameBase :: NameBase -> String
-getNameBase = nameBase . getName
-
-instance Eq NameBase where
-    (==) = (==) `on` getNameBase
-
-instance Ord NameBase where
-    compare = compare `on` getNameBase
-
-instance S.Show NameBase where
-    showsPrec p = showsPrec p . nameBase . getName
-
--- data TyVarInfo = TyVarInfo {
---     tyVarNameBase   :: NameBase
---   , _tyVarShowsPrec :: Name
--- }
-type TyVarInfo = (NameBase, Name)
-
--- numTyArrows :: Type -> Int
--- numTyArrows t = length (uncurryTy t) - 1
--- numTyArrows = go 0
---   where
---     go !n (AppT (AppT ArrowT _) ty) = go (n + 1) ty
---     go !n _                         = n
-
-numKindArrows :: Kind -> Int
-numKindArrows k = length (uncurryKind k) - 1
--- #if MIN_VERSION_template_haskell(2,8,0)
--- numKindArrows = numTyArrows
--- #else
--- numKindArrows = go 0
---   where
---     go !n (ArrowK _ k) = go (n + 1) k
---     go !n _            = n
--- #endif
-
-applyTy :: Type -> [Type] -> Type
-applyTy = foldl' AppT
-
--- Fully applies a type constructor to its type variables.
-applyTyCon :: Name -> [Type] -> Type
-applyTyCon = applyTy . ConT
-
-unapplyTy :: Type -> NonEmpty Type
-unapplyTy = NE.reverse . go
-  where
-    go :: Type -> NonEmpty Type
-    go (AppT t1 t2) = t2 <| go t1
-    go (SigT t _)   = go t
-    go t            = t :| []
-
-uncurryTy :: Type -> NonEmpty Type
-uncurryTy (AppT (AppT ArrowT t1) t2) = t1 <| uncurryTy t2
-uncurryTy (SigT t _)                 = uncurryTy t
-uncurryTy t                          = t :| []
-
-uncurryKind :: Kind -> NonEmpty Kind
-#if MIN_VERSION_template_haskell(2,8,0)
-uncurryKind = uncurryTy
-#else
-uncurryKind (ArrowK k1 k2) = k1 <| uncurryKind k2
-uncurryKind k              = k :| []
-#endif
-
-applyConstraint :: TyVarBndr -> Pred
-applyConstraint (PlainTV  name)      = applyClass ''T.Show  name
-applyConstraint (KindedTV name kind) = applyClass showClass name
-  where
-    showClass :: Name
-    showClass = showClassTable . toEnum $ numKindArrows kind
-
-needsConstraint :: ShowClass -> Kind -> Bool
-needsConstraint showClass kind =
-       showClass >= toEnum (numKindArrows kind)
-    && canRealizeKindStarChain kind
-
-wellKinded :: [Kind] -> Bool
-wellKinded = all canRealizeKindStar
-
--- | Of form k1 -> k2 -> ... -> kn, where k is either a single kind variable or *.
-canRealizeKindStarChain :: Kind -> Bool
-canRealizeKindStarChain = all canRealizeKindStar . uncurryKind
-
--- starifyKindChain :: Kind -> Kind
--- #if MIN_VERSION_template_haskell(2,8,0)
--- starifyKindChain (AppT (AppT ArrowT k1) k2) =
---     AppT (AppT ArrowT (starifyKindChain k1)) $ starifyKindChain k2
--- starifyKindChain (SigT k _) = starifyKindChain k
--- starifyKindChain (VarT _)   = starK
--- starifyKindChain k          = k
--- #else
--- starifyKindChain = id -- Kind variables weren't possible in Template Haskell prior to 2.8.0.0
--- #endif
-
-canRealizeKindStar :: Kind -> Bool
--- canRealizeKindStar k = numKindArrows k == 0
-canRealizeKindStar k = case uncurryKind k of
-    k' :| [] -> case k' of
-#if MIN_VERSION_template_haskell(2,8,0)
-                     StarT    -> True
-                     (VarT _) -> True -- Kind k can be instantiated with *
-#else
-                     StarK    -> True
-#endif
-                     _ -> False
-    _ -> False
-
-createKindChain :: Int -> Kind
-createKindChain = go starK
-  where
-    go :: Kind -> Int -> Kind
-    go k !0 = k
-#if MIN_VERSION_template_haskell(2,8,0)
-    go k !n = go (AppT (AppT ArrowT StarT) k) (n - 1)
-#else
-    go k !n = go (ArrowK StarK k) (n - 1)
-#endif
-
-# if MIN_VERSION_template_haskell(2,8,0) && __GLASGOW_HASKELL__ < 710
-distinctKindVars :: Kind -> Set Name
-distinctKindVars (AppT k1 k2) = distinctKindVars k1 `Set.union` distinctKindVars k2
-distinctKindVars (SigT k _)   = distinctKindVars k
-distinctKindVars (VarT k)     = Set.singleton k
-distinctKindVars _            = Set.empty
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-tvbToType :: TyVarBndr -> Type
-tvbToType (PlainTV n)    = VarT n
-tvbToType (KindedTV n k) = SigT (VarT n) k
-#endif
-
--- | Deduces the 'Show' instance context of a simple type constructor, as well
+-- | Deduces the Show instance context of a simple type constructor, as well
 -- as the type constructor fully applied to its type variables.
 cxtAndTypeTyCon :: ShowClass
                 -> Name
                 -> Cxt
                 -> [TyVarBndr]
                 -> (Cxt, Type, [NameBase])
-cxtAndTypeTyCon numToDrop tyConName dataCxt tvbs =
+cxtAndTypeTyCon sClass tyConName dataCxt tvbs =
     if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
-       then derivingKindError numToDrop tyConName
+       then derivingKindError sClass tyConName
     else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-       then datatypeContextError numToDrop instanceType
+       then datatypeContextError sClass instanceType
     else (instanceCxt, instanceType, droppedNbs)
   where
     instanceCxt :: Cxt
-    instanceCxt = map (applyConstraint)
-                $ filter (needsConstraint numToDrop . tvbKind) remaining
+    instanceCxt = map (applyShowConstraint)
+                $ filter (needsConstraint sClass . tvbKind) remaining
 
     instanceType :: Type
     instanceType = applyTyCon tyConName $ map (VarT . tvbName) remaining
 
     remainingLength :: Int
-    remainingLength = length tvbs - fromEnum numToDrop
+    remainingLength = length tvbs - fromEnum sClass
 
     remaining, dropped :: [TyVarBndr]
     (remaining, dropped) = splitAt remainingLength tvbs
@@ -1150,7 +853,7 @@ cxtAndTypeTyCon numToDrop tyConName dataCxt tvbs =
     droppedNbs = map (NameBase . tvbName) dropped
 
 #if MIN_VERSION_template_haskell(2,7,0)
--- | Deduces the 'Show' instance context of a data family instance constructor,
+-- | Deduces the Show instance context of a data family instance constructor,
 -- as well as the type constructor fully applied to its type variables.
 cxtAndTypeDataFamInstCon :: ShowClass
                          -> Name
@@ -1158,18 +861,18 @@ cxtAndTypeDataFamInstCon :: ShowClass
                          -> [TyVarBndr]
                          -> [Type]
                          -> (Cxt, Type, [NameBase])
-cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
+cxtAndTypeDataFamInstCon sClass parentName dataCxt famTvbs instTysAndKinds =
     if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
-       then derivingKindError numToDrop parentName
+       then derivingKindError sClass parentName
     else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-       then datatypeContextError numToDrop instanceType
+       then datatypeContextError sClass instanceType
     else if canEtaReduce remaining dropped -- If it is safe to drop the type variables
        then (instanceCxt, instanceType, droppedNbs)
     else etaReductionError instanceType
   where
     instanceCxt :: Cxt
-    instanceCxt = map (applyConstraint)
-                $ filter (needsConstraint numToDrop . tvbKind) lhsTvbs
+    instanceCxt = map (applyShowConstraint)
+                $ filter (needsConstraint sClass . tvbKind) lhsTvbs
 
     -- We need to make sure that type variables in the instance head which have
     -- Show constrains aren't poly-kinded, e.g.,
@@ -1184,7 +887,7 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
                  $ map unSigT remaining
 
     remainingLength :: Int
-    remainingLength = length famTvbs - fromEnum numToDrop
+    remainingLength = length famTvbs - fromEnum sClass
 
     remaining, dropped :: [Type]
     (remaining, dropped) = splitAt remainingLength rhsTypes
@@ -1258,17 +961,33 @@ cxtAndTypeDataFamInstCon numToDrop parentName dataCxt famTvbs instTysAndKinds =
 # endif
 #endif
 
-#if !(MIN_VERSION_template_haskell(2,7,0))
-dataConIError :: a
-dataConIError = error
-    . showString "Cannot use a data constructor."
-    . showString "\n\t(Note: if you are trying to derive Show for a type family,"
-    . showString "\n\tuse GHC >= 7.4 instead.)"
-    $ ""
-#endif
+-- | Given a TyVarBndr, apply a Show, Show1, or Show2 constraint to it, depending
+-- on its kind.
+applyShowConstraint :: TyVarBndr -> Pred
+applyShowConstraint (PlainTV  name)      = applyClass ''T.Show  name
+applyShowConstraint (KindedTV name kind) = applyClass className name
+  where
+    className :: Name
+    className = showClassNameTable . toEnum $ numKindArrows kind
 
+-- | Can a kind signature inhabit a Show constraint?
+--
+-- Show:  Kind k
+-- Show1: Kind k1 -> k2
+-- Show2: Kind k1 -> k2 -> k3
+needsConstraint :: ShowClass -> Kind -> Bool
+needsConstraint sClass kind =
+       sClass >= toEnum (numKindArrows kind)
+    && canRealizeKindStarChain kind
+
+-------------------------------------------------------------------------------
+-- Error messages
+-------------------------------------------------------------------------------
+
+-- | Either the given data type doesn't have enough type variables, or one of
+-- the type variables to be eta-reduced cannot realize kind *.
 derivingKindError :: ShowClass -> Name -> a
-derivingKindError numToDrop tyConName = error
+derivingKindError sClass tyConName = error
     . showString "Cannot derive well-kinded instance of form ‘"
     . showString className
     . showChar ' '
@@ -1279,19 +998,23 @@ derivingKindError numToDrop tyConName = error
     . showString "‘\n\tClass "
     . showString className
     . showString " expects an argument of kind "
-    . showString (pprint . createKindChain $ fromEnum numToDrop)
+    . showString (pprint . createKindChain $ fromEnum sClass)
     $ ""
   where
     className :: String
-    className = nameBase $ showClassTable numToDrop
+    className = nameBase $ showClassNameTable sClass
 
+-- | One of the last type variables cannot be eta-reduced (see the canEtaReduce
+-- function for the criteria it would have to meet).
 etaReductionError :: Type -> a
 etaReductionError instanceType = error $
     "Cannot eta-reduce to an instance of form \n\tinstance (...) => "
     ++ pprint instanceType
 
+-- | The data type has a DatatypeContext which mentions one of the eta-reduced
+-- type variables.
 datatypeContextError :: ShowClass -> Type -> a
-datatypeContextError numToDrop instanceType = error
+datatypeContextError sClass instanceType = error
     . showString "Can't make a derived instance of ‘"
     . showString (pprint instanceType)
     . showString "‘:\n\tData type ‘"
@@ -1300,8 +1023,10 @@ datatypeContextError numToDrop instanceType = error
     $ ""
   where
     className :: String
-    className = nameBase $ showClassTable numToDrop
+    className = nameBase $ showClassNameTable sClass
 
+-- | The data type mentions one of the n eta-reduced type variables in a place other
+-- than the last nth positions of a data type in a constructor's field.
 outOfPlaceTyVarError :: String -> [NameBase] -> Int -> a
 outOfPlaceTyVarError conName tyVarNames numLastArgs = error
     . showString "Constructor ‘"
@@ -1321,6 +1046,18 @@ outOfPlaceTyVarError conName tyVarNames numLastArgs = error
       plural one many = case numLastArgs of
           1 -> one
           _ -> many
+
+#if !(MIN_VERSION_template_haskell(2,7,0))
+-- | Template Haskell didn't list all of a data family's instances upon reification
+-- until template-haskell-2.7.0.0, which is necessary for a derived Show instance
+-- to work.
+dataConIError :: a
+dataConIError = error
+    . showString "Cannot use a data constructor."
+    . showString "\n\t(Note: if you are trying to derive Show for a type family,"
+    . showString "\n\tuse GHC >= 7.4 instead.)"
+    $ ""
+#endif
 
 -------------------------------------------------------------------------------
 -- Expanding type synonyms
@@ -1368,3 +1105,322 @@ subst subs t@(VarT n)      = fromMaybe t $ Map.lookup n subs
 subst subs (AppT t1 t2)    = AppT (subst subs t1) (subst subs t2)
 subst subs (SigT t k)      = SigT (subst subs t) k
 subst _ t                  = t
+
+-------------------------------------------------------------------------------
+-- Class-specific constants
+-------------------------------------------------------------------------------
+
+-- | A representation of which @Show@ variant is being derived.
+data ShowClass = Show | Show1 | Show2
+  deriving (Enum, Eq, Ord)
+
+showbPrecConstNameTable :: ShowClass -> Name
+showbPrecConstNameTable Show  = 'showbPrecConst
+showbPrecConstNameTable Show1 = 'showbPrecWithConst
+showbPrecConstNameTable Show2 = 'showbPrecWith2Const
+
+showClassNameTable :: ShowClass -> Name
+showClassNameTable Show  = ''T.Show
+showClassNameTable Show1 = ''Show1
+showClassNameTable Show2 = ''Show2
+
+showbPrecNameTable :: ShowClass -> Name
+showbPrecNameTable Show  = 'showbPrec
+showbPrecNameTable Show1 = 'showbPrecWith
+showbPrecNameTable Show2 = 'showbPrecWith2
+
+-- | A type-restricted version of 'const'. This is useful when generating the lambda
+-- expression in 'mkShowbPrec' for a data type with only nullary constructors (since
+-- the expression wouldn't depend on the precedence). For example, if you had @data
+-- Nullary = Nullary@ and attempted to run @$(mkShowbPrec ''Nullary) Nullary@, simply
+-- ignoring the precedence argument would cause the type signature of @$(mkShowbPrec
+-- ''Nullary)@ to be @a -> Nullary -> Builder@, not @Int -> Nullary -> Builder@.
+showbPrecConst :: Builder -> Int -> a -> Builder
+showbPrecConst = const . const
+{-# INLINE showbPrecConst #-}
+
+showbPrecWithConst :: Builder -> (Int -> a -> Builder) -> Int -> f a -> Builder
+showbPrecWithConst = const . const . const
+{-# INLINE showbPrecWithConst #-}
+
+showbPrecWith2Const :: Builder -> (Int -> a -> Builder) -> (Int -> b -> Builder)
+                    -> Int -> f a b -> Builder
+showbPrecWith2Const = const . const . const . const
+{-# INLINE showbPrecWith2Const #-}
+
+-------------------------------------------------------------------------------
+-- NameBase
+-------------------------------------------------------------------------------
+
+-- | A wrapper around Name which only uses the 'nameBase' (not the entire Name)
+-- to compare for equality. For example, if you had two Names a_123 and a_456,
+-- they are not equal as Names, but they are equal as NameBases.
+--
+-- This is useful when inspecting type variables, since a type variable in an
+-- instance context may have a distinct Name from a type variable within an
+-- actual constructor declaration, but we'd want to treat them as the same
+-- if they have the same 'nameBase' (since that's what the programmer uses to
+-- begin with).
+newtype NameBase = NameBase { getName :: Name }
+
+getNameBase :: NameBase -> String
+getNameBase = nameBase . getName
+
+instance Eq NameBase where
+    (==) = (==) `on` getNameBase
+
+instance Ord NameBase where
+    compare = compare `on` getNameBase
+
+instance S.Show NameBase where
+    showsPrec p = showsPrec p . getNameBase
+
+-- | A NameBase paired with the name of its show function. For example, in a
+-- Show2 declaration, a list of TyVarInfos might look like [(a, 'sp1), (b, 'sp2)].
+type TyVarInfo = (NameBase, Name)
+
+-------------------------------------------------------------------------------
+-- Assorted utilities
+-------------------------------------------------------------------------------
+
+-- TODO: Finish me
+-- newNameList :: [a] -> Q [Name]
+-- newNameList = mapM newName ["sp" ++ S.show n | (_, n) <- zip nbs [(1 :: Int) ..]]
+
+-- | Remove any occurrences of a forall-ed type variable from a list of @TyVarInfo@s.
+removeForalled :: [TyVarBndr] -> [TyVarInfo] -> [TyVarInfo]
+removeForalled tvbs = filter (not . foralled tvbs)
+  where
+    foralled :: [TyVarBndr] -> TyVarInfo -> Bool
+    foralled tvbs' tvi = fst tvi `elem` map (NameBase . tvbName) tvbs'
+
+-- | Checks if a 'Name' represents a tuple type constructor (other than '()')
+isNonUnitTuple :: Name -> Bool
+isNonUnitTuple = isTupleString . nameBase
+
+-- | Parenthesize an infix constructor name if it is being applied as a prefix
+-- function (e.g., data Amp a = (:&) a a)
+parenInfixConName :: Name -> ShowS
+parenInfixConName conName =
+    let conNameBase = nameBase conName
+     in showParen (isInfixTypeCon conNameBase) $ showString conNameBase
+
+-- | Extracts the name from a TyVarBndr.
+tvbName :: TyVarBndr -> Name
+tvbName (PlainTV  name)   = name
+tvbName (KindedTV name _) = name
+
+-- | Extracts the kind from a TyVarBndr.
+tvbKind :: TyVarBndr -> Kind
+tvbKind (PlainTV  _)   = starK
+tvbKind (KindedTV _ k) = k
+
+-- | Replace the Name of a TyVarBndr with one from a Type (if the Type has a Name).
+replaceTyVarName :: TyVarBndr -> Type -> TyVarBndr
+replaceTyVarName tvb            (SigT t _) = replaceTyVarName tvb t
+replaceTyVarName (PlainTV  _)   (VarT n)   = PlainTV  n
+replaceTyVarName (KindedTV _ k) (VarT n)   = KindedTV n k
+replaceTyVarName tvb            _          = tvb
+
+-- | Applies a typeclass constraint to a type.
+applyClass :: Name -> Name -> Pred
+#if MIN_VERSION_template_haskell(2,10,0)
+applyClass con t = AppT (ConT con) (VarT t)
+#else
+applyClass con t = ClassP con [VarT t]
+#endif
+
+-- | Checks to see if the last types in a data family instance can be safely eta-
+-- reduced (i.e., dropped), given the other types. This checks for three conditions:
+--
+-- (1) All of the dropped types are type variables
+-- (2) All of the dropped types are distinct
+-- (3) None of the remaining types mention any of the dropped types
+canEtaReduce :: [Type] -> [Type] -> Bool
+canEtaReduce remaining dropped =
+       all isTyVar dropped
+    && allDistinct nbs -- Make sure not to pass something of type [Type], since Type
+                       -- didn't have an Ord instance until template-haskell-2.10.0.0
+    && not (any (`mentionsNameBase` nbs) remaining)
+  where
+    nbs :: [NameBase]
+    nbs = map varTToNameBase dropped
+
+-- | Extract the Name from a type variable.
+varTToName :: Type -> Name
+varTToName (VarT n)   = n
+varTToName (SigT t _) = varTToName t
+varTToName _          = error "Not a type variable!"
+
+-- | Extract the NameBase from a type variable.
+varTToNameBase :: Type -> NameBase
+varTToNameBase = NameBase . varTToName
+
+-- | Peel off a kind signature from a Type (if it has one).
+unSigT :: Type -> Type
+unSigT (SigT t _) = t
+unSigT t          = t
+
+-- | Is the given type a variable?
+isTyVar :: Type -> Bool
+isTyVar (VarT _)   = True
+isTyVar (SigT t _) = isTyVar t
+isTyVar _          = False
+
+-- | Is the given type a type family constructor (and not a data family constructor)?
+isTyFamily :: Type -> Q Bool
+isTyFamily (ConT n) = do
+    info <- reify n
+    return $ case info of
+#if MIN_VERSION_template_haskell(2,7,0)
+         FamilyI (FamilyD TypeFam _ _ _) _ -> True
+#else
+         TyConI  (FamilyD TypeFam _ _ _)   -> True
+#endif
+         _ -> False
+isTyFamily _ = return False
+
+-- | Are all of the items in a list (which have an ordering) distinct?
+--
+-- This uses Set (as opposed to nub) for better asymptotic time complexity.
+allDistinct :: Ord a => [a] -> Bool
+allDistinct = allDistinct' Set.empty
+  where
+    allDistinct' :: Ord a => Set a -> [a] -> Bool
+    allDistinct' uniqs (x:xs)
+        | x `Set.member` uniqs = False
+        | otherwise            = allDistinct' (Set.insert x uniqs) xs
+    allDistinct' _ _           = True
+
+-- | Does the given type mention any of the NameBases in the list?
+mentionsNameBase :: Type -> [NameBase] -> Bool
+mentionsNameBase = go Set.empty
+  where
+    go :: Set NameBase -> Type -> [NameBase] -> Bool
+    go foralls (ForallT tvbs _ t) nbs =
+        go (foralls `Set.union` Set.fromList (map (NameBase . tvbName) tvbs)) t nbs
+    go foralls (AppT t1 t2) nbs = go foralls t1 nbs || go foralls t2 nbs
+    go foralls (SigT t _)   nbs = go foralls t nbs
+    go foralls (VarT n)     nbs = varNb `elem` nbs && not (varNb `Set.member` foralls)
+      where
+        varNb = NameBase n
+    go _       _            _   = False
+
+-- | Does an instance predicate mention any of the NameBases in the list?
+predMentionsNameBase :: Pred -> [NameBase] -> Bool
+#if MIN_VERSION_template_haskell(2,10,0)
+predMentionsNameBase = mentionsNameBase
+#else
+predMentionsNameBase (ClassP _ tys) nbs = any (`mentionsNameBase` nbs) tys
+predMentionsNameBase (EqualP t1 t2) nbs = mentionsNameBase t1 nbs || mentionsNameBase t2 nbs
+#endif
+
+-- | The number of arrows that compose the spine of a kind signature
+-- (e.g., (* -> *) -> k -> * has two arrows on its spine).
+numKindArrows :: Kind -> Int
+numKindArrows k = length (uncurryKind k) - 1
+
+-- | Construct a type via curried application.
+applyTy :: Type -> [Type] -> Type
+applyTy = foldl' AppT
+
+-- | Fully applies a type constructor to its type variables.
+applyTyCon :: Name -> [Type] -> Type
+applyTyCon = applyTy . ConT
+
+-- | Split an applied type into its individual components. For example, this:
+--
+-- @
+-- Either Int Char
+-- @
+--
+-- would split to this:
+--
+-- @
+-- [Either, Int, Char]
+-- @
+unapplyTy :: Type -> NonEmpty Type
+unapplyTy = NE.reverse . go
+  where
+    go :: Type -> NonEmpty Type
+    go (AppT t1 t2) = t2 <| go t1
+    go (SigT t _)   = go t
+    go t            = t :| []
+
+-- | Split a type signature by the arrows on its spine. For example, this:
+--
+-- @
+-- (Int -> String) -> Char -> ()
+-- @
+--
+-- would split to this:
+--
+-- @
+-- [Int -> String, Char, ()]
+-- @
+uncurryTy :: Type -> NonEmpty Type
+uncurryTy (AppT (AppT ArrowT t1) t2) = t1 <| uncurryTy t2
+uncurryTy (SigT t _)                 = uncurryTy t
+uncurryTy t                          = t :| []
+
+-- | Like uncurryType, except on a kind level.
+uncurryKind :: Kind -> NonEmpty Kind
+#if MIN_VERSION_template_haskell(2,8,0)
+uncurryKind = uncurryTy
+#else
+uncurryKind (ArrowK k1 k2) = k1 <| uncurryKind k2
+uncurryKind k              = k :| []
+#endif
+
+wellKinded :: [Kind] -> Bool
+wellKinded = all canRealizeKindStar
+
+-- | Of form k1 -> k2 -> ... -> kn, where k is either a single kind variable or *.
+canRealizeKindStarChain :: Kind -> Bool
+canRealizeKindStarChain = all canRealizeKindStar . uncurryKind
+
+canRealizeKindStar :: Kind -> Bool
+canRealizeKindStar k = case uncurryKind k of
+    k' :| [] -> case k' of
+#if MIN_VERSION_template_haskell(2,8,0)
+                     StarT    -> True
+                     (VarT _) -> True -- Kind k can be instantiated with *
+#else
+                     StarK    -> True
+#endif
+                     _ -> False
+    _ -> False
+
+createKindChain :: Int -> Kind
+createKindChain = go starK
+  where
+    go :: Kind -> Int -> Kind
+    go k !0 = k
+#if MIN_VERSION_template_haskell(2,8,0)
+    go k !n = go (AppT (AppT ArrowT StarT) k) (n - 1)
+#else
+    go k !n = go (ArrowK StarK k) (n - 1)
+#endif
+
+# if MIN_VERSION_template_haskell(2,8,0) && __GLASGOW_HASKELL__ < 710
+distinctKindVars :: Kind -> Set Name
+distinctKindVars (AppT k1 k2) = distinctKindVars k1 `Set.union` distinctKindVars k2
+distinctKindVars (SigT k _)   = distinctKindVars k
+distinctKindVars (VarT k)     = Set.singleton k
+distinctKindVars _            = Set.empty
+#endif
+
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+tvbToType :: TyVarBndr -> Type
+tvbToType (PlainTV n)    = VarT n
+tvbToType (KindedTV n k) = SigT (VarT n) k
+#endif
+
+#if MIN_VERSION_template_haskell(2,7,0)
+-- | Extracts the name of a constructor.
+constructorName :: Con -> Name
+constructorName (NormalC name      _  ) = name
+constructorName (RecC    name      _  ) = name
+constructorName (InfixC  _    name _  ) = name
+constructorName (ForallC _    _    con) = constructorName con
+#endif

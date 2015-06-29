@@ -62,10 +62,6 @@ source-repository head
 
 library
   exposed-modules:     Text.Show.Text
-                       Text.Show.Text.Debug.Trace
-                       Text.Show.Text.Debug.Trace.TH
-                       Text.Show.Text.TH
-
                        Text.Show.Text.Control.Applicative
                        Text.Show.Text.Control.Concurrent
                        Text.Show.Text.Control.Exception
@@ -81,6 +77,10 @@ library
                        Text.Show.Text.Data.Fixed
                        Text.Show.Text.Data.Floating
                        Text.Show.Text.Data.Functor.Identity
+                       Text.Show.Text.Debug.Trace
+                       Text.Show.Text.Debug.Trace.Generic
+                       Text.Show.Text.Debug.Trace.TH
+                       Text.Show.Text.Generic
                        Text.Show.Text.Data.Integral
                        Text.Show.Text.Data.List
                        Text.Show.Text.Data.Maybe
@@ -96,11 +96,13 @@ library
                        Text.Show.Text.Foreign.C.Types
                        Text.Show.Text.Foreign.Ptr
                        Text.Show.Text.Functions
+                       Text.Show.Text.GHC.Generics
                        Text.Show.Text.Numeric.Natural
                        Text.Show.Text.System.Exit
                        Text.Show.Text.System.IO
                        Text.Show.Text.System.Posix.Types
                        Text.Show.Text.Text.Read
+                       Text.Show.Text.TH
 
                        -- Only exports functions if using Windows
                        Text.Show.Text.GHC.Conc.Windows
@@ -109,11 +111,6 @@ library
                        Text.Show.Text.GHC.Fingerprint
                        -- Only exports functions if base >= 4.4 and not using Windows
                        Text.Show.Text.GHC.Event
-
-                       -- Only exports functions if GHC >= 7.2
-                       Text.Show.Text.Debug.Trace.Generic
-                       Text.Show.Text.Generic
-                       Text.Show.Text.GHC.Generics
 
                        -- Only exports functions if base >= 4.5
                        Text.Show.Text.GHC.Stats
@@ -141,6 +138,7 @@ library
                      , bytestring         >= 0.9     && < 0.11
                      , bytestring-builder
                      , containers         >= 0.1     && < 0.6
+                     , generic-deriving   >= 1.4     && < 2
                      , ghc-prim
                      , integer-gmp
                      , nats               >= 0.1     && < 2
@@ -172,10 +170,6 @@ test-suite text-show-spec
                        Derived.Records
                        Derived.TypeSynonyms
 
-                       Instances.Derived
-                       Instances.FromStringTextShow
-                       Instances.Utils
-
                        Instances.Control.Applicative
                        Instances.Control.Concurrent
                        Instances.Control.Exception
@@ -193,13 +187,18 @@ test-suite text-show-spec
                        Instances.Data.Tuple
                        Instances.Data.Typeable
                        Instances.Data.Version
+                       Instances.Derived
                        Instances.Foreign.C.Types
                        Instances.Foreign.Ptr
+                       Instances.FromStringTextShow
+                       Instances.Generic
+                       Instances.GHC.Generics
                        Instances.Numeric.Natural
                        Instances.System.Exit
                        Instances.System.IO
                        Instances.System.Posix.Types
                        Instances.Text.Read
+                       Instances.Utils
 
                        -- Only exports instances if using Windows
                        Instances.GHC.Conc.Windows
@@ -208,10 +207,6 @@ test-suite text-show-spec
                        Instances.GHC.Fingerprint
                        -- Only exports instances if base >= 4.4 and not using Windows
                        Instances.GHC.Event
-
-                       -- Only exports instances if GHC >= 7.2
-                       Instances.Generic
-                       Instances.GHC.Generics
 
                        -- Only exports instances if base >= 4.5
                        Instances.GHC.Stats
@@ -268,6 +263,8 @@ test-suite text-show-spec
                        Spec.Foreign.PtrSpec
                        Spec.FromStringTextShowSpec
                        Spec.FunctionsSpec
+                       Spec.GenericSpec
+                       Spec.GHC.GenericsSpec
                        Spec.Numeric.NaturalSpec
                        Spec.System.ExitSpec
                        Spec.System.IOSpec
@@ -282,10 +279,6 @@ test-suite text-show-spec
                        Spec.GHC.FingerprintSpec
                        -- Only exports tests if base >= 4.4 and not using Windows
                        Spec.GHC.EventSpec
-
-                       -- Only exports tests if GHC >= 7.2
-                       Spec.GenericSpec
-                       Spec.GHC.GenericsSpec
 
                        -- Only exports tests if base >= 4.5
                        Spec.GHC.StatsSpec
@@ -310,9 +303,10 @@ test-suite text-show-spec
   build-depends:       array                >= 0.3    && < 0.6
                      , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.2  && < 1
-                     , base-orphans         >= 0.3    && < 1
+                     , base-orphans         >= 0.4    && < 1
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
+                     , generic-deriving     >= 1.8.0  && < 2
                      , ghc-prim
                      , hspec                >= 2      && < 3
                      , nats                 >= 0.1    && < 2

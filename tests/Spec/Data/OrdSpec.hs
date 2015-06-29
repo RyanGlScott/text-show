@@ -15,7 +15,8 @@ module Spec.Data.OrdSpec (main, spec) where
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down)
 #endif
-import Data.Orphans ()
+
+import Generics.Deriving.Instances ()
 
 import Instances.Data.Ord ()
 
