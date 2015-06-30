@@ -34,22 +34,24 @@ module Derived.PolyKinds (
 #include "generic.h"
 
 #if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import GHC.Generics (Generic1)
+import           GHC.Generics (Generic1)
 # endif
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
-import GHC.Show (appPrec, appPrec1, showSpace)
+import           GHC.Show (appPrec, appPrec1, showSpace)
 
-import Prelude hiding (Show)
+import           Prelude hiding (Show)
 
-import Test.QuickCheck (Arbitrary)
+import           Test.QuickCheck (Arbitrary)
 
-import Text.Show as S (Show)
-import Text.Show.Text as T (Show(..), Show1(..))
-import Text.Show.Text.TH (deriveShow2, mkShowbPrec, mkShowbPrecWith)
+import           Text.Show as S (Show)
+import           Text.Show.Text as T (Show(..), Show1(..))
+import           Text.Show.Text.TH (deriveShow2, mkShowbPrec, mkShowbPrecWith)
 
-import TransformersCompat as S (Show1(..), Show2(..))
+import           TransformersCompat as S (Show1(..), Show2(..))
 
 -------------------------------------------------------------------------------
 
@@ -236,4 +238,9 @@ instance T.Show (TyFamilyProxy a b) where
 instance T.Show1 (TyFamilyProxy a) where
     showbPrecWith = $(mkShowbPrecWith 'TyFamilyProxy)
 $(deriveShow2 'TyFamilyProxy)
+#endif
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveAll ''TyConCompose)
+$(Generics.deriveAll ''TyConProxy)
 #endif

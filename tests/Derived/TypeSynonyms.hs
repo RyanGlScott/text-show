@@ -24,20 +24,22 @@ module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 #include "generic.h"
 
 #if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import GHC.Generics (Generic1)
+import           GHC.Generics (Generic1)
 # endif
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
 
-import Prelude hiding (Show(..))
+import           Prelude hiding (Show(..))
 
-import Test.QuickCheck (Arbitrary)
+import           Test.QuickCheck (Arbitrary)
 
-import Text.Show as S (Show(..))
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import           Text.Show as S (Show(..))
+import           Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
 
-import TransformersCompat as S (Show1(..), Show2(..), showsUnaryWith)
+import           TransformersCompat as S (Show1(..), Show2(..), showsUnaryWith)
 
 -------------------------------------------------------------------------------
 
@@ -128,4 +130,8 @@ $(deriveShow2 ''TyCon)
 $(deriveShow  'TyFamily)
 $(deriveShow1 'TyFamily)
 $(deriveShow2 'TyFamily)
+#endif
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveAll ''TyCon)
 #endif

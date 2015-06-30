@@ -14,10 +14,8 @@ module Spec.Derived.InfixSpec (main, spec) where
 
 import Derived.Infix
 
-import Spec.Utils (prop_matchesShow, prop_genericShow, prop_genericShow1)
-#if MIN_VERSION_template_haskell(2,7,0)
-import Spec.Utils (prop_genericShow')
-#endif
+import Spec.Utils (prop_matchesShow, prop_genericShow,
+                   prop_genericShow', prop_genericShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -33,7 +31,7 @@ spec = parallel $ do
         prop "generic Show1" (prop_genericShow1 :: Int -> TyConPlain Int Int -> Bool)
     describe "TyConGADT Int Int" $ do
         prop "Show instance" (prop_matchesShow  :: Int -> TyConGADT Int Int -> Bool)
-        prop "generic Show"  (prop_genericShow  :: Int -> TyConGADT Int Int -> Bool)
+        prop "generic Show"  (prop_genericShow' :: Int -> TyConGADT Int Int -> Bool)
         prop "generic Show1" (prop_genericShow1 :: Int -> TyConGADT Int Int -> Bool)
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyPlain Int Int" $ do

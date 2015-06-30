@@ -70,7 +70,7 @@ data TyConGADT a b where
     (:...)  ::           g ->       h -> Int -> TyConGADT g h
     (:....) :: { tcg1 :: i, tcg2 :: j }      -> TyConGADT i j
   deriving ( S.Show
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
