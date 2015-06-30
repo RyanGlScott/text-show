@@ -1,7 +1,5 @@
 {-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 
@@ -47,7 +45,10 @@ type FakeOut a = Int
 type Id a = a
 type Flip f a b = f b a
 
-deriving instance Functor ((,,,) a b c) -- Needed for the Generic1 instances
+-- Needed for the Generic1 instances
+instance Functor ((,,,) a b c) where
+    fmap f (a, b, c, d) = (a, b, c, f d)
+
 instance (S.Show a, S.Show b) => S.Show2 ((,,,) a b) where
     showsPrecWith2 sp1 sp2 _ (a, b, c, d) =
                           showChar '('

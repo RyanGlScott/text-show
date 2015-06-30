@@ -7,6 +7,9 @@
 
 #if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric              #-}
+#else
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 708
@@ -41,6 +44,8 @@ import           GHC.Generics (Generic)
 # if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
 # endif
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
 import           GHC.Show (appPrec, appPrec1)
 
@@ -364,3 +369,10 @@ instance Show a => Show (FromTextShow a) where
 instance Show1 FromTextShow where
     showbPrecWith sp p (FromTextShow x) = sp p x
     INLINE_INST_FUN(showbPrecWith)
+
+-------------------------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveAll ''FromStringShow)
+$(Generics.deriveAll ''FromTextShow)
+#endif

@@ -1,21 +1,25 @@
-{-# LANGUAGE CPP                 #-}
-{-# LANGUAGE DeriveDataTypeable  #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE CPP                  #-}
+{-# LANGUAGE DeriveDataTypeable   #-}
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE TypeOperators        #-}
 
 #if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE DeriveGeneric        #-}
+#else
+{-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE PolyKinds           #-}
+{-# LANGUAGE PolyKinds            #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE StandaloneDeriving  #-}
+{-# LANGUAGE StandaloneDeriving   #-}
 #endif
 {-|
 Module:      Text.Show.Text.Generic
@@ -71,6 +75,9 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Typeable (Typeable)
 
 import           Generics.Deriving.Base
+#if __GLASGOW_HASKELL__ < 702
+import qualified Generics.Deriving.TH as Generics (deriveAll)
+#endif
 import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude ()
@@ -431,3 +438,9 @@ gShowbProduct gsa gsb t@Pref n (a :*: b) =
        gsa t n a
     <> showbSpace
     <> gsb t n b
+
+-------------------------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveAll ''ConType)
+#endif

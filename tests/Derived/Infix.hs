@@ -221,6 +221,7 @@ $(deriveShow  ''TyConGADT)
 $(deriveShow1 ''TyConGADT)
 $(deriveShow2 ''TyConGADT)
 
+#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveShow  '(:#:))
 $(deriveShow1 '(:$:))
 $(deriveShow2 'TyFamilyPlain)
@@ -228,3 +229,4 @@ $(deriveShow2 'TyFamilyPlain)
 $(deriveShow  '(:*))
 $(deriveShow1 '(:***))
 $(deriveShow2 '(:****))
+#endif
