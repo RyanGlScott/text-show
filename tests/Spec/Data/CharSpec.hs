@@ -3,7 +3,7 @@ Module:      Spec.Data.CharSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for data types in the "Data.Char" module.
@@ -29,7 +29,10 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Char" $ do
-    prop "Char instance"            (prop_matchesShow :: Int -> Char -> Bool)
-    prop "GeneralCategory instance" (prop_matchesShow :: Int -> GeneralCategory -> Bool)
-    it   "asciiTab = asciiTabB"   $ map fromString asciiTab `shouldBe` elems asciiTabB
+spec = parallel $ do
+    describe "Char" $
+        prop "Show instance"   (prop_matchesShow :: Int -> Char -> Bool)
+    describe "GeneralCategory" $
+        prop "Show instance"   (prop_matchesShow :: Int -> GeneralCategory -> Bool)
+    describe "asciiTabB" $
+        it "equals asciiTab" $ map fromString asciiTab `shouldBe` elems asciiTabB

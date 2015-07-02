@@ -3,7 +3,7 @@ Module:      Spec.Data.ComplexSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for 'Complex'.
@@ -21,5 +21,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Complex" $
-    prop "Complex Double instance" (prop_matchesShow :: Int -> Complex Double -> Bool)
+spec = parallel . describe "Complex Double" $
+    prop "Show instance" (prop_matchesShow :: Int -> Complex Double -> Bool)

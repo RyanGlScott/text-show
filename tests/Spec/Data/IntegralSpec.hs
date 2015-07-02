@@ -5,7 +5,7 @@ Module:      Spec.Data.IntegralSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for integral data types.
@@ -37,21 +37,33 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Integral" $ do
-    prop "Int instance"          (prop_matchesShow :: Int -> Int -> Bool)
-    prop "Int8 instance"         (prop_matchesShow :: Int -> Int8 -> Bool)
-    prop "Int16 instance"        (prop_matchesShow :: Int -> Int16 -> Bool)
-    prop "Int32 instance"        (prop_matchesShow :: Int -> Int32 -> Bool)
-    prop "Int64 instance"        (prop_matchesShow :: Int -> Int64 -> Bool)
-    prop "Integer instance"      (prop_matchesShow :: Int -> Integer -> Bool)
-    prop "Word instance"         (prop_matchesShow :: Int -> Word -> Bool)
-    prop "Word8 instance"        (prop_matchesShow :: Int -> Word8 -> Bool)
-    prop "Word16 instance"       (prop_matchesShow :: Int -> Word16 -> Bool)
-    prop "Word32 instance"       (prop_matchesShow :: Int -> Word32 -> Bool)
-    prop "Word64 instance"       (prop_matchesShow :: Int -> Word64 -> Bool)
+spec = parallel $ do
+    describe "Int" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Int -> Bool)
+    describe "Int8" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Int8 -> Bool)
+    describe "Int16" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Int16 -> Bool)
+    describe "Int32" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Int32 -> Bool)
+    describe "Int64" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Int64 -> Bool)
+    describe "Integer" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Integer -> Bool)
+    describe "Word" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Word -> Bool)
+    describe "Word8" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Word8 -> Bool)
+    describe "Word16" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Word16 -> Bool)
+    describe "Word32" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Word32 -> Bool)
+    describe "Word64" $
+        prop "Show instance"                        (prop_matchesShow :: Int -> Word64 -> Bool)
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why this diverges on Windows
-    prop "showbIntAtBase output" prop_showIntAtBase
+    describe "showbIntAtBase" $
+        prop "has the same output as showIntAtBase" prop_showIntAtBase
 #endif
 
 -- | Verifies 'showIntAtBase' and 'showbIntAtBase' generate the same output.

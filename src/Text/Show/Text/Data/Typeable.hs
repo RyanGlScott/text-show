@@ -6,7 +6,7 @@ Module:      Text.Show.Text.Data.Typeable
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @Typeable@ module.
@@ -16,7 +16,7 @@ Monomorphic 'Show' functions for data types in the @Typeable@ module.
 module Text.Show.Text.Data.Typeable (showbTyCon, showbTypeRepPrec) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (TyCon(..), funTc, listTc)
@@ -32,18 +32,18 @@ import Prelude hiding (Show)
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.List ()
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils (isTupleString, s)
+import Text.Show.Text.Utils (isTupleString)
 
 #include "inline.h"
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p tyrep =
     case tys of
       [] -> showbTyCon tycon
-      [x]   | tycon == listTc -> s '[' <> showb x <> s ']'
+      [x]   | tycon == listTc -> singleton '[' <> showb x <> singleton ']'
       [a,r] | tycon == funTc  -> showbParen (p > 8) $
                                     showbPrec 9 a
                                  <> " -> "
@@ -69,7 +69,6 @@ showbTypeRepPrec p tyrep =
 -- | The list 'TyCon'.
 listTc :: TyCon
 listTc = typeRepTyCon $ typeOf [()]
-{-# INLINE listTc #-}
 
 -- | The function (@->@) 'TyCon'.
 funTc :: TyCon
@@ -82,7 +81,7 @@ isTupleTyCon = isTupleString . tyConString
 {-# INLINE isTupleTyCon #-}
 
 -- | Convert a 'TyCon' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConString

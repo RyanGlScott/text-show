@@ -5,7 +5,7 @@ Module:      Text.Show.Text.Data.List
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Exports 'showbListWith'.
@@ -14,8 +14,7 @@ module Text.Show.Text.Data.List (showbListWith) where
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec, showbList),
-                               Show1(showbPrec1), showbListWith)
+import Text.Show.Text.Classes (Show(showb, showbList), Show1(..), showbListWith)
 import Text.Show.Text.Data.Char ()
 import Text.Show.Text.Data.Integral ()
 
@@ -29,5 +28,5 @@ instance Show a => Show [a] where
     INLINE_INST_FUN(showb)
 
 instance Show1 [] where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith sp _ = showbListWith (sp 0)
+    INLINE_INST_FUN(showbPrecWith)

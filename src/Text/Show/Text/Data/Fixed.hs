@@ -5,7 +5,7 @@ Module:      Text.Show.Text.Data.Fixed
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Fixed' values.
@@ -27,9 +27,10 @@ import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
 import Data.Monoid.Compat ((<>))
 import Data.Semigroup (timesN)
+import Data.Text.Lazy.Builder (singleton)
 
 import Text.Show.Text.Data.Integral ()
-import Text.Show.Text.Utils (lengthB, s)
+import Text.Show.Text.Utils (lengthB)
 #else
 import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)
@@ -39,12 +40,12 @@ import Data.Text.Lazy.Builder (fromString)
 
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
 -- whether to chop off trailing zeroes.
--- 
+--
 -- /Since: 0.3/
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
 #if MIN_VERSION_base(4,7,0)
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0
-    = s '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
+    = singleton '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
 showbFixed chopTrailingZeroes fa@(MkFixed a)
     = showb i <> withDotB (showbIntegerZeroes chopTrailingZeroes digits fracNum)
   where
@@ -68,7 +69,7 @@ showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
 showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder
 showbIntegerZeroes True _ 0 = mempty
 showbIntegerZeroes chopTrailingZeroes digits a
-    = timesN (fromIntegral . max 0 $ digits - lengthB sh) (s '0') <> sh'
+    = timesN (fromIntegral . max 0 $ digits - lengthB sh) (singleton '0') <> sh'
   where
     sh, sh' :: Builder
     sh  = showb a
@@ -83,7 +84,7 @@ chopZeroesB a = showb a
 -- | Prepends a dot to a non-empty 'Builder'.
 withDotB :: Builder -> Builder
 withDotB b | b == mempty = mempty
-           | otherwise   = s '.' <> b
+           | otherwise   = singleton '.' <> b
 {-# INLINE withDotB #-}
 #endif
 

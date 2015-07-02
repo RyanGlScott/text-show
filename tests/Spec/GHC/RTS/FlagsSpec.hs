@@ -5,7 +5,7 @@ Module:      Spec.GHC.RTS.Flags
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for 'ConType'.
@@ -33,18 +33,26 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
-    describe "Text.Show.Text.GHC.RTS.Flags" $ do
-        prop "RTSFlags instance"   prop_showRTSFlags
-        prop "GCFlags instance"    prop_showGCFlags
-        prop "ConcFlags instance"  (prop_matchesShow :: Int -> ConcFlags -> Bool)
-        prop "MiscFlags instance"  (prop_matchesShow :: Int -> MiscFlags -> Bool)
-        prop "DebugFlags instance" (prop_matchesShow :: Int -> DebugFlags -> Bool)
-        prop "CCFlags instance"    prop_showCCFlags
-        prop "ProfFlags instance"  prop_showProfFlags
-        prop "TraceFlags instance" prop_showTraceFlags
-        prop "TickyFlags instance" (prop_matchesShow :: Int -> TickyFlags -> Bool)
+    describe "RTSFlags" $
+        prop "Show instance" prop_showRTSFlags
+    describe "GCFlags" $
+        prop "Show instance" prop_showGCFlags
+    describe "ConcFlags" $
+        prop "Show instance" (prop_matchesShow :: Int -> ConcFlags -> Bool)
+    describe "MiscFlags" $
+        prop "Show instance" (prop_matchesShow :: Int -> MiscFlags -> Bool)
+    describe "DebugFlags" $
+        prop "Show instance" (prop_matchesShow :: Int -> DebugFlags -> Bool)
+    describe "CCFlags" $
+        prop "Show instance" prop_showCCFlags
+    describe "ProfFlags" $
+        prop "Show instance" prop_showProfFlags
+    describe "TraceFlags" $
+        prop "Show instance" prop_showTraceFlags
+    describe "TickyFlags" $
+        prop "Show instance" (prop_matchesShow :: Int -> TickyFlags -> Bool)
 #else
     pure ()
 #endif

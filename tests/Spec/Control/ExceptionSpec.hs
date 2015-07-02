@@ -5,7 +5,7 @@ Module:      Spec.Control.ExceptionSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for data types in the "Control.Exception" module.
@@ -26,27 +26,47 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Text.Show.Text.Control.Exception" $ do
-    prop "SomeException instance"             (prop_matchesShow :: Int -> SomeException -> Bool)
-    prop "IOException instance"               (prop_matchesShow :: Int -> IOException -> Bool)
-    prop "ArithException instance"            (prop_matchesShow :: Int -> ArithException -> Bool)
-    prop "ArrayException instance"            (prop_matchesShow :: Int -> ArrayException -> Bool)
-    prop "AssertionFailed instance"           (prop_matchesShow :: Int -> AssertionFailed -> Bool)
+    describe "SomeException" $
+        prop "Show instance" (prop_matchesShow :: Int -> SomeException -> Bool)
+    describe "IOException" $
+        prop "Show instance" (prop_matchesShow :: Int -> IOException -> Bool)
+    describe "ArithException" $
+        prop "Show instance" (prop_matchesShow :: Int -> ArithException -> Bool)
+    describe "ArrayException" $
+        prop "Show instance" (prop_matchesShow :: Int -> ArrayException -> Bool)
+    describe "AssertionFailed" $
+        prop "Show instance" (prop_matchesShow :: Int -> AssertionFailed -> Bool)
 #if MIN_VERSION_base(4,7,0)
-    prop "SomeAsyncException instance"        (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
+    describe "SomeAsyncException" $
+        prop "Show instance" (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
 #endif
-    prop "AsyncException instance"            (prop_matchesShow :: Int -> AsyncException -> Bool)
-    prop "NonTermination instance"            (prop_matchesShow :: Int -> NonTermination -> Bool)
-    prop "NestedAtomically instance"          (prop_matchesShow :: Int -> NestedAtomically -> Bool)
-    prop "BlockedIndefinitelyOnMVar instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
-    prop "BlockedIndefinitelyOnSTM instance"  (prop_matchesShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
+    describe "AsyncException" $
+        prop "Show instance" (prop_matchesShow :: Int -> AsyncException -> Bool)
+    describe "NonTermination" $
+        prop "Show instance" (prop_matchesShow :: Int -> NonTermination -> Bool)
+    describe "NestedAtomically" $
+        prop "Show instance" (prop_matchesShow :: Int -> NestedAtomically -> Bool)
+    describe "BlockedIndefinitelyOnMVar" $
+        prop "Show instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
+    describe "BlockedIndefinitelyOnSTM" $
+        prop "Show instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
 #if MIN_VERSION_base(4,8,0)
-    prop "AllocationLimitExceeded instance"   (prop_matchesShow :: Int -> AllocationLimitExceeded -> Bool)
+    describe "AllocationLimitExceeded" $
+        prop "Show instance" (prop_matchesShow :: Int -> AllocationLimitExceeded -> Bool)
 #endif
-    prop "Deadlock instance"                  (prop_matchesShow :: Int -> Deadlock -> Bool)
-    prop "NoMethodError instance"             (prop_matchesShow :: Int -> NoMethodError -> Bool)
-    prop "PatternMatchFail instance"          (prop_matchesShow :: Int -> PatternMatchFail -> Bool)
-    prop "RecConError instance"               (prop_matchesShow :: Int -> RecConError -> Bool)
-    prop "RecSelError instance"               (prop_matchesShow :: Int -> RecSelError -> Bool)
-    prop "RecUpdError instance"               (prop_matchesShow :: Int -> RecUpdError -> Bool)
-    prop "ErrorCall instance"                 (prop_matchesShow :: Int -> ErrorCall -> Bool)
-    prop "MaskingState instance"              (prop_matchesShow :: Int -> MaskingState -> Bool)
+    describe "Deadlock" $
+        prop "Show instance" (prop_matchesShow :: Int -> Deadlock -> Bool)
+    describe "NoMethodError" $
+        prop "Show instance" (prop_matchesShow :: Int -> NoMethodError -> Bool)
+    describe "PatternMatchFail" $
+        prop "Show instance" (prop_matchesShow :: Int -> PatternMatchFail -> Bool)
+    describe "RecConError" $
+        prop "Show instance" (prop_matchesShow :: Int -> RecConError -> Bool)
+    describe "RecSelError" $
+        prop "Show instance" (prop_matchesShow :: Int -> RecSelError -> Bool)
+    describe "RecUpdError" $
+        prop "Show instance" (prop_matchesShow :: Int -> RecUpdError -> Bool)
+    describe "ErrorCall" $
+        prop "Show instance" (prop_matchesShow :: Int -> ErrorCall -> Bool)
+    describe "MaskingState" $
+        prop "Show instance" (prop_matchesShow :: Int -> MaskingState -> Bool)

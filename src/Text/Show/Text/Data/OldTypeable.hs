@@ -9,7 +9,7 @@ Module:      Text.Show.Text.Data.OldTypeable
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for data types in the @OldTypeable@ module.
@@ -28,17 +28,17 @@ module Text.Show.Text.Data.OldTypeable (
 import Data.Monoid.Compat ((<>))
 import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
                                   funTc, listTc)
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showb, showbPrec), showbParen, showbSpace)
 import Text.Show.Text.Data.Typeable.Utils (showbArgs, showbTuple)
-import Text.Show.Text.Utils (isTupleString, s)
+import Text.Show.Text.Utils (isTupleString)
 
 -- | Convert a 'TyCon' to a 'Builder'.
 -- This function is only available with @base-4.7@.
--- 
+--
 -- /Since: 0.5/
 showbTyCon :: TyCon -> Builder
 showbTyCon = fromString . tyConName
@@ -46,13 +46,13 @@ showbTyCon = fromString . tyConName
 
 -- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.7@.
--- 
+--
 -- /Since: 0.5/
 showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p (TypeRep _ tycon tys) =
     case tys of
       [] -> showbTyCon tycon
-      [x]   | tycon == listTc -> s '[' <> showb x <> s ']'
+      [x]   | tycon == listTc -> singleton '[' <> showb x <> singleton ']'
       [a,r] | tycon == funTc  -> showbParen (p > 8) $
                                     showbPrec 9 a
                                  <> " -> "

@@ -6,37 +6,38 @@ Module:      Text.Show.Text.Data.Functor.Identity
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Identity' values.
 
 /Since: 0.5/
 -}
-module Text.Show.Text.Data.Functor.Identity (showbIdentityPrec) where
+module Text.Show.Text.Data.Functor.Identity (showbIdentityPrecWith) where
 
 import Data.Functor.Identity (Identity(..))
 import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
+import Text.Show.Text.Classes (Show(showbPrec), Show1(..), showbPrec1, showbUnaryWith)
 
 #include "inline.h"
 
--- | Convert an 'Identity' value to a 'Builder' with the given precedence.
+-- | Convert an 'Identity' value to a 'Builder' with the given show function
+-- and precedence.
 -- 
--- /Since: 0.5/
-showbIdentityPrec :: Show a => Int -> Identity a -> Builder
+-- /Since: 1/
+showbIdentityPrecWith :: (Int -> a -> Builder) -> Int -> Identity a -> Builder
 -- This would be equivalent to the derived instance of 'Identity' if the
 -- 'runIdentity' field were removed.
-showbIdentityPrec p (Identity x) = showbUnary "Identity" p x
-{-# INLINE showbIdentityPrec #-}
+showbIdentityPrecWith sp p (Identity x) = showbUnaryWith sp "Identity" p x
+{-# INLINE showbIdentityPrecWith #-}
 
 instance Show a => Show (Identity a) where
-    showbPrec = showbIdentityPrec
+    showbPrec = showbPrec1
     {-# INLINE showbPrec #-}
 
 instance Show1 Identity where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith = showbIdentityPrecWith
+    INLINE_INST_FUN(showbPrecWith)

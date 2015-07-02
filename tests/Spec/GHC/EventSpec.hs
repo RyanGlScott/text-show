@@ -5,7 +5,7 @@ Module:      Spec.GHC.EventSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for data types in the "GHC.Event" module.
@@ -33,11 +33,12 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
-    describe "Text.Show.Text.GHC.Event" $ do
-        prop "Event instance" (prop_matchesShow :: Int -> Event -> Bool)
---         prop "FdKey instance" (prop_matchesShow :: Int -> FdKey -> Bool)
+    describe "Event" $
+        prop "Show instance" (prop_matchesShow :: Int -> Event -> Bool)
+--     describe "FdKey" $
+--         prop "Show instance" (prop_matchesShow :: Int -> FdKey -> Bool)
 #else
     pure ()
 #endif

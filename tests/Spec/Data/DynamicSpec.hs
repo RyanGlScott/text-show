@@ -3,7 +3,7 @@ Module:      Spec.Data.DynamicSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for 'Dynamic'.
@@ -23,5 +23,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Dynamic" $
-    prop "Dynamic instance" (prop_matchesShow :: Int -> Dynamic -> Bool)
+spec = parallel . describe "Dynamic" $
+    prop "Show instance" (prop_matchesShow :: Int -> Dynamic -> Bool)

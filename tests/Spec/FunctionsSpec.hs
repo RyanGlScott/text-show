@@ -3,7 +3,7 @@ Module:      Spec.FunctionsSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for the orphan 'Show' instance for functions.
@@ -22,5 +22,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Functions" $
-    prop "Int -> Int instance" (prop_matchesShow :: Int -> (Int -> Int) -> Bool)
+spec = parallel . describe "Int -> Int" $
+    prop "Show instance" (prop_matchesShow :: Int -> (Int -> Int) -> Bool)

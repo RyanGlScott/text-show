@@ -6,7 +6,7 @@ Module:      Text.Show.Text.Data.Ratio
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Ratio' values.
@@ -23,6 +23,9 @@ import GHC.Real (Ratio(..), ratioPrec, ratioPrec1)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showbPrec), showbParen)
+#if MIN_VERSION_base(4,4,0)
+import Text.Show.Text.Classes (Show1(..))
+#endif
 import Text.Show.Text.Data.Integral ()
 
 #include "inline.h"
@@ -56,3 +59,12 @@ instance
     {-# SPECIALIZE instance Show Rational #-}
     showbPrec = showbRatioPrec
     INLINE_INST_FUN(showbPrec)
+
+#if MIN_VERSION_base(4,4,0)
+instance Show1 Ratio where
+    showbPrecWith sp p (numer :% denom) = showbParen (p > ratioPrec) $
+           sp ratioPrec1 numer
+        <> " % "
+        <> sp ratioPrec1 denom
+    INLINE_INST_FUN(showbPrecWith)
+#endif

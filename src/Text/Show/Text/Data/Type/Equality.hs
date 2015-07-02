@@ -11,7 +11,7 @@ Module:      Text.Show.Text.Data.Type.Equality
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for propositional equality.
@@ -31,23 +31,24 @@ import Data.Type.Equality ((:~:)(..))
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
-import Text.Show.Text.TH.Internal (mkShowbPrec)
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(..), Show2(..))
+import Text.Show.Text.TH.Internal (deriveShow2)
 
 -- | Convert a propositional equality value to a 'Builder'.
 -- This function is only available with @base-4.7.0.0@ or later.
--- 
+--
 -- /Since: 0.3/
 showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality = showb
 {-# INLINE showbPropEquality #-}
 
--- TODO: Derive with TH once it can detect phantom types properly
 instance Show (a :~: b) where
-    showbPrec = $(mkShowbPrec ''(:~:))
-    {-# INLINE showb #-}
+    showbPrec = showbPrecWith undefined
+    {-# INLINE showbPrec #-}
 
 instance Show1 ((:~:) a) where
-    showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+    showbPrecWith = showbPrecWith2 undefined
+    {-# INLINE showbPrecWith #-}
+
+$(deriveShow2 ''(:~:))
 #endif

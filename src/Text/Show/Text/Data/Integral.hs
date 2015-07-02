@@ -7,7 +7,7 @@ Module:      Text.Show.Text.Data.Integral
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for integral types.
@@ -36,7 +36,7 @@ module Text.Show.Text.Data.Integral (
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
 import           Data.Monoid.Compat ((<>))
-import           Data.Text.Lazy.Builder (Builder)
+import           Data.Text.Lazy.Builder (Builder, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Word (Word8, Word16, Word32, Word64)
 
@@ -51,16 +51,16 @@ import           Prelude ()
 import           Prelude.Compat hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec))
-import           Text.Show.Text.Utils (s, toString)
+import           Text.Show.Text.Utils (toString)
 
 #include "inline.h"
 
 -- | Convert an 'Int' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbIntPrec :: Int -> Int -> Builder
 showbIntPrec (I# p) n'@(I# n)
-    | isTrue (n <# 0#) && isTrue (p ># 6#) = s '(' <> decimal n' <> s ')'
+    | isTrue (n <# 0#) && isTrue (p ># 6#) = singleton '(' <> decimal n' <> singleton ')'
     | otherwise = decimal n'
   where
 #if __GLASGOW_HASKELL__ >= 708
@@ -72,28 +72,28 @@ showbIntPrec (I# p) n'@(I# n)
 #endif
 
 -- | Convert an 'Int8' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbInt8Prec :: Int -> Int8 -> Builder
 showbInt8Prec p = showbIntPrec p . fromIntegral
 {-# INLINE showbInt8Prec #-}
 
 -- | Convert an 'Int16' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbInt16Prec :: Int -> Int16 -> Builder
 showbInt16Prec p = showbIntPrec p . fromIntegral
 {-# INLINE showbInt16Prec #-}
 
 -- | Convert an 'Int32' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbInt32Prec :: Int -> Int32 -> Builder
 showbInt32Prec p = showbIntPrec p . fromIntegral
 {-# INLINE showbInt32Prec #-}
 
 -- | Convert an 'Int64' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbInt64Prec :: Int -> Int64 -> Builder
 #if WORD_SIZE_IN_BITS < 64
@@ -104,16 +104,16 @@ showbInt64Prec p = showbIntPrec p . fromIntegral
 {-# INLINE showbInt64Prec #-}
 
 -- | Convert an 'Integer' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbIntegerPrec :: Int -> Integer -> Builder
 showbIntegerPrec p n
-    | p > 6 && n < 0 = s '(' <> decimal n <> s ')'
+    | p > 6 && n < 0 = singleton '(' <> decimal n <> singleton ')'
     | otherwise      = decimal n
 {-# INLINE showbIntegerPrec #-}
 
 -- | Convert an 'Integral' type to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbIntegralPrec :: Integral a => Int -> a -> Builder
 showbIntegralPrec p = showbIntegerPrec p . toInteger
@@ -121,7 +121,7 @@ showbIntegralPrec p = showbIntegerPrec p . toInteger
 
 -- | Shows a /non-negative/ 'Integral' number using the base specified by the
 -- first argument, and the character representation specified by the second.
--- 
+--
 -- /Since: 0.3/
 showbIntAtBase :: (Integral a, Show a) => a -> (Int -> Char) -> a -> Builder
 showbIntAtBase base toChr n0
@@ -136,61 +136,61 @@ showbIntAtBase base toChr n0
       where
         c :: Char
         c = toChr $ fromIntegral d
-        
+
         b' :: Builder
-        b' = s c <> b
+        b' = singleton c <> b
 
 -- | Show /non-negative/ 'Integral' numbers in base 2.
--- 
+--
 -- /Since: 0.3/
 showbBin :: (Integral a, Show a) => a -> Builder
 showbBin = showbIntAtBase 2 intToDigit
 {-# INLINE showbBin #-}
 
 -- | Show /non-negative/ 'Integral' numbers in base 16.
--- 
+--
 -- /Since: 0.3/
 showbHex :: (Integral a, Show a) => a -> Builder
 showbHex = showbIntAtBase 16 intToDigit
 {-# INLINE showbHex #-}
 
 -- | Show /non-negative/ 'Integral' numbers in base 8.
--- 
+--
 -- /Since: 0.3/
 showbOct :: (Integral a, Show a) => a -> Builder
 showbOct = showbIntAtBase 8 intToDigit
 {-# INLINE showbOct #-}
 
 -- | Convert a 'Word' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbWord :: Word -> Builder
 showbWord = decimal
 {-# INLINE showbWord #-}
 
 -- | Convert a 'Word8' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbWord8 :: Word8 -> Builder
 showbWord8 = decimal
 {-# INLINE showbWord8 #-}
 
 -- | Convert a 'Word16' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbWord16 :: Word16 -> Builder
 showbWord16 = decimal
 {-# INLINE showbWord16 #-}
 
 -- | Convert a 'Word32' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbWord32 :: Word32 -> Builder
 showbWord32 = decimal
 {-# INLINE showbWord32 #-}
 
 -- | Convert a 'Word64' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbWord64 :: Word64 -> Builder
 showbWord64 = decimal

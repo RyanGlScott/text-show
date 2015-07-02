@@ -3,7 +3,7 @@ Module:      Text.Show.Text
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Efficiently convert from values to 'Text' via 'Builder's.
@@ -11,7 +11,8 @@ Efficiently convert from values to 'Text' via 'Builder's.
 /Since: 0.1/
 -}
 module Text.Show.Text (
-      -- * The 'Show' class
+      -- * The @Show@-related classes
+      -- ** 'Show'
       Show(..)
     , show
     , showLazy
@@ -21,10 +22,14 @@ module Text.Show.Text (
     , showListLazy
     , showbParen
     , showbSpace
-    , showbUnary
+      -- ** 'Show1'
     , Show1(..)
-    , showbUnary1
-    , showbBinary1
+    , showbPrec1
+    , showbUnaryWith
+      -- ** 'Show2'
+    , Show2(..)
+    , showbPrec2
+    , showbBinaryWith
       -- * 'Builder's
     , module Data.Text.Lazy.Builder
     , toString

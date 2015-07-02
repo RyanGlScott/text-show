@@ -5,7 +5,7 @@ Module:      Spec.GHC.StaticPtrSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for 'StaticPtr'.
@@ -34,8 +34,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,8,0)
-    describe "Text.Show.Text.GHC.StaticPtr" $
-        prop "StaticPtrInfo instance" (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
+    describe "StaticPtrInfo" $
+        prop "Show instance" (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
 #else
     pure ()
 #endif

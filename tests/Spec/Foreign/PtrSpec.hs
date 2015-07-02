@@ -3,7 +3,7 @@ Module:      Spec.Foreign.PtrSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for pointer data types.
@@ -28,12 +28,17 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Foreign.Ptr" $ do
-    prop "Ptr Int instance"     (prop_matchesShow :: Int -> Ptr Int -> Bool)
-    prop "FunPtr Int instance"  (prop_matchesShow :: Int -> FunPtr Int -> Bool)
-    prop "IntPtr instance"      (prop_matchesShow :: Int -> IntPtr -> Bool)
-    prop "WordPtr instance"     (prop_matchesShow :: Int -> WordPtr -> Bool)
-    prop "ForeignPtr instance"  prop_showForeignPtr
+spec = parallel $ do
+    describe "Ptr Int" $
+        prop "Show instance"     (prop_matchesShow :: Int -> Ptr Int -> Bool)
+    describe "FunPtr Int" $
+        prop "Show instance"  (prop_matchesShow :: Int -> FunPtr Int -> Bool)
+    describe "IntPtr" $
+        prop "Show instance"      (prop_matchesShow :: Int -> IntPtr -> Bool)
+    describe "WordPtr" $
+        prop "Show instance"     (prop_matchesShow :: Int -> WordPtr -> Bool)
+    describe "ForeignPtr" $
+        prop "Show instance"  prop_showForeignPtr
 
 -- | Verifies the 'Show' instance for 'ForeignPtr' is accurate.
 prop_showForeignPtr :: Int -> Ptr Int -> Property

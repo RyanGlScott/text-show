@@ -5,7 +5,7 @@ Module:      Spec.GHC.FingerprintSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for 'Fingerprint'.
@@ -36,8 +36,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,4,0)
-    describe "Text.Show.Text.GHC.Fingerprint" $
-        prop "Fingerprint instance" (prop_matchesShow :: Int -> Fingerprint -> Bool)
+    describe "Fingerprint" $
+        prop "Show instance" (prop_matchesShow :: Int -> Fingerprint -> Bool)
 #else
     pure ()
 #endif

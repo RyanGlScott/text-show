@@ -1,10 +1,4 @@
-{-# LANGUAGE CPP                #-}
-
-#if __GLASGOW_HASKELL__ >= 704
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE StandaloneDeriving #-}
-#endif
-
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -12,19 +6,12 @@ Module:      Instances.Data.Tuple
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 'Arbitrary' instances for tuple types.
 -}
 module Instances.Data.Tuple () where
-
-#if __GLASGOW_HASKELL__ >= 704
-import GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
-import GHC.Generics (Generic1)
-# endif
-#endif
 
 import Prelude ()
 import Prelude.Compat
@@ -190,26 +177,3 @@ instance ( Arbitrary a
         <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
         <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
         <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-
-#if __GLASGOW_HASKELL__ >= 704
-deriving instance Generic (a, b, c, d, e, f, g, h)
-deriving instance Generic (a, b, c, d, e, f, g, h, i)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-
-# if __GLASGOW_HASKELL__ >= 706
-deriving instance Generic1 ((,,,,,,,)         a b c d e f g)
-deriving instance Generic1 ((,,,,,,,,)        a b c d e f g h)
-deriving instance Generic1 ((,,,,,,,,,)       a b c d e f g h i)
-deriving instance Generic1 ((,,,,,,,,,,)      a b c d e f g h i j)
-deriving instance Generic1 ((,,,,,,,,,,,)     a b c d e f g h i j k)
-deriving instance Generic1 ((,,,,,,,,,,,,)    a b c d e f g h i j k l)
-deriving instance Generic1 ((,,,,,,,,,,,,,)   a b c d e f g h i j k l m)
-deriving instance Generic1 ((,,,,,,,,,,,,,,)  a b c d e f g h i j k l m n)
-deriving instance Generic1 ((,,,,,,,,,,,,,,,) a b c d e f g h i j k l m n o)
-# endif
-#endif

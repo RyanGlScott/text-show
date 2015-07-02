@@ -9,7 +9,7 @@ Module:      Text.Show.Text.GHC.Conc.Windows
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'ConsoleEvent'.
@@ -29,14 +29,14 @@ import Data.Text.Lazy.Builder (Builder)
 import GHC.Conc.Windows (ConsoleEvent)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 -- | Convert a 'ConsoleEvent' to a 'Builder'.
--- 
+--
 -- /Since: 0.5/
 showbConsoleEvent :: ConsoleEvent -> Builder
 showbConsoleEvent = showb
 {-# INLINE showbConsoleEvent #-}
 
-$(deriveShowPragmas defaultInlineShowb ''ConsoleEvent)
+$(deriveShow ''ConsoleEvent)
 #endif

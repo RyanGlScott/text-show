@@ -3,7 +3,7 @@ Module:      Spec.Numeric.NaturalSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for 'Natural'.
@@ -23,5 +23,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Numeric.Natural" $
-    prop "Natural instance" (prop_matchesShow :: Int -> Natural -> Bool)
+spec = parallel . describe "Natural" $
+    prop "Show instance" (prop_matchesShow :: Int -> Natural -> Bool)

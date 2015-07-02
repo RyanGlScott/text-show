@@ -6,7 +6,7 @@ Module:      Text.Show.Text.Control.Monad.ST
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for strict 'ST' values.
@@ -17,8 +17,8 @@ module Text.Show.Text.Control.Monad.ST (showbST) where
 
 import Control.Monad.ST (ST)
 import Data.Text.Lazy.Builder (Builder)
-import Prelude ()
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Prelude hiding (Show)
+import Text.Show.Text.Classes (Show(showb), Show1(..), Show2(..))
 
 #include "inline.h"
 
@@ -26,13 +26,17 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 -- 
 -- /Since: 0.3/
 showbST :: ST s a -> Builder
-showbST _ = "<<ST action>>"
+showbST = showb
 {-# INLINE showbST #-}
 
 instance Show (ST s a) where
-    showb = showbST
+    showb = showbPrecWith undefined 0
     INLINE_INST_FUN(showb)
 
 instance Show1 (ST s) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith = showbPrecWith2 undefined
+    INLINE_INST_FUN(showbPrecWith)
+
+instance Show2 ST where
+    showbPrecWith2 _ _ _ _ = "<<ST action>>"
+    INLINE_INST_FUN(showbPrecWith2)

@@ -16,9 +16,11 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Version" $ do
-    prop "Version instance"            (prop_matchesShow :: Int -> Version -> Bool)
-    prop "showbVersionConcrete output" prop_showVersion
+spec = parallel $ do
+    describe "Version" $
+        prop "Show instance"                      (prop_matchesShow :: Int -> Version -> Bool)
+    describe "showbVersionConcrete" $
+        prop "has the same output as showVersion" prop_showVersion
 
 -- | Verifies 'showVersion' and 'showbVersion' generate the same output.
 prop_showVersion :: Version -> Bool

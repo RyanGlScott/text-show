@@ -5,7 +5,7 @@ Module:      Spec.System.IOSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for data types in the "System.IO" module.
@@ -35,19 +35,29 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.System.IO" $ do
-    prop "Handle instance"            (prop_matchesShow :: Int -> Handle -> Bool)
-    prop "IOMode instance"            (prop_matchesShow :: Int -> IOMode -> Bool)
-    prop "BufferMode instance"        (prop_matchesShow :: Int -> BufferMode -> Bool)
-    prop "HandlePosn instance"        (prop_matchesShow :: Int -> HandlePosn -> Bool)
-    prop "SeekMode instance"          (prop_matchesShow :: Int -> SeekMode -> Bool)
-    prop "TextEncoding instance"      prop_showTextEncoding
+spec = parallel $ do
+    describe "Handle" $
+        prop "Show instance" (prop_matchesShow :: Int -> Handle -> Bool)
+    describe "IOMode" $
+        prop "Show instance" (prop_matchesShow :: Int -> IOMode -> Bool)
+    describe "BufferMode" $
+        prop "Show instance" (prop_matchesShow :: Int -> BufferMode -> Bool)
+    describe "HandlePosn" $
+        prop "Show instance" (prop_matchesShow :: Int -> HandlePosn -> Bool)
+    describe "SeekMode" $
+        prop "Show instance" (prop_matchesShow :: Int -> SeekMode -> Bool)
+    describe "TextEncoding" $
+        prop "Show instance" prop_showTextEncoding
 #if MIN_VERSION_base(4,4,0)
-    prop "CodingProgress instance"    (prop_matchesShow :: Int -> CodingProgress -> Bool)
-    prop "CodingFailureMode instance" (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
+    describe "CodingProgress" $
+        prop "Show instance" (prop_matchesShow :: Int -> CodingProgress -> Bool)
+    describe "CodingFailureMode" $
+        prop "Show instance" (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
 #endif
-    prop "Newline instance"           (prop_matchesShow :: Int -> Newline -> Bool)
-    prop "NewlineMode instance"       (prop_matchesShow :: Int -> NewlineMode -> Bool)
+    describe "Newline" $
+        prop "Show instance" (prop_matchesShow :: Int -> Newline -> Bool)
+    describe "NewlineMode" $
+        prop "Show instance" (prop_matchesShow :: Int -> NewlineMode -> Bool)
 
 -- | Verifies the 'Show' instance for 'TextEncoding' is accurate.
 prop_showTextEncoding :: Int -> Property

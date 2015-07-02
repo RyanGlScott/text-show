@@ -6,10 +6,13 @@ Module:      Text.Show.Text.Data.Ratio
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'Ratio' values.
+
+Due to use of the @DatatypeContexts@ extension, there is no @Show1 Complex@
+instance on @base-4.3.0.0@.
 
 /Since: 0.5/
 -}
@@ -22,18 +25,15 @@ import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (Show(showbPrec))
 import Text.Show.Text.Data.Floating ()
-#if MIN_VERSION_base(4,4,0)
-import Text.Show.Text.Classes (Show1(showbPrec1))
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec,
-                                   specializeTypes)
-#else
 import Text.Show.Text.TH.Internal (mkShowbPrec)
+#if MIN_VERSION_base(4,4,0)
+import Text.Show.Text.TH.Internal (deriveShow1)
 #endif
 
 #include "inline.h"
 
 -- | Convert a 'Complex' value to a 'Builder' with the given precedence.
--- 
+--
 -- Note that on @base-4.3.0.0@, this function must have a @('Show' a, 'RealFloat' a)@
 -- constraint instead of just a @('Show' a)@ constraint.
 -- /Since: 0.5/
@@ -48,22 +48,18 @@ showbComplexPrec :: (RealFloat a, Show a)
 showbComplexPrec = showbPrec
 {-# INLINE showbComplexPrec #-}
 
--- TODO: Only use TH when context solver is improved
+instance
 #if MIN_VERSION_base(4,4,0)
-$(deriveShowPragmas defaultInlineShowbPrec {
-                        specializeTypes = [ [t| Complex Float  |]
-                                          , [t| Complex Double |]
-                                          ]
-                    }
-                    ''Complex)
-
-instance Show1 Complex where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+  Show a
 #else
-instance (RealFloat a, Show a) => Show (Complex a) where
+  (RealFloat a, Show a)
+#endif
+  => Show (Complex a) where
     {-# SPECIALIZE instance Show (Complex Float)  #-}
     {-# SPECIALIZE instance Show (Complex Double) #-}
     showbPrec = $(mkShowbPrec ''Complex)
     INLINE_INST_FUN(showbPrec)
+
+#if MIN_VERSION_base(4,4,0)
+$(deriveShow1 ''Complex)
 #endif

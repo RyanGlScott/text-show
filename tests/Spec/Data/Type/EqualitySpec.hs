@@ -6,7 +6,7 @@ Module:      Spec.Data.Type.EqualitySpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for '(:~:)'.
@@ -35,8 +35,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
-    describe "Text.Show.Text.Data.Type.Equality" $
-        prop "(:~:) instance"                          (prop_matchesShow :: Int -> Int :~: Int -> Bool)
+    describe "Int :~: Int" $
+        prop "Show instance" (prop_matchesShow :: Int -> Int :~: Int -> Bool)
 #else
     pure ()
 #endif

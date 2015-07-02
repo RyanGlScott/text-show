@@ -3,11 +3,12 @@ Module:      Text.Show.Text.Instances
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
-Imports all orphan 'Show' instance covered by @text-show@ (except for the instance
-in `Text.Show.Text.Functions`, which is not imported by default).
+Imports all orphan 'Show', 'Show1', and 'Show2' instances covered by @text-show@
+(except for the instances in `Text.Show.Text.Functions`, which are not imported
+by default).
 -}
 module Text.Show.Text.Instances () where
 

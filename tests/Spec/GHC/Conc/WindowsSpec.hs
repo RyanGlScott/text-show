@@ -5,7 +5,7 @@ Module:      Spec.GHC.Conc.WindowsSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ test for 'ConsoleEvent'.
@@ -34,8 +34,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
-    describe "Text.Show.Text.GHC.Conc.Windows" $
-        prop "ConsoleEvent instance" (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+    describe "ConsoleEvent" $
+        prop "Show instance" (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
 #else
     pure ()
 #endif

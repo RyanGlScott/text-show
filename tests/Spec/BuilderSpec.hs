@@ -3,7 +3,7 @@ Module:      Spec.BuilderSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for functions that manipulate 'Builder's.
@@ -42,9 +42,14 @@ prop_unwordsB :: [String] -> Bool
 prop_unwordsB strs = unwordsB (map fromString strs) == fromString (unwords strs)
 
 spec :: Spec
-spec = parallel . describe "Builder-related functions" $ do
-    prop "lengthB output"             prop_lengthB
-    prop "fromString . toString = id" prop_toString
-    prop "fromText . toText = id"     prop_toText
-    prop "unlinesB output"            prop_unlinesB
-    prop "unwordsB output"            prop_unwordsB
+spec = parallel $ do
+    describe "lengthB" $
+        prop "has the same output as length"  prop_lengthB
+    describe "toString" $
+        prop "fromString . toString = id"     prop_toString
+    describe "toText" $
+        prop "fromText . toText = id"         prop_toText
+    describe "unlinesB" $
+        prop "has the same output as unlines" prop_unlinesB
+    describe "unwordsB" $
+        prop "has the same output as unwords" prop_unwordsB

@@ -6,18 +6,18 @@ Module:      Text.Show.Text.Functions
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
-Optional 'Show' and 'Show1' instances for functions.
+Optional 'Show', 'Show1', and 'Show2' instances for functions.
 
 /Since: 0.3/
 -}
 module Text.Show.Text.Functions (showbFunction) where
 
 import Data.Text.Lazy.Builder (Builder)
-import Prelude ()
-import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
+import Prelude hiding (Show)
+import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(..), Show2(..))
 
 #include "inline.h"
 
@@ -25,13 +25,17 @@ import Text.Show.Text.Classes (Show(showb, showbPrec), Show1(showbPrec1))
 -- 
 -- /Since: 0.3/
 showbFunction :: (a -> b) -> Builder
-showbFunction _ = "<function>"
+showbFunction = showb
 {-# INLINE showbFunction #-}
 
 instance Show (a -> b) where
-    showb = showbFunction
+    showbPrec = showbPrecWith undefined
     INLINE_INST_FUN(showb)
 
 instance Show1 ((->) a) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith = showbPrecWith2 undefined
+    INLINE_INST_FUN(showbPrecWith)
+
+instance Show2 (->) where
+    showbPrecWith2 _ _ _ _ = "<function>"
+    INLINE_INST_FUN(showbPrecWith2)

@@ -7,7 +7,7 @@ Module:      Text.Show.Text.Data.Floating
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for floating-point types.
@@ -33,36 +33,36 @@ import           Data.Array.Base (unsafeAt)
 import           Data.Array.IArray (Array, array)
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as T (replicate)
-import           Data.Text.Lazy.Builder (Builder, fromString, fromText)
+import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 
 import           Prelude hiding (Show)
 
 import           Text.Show.Text.Classes (Show(showb, showbPrec), showbParen)
-import           Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
-import           Text.Show.Text.Utils (i2d, s)
+import           Text.Show.Text.TH.Internal (deriveShow)
+import           Text.Show.Text.Utils (i2d)
 
 #include "inline.h"
 
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder
 showbRealFloatPrec p x
-    | x < 0 || isNegativeZero x = showbParen (p > 6) $ s '-' <> showbGFloat Nothing (-x)
+    | x < 0 || isNegativeZero x = showbParen (p > 6) $ singleton '-' <> showbGFloat Nothing (-x)
     | otherwise                 = showbGFloat Nothing x
 {-# INLINE showbRealFloatPrec #-}
 
 -- | Convert a 'Float' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbFloatPrec :: Int -> Float -> Builder
 showbFloatPrec = showbRealFloatPrec
 {-# INLINE showbFloatPrec #-}
 
 -- | Convert a 'Double' to a 'Builder' with the given precedence.
--- 
+--
 -- /Since: 0.3/
 showbDoublePrec :: Int -> Double -> Builder
 showbDoublePrec = showbRealFloatPrec
@@ -70,11 +70,11 @@ showbDoublePrec = showbRealFloatPrec
 
 -- | Show a signed 'RealFloat' value
 -- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
--- 
+--
 -- In the call @'showbEFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbEFloat = formatRealFloatB Exponent
@@ -82,11 +82,11 @@ showbEFloat = formatRealFloatB Exponent
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
--- 
+--
 -- In the call @'showbFFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloat = formatRealFloatB Fixed
@@ -95,11 +95,11 @@ showbFFloat = formatRealFloatB Fixed
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
--- 
+--
 -- In the call @'showbGFloat' digs val@, if @digs@ is 'Nothing',
 -- the value is shown to full precision; if @digs@ is @'Just' d@,
 -- then at most @d@ digits after the decimal point are shown.
--- 
+--
 -- /Since: 0.3/
 showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloat = formatRealFloatB Generic
@@ -107,10 +107,10 @@ showbGFloat = formatRealFloatB Generic
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
--- 
+--
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
--- 
+--
 -- /Since: 0.3/
 showbFFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloatAlt d = formatRealFloatAltB Fixed d True
@@ -119,17 +119,17 @@ showbFFloatAlt d = formatRealFloatAltB Fixed d True
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
 -- between @0.1@ and @9,999,999@, and scientific notation otherwise.
--- 
+--
 -- This behaves as 'showFFloat', except that a decimal point
 -- is always guaranteed, even if not needed.
--- 
+--
 -- /Since: 0.3/
 showbGFloatAlt :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloatAlt d = formatRealFloatAltB Generic d True
 {-# INLINE showbGFloatAlt #-}
 
 -- | Convert an 'FPFormat' value to a 'Builder'.
--- 
+--
 -- /Since: 0.9/
 showbFPFormat :: FPFormat -> Builder
 showbFPFormat = showb
@@ -141,7 +141,7 @@ showbFPFormat = showb
 
 -- | Like 'formatRealFloatAltB', except that the decimal is only shown for arguments
 -- whose absolute value is between @0.1@ and @9,999,999@.
--- 
+--
 -- /Since: 0.8/
 formatRealFloatB :: RealFloat a
                  => FPFormat  -- ^ What notation to use.
@@ -153,7 +153,7 @@ formatRealFloatB fmt decs = formatRealFloatAltB fmt decs False
 
 -- | Converts a 'RealFloat' value to a Builder, specifying if a decimal point
 -- should always be shown.
--- 
+--
 -- /Since: 0.8/
 formatRealFloatAltB :: RealFloat a
                     => FPFormat  -- ^ What notation to use.
@@ -166,7 +166,7 @@ formatRealFloatAltB :: RealFloat a
 formatRealFloatAltB fmt decs alt x
    | isNaN x                   = "NaN"
    | isInfinite x              = if x < 0 then "-Infinity" else "Infinity"
-   | x < 0 || isNegativeZero x = s '-' <> doFmt fmt (floatToDigits (-x))
+   | x < 0 || isNegativeZero x = singleton '-' <> doFmt fmt (floatToDigits (-x))
    | otherwise                 = doFmt fmt (floatToDigits x)
  where
   doFmt format (is, e) =
@@ -181,8 +181,8 @@ formatRealFloatAltB fmt decs alt x
         let show_e' = decimal (e-1) in
         case ds of
           "0"     -> "0.0e0"
-          [d]     -> s d <> ".0e" <> show_e'
-          (d:ds') -> s d <> s '.' <> fromString ds' <> s 'e' <> show_e'
+          [d]     -> singleton d <> ".0e" <> show_e'
+          (d:ds') -> singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> show_e'
           []      -> error "formatRealFloat/doFmt/Exponent: []"
        Just dec ->
         let dec' = max dec 1 in
@@ -193,7 +193,7 @@ formatRealFloatAltB fmt decs alt x
            (ei,is') = roundTo (dec'+1) is
            (d:ds') = map i2d (if ei > 0 then init is' else is')
           in
-          s d <> s '.' <> fromString ds' <> s 'e' <> decimal (e-1+ei)
+          singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> decimal (e-1+ei)
      Fixed ->
       let
        mk0 ls = case ls of { "" -> "0" ; _ -> fromString ls}
@@ -203,7 +203,7 @@ formatRealFloatAltB fmt decs alt x
           | e <= 0    -> "0." <> fromText (T.replicate (-e) "0") <> fromString ds
           | otherwise ->
              let
-                f 0 str    rs  = mk0 (reverse str) <> s '.' <> mk0 rs
+                f 0 str    rs  = mk0 (reverse str) <> singleton '.' <> mk0 rs
                 f n str    ""  = f (n-1) ('0':str) ""
                 f n str (r:rs) = f (n-1) (r:str) rs
              in
@@ -215,13 +215,13 @@ formatRealFloatAltB fmt decs alt x
           (ei,is') = roundTo (dec' + e) is
           (ls,rs)  = splitAt (e+ei) (map i2d is')
          in
-         mk0 ls <> (if null rs && not alt then "" else s '.' <> fromString rs)
+         mk0 ls <> (if null rs && not alt then "" else singleton '.' <> fromString rs)
         else
          let
           (ei,is') = roundTo dec' (replicate (-e) 0 ++ is)
           d:ds' = map i2d (if ei > 0 then is' else 0:is')
          in
-         s d <> (if null ds' && not alt then "" else s '.' <> fromString ds')
+         singleton d <> (if null ds' && not alt then "" else singleton '.' <> fromString ds')
 
 -- Based on "Printing Floating-Point Numbers Quickly and Accurately"
 -- by R.G. Burger and R.K. Dybvig in PLDI 96.
@@ -369,18 +369,15 @@ roundTo d is =
        i'     = c + i
 #endif
 
-
 -- Exponentiation with a cache for the most common numbers.
 
 -- | The minimum exponent in the cache.
 minExpt :: Int
 minExpt = 0
-{-# INLINE minExpt #-}
 
 -- | The maximum exponent (of 2) in the cache.
 maxExpt :: Int
 maxExpt = 1100
-{-# INLINE maxExpt #-}
 
 -- | Exponentiate an 'Integer', using a cache if possible.
 expt :: Integer -> Int -> Integer
@@ -396,7 +393,6 @@ expts = array (minExpt,maxExpt) [(n,2^n) | n <- [minExpt .. maxExpt]]
 -- | The maximum exponent (of 10) in the cache.
 maxExpt10 :: Int
 maxExpt10 = 324
-{-# INLINE maxExpt10 #-}
 
 -- | Cached powers of 10.
 expts10 :: Array Int Integer
@@ -414,4 +410,4 @@ instance Show Double where
     showbPrec = showbDoublePrec
     INLINE_INST_FUN(showbPrec)
 
-$(deriveShowPragmas defaultInlineShowb ''FPFormat)
+$(deriveShow ''FPFormat)

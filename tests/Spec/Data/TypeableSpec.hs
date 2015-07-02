@@ -3,7 +3,7 @@ Module:      Spec.Data.TypeableSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for data types in the "Data.Typeable" module.
@@ -23,6 +23,8 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Typeable" $ do
-    prop "TypeRep instance" (prop_matchesShow :: Int -> TypeRep -> Bool)
-    prop "TyCon instance"   (prop_matchesShow :: Int -> TyCon -> Bool)
+spec = parallel $ do
+    describe "TypeRep" $
+        prop "Show instance" (prop_matchesShow :: Int -> TypeRep -> Bool)
+    describe "TyCon" $
+        prop "Show instance" (prop_matchesShow :: Int -> TyCon -> Bool)

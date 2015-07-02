@@ -1,10 +1,11 @@
 {-# LANGUAGE MagicHash #-}
+
 {-|
 Module:      Text.Show.Text.Utils
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Miscellaneous utility functions.
@@ -41,14 +42,8 @@ isTupleString ('(':',':_) = True
 isTupleString _           = False
 {-# INLINE isTupleString #-}
 
--- | A shorter name for 'singleton' for convenience's sake (since it tends to be used
--- pretty often in @text-show@).
-s :: Char -> Builder
-s = singleton
-{-# INLINE s #-}
-
 -- | Computes the length of a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 lengthB :: Builder -> Int64
 lengthB = length . toLazyText
@@ -56,30 +51,30 @@ lengthB = length . toLazyText
 
 -- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
 -- as 'show' would).
--- 
+--
 -- /Since: 0.4.1/
 toString :: Builder -> String
 toString = unpack . toLazyText
 {-# INLINE toString #-}
 
 -- | Convert a 'Builder' to a strict 'Text'.
--- 
+--
 -- /Since: 0.4.1/
 toText :: Builder -> Text
 toText = toStrict . toLazyText
 {-# INLINE toText #-}
 
 -- | Merges several 'Builder's, separating them by newlines.
--- 
+--
 -- /Since: 0.1/
 unlinesB :: [Builder] -> Builder
-unlinesB (b:bs) = b <> s '\n' <> unlinesB bs
+unlinesB (b:bs) = b <> singleton '\n' <> unlinesB bs
 unlinesB []     = mempty
 
 -- | Merges several 'Builder's, separating them by spaces.
--- 
+--
 -- /Since: 0.1/
 unwordsB :: [Builder] -> Builder
-unwordsB (b:bs@(_:_)) = b <> s ' ' <> unwordsB bs
+unwordsB (b:bs@(_:_)) = b <> singleton ' ' <> unwordsB bs
 unwordsB [b]          = b
 unwordsB []           = mempty

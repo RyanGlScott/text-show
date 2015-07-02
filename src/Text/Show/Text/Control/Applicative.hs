@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -7,14 +6,14 @@ Module:      Text.Show.Text.Control.Applicative
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' function for 'ZipList'.
 
 /Since: 0.3/
 -}
-module Text.Show.Text.Control.Applicative (showbConstPrec, showbZipListPrec) where
+module Text.Show.Text.Control.Applicative (showbConstPrecWith, showbZipListPrecWith) where
 
 import Control.Applicative (Const(..), ZipList)
 
@@ -22,36 +21,30 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1), showbUnary)
+import Text.Show.Text.Classes (Show(showbPrec), Show1(..), Show2(..), showbUnaryWith)
 import Text.Show.Text.Data.List ()
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowbPrec)
+import Text.Show.Text.TH.Internal (deriveShow, deriveShow1)
 
-#include "inline.h"
-
--- | Convert a 'Const' value to a 'Builder' with the given precedence.
+-- | Convert a 'Const' value to a 'Builder' with the given show function and precedence.
 -- 
--- /Since: 0.7/
-showbConstPrec :: Show a => Int -> Const a b -> Builder
-showbConstPrec p (Const x) = showbUnary "Const" p x
-{-# INLINE showbConstPrec #-}
+-- /Since: 1/
+showbConstPrecWith :: (Int -> a -> Builder) -> Int -> Const a b -> Builder
+showbConstPrecWith sp = showbPrecWith2 sp undefined
 
--- | Convert a 'ZipList' to a 'Builder' with the given precedence.
+-- | Convert a 'ZipList' to a 'Builder' with the given show function precedence.
 -- 
--- /Since: 0.3/
-showbZipListPrec :: Show a => Int -> ZipList a -> Builder
-showbZipListPrec = showbPrec
-{-# INLINE showbZipListPrec #-}
+-- /Since: 1/
+showbZipListPrecWith :: (Int -> a -> Builder) -> Int -> ZipList a -> Builder
+showbZipListPrecWith = showbPrecWith
 
 instance Show a => Show (Const a b) where
-    showbPrec = showbConstPrec
-    INLINE_INST_FUN(showbPrec)
+    showbPrec = showbPrecWith undefined
 
 instance Show a => Show1 (Const a) where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+    showbPrecWith = showbPrecWith2 showbPrec
 
-$(deriveShowPragmas defaultInlineShowbPrec ''ZipList)
+instance Show2 Const where
+    showbPrecWith2 sp1 _ p (Const x) = showbUnaryWith sp1 "Const" p x
 
-instance Show1 ZipList where
-    showbPrec1 = showbPrec
-    INLINE_INST_FUN(showbPrec1)
+$(deriveShow  ''ZipList)
+$(deriveShow1 ''ZipList)

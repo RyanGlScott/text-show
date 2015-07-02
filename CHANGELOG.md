@@ -1,7 +1,19 @@
-# 0.9
+# 1
+* The `Show1` class has been completely overhauled. `Show1` now uses the function `showbPrecWith`, which takes as an argument a function of type `Int -> a -> Builder` to show occurrences of the type parameter (instead of requiring the type parameter to be a `Show` instance). This matches the new implementation of `Show1` in the next version of `transformers`. A similar `Show2` class (with the function `showbPrecWith2`) was also added.
+* As a consequence, `Show1` instances should no longer be defined in terms of `showbPrec`; rather, `Show` instances should be defined in terms of `showbPrecWith` or `showbPrecWith2`, and `Show1` instances can be defined in terms of `showbPrecWith2`.
+* The `showbPrec1` function is no longer a class method of `Show1`, but is now a standalone function defined in terms of `showbPrecWith`. `showbPrec1` can be useful for defining `Show` instances. A similar `showbPrec2` function was also added.
+* The monomorphic functions in the many submodules of this package have been generalized (where possible) to use `Show1` and `Show2` instances. These functions have `-PrecWith` and `-PrecWith2` suffixes, respectively.
+* Because of the generality of the new `showPrecWith` function, `Show1` instances are now possible for `Ratio`, `Alt`, `Rec1`, `M1`, `(:+:)`, `(:*:)`, and `(:.:)`.
+* Removed many silly instances for `FromStringShow` and `FromTextShow`, since they'll never be used in the ways suggested by those instances to begin with.
+* The Template Haskell engine has been completely overhauled. Deriving `Show1` and `Show2` instances are now possible using the `deriveShow1` and `deriveShow2` functions. See the documentation in `Text.Show.Text.TH` for more details. In addition, the `mkShowbPrecWith`, `mkShowbPrec1`, `mkShowbPrecWith2`, and `mkShowbPrec2` functions were added.
 * Removed the ability to call `deriveShow` or `mkShowbPrec` (or other functions prefixed with `mk-`) using a data family name. This is considered a misfeature. If you want to derive `Show` for data family instances, use the corresponding `data instance` or `newtype instance` constructor name as an argument instead.
-* `PragmaOptions` (in `Text.Show.Text.TH`) combined all of its inlining-related fields into a single field, `inlineFunctions`, which takes a list of names of functions to inline.
+ * Removed `PragmaOptions`, `deriveShowPragmas`, `defaultInlineShowbPrec`, `defaultInlineShowb`, and `defaultInlineShowbList`, as it was impossible to make Template Haskell-generated pragmas work consistently across different versions of GHC. If you really want to use `INLINE` and `SPECIALIZE instance` pragmas with your Template Haskell-generated code, create manual instances with `mkShowbPrec` and family.
+* `Show1` instances can now be created generically using the `genericShowbPrecWith` function in `Text.Show.Text.Generics`. A `genericShowbPrec1` was also added.
+* Added `generic-deriving` as a dependency, which allows generics-related code to be exported on more versions of GHC
+* `ConType` (in `Text.Show.Text.Generics`) now has an `Inf String` constructor instead of `Inf Builder`. As a result, `ConType` now always an `Eq` and `Ord` instance, and a `Read ConType` instance was added.
+* `Typeable` instances for the promoted data constructors `'FromStringShow` and `'FromTextShow`
 * Added `showbFPFormat` to `Text.Show.Text.Data.Floating`
+* Revamped test suite
 
 ### 0.8.1.1
 * Retroactive `CHANGELOG` update

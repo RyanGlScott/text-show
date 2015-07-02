@@ -12,7 +12,7 @@ Module:      Instances.Foreign.C.Types
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 'Arbitrary' instances for data types in the "Foreign.C.Types" module.

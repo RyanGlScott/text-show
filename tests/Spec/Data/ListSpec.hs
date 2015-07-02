@@ -3,7 +3,7 @@ Module:      Spec.Data.ListSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for lists.
@@ -23,11 +23,15 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.List" $ do
-    prop "String instance"      (prop_matchesShow :: Int -> String -> Bool)
-    prop "[String] instance"    (prop_matchesShow :: Int -> [String] -> Bool)
-    prop "[Int] instance"       (prop_matchesShow :: Int -> [Int] -> Bool)
-    prop "showbListWith output" prop_showListWith
+spec = parallel $ do
+    describe "String" $
+        prop "Show instance"                       (prop_matchesShow :: Int -> String -> Bool)
+    describe "[String]" $
+        prop "Show instance"                       (prop_matchesShow :: Int -> [String] -> Bool)
+    describe "[Int]" $
+        prop "Show instance"                       (prop_matchesShow :: Int -> [Int] -> Bool)
+    describe "showbListWith" $
+        prop "has the same output as showListWith" prop_showListWith
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
 prop_showListWith :: String -> Bool

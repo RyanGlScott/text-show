@@ -6,7 +6,7 @@ Module:      Text.Show.Text.Data.Ord
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 Monomorphic 'Show' functions for 'Ordering' and 'Down'.
@@ -16,7 +16,7 @@ Monomorphic 'Show' functions for 'Ordering' and 'Down'.
 module Text.Show.Text.Data.Ord (
       showbOrdering
 #if MIN_VERSION_base(4,6,0)
-    , showbDownPrec
+    , showbDownPrecWith
 #endif
     ) where
 
@@ -25,42 +25,39 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude hiding (Show)
 
 import Text.Show.Text.Classes (showb)
-import Text.Show.Text.TH.Internal (deriveShowPragmas, defaultInlineShowb)
+import Text.Show.Text.TH.Internal (deriveShow)
 
 #if MIN_VERSION_base(4,6,0)
 import Data.Ord (Down)
 
 import Prelude hiding (Show)
 
-import Text.Show.Text.Classes (Show(showbPrec), Show1(showbPrec1))
-import Text.Show.Text.TH.Internal (defaultInlineShowbPrec)
+import Text.Show.Text.Classes (showbPrecWith)
+import Text.Show.Text.TH.Internal (deriveShow1)
 #endif
 
 #include "inline.h"
 
 -- | Convert a 'Ordering' to a 'Builder'.
--- 
+--
 -- /Since: 0.3/
 showbOrdering :: Ordering -> Builder
 showbOrdering = showb
 {-# INLINE showbOrdering #-}
 
 #if MIN_VERSION_base(4,6,0)
--- | Convert a 'Down' value to a 'Builder' with the given precedence.
+-- | Convert a 'Down' value to a 'Builder' with the given show function and precedence.
 -- This function is only available with @base-4.6.0.0@ or later.
--- 
--- /Since: 0.8/
-showbDownPrec :: Show a => Int -> Down a -> Builder
-showbDownPrec = showbPrec
-{-# INLINE showbDownPrec #-}
+--
+-- /Since: 1/
+showbDownPrecWith :: (Int -> a -> Builder) -> Int -> Down a -> Builder
+showbDownPrecWith = showbPrecWith
+{-# INLINE showbDownPrecWith #-}
 #endif
 
-$(deriveShowPragmas defaultInlineShowb ''Ordering)
+$(deriveShow  ''Ordering)
 
 #if MIN_VERSION_base(4,6,0)
-$(deriveShowPragmas defaultInlineShowbPrec ''Down)
-
-instance Show1 Down where
-    showbPrec1 = showbPrec
-    {-# INLINE showbPrec1 #-}
+$(deriveShow  ''Down)
+$(deriveShow1 ''Down)
 #endif

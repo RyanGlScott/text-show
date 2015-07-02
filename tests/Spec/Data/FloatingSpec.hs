@@ -5,7 +5,7 @@ Module:      Spec.Data.FloatingSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
-Stability:   Experimental
+Stability:   Provisional
 Portability: GHC
 
 @hspec@ tests for floating-point data types.
@@ -36,15 +36,23 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Data.Floating" $ do
-    prop "Float instance"          (prop_matchesShow :: Int -> Float -> Bool)
-    prop "Double instance"         (prop_matchesShow :: Int -> Double -> Bool)
-    prop "showbEFloat output"    $ prop_showXFloat showEFloat showbEFloat
-    prop "showbFFloat output"    $ prop_showXFloat showFFloat showbFFloat
-    prop "showbGFloat output"    $ prop_showXFloat showGFloat showbGFloat
-    prop "showbFFloatAlt output" $ prop_showXFloat showFFloatAlt showbFFloatAlt
-    prop "showbGFloatAlt output" $ prop_showXFloat showGFloatAlt showbGFloatAlt
-    prop "FPFormat instance"       (prop_matchesShow :: Int -> FPFormat -> Bool)
+spec = parallel $ do
+    describe "Float" $
+        prop "Show instance"                          (prop_matchesShow :: Int -> Float -> Bool)
+    describe "Double" $
+        prop "Show instance"                          (prop_matchesShow :: Int -> Double -> Bool)
+    describe "showbEFloat" $
+        prop "has the same output as showEFloat" $    prop_showXFloat showEFloat showbEFloat
+    describe "showbFFloat" $
+        prop "has the same output as showFFloat" $    prop_showXFloat showFFloat showbFFloat
+    describe "showbGFloat" $
+        prop "has the same output as showGFloat" $    prop_showXFloat showGFloat showbGFloat
+    describe "showbFFloatAlt" $
+        prop "has the same output as showFFloatAlt" $ prop_showXFloat showFFloatAlt showbFFloatAlt
+    describe "showbGFloatAlt" $
+        prop "has the same output as showFFloatAlt" $ prop_showXFloat showGFloatAlt showbGFloatAlt
+    describe "FPFormat" $
+        prop "Show instance"                          (prop_matchesShow :: Int -> FPFormat -> Bool)
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
 -- is one of E, F, or G).
