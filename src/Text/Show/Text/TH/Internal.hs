@@ -568,7 +568,7 @@ mkShowForCons _   []   = error "Must have at least one data constructor"
 mkShowForCons nbs cons = do
     p     <- newName "p"
     value <- newName "value"
-    sps   <- mapM newName ["sp" ++ S.show n | (_, n) <- zip nbs [(1 :: Int) ..]]
+    sps   <- newNameList "sp" $ length nbs
     let tvis   = zip nbs sps
         sClass = toEnum $ length nbs
     lamE (map varP $ sps ++ [p, value])
@@ -594,7 +594,7 @@ mkShowForCon p sClass tvis (NormalC conName [(_, argTy)]) = do
           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArg) |])
           []
 mkShowForCon p sClass tvis (NormalC conName ts) = do
-    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [(1 :: Int) ..]]
+    args <- newNameList "arg" $ length ts
 
     if isNonUnitTuple conName
        then do
@@ -619,7 +619,7 @@ mkShowForCon p sClass tvis (NormalC conName ts) = do
                  []
 mkShowForCon p sClass tvis (RecC conName []) = mkShowForCon p sClass tvis $ NormalC conName []
 mkShowForCon _p sClass tvis (RecC conName ts) = do
-    args <- mapM newName ["arg" ++ S.show n | (_, n) <- zip ts [1 :: Int ..]]
+    args <- newNameList "arg" $ length ts
 
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
                                       -> [ [| fromString $(stringE (nameBase argName ++ " = ")) |]
@@ -1191,9 +1191,9 @@ type TyVarInfo = (NameBase, Name)
 -- Assorted utilities
 -------------------------------------------------------------------------------
 
--- TODO: Finish me
--- newNameList :: [a] -> Q [Name]
--- newNameList = mapM newName ["sp" ++ S.show n | (_, n) <- zip nbs [(1 :: Int) ..]]
+-- | Generate a list of fresh names with a common prefix, and numbered suffixes.
+newNameList :: String -> Int -> Q [Name]
+newNameList prefix n = mapM (newName . (prefix ++) . S.show) [1..n]
 
 -- | Remove any occurrences of a forall-ed type variable from a list of @TyVarInfo@s.
 removeForalled :: [TyVarBndr] -> [TyVarInfo] -> [TyVarInfo]

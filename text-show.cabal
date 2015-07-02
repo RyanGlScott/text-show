@@ -187,7 +187,6 @@ test-suite text-show-spec
                        Instances.Data.Tuple
                        Instances.Data.Typeable
                        Instances.Data.Version
-                       Instances.Derived
                        Instances.Foreign.C.Types
                        Instances.Foreign.Ptr
                        Instances.FromStringTextShow
