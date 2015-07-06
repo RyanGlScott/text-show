@@ -22,7 +22,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
 import GHC.Event (Event)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -36,9 +36,9 @@ spec :: Spec
 spec = parallel $ do
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
     describe "Event" $
-        prop "Show instance" (prop_matchesShow :: Int -> Event -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Event -> Bool)
 --     describe "FdKey" $
---         prop "Show instance" (prop_matchesShow :: Int -> FdKey -> Bool)
+--         prop "TextShow instance" (prop_matchesTextShow :: Int -> FdKey -> Bool)
 #else
     pure ()
 #endif

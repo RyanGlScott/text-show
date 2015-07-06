@@ -32,21 +32,20 @@ import GHC.Show (appPrec)
 #endif
 
 import Prelude ()
-import Prelude.Compat hiding (Show)
+import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), oneof)
 
-import Text.Show as S
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat as S
+import TransformersCompat (Show1(..), Show2(..))
 
 -------------------------------------------------------------------------------
 
 infixl 4 :@:
 data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
                | (:@:)       { tc3 :: b, tc4 :: a }
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -67,7 +66,7 @@ data family TyFamily
 infixl 4 :!:
 data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2 :: b }
                            | (:!:)          { tf3 :: b, tf4 :: a }
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -90,17 +89,17 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
 
 -------------------------------------------------------------------------------
 
-instance S.Show a => S.Show1 (TyCon a) where
+instance Show a => Show1 (TyCon a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyCon where
+instance Show2 TyCon where
     showsPrecWith2 sp1 sp2 p (TyConPrefix a b) =
         showsRecord sp1 sp2 "TyConPrefix" "tc1" "tc2" p a b
     showsPrecWith2 sp1 sp2 p (a :@: b) =
         showsRecord sp2 sp1 "(:@:)" "tc3" "tc4" p a b
 
-instance S.Show a => S.Show1 (TyFamily a) where
+instance Show a => Show1 (TyFamily a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyFamily where
+instance Show2 TyFamily where
     showsPrecWith2 sp1 sp2 p (TyFamilyPrefix a b) =
         showsRecord sp1 sp2 "TyFamilyPrefix" "tf1" "tf2" p a b
     showsPrecWith2 sp1 sp2 p (a :!: b) =
@@ -120,12 +119,12 @@ showsRecord sp1 sp2 con rec1 rec2 _p a b =
 
 -------------------------------------------------------------------------------
 
-$(deriveShow  ''TyCon)
-$(deriveShow1 ''TyCon)
-$(deriveShow2 ''TyCon)
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow  'TyFamilyPrefix)
-$(deriveShow1 '(:!:))
-$(deriveShow2 'TyFamilyPrefix)
+$(deriveTextShow  'TyFamilyPrefix)
+$(deriveTextShow1 '(:!:))
+$(deriveTextShow2 'TyFamilyPrefix)
 #endif

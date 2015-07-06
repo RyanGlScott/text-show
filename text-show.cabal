@@ -1,47 +1,42 @@
 name:                text-show
-version:             1
+version:             2
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
                      in the spirit of
                      @<http://hackage.haskell.org/package/bytestring-show bytestring-show>@.
                      .
-                     At the moment, @text-show@ provides @Show@ instances for most data
+                     At the moment, @text-show@ provides instances for most data
                      types in the @<http://hackage.haskell.org/package/array array>@,
                      @<http://hackage.haskell.org/package/base base>@,
                      @<http://hackage.haskell.org/package/bytestring bytestring>@, and
                      @<http://hackage.haskell.org/package/text text>@ packages.
                      Therefore, much of the source code for @text-show@ consists of
                      borrowed code from those packages in order to ensure that the
-                     behaviors of the two @Show@ typeclasses coincide.
+                     behaviors of @Show@ and @TextShow@ coincide.
                      .
-                     For most uses, simply importing "Text.Show.Text"
+                     For most uses, simply importing "TextShow"
                      will suffice:
                      .
                      @
                         module Main where
                         .
-                        import Data.Text (Text)
-                        import Prelude hiding (Show(..), print)
-                        import Text.Show.Text
-                        .
-                        hello :: Text
-                        hello = show (Just \"Hello, World!\")
+                        import TextShow
                         .
                         main :: IO ()
-                        main = print hello
+                        main = printT (Just \"Hello, World!\")
                      @
                      .
                      If you desire it, there are also monomorphic versions of the @showb@
-                     function available in the submodules of "Text.Show.Text". A naming
+                     function available in the submodules of "TextShow". A naming
                      convention is present in which functions that show different values
                      depending on the precedence end with @Prec@ (e.g., @showbIntPrec@),
                      whereas functions that show the same values regardless of
                      precedence do not end with @Prec@ (e.g., @showbBool@).
                      .
-                     Support for automatically deriving @Show@ instances can be found
-                     in the "Text.Show.Text.TH" and "Text.Show.Text.Generic" modules.
-                     If you don't know which one to use, use @Text.Show.Text.TH@.
+                     Support for automatically deriving @TextShow@ instances can be found
+                     in the "TextShow.TH" and "TextShow.Generic" modules. If you don't
+                     know which one to use, use "TextShow.TH".
 homepage:            https://github.com/RyanGlScott/text-show
 bug-reports:         https://github.com/RyanGlScott/text-show/issues
 license:             BSD3
@@ -61,77 +56,77 @@ source-repository head
   location:            https://github.com/RyanGlScott/text-show
 
 library
-  exposed-modules:     Text.Show.Text
-                       Text.Show.Text.Control.Applicative
-                       Text.Show.Text.Control.Concurrent
-                       Text.Show.Text.Control.Exception
-                       Text.Show.Text.Control.Monad.ST
-                       Text.Show.Text.Data.Array
-                       Text.Show.Text.Data.Bool
-                       Text.Show.Text.Data.ByteString
-                       Text.Show.Text.Data.Char
-                       Text.Show.Text.Data.Complex
-                       Text.Show.Text.Data.Data
-                       Text.Show.Text.Data.Dynamic
-                       Text.Show.Text.Data.Either
-                       Text.Show.Text.Data.Fixed
-                       Text.Show.Text.Data.Floating
-                       Text.Show.Text.Data.Functor.Identity
-                       Text.Show.Text.Debug.Trace
-                       Text.Show.Text.Debug.Trace.Generic
-                       Text.Show.Text.Debug.Trace.TH
-                       Text.Show.Text.Generic
-                       Text.Show.Text.Data.Integral
-                       Text.Show.Text.Data.List
-                       Text.Show.Text.Data.Maybe
-                       Text.Show.Text.Data.Monoid
-                       Text.Show.Text.Data.Ord
-                       Text.Show.Text.Data.Proxy
-                       Text.Show.Text.Data.Ratio
-                       Text.Show.Text.Data.Text
-                       Text.Show.Text.Data.Tuple
-                       Text.Show.Text.Data.Typeable
-                       Text.Show.Text.Data.Version
-                       Text.Show.Text.Data.Void
-                       Text.Show.Text.Foreign.C.Types
-                       Text.Show.Text.Foreign.Ptr
-                       Text.Show.Text.Functions
-                       Text.Show.Text.GHC.Generics
-                       Text.Show.Text.Numeric.Natural
-                       Text.Show.Text.System.Exit
-                       Text.Show.Text.System.IO
-                       Text.Show.Text.System.Posix.Types
-                       Text.Show.Text.Text.Read
-                       Text.Show.Text.TH
+  exposed-modules:     TextShow
+                       TextShow.Control.Applicative
+                       TextShow.Control.Concurrent
+                       TextShow.Control.Exception
+                       TextShow.Control.Monad.ST
+                       TextShow.Data.Array
+                       TextShow.Data.Bool
+                       TextShow.Data.ByteString
+                       TextShow.Data.Char
+                       TextShow.Data.Complex
+                       TextShow.Data.Data
+                       TextShow.Data.Dynamic
+                       TextShow.Data.Either
+                       TextShow.Data.Fixed
+                       TextShow.Data.Floating
+                       TextShow.Data.Functor.Identity
+                       TextShow.Debug.Trace
+                       TextShow.Debug.Trace.Generic
+                       TextShow.Debug.Trace.TH
+                       TextShow.Generic
+                       TextShow.Data.Integral
+                       TextShow.Data.List
+                       TextShow.Data.Maybe
+                       TextShow.Data.Monoid
+                       TextShow.Data.Ord
+                       TextShow.Data.Proxy
+                       TextShow.Data.Ratio
+                       TextShow.Data.Text
+                       TextShow.Data.Tuple
+                       TextShow.Data.Typeable
+                       TextShow.Data.Version
+                       TextShow.Data.Void
+                       TextShow.Foreign.C.Types
+                       TextShow.Foreign.Ptr
+                       TextShow.Functions
+                       TextShow.GHC.Generics
+                       TextShow.Numeric.Natural
+                       TextShow.System.Exit
+                       TextShow.System.IO
+                       TextShow.System.Posix.Types
+                       TextShow.Text.Read
+                       TextShow.TH
 
                        -- Only exports functions if using Windows
-                       Text.Show.Text.GHC.Conc.Windows
+                       TextShow.GHC.Conc.Windows
 
                        -- Only exports functions if base >= 4.4
-                       Text.Show.Text.GHC.Fingerprint
+                       TextShow.GHC.Fingerprint
                        -- Only exports functions if base >= 4.4 and not using Windows
-                       Text.Show.Text.GHC.Event
+                       TextShow.GHC.Event
 
                        -- Only exports functions if base >= 4.5
-                       Text.Show.Text.GHC.Stats
+                       TextShow.GHC.Stats
 
                        -- Only exports functions if base >= 4.6
-                       Text.Show.Text.GHC.TypeLits
+                       TextShow.GHC.TypeLits
 
                        -- Only exports functions if base >= 4.7
-                       Text.Show.Text.Data.Type.Coercion
-                       Text.Show.Text.Data.Type.Equality
+                       TextShow.Data.Type.Coercion
+                       TextShow.Data.Type.Equality
                        -- Only exports functions if base >= 4.7 && < 4.8
-                       Text.Show.Text.Data.OldTypeable
+                       TextShow.Data.OldTypeable
 
                        -- Only exports functions if base >= 4.8
-                       Text.Show.Text.GHC.RTS.Flags
-                       Text.Show.Text.GHC.StaticPtr
-  other-modules:       Text.Show.Text.Classes
-                       Text.Show.Text.Data.Typeable.Utils
-                       Text.Show.Text.Instances
-                       Text.Show.Text.TH.Internal
-                       Text.Show.Text.Utils
+                       TextShow.GHC.RTS.Flags
+                       TextShow.GHC.StaticPtr
+  other-modules:       TextShow.Classes
+                       TextShow.Data.Typeable.Utils
+                       TextShow.Instances
+                       TextShow.TH.Internal
+                       TextShow.Utils
   build-depends:       array              >= 0.3     && < 0.6
                      , base               >= 4.3     && < 5
                      , base-compat        >= 0.8.1   && < 1
@@ -313,7 +308,7 @@ test-suite text-show-spec
                      , quickcheck-instances >= 0.1    && < 0.4
                      , tagged               >= 0.8.1  && < 1
                      , text                 >= 0.11.1 && < 1.3
-                     , text-show            == 1
+                     , text-show            == 2
                      , transformers         >= 0.2.1  && < 0.5
                      , transformers-compat  >= 0.3    && < 1
                      , void                 >= 0.5    && < 1

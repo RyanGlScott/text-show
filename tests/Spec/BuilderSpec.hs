@@ -15,7 +15,7 @@ import Instances.Data.Text ()
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
-import Text.Show.Text (Builder, fromString, fromText, lengthB,
+import TextShow (Builder, fromString, fromText, lengthB,
                        toString, toText, unlinesB, unwordsB)
 
 main :: IO ()

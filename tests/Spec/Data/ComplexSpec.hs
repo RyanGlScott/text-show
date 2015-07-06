@@ -12,7 +12,7 @@ module Spec.Data.ComplexSpec (main, spec) where
 
 import Data.Complex (Complex)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -22,4 +22,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Complex Double" $
-    prop "Show instance" (prop_matchesShow :: Int -> Complex Double -> Bool)
+    prop "TextShow instance" (prop_matchesTextShow :: Int -> Complex Double -> Bool)

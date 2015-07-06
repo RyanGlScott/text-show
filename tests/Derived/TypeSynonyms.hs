@@ -32,14 +32,13 @@ import           GHC.Generics (Generic1)
 import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
 
-import           Prelude hiding (Show(..))
+import           Prelude
 
 import           Test.QuickCheck (Arbitrary)
 
-import           Text.Show as S (Show(..))
-import           Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import           TransformersCompat as S (Show1(..), Show2(..), showsUnaryWith)
+import           TransformersCompat (Show1(..), Show2(..), showsUnaryWith)
 
 -------------------------------------------------------------------------------
 
@@ -51,7 +50,7 @@ type Flip f a b = f b a
 instance Functor ((,,,) a b c) where
     fmap f (a, b, c, d) = (a, b, c, f d)
 
-instance (S.Show a, S.Show b) => S.Show2 ((,,,) a b) where
+instance (Show a, Show b) => Show2 ((,,,) a b) where
     showsPrecWith2 sp1 sp2 _ (a, b, c, d) =
                           showChar '('
         . showsPrec 0 a . showChar ','
@@ -68,7 +67,7 @@ newtype TyCon a b = TyCon
     , Id (Flip Either (Id b) (Id a))
     )
   deriving ( Arbitrary
-           , S.Show
+           , Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -93,7 +92,7 @@ newtype instance TyFamily a b = TyFamily
     , Id (Flip Either (Id b) (Id a))
     )
   deriving ( Arbitrary
-           , S.Show
+           , Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -104,17 +103,17 @@ newtype instance TyFamily a b = TyFamily
 
 -------------------------------------------------------------------------------
 
-instance S.Show a => S.Show1 (TyCon a) where
+instance Show a => Show1 (TyCon a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyCon where
+instance Show2 TyCon where
     showsPrecWith2 sp1 sp2 p (TyCon x) =
         showsUnaryWith (showsPrecWith2 (showsPrecWith2 showsPrec sp1)
                                        (showsPrecWith2 sp1       sp2)
                        ) "TyCon" p x
 
-instance S.Show a => S.Show1 (TyFamily a) where
+instance Show a => Show1 (TyFamily a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyFamily where
+instance Show2 TyFamily where
     showsPrecWith2 sp1 sp2 p (TyFamily x) =
         showsUnaryWith (showsPrecWith2 (showsPrecWith2 showsPrec sp1)
                                        (showsPrecWith2 sp1       sp2)
@@ -122,14 +121,14 @@ instance S.Show2 TyFamily where
 
 -------------------------------------------------------------------------------
 
-$(deriveShow  ''TyCon)
-$(deriveShow1 ''TyCon)
-$(deriveShow2 ''TyCon)
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow  'TyFamily)
-$(deriveShow1 'TyFamily)
-$(deriveShow2 'TyFamily)
+$(deriveTextShow  'TyFamily)
+$(deriveTextShow1 'TyFamily)
+$(deriveTextShow2 'TyFamily)
 #endif
 
 #if __GLASGOW_HASKELL__ < 702

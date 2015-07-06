@@ -18,8 +18,8 @@ import Generics.Deriving.Instances ()
 
 import Instances.Control.Applicative ()
 
-import Spec.Utils (prop_matchesShow, prop_matchesShow2,
-                   prop_genericShow, prop_genericShow1)
+import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow2,
+                   prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -30,8 +30,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Const Int Int" $
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> Const Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> Const Int Int -> Bool)
     describe "ZipList Int" $ do
-        prop "Show instance"  (prop_matchesShow  :: Int -> ZipList Int -> Bool)
-        prop "generic Show"   (prop_genericShow  :: Int -> ZipList Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> ZipList Int -> Bool)
+        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> ZipList Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> ZipList Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> ZipList Int -> Bool)

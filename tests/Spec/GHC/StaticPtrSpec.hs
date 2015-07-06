@@ -22,7 +22,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,8,0)
 import GHC.StaticPtr (StaticPtrInfo)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -35,7 +35,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,8,0)
     describe "StaticPtrInfo" $
-        prop "Show instance" (prop_matchesShow :: Int -> StaticPtrInfo -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> StaticPtrInfo -> Bool)
 #else
     pure ()
 #endif

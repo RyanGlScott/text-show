@@ -14,8 +14,8 @@ module Spec.Derived.InfixSpec (main, spec) where
 
 import Derived.Infix
 
-import Spec.Utils (prop_matchesShow, prop_genericShow,
-                   prop_genericShow', prop_genericShow1)
+import Spec.Utils (prop_matchesTextShow, prop_genericTextShow,
+                   prop_genericTextShow', prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -26,20 +26,20 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TyConPlain Int Int" $ do
-        prop "Show instance" (prop_matchesShow  :: Int -> TyConPlain Int Int -> Bool)
-        prop "generic Show"  (prop_genericShow  :: Int -> TyConPlain Int Int -> Bool)
-        prop "generic Show1" (prop_genericShow1 :: Int -> TyConPlain Int Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyConPlain Int Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyConPlain Int Int -> Bool)
+        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyConPlain Int Int -> Bool)
     describe "TyConGADT Int Int" $ do
-        prop "Show instance" (prop_matchesShow  :: Int -> TyConGADT Int Int -> Bool)
-        prop "generic Show"  (prop_genericShow' :: Int -> TyConGADT Int Int -> Bool)
-        prop "generic Show1" (prop_genericShow1 :: Int -> TyConGADT Int Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyConGADT Int Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow' :: Int -> TyConGADT Int Int -> Bool)
+        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyConGADT Int Int -> Bool)
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyPlain Int Int" $ do
-        prop "Show instance" (prop_matchesShow  :: Int -> TyFamilyPlain Int Int -> Bool)
-        prop "generic Show"  (prop_genericShow' :: Int -> TyFamilyPlain Int Int -> Bool)
-        prop "generic Show1" (prop_genericShow1 :: Int -> TyFamilyPlain Int Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyFamilyPlain Int Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow' :: Int -> TyFamilyPlain Int Int -> Bool)
+        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyFamilyPlain Int Int -> Bool)
     describe "TyFamilyGADT Int Int" $ do
-        prop "Show instance" (prop_matchesShow  :: Int -> TyFamilyGADT Int Int -> Bool)
-        prop "generic Show"  (prop_genericShow' :: Int -> TyFamilyGADT Int Int -> Bool)
-        prop "generic Show1" (prop_genericShow1 :: Int -> TyFamilyGADT Int Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyFamilyGADT Int Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow' :: Int -> TyFamilyGADT Int Int -> Bool)
+        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyFamilyGADT Int Int -> Bool)
 #endif

@@ -12,12 +12,12 @@ module Spec.FromStringTextShowSpec (main, spec) where
 
 import Instances.FromStringTextShow ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
-import Text.Show.Text (FromStringShow(..), FromTextShow(..))
+import TextShow (FromStringShow(..), FromTextShow(..))
 
 main :: IO ()
 main = hspec spec
@@ -25,10 +25,10 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "FromStringShow Int" $
-        prop "Show instance" (prop_matchesShow  :: Int -> FromStringShow Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> FromStringShow Int -> Bool)
     describe "FromStringShow String" $
-        prop "Show instance" (prop_matchesShow :: Int -> FromStringShow String -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> FromStringShow String -> Bool)
     describe "FromTextShow Int" $
-        prop "Show instance" (prop_matchesShow  :: Int -> FromTextShow Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> FromTextShow Int -> Bool)
     describe "FromTextShow String" $
-        prop "Show instance" (prop_matchesShow  :: Int -> FromTextShow String -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> FromTextShow String -> Bool)

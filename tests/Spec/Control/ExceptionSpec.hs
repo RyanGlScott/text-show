@@ -16,7 +16,7 @@ import Control.Exception
 
 import Instances.Control.Exception ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,48 +25,48 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Text.Show.Text.Control.Exception" $ do
+spec = parallel . describe "TextShow.Control.Exception" $ do
     describe "SomeException" $
-        prop "Show instance" (prop_matchesShow :: Int -> SomeException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeException -> Bool)
     describe "IOException" $
-        prop "Show instance" (prop_matchesShow :: Int -> IOException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> IOException -> Bool)
     describe "ArithException" $
-        prop "Show instance" (prop_matchesShow :: Int -> ArithException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ArithException -> Bool)
     describe "ArrayException" $
-        prop "Show instance" (prop_matchesShow :: Int -> ArrayException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ArrayException -> Bool)
     describe "AssertionFailed" $
-        prop "Show instance" (prop_matchesShow :: Int -> AssertionFailed -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> AssertionFailed -> Bool)
 #if MIN_VERSION_base(4,7,0)
     describe "SomeAsyncException" $
-        prop "Show instance" (prop_matchesShow :: Int -> SomeAsyncException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeAsyncException -> Bool)
 #endif
     describe "AsyncException" $
-        prop "Show instance" (prop_matchesShow :: Int -> AsyncException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> AsyncException -> Bool)
     describe "NonTermination" $
-        prop "Show instance" (prop_matchesShow :: Int -> NonTermination -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> NonTermination -> Bool)
     describe "NestedAtomically" $
-        prop "Show instance" (prop_matchesShow :: Int -> NestedAtomically -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> NestedAtomically -> Bool)
     describe "BlockedIndefinitelyOnMVar" $
-        prop "Show instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
     describe "BlockedIndefinitelyOnSTM" $
-        prop "Show instance" (prop_matchesShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
 #if MIN_VERSION_base(4,8,0)
     describe "AllocationLimitExceeded" $
-        prop "Show instance" (prop_matchesShow :: Int -> AllocationLimitExceeded -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> AllocationLimitExceeded -> Bool)
 #endif
     describe "Deadlock" $
-        prop "Show instance" (prop_matchesShow :: Int -> Deadlock -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Deadlock -> Bool)
     describe "NoMethodError" $
-        prop "Show instance" (prop_matchesShow :: Int -> NoMethodError -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> NoMethodError -> Bool)
     describe "PatternMatchFail" $
-        prop "Show instance" (prop_matchesShow :: Int -> PatternMatchFail -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> PatternMatchFail -> Bool)
     describe "RecConError" $
-        prop "Show instance" (prop_matchesShow :: Int -> RecConError -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecConError -> Bool)
     describe "RecSelError" $
-        prop "Show instance" (prop_matchesShow :: Int -> RecSelError -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecSelError -> Bool)
     describe "RecUpdError" $
-        prop "Show instance" (prop_matchesShow :: Int -> RecUpdError -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecUpdError -> Bool)
     describe "ErrorCall" $
-        prop "Show instance" (prop_matchesShow :: Int -> ErrorCall -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ErrorCall -> Bool)
     describe "MaskingState" $
-        prop "Show instance" (prop_matchesShow :: Int -> MaskingState -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> MaskingState -> Bool)

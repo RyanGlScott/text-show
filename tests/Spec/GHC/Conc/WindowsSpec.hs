@@ -22,7 +22,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
 import GHC.Conc.Windows (ConsoleEvent)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -35,7 +35,7 @@ spec :: Spec
 spec = parallel $
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
     describe "ConsoleEvent" $
-        prop "Show instance" (prop_matchesShow :: Int -> ConsoleEvent -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConsoleEvent -> Bool)
 #else
     pure ()
 #endif

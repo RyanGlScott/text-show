@@ -21,23 +21,22 @@ Defines data types with rank-n voodoo.
 module Derived.RankNTypes (TyCon(..), TyFamily(..)) where
 
 import Prelude ()
-import Prelude.Compat hiding (Show(..))
+import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
-import Text.Show as S (Show(..))
-import Text.Show.Text as T (Show(..), Show1(..), Show2(..))
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2,
-                          mkShowbPrec, mkShowbPrecWith, mkShowbPrecWith2)
+import TextShow (Show(..), Show1(..), Show2(..))
+import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2,
+                    makeShowbPrec, makeShowbPrecWith, makeShowbPrecWith2)
 
-import TransformersCompat as S (Show1(..), Show2(..), showsUnaryWith, showsBinaryWith)
+import TransformersCompat (Show1(..), Show2(..), showsUnaryWith, showsBinaryWith)
 
 -------------------------------------------------------------------------------
 
 data TyCon a b = TyCon (forall a. Tagged2 a Int b)
                        (forall b. Tagged2 b a   a)
 
-deriving instance (S.Show a, S.Show b) => S.Show (TyCon a b)
+deriving instance (Show a, Show b) => Show (TyCon a b)
 
 -------------------------------------------------------------------------------
 
@@ -51,12 +50,12 @@ data family TyFamily
 data instance TyFamily a b = TyFamily (forall a. Tagged2 a Int b)
                                       (forall b. Tagged2 b a   a)
 
-deriving instance (S.Show a, S.Show b) => S.Show (TyFamily a b)
+deriving instance (Show a, Show b) => Show (TyFamily a b)
 
 -------------------------------------------------------------------------------
 
 newtype Tagged2 s t c = Tagged2 c
-  deriving S.Show
+  deriving Show
 
 -------------------------------------------------------------------------------
 
@@ -76,15 +75,15 @@ instance Arbitrary (TyFamily Int Int) where
 
 -------------------------------------------------------------------------------
 
-instance S.Show a => S.Show1 (TyCon a) where
+instance Show a => Show1 (TyCon a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyCon where
+instance Show2 TyCon where
     showsPrecWith2 sp1 sp2 p (TyCon b a) =
         showsForall sp1 sp2 "TyCon" p b a
 
-instance S.Show a => S.Show1 (TyFamily a) where
+instance Show a => Show1 (TyFamily a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyFamily where
+instance Show2 TyFamily where
     showsPrecWith2 sp1 sp2 p (TyFamily b a) =
         showsForall sp1 sp2 "TyFamily" p b a
 
@@ -114,17 +113,17 @@ $(deriveShow2 'TyFamily)
 
 $(return [])
 
-instance S.Show1 (Tagged2 s t) where
+instance TextShow1 (Tagged2 s t) where
     showsPrecWith sp p (Tagged2 b) = showsUnaryWith sp "Tagged2" p b
 
-instance S.Show2 (Tagged2 s) where
+instance TextShow2 (Tagged2 s) where
     showsPrecWith2 _ = showsPrecWith
 
-instance T.Show c => T.Show (Tagged2 s t c) where
-    showbPrec = $(mkShowbPrec ''Tagged2)
+instance TextShow c => TextShow (Tagged2 s t c) where
+    showbPrec = $(makeShowbPrec ''Tagged2)
 
-instance T.Show1 (Tagged2 s t) where
-    showbPrecWith = $(mkShowbPrecWith ''Tagged2)
+instance TextShow1 (Tagged2 s t) where
+    showbPrecWith = $(makeShowbPrecWith ''Tagged2)
 
-instance T.Show2 (Tagged2 s) where
-    showbPrecWith2 = $(mkShowbPrecWith2 ''Tagged2)
+instance TextShow2 (Tagged2 s) where
+    showbPrecWith2 = $(makeShowbPrecWith2 ''Tagged2)

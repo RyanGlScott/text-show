@@ -14,7 +14,7 @@ module Spec.Data.TextSpec (main, spec) where
 
 import           Instances.Data.Text ()
 
-import           Spec.Utils (prop_matchesShow)
+import           Spec.Utils (prop_matchesTextShow)
 
 import           Test.Hspec (Spec, describe, hspec, parallel)
 import           Test.Hspec.QuickCheck (prop)
@@ -37,20 +37,20 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Builder" $
-        prop "Show instance" (prop_matchesShow :: Int -> Builder -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Builder -> Bool)
     describe "strict Text" $
-        prop "Show instance" (prop_matchesShow :: Int -> TS.Text -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TS.Text -> Bool)
     describe "lazy Text" $
-        prop "Show instance" (prop_matchesShow :: Int -> TL.Text -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TL.Text -> Bool)
     describe "I16" $
-        prop "Show instance" (prop_matchesShow :: Int -> I16 -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> I16 -> Bool)
     describe "UnicodeException" $
-        prop "Show instance" (prop_matchesShow :: Int -> UnicodeException -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> UnicodeException -> Bool)
 #if MIN_VERSION_text(1,0,0)
     describe "Decoding" $
-        prop "Show instance" (prop_matchesShow :: Int -> Decoding -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Decoding -> Bool)
 #endif
 #if MIN_VERSION_text(1,1,0)
     describe "Size" $
-        prop "Show instance" (prop_matchesShow :: Int -> Size -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Size -> Bool)
 #endif

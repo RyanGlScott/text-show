@@ -43,28 +43,28 @@ module TransformersCompat (
 #include "generic.h"
 #include "inline.h"
 
-import            Control.Applicative (Const(..))
+import           Control.Applicative (Const(..))
 
 -- #if __GLASGOW_HASKELL__ >= 708
--- import            Data.Data (Data, Typeable)
+-- import           Data.Data (Data, Typeable)
 -- #endif
-import            Data.Functor.Identity (Identity(..))
-import            Data.Text.Lazy.Builder (Builder)
+import           Data.Functor.Identity (Identity(..))
+import           Data.Text.Lazy.Builder (Builder)
 
 #if __GLASGOW_HASKELL__ >= 702
-import            GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import            GHC.Generics (Generic1)
+import           GHC.Generics (Generic1)
 # endif
 #endif
 
-import            Prelude ()
-import            Prelude.Compat
+import           Prelude ()
+import           Prelude.Compat
 
 import           Text.Read (Read(..), readListPrecDefault)
-import qualified Text.Show.Text as T (Show, Show1, Show2)
-import           Text.Show.Text (fromString, showbPrec, showbPrecWith,
-                                 showbPrecWith2, toString)
+
+import           TextShow (TextShow(showbPrec), TextShow1(..), TextShow2(..),
+                           fromString, toString)
 
 -- | Lifting of the 'Show' class to unary type constructors.
 class Show1 f where
@@ -111,11 +111,11 @@ instance Read (f a) => Read (FromStringShow1 f a) where
     readListPrec = readListPrecDefault
     INLINE_INST_FUN(readListPrec)
 
-instance (Show1 f, Show a) => T.Show (FromStringShow1 f a) where
+instance (Show1 f, Show a) => TextShow (FromStringShow1 f a) where
     showbPrec = showbPrecWith (showsToShowb showsPrec)
     INLINE_INST_FUN(showbPrec)
 
-instance Show1 f => T.Show1 (FromStringShow1 f) where
+instance Show1 f => TextShow1 (FromStringShow1 f) where
     showbPrecWith sp p (FromStringShow1 x) =
         fromString $ showsPrecWith (showbToShows sp) p x ""
     INLINE_INST_FUN(showbPrecWith)
@@ -162,15 +162,15 @@ instance Read (f a b) => Read (FromStringShow2 f a b) where
     readListPrec = readListPrecDefault
     INLINE_INST_FUN(readListPrec)
 
-instance (Show2 f, Show a, Show b) => T.Show (FromStringShow2 f a b) where
+instance (Show2 f, Show a, Show b) => TextShow (FromStringShow2 f a b) where
     showbPrec = showbPrecWith (showsToShowb showsPrec)
     INLINE_INST_FUN(showbPrec)
 
-instance (Show2 f, Show a) => T.Show1 (FromStringShow2 f a) where
+instance (Show2 f, Show a) => TextShow1 (FromStringShow2 f a) where
     showbPrecWith = showbPrecWith2 (showsToShowb showsPrec)
     INLINE_INST_FUN(showbPrecWith)
 
-instance Show2 f => T.Show2 (FromStringShow2 f) where
+instance Show2 f => TextShow2 (FromStringShow2 f) where
     showbPrecWith2 sp1 sp2 p (FromStringShow2 x) =
         fromString $ showsPrecWith2 (showbToShows sp1) (showbToShows sp2) p x ""
     INLINE_INST_FUN(showbPrecWith2)
@@ -235,3 +235,11 @@ instance Show2 Either where
 
 instance Show2 Const where
     showsPrecWith2 sp _ d (Const x) = showsUnaryWith sp "Const" d x
+
+instance (Show a, Show b, Show c) => Show2 ((,,,,) a b c) where
+    showsPrecWith2 sp1 sp2 _ (a, b, c, d, e) =
+        showChar '(' . shows a . showChar ','
+                     . shows b . showChar ','
+                     . shows c . showChar ','
+                     . sp1 0 d . showChar ','
+                     . sp2 0 e . showChar ')'

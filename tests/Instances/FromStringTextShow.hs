@@ -15,7 +15,7 @@ Portability: GHC
 module Instances.FromStringTextShow () where
 
 import Test.QuickCheck (Arbitrary)
-import Text.Show.Text (FromStringShow(..), FromTextShow(..))
+import TextShow (FromStringShow(..), FromTextShow(..))
 
 deriving instance Arbitrary a => Arbitrary (FromStringShow a)
 deriving instance Arbitrary a => Arbitrary (FromTextShow a)

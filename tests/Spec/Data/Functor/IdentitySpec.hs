@@ -15,7 +15,7 @@ import Data.Functor.Identity (Identity)
 
 import Instances.Data.Functor.Identity ()
 
-import Spec.Utils (prop_matchesShow1)
+import Spec.Utils (prop_matchesTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,4 +25,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Identity Int" $
-    prop "Show1 instance" (prop_matchesShow1 :: Int -> Identity Int -> Bool)
+    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Identity Int -> Bool)

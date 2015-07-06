@@ -14,7 +14,7 @@ module Spec.System.Posix.TypesSpec (main, spec) where
 
 import Instances.System.Posix.Types ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import System.Posix.Types
 
@@ -29,56 +29,56 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Fd" $
-        prop "Show instance" (prop_matchesShow :: Int -> Fd -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fd -> Bool)
 #if defined(HTYPE_DEV_T)
     describe "CDev" $
-        prop "Show instance" (prop_matchesShow :: Int -> CDev -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CDev -> Bool)
 #endif
 #if defined(HTYPE_INO_T)
     describe "CIno" $
-        prop "Show instance" (prop_matchesShow :: Int -> CIno -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CIno -> Bool)
 #endif
 #if defined(HTYPE_MODE_T)
     describe "CMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> CMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CMode -> Bool)
 #endif
 #if defined(HTYPE_OFF_T)
     describe "COff" $
-        prop "Show instance" (prop_matchesShow :: Int -> COff -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> COff -> Bool)
 #endif
 #if defined(HTYPE_PID_T)
     describe "CPid" $
-        prop "Show instance" (prop_matchesShow :: Int -> CPid -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CPid -> Bool)
 #endif
 #if defined(HTYPE_SSIZE_T)
     describe "CSsize" $
-        prop "Show instance" (prop_matchesShow :: Int -> CSsize -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSsize -> Bool)
 #endif
 #if defined(HTYPE_GID_T)
     describe "CGid" $
-        prop "Show instance" (prop_matchesShow :: Int -> CGid -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CGid -> Bool)
 #endif
 #if defined(HTYPE_NLINK_T)
     describe "CNlink" $
-        prop "Show instance" (prop_matchesShow :: Int -> CNlink -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CNlink -> Bool)
 #endif
 #if defined(HTYPE_UID_T)
     describe "CUid" $
-        prop "Show instance" (prop_matchesShow :: Int -> CUid -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUid -> Bool)
 #endif
 #if defined(HTYPE_CC_T)
     describe "CCc" $
-        prop "Show instance" (prop_matchesShow :: Int -> CCc -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CCc -> Bool)
 #endif
 #if defined(HTYPE_SPEED_T)
     describe "CSpeed" $
-        prop "Show instance" (prop_matchesShow :: Int -> CSpeed -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSpeed -> Bool)
 #endif
 #if defined(HTYPE_TCFLAG_T)
     describe "CTcflag" $
-        prop "Show instance" (prop_matchesShow :: Int -> CTcflag -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CTcflag -> Bool)
 #endif
 #if defined(HTYPE_RLIM_T)
     describe "CRLim" $
-        prop "Show instance" (prop_matchesShow :: Int -> CRLim -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CRLim -> Bool)
 #endif

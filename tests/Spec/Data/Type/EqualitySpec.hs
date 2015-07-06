@@ -23,7 +23,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,7,0)
 import Data.Type.Equality ((:~:))
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -36,7 +36,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
     describe "Int :~: Int" $
-        prop "Show instance" (prop_matchesShow :: Int -> Int :~: Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Int :~: Int -> Bool)
 #else
     pure ()
 #endif

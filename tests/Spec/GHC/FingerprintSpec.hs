@@ -24,7 +24,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,4,0)
 import GHC.Fingerprint.Type (Fingerprint)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -37,7 +37,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,4,0)
     describe "Fingerprint" $
-        prop "Show instance" (prop_matchesShow :: Int -> Fingerprint -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fingerprint -> Bool)
 #else
     pure ()
 #endif

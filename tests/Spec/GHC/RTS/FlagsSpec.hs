@@ -22,7 +22,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,8,0)
 import GHC.RTS.Flags
 
-import Spec.Utils (ioProperty, prop_matchesShow)
+import Spec.Utils (ioProperty, prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -36,23 +36,23 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
     describe "RTSFlags" $
-        prop "Show instance" prop_showRTSFlags
+        prop "TextShow instance" prop_showRTSFlags
     describe "GCFlags" $
-        prop "Show instance" prop_showGCFlags
+        prop "TextShow instance" prop_showGCFlags
     describe "ConcFlags" $
-        prop "Show instance" (prop_matchesShow :: Int -> ConcFlags -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConcFlags -> Bool)
     describe "MiscFlags" $
-        prop "Show instance" (prop_matchesShow :: Int -> MiscFlags -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> MiscFlags -> Bool)
     describe "DebugFlags" $
-        prop "Show instance" (prop_matchesShow :: Int -> DebugFlags -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DebugFlags -> Bool)
     describe "CCFlags" $
-        prop "Show instance" prop_showCCFlags
+        prop "TextShow instance" prop_showCCFlags
     describe "ProfFlags" $
-        prop "Show instance" prop_showProfFlags
+        prop "TextShow instance" prop_showProfFlags
     describe "TraceFlags" $
-        prop "Show instance" prop_showTraceFlags
+        prop "TextShow instance" prop_showTraceFlags
     describe "TickyFlags" $
-        prop "Show instance" (prop_matchesShow :: Int -> TickyFlags -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TickyFlags -> Bool)
 #else
     pure ()
 #endif
@@ -62,29 +62,29 @@ spec = parallel $ do
 prop_showRTSFlags :: Int -> Property
 prop_showRTSFlags p = ioProperty $ do
     rtsflags <- getRTSFlags
-    pure $ prop_matchesShow p rtsflags
+    pure $ prop_matchesTextShow p rtsflags
 
 -- | Verifies that the 'Show' instance for 'GCFlags' is accurate.
 prop_showGCFlags :: Int -> Property
 prop_showGCFlags p = ioProperty $ do
     gcflags <- getGCFlags
-    pure $ prop_matchesShow p gcflags
+    pure $ prop_matchesTextShow p gcflags
 
 -- | Verifies that the 'Show' instance for 'CCFlags' is accurate.
 prop_showCCFlags :: Int -> Property
 prop_showCCFlags p = ioProperty $ do
     ccflags <- getCCFlags
-    pure $ prop_matchesShow p ccflags
+    pure $ prop_matchesTextShow p ccflags
 
 -- | Verifies that the 'Show' instance for 'ProfFlags' is accurate.
 prop_showProfFlags :: Int -> Property
 prop_showProfFlags p = ioProperty $ do
     profflags <- getProfFlags
-    pure $ prop_matchesShow p profflags
+    pure $ prop_matchesTextShow p profflags
 
 -- | Verifies that the 'Show' instance for 'TraceFlags' is accurate.
 prop_showTraceFlags :: Int -> Property
 prop_showTraceFlags p = ioProperty $ do
     traceflags <- getTraceFlags
-    pure $ prop_matchesShow p traceflags
+    pure $ prop_matchesTextShow p traceflags
 #endif

@@ -12,7 +12,7 @@ module Spec.System.ExitSpec (main, spec) where
 
 import Instances.System.Exit ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import System.Exit (ExitCode)
 
@@ -24,4 +24,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "ExitCode" $
-    prop "Show instance" (prop_matchesShow :: Int -> ExitCode -> Bool)
+    prop "TextShow instance" (prop_matchesTextShow :: Int -> ExitCode -> Bool)

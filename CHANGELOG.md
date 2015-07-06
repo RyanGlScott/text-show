@@ -1,3 +1,82 @@
+# 2
+* Changed the top-level module name from `Text.Show.Text` to `TextShow`, since the former was extremely verbose without much benefit. As a result, this will break all existing code that depends on `text-show`.
+* Several typeclasses and functions were renamed so as to not to clash with the `Prelude`:
+ * `Show` → `TextShow`
+ * `Show1` → `TextShow1`
+ * `Show2` → `TextShow2`
+ * `show` → `showt`
+ * `showLazy` → `showtl`
+ * `showPrec` → `showtPrec`
+ * `showPrecLazy` → `showtlPrec`
+ * `showList` → `showtList`
+ * `showListLazy` → `showtlList`
+ * `print` → `printT`
+ * `printLazy` → `printTL`
+ * `hPrint` → `hPrintT`
+ * `hPrintLazy` → `hPrintTL`
+ * `GShow` → `GTextShow`
+ * `GShow1` → `GTextShow1`
+ * `genericShow` → `genericShowt`
+ * `genericShowLazy` → `genericShowtl`
+ * `genericShowPrec` → `genericShowtPrec`
+ * `genericShowPrecLazy` → `genericShowtlPrec`
+ * `genericShowList` → `genericShowtList`
+ * `genericShowListLazy` → `genericShowtlList`
+ * `genericPrint` → `genericPrintT`
+ * `genericPrintLazy` → genericPrintTL``
+ * `genericHPrint` → `genericHPrintT`
+ * `genericHPrintLazy` → `genericHPrintTL`
+ * `deriveShow` → `deriveTextShow`
+ * `deriveShow1` → `deriveTextShow1`
+ * `deriveShow2` → `deriveTextShow2`
+ * `mkShow` → `makeShowt`
+ * `mkShowLazy` → `makeShowtl`
+ * `mkShowPrec` → `makeShowtPrec`
+ * `mkShowPrecLazy` → `makeShowtlPrec`
+ * `mkShowList` → `makeShowtList`
+ * `mkShowListLazy` → `makeShowtlList`
+ * `mkShowb` → `makeShowb`
+ * `mkShowbPrec` → `makeShowbPrec`
+ * `mkShowbList` → `makeShowbList`
+ * `mkPrint` → `makePrintT`
+ * `mkPrintLazy` → `makePrintTL`
+ * `mkHPrint` → `makeHPrintT`
+ * `mkHPrintLazy` → `makeHPrintTL`
+ * `mkShowbPrecWith` → `makeShowbPrecWith`
+ * `mkShowbPrec1` → `makeShowbPrec1`
+ * `mkShowbPrecWith2` → `makeShowbPrecWith2`
+ * `mkShowbPrec2` → `makeShowbPrec2`
+ * `trace` → `tracet`
+ * `traceLazy` → `tracetl`
+ * `traceId` → `tracetId`
+ * `traceIdLazy` → `tracetlId`
+ * `traceShow` → `traceTextShow`
+ * `traceShowId` → `traceTextShowId`
+ * `traceStack` → `tracetStack`
+ * `traceStackLazy` → `tracetlStack`
+ * `traceIO` → `tracetIO`
+ * `traceIOLazy` → `tracetlIO`
+ * `traceM` → `tracetM`
+ * `traceMLazy` → `tracetlM`
+ * `traceShowM` → `traceTextShowM`
+ * `traceEvent` → `tracetEvent`
+ * `traceEventLazy` → `tracetlEvent`
+ * `traceEventIO` → `travetEventIO`
+ * `traceEventIOLazy` → `tracetlEventIO`
+ * `traceMarker` → `tracetMarker`
+ * `traceMarkerLazy` → `tracetlMarker`
+ * `traceMarkerIO` → `tracetMarkerIO`
+ * `traceMarkerIOLazy` → `tracetlMarkerIO`
+ * `genericTraceShow` → `genericTraceTextShow`
+ * `genericTraceShowId` → `genericTraceTextShowId`
+ * `genericTraceShowM` → `genericTraceTextShowM`
+ * `mkTraceShow` → `makeTraceTextShow`
+ * `mkTraceShowId` → `makeTraceTextShowId`
+ * `mkTraceShowM` → `makeTraceTextShowM`
+* Generalized `tracetM`, `tracetlM`, and `traceTextShowM` to use an `Applicative` constraint instead of `Monad`
+* Fixed a bug in which the `TextShow(1)` instances for `Proxy`, `(:~:)`, and `Coercion` didn't use `-XPolyKinds`
+* Fixed a bug in the Template Haskell deriver which would cause `deriveTextShow` to fail on type parameters with sufficiently high kinds
+
 # 1
 * The `Show1` class has been completely overhauled. `Show1` now uses the function `showbPrecWith`, which takes as an argument a function of type `Int -> a -> Builder` to show occurrences of the type parameter (instead of requiring the type parameter to be a `Show` instance). This matches the new implementation of `Show1` in the next version of `transformers`. A similar `Show2` class (with the function `showbPrecWith2`) was also added.
 * As a consequence, `Show1` instances should no longer be defined in terms of `showbPrec`; rather, `Show` instances should be defined in terms of `showbPrecWith` or `showbPrecWith2`, and `Show1` instances can be defined in terms of `showbPrecWith2`.

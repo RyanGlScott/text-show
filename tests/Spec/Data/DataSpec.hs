@@ -14,7 +14,7 @@ import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity)
 
 import Instances.Data.Data ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,12 +25,12 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Constr" $
-        prop "Show instance" (prop_matchesShow :: Int -> Constr -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Constr -> Bool)
     describe "ConstrRep" $
-        prop "Show instance" (prop_matchesShow :: Int -> ConstrRep -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConstrRep -> Bool)
     describe "DataRep" $
-        prop "Show instance" (prop_matchesShow :: Int -> DataRep -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DataRep -> Bool)
     describe "DataType" $
-        prop "Show instance" (prop_matchesShow :: Int -> DataType -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DataType -> Bool)
     describe "Fixity" $
-        prop "Show instance" (prop_matchesShow :: Int -> Fixity -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fixity -> Bool)

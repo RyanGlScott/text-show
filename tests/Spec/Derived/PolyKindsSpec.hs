@@ -14,9 +14,9 @@ module Spec.Derived.PolyKindsSpec (main, spec) where
 
 import Derived.PolyKinds
 
-import Spec.Utils (prop_matchesShow2, prop_genericShow, prop_genericShow1)
+import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow, prop_genericTextShow1)
 #if MIN_VERSION_template_haskell(2,7,0)
-import Spec.Utils (prop_genericShow')
+import Spec.Utils (prop_genericTextShow')
 #endif
 
 import Test.Hspec (Spec, describe, hspec, parallel)
@@ -28,20 +28,28 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TyConCompose Either Either Either Maybe Maybe Int Int" $ do
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
-        prop "generic Show"   (prop_genericShow  :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyConCompose Either Either Either Maybe Maybe Int Int -> Bool)
     describe "TyConProxy Int Int" $ do
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyConProxy Int Int -> Bool)
-        prop "generic Show"   (prop_genericShow  :: Int -> TyConProxy Int Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> TyConProxy Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyConProxy Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> TyConProxy Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyConProxy Int Int -> Bool)
+    describe "TyConReallyHighKinds (,,,,) Int Int Int Int Int" $ do
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyConReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> TyConReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyConReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyCompose Either Either Either Maybe Maybe Int Int" $ do
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
-        prop "generic Show"   (prop_genericShow' :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow' :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyFamilyCompose Either Either Either Maybe Maybe Int Int -> Bool)
     describe "TyFamilyProxy Int Int" $ do
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyFamilyProxy Int Int -> Bool)
-        prop "generic Show"   (prop_genericShow' :: Int -> TyFamilyProxy Int Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> TyFamilyProxy Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyFamilyProxy Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow' :: Int -> TyFamilyProxy Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyFamilyProxy Int Int -> Bool)
+    describe "TyFamilyReallyHighKinds (,,,,) Int Int Int Int Int" $ do
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyFamilyReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow' :: Int -> TyFamilyReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyFamilyReallyHighKinds (,,,,) Int Int Int Int Int -> Bool)
 #endif

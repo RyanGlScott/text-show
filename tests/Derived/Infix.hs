@@ -35,14 +35,13 @@ import GHC.Generics (Generic1)
 import GHC.Show (appPrec, appPrec1, showSpace)
 
 import Prelude ()
-import Prelude.Compat hiding (Show(..))
+import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), oneof)
 
-import Text.Show as S (Show(..))
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat as S (Show1(..), Show2(..), showsBinaryWith)
+import TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
 
 -------------------------------------------------------------------------------
 
@@ -52,7 +51,7 @@ infixr 5 `TyConPlain`
 data TyConPlain a b = (:!:) a b
                     | a :@: b
                     | a `TyConPlain` b
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -69,7 +68,7 @@ data TyConGADT a b where
     (:..)   ::           e ->       f        -> TyConGADT e f
     (:...)  ::           g ->       h -> Int -> TyConGADT g h
     (:....) :: { tcg1 :: i, tcg2 :: j }      -> TyConGADT i j
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -93,7 +92,7 @@ infixr 5 `TyFamilyPlain`
 data instance TyFamilyPlain a b = (:#:) a b
                                 | a :$: b
                                 | a `TyFamilyPlain` b
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -117,7 +116,7 @@ data instance TyFamilyGADT a b where
     (:**)   ::           e ->       f        -> TyFamilyGADT e f
     (:***)  ::           g ->       h -> Int -> TyFamilyGADT g h
     (:****) :: { tfg1 :: i, tfg2 :: j }      -> TyFamilyGADT i j
-  deriving ( S.Show
+  deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -152,9 +151,9 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
 
 -------------------------------------------------------------------------------
 
-instance S.Show a => S.Show1 (TyConPlain a) where
+instance Show a => Show1 (TyConPlain a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyConPlain where
+instance Show2 TyConPlain where
     showsPrecWith2 sp1 sp2 p (a :!: b) =
         showsBinaryWith sp1 sp2 "(:!:)" p a b
     showsPrecWith2 sp1 sp2 p (a :@: b) =
@@ -162,9 +161,9 @@ instance S.Show2 TyConPlain where
     showsPrecWith2 sp1 sp2 p (TyConPlain a b) =
         showsInfix sp1 sp2 "`TyConPlain`" p 5 a b
 
-instance S.Show a => S.Show1 (TyConGADT a) where
+instance Show a => Show1 (TyConGADT a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyConGADT where
+instance Show2 TyConGADT where
     showsPrecWith2 sp1 sp2 p (a :. b) =
         showsInfix sp1 sp2 ":." p 1 a b
     showsPrecWith2 sp1 sp2 p (a :.. b) =
@@ -174,9 +173,9 @@ instance S.Show2 TyConGADT where
     showsPrecWith2 sp1 sp2 p (a :.... b) =
         showsBinaryWith sp1 sp2 "(:....)" p a b
 
-instance S.Show a => S.Show1 (TyFamilyPlain a) where
+instance Show a => Show1 (TyFamilyPlain a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyFamilyPlain where
+instance Show2 TyFamilyPlain where
     showsPrecWith2 sp1 sp2 p (a :#: b) =
         showsBinaryWith sp1 sp2 "(:#:)" p a b
     showsPrecWith2 sp1 sp2 p (a :$: b) =
@@ -184,9 +183,9 @@ instance S.Show2 TyFamilyPlain where
     showsPrecWith2 sp1 sp2 p (TyFamilyPlain a b) =
         showsInfix sp1 sp2 "`TyFamilyPlain`" p 5 a b
 
-instance S.Show a => S.Show1 (TyFamilyGADT a) where
+instance Show a => Show1 (TyFamilyGADT a) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance S.Show2 TyFamilyGADT where
+instance Show2 TyFamilyGADT where
     showsPrecWith2 sp1 sp2 p (a :* b) =
         showsInfix sp1 sp2 ":*" p 1 a b
     showsPrecWith2 sp1 sp2 p (a :** b) =
@@ -213,20 +212,20 @@ showsTernaryWith sp1 sp2 name p a b i = showParen (p > appPrec) $
 
 -------------------------------------------------------------------------------
 
-$(deriveShow  ''TyConPlain)
-$(deriveShow1 ''TyConPlain)
-$(deriveShow2 ''TyConPlain)
+$(deriveTextShow  ''TyConPlain)
+$(deriveTextShow1 ''TyConPlain)
+$(deriveTextShow2 ''TyConPlain)
 
-$(deriveShow  ''TyConGADT)
-$(deriveShow1 ''TyConGADT)
-$(deriveShow2 ''TyConGADT)
+$(deriveTextShow  ''TyConGADT)
+$(deriveTextShow1 ''TyConGADT)
+$(deriveTextShow2 ''TyConGADT)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow  '(:#:))
-$(deriveShow1 '(:$:))
-$(deriveShow2 'TyFamilyPlain)
+$(deriveTextShow  '(:#:))
+$(deriveTextShow1 '(:$:))
+$(deriveTextShow2 'TyFamilyPlain)
 
-$(deriveShow  '(:*))
-$(deriveShow1 '(:***))
-$(deriveShow2 '(:****))
+$(deriveTextShow  '(:*))
+$(deriveTextShow1 '(:***))
+$(deriveTextShow2 '(:****))
 #endif

@@ -26,7 +26,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable (TyCon, TypeRep)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -39,9 +39,9 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
     describe "TypeRep" $
-        prop "Show instance" (prop_matchesShow :: Int -> TypeRep -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TypeRep -> Bool)
     describe "TyCon" $
-        prop "Show instance" (prop_matchesShow :: Int -> TyCon -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TyCon -> Bool)
 #else
     pure ()
 #endif

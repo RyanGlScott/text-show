@@ -18,7 +18,7 @@ import Instances.Foreign.Ptr ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -30,18 +30,18 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Ptr Int" $
-        prop "Show instance"     (prop_matchesShow :: Int -> Ptr Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Ptr Int -> Bool)
     describe "FunPtr Int" $
-        prop "Show instance"  (prop_matchesShow :: Int -> FunPtr Int -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> FunPtr Int -> Bool)
     describe "IntPtr" $
-        prop "Show instance"      (prop_matchesShow :: Int -> IntPtr -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> IntPtr -> Bool)
     describe "WordPtr" $
-        prop "Show instance"     (prop_matchesShow :: Int -> WordPtr -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> WordPtr -> Bool)
     describe "ForeignPtr" $
-        prop "Show instance"  prop_showForeignPtr
+        prop "TextShow instance" prop_showForeignPtr
 
 -- | Verifies the 'Show' instance for 'ForeignPtr' is accurate.
 prop_showForeignPtr :: Int -> Ptr Int -> Property
 prop_showForeignPtr p ptr = ioProperty $ do
     fptr <- newForeignPtr_ ptr
-    pure $ prop_matchesShow p fptr
+    pure $ prop_matchesTextShow p fptr

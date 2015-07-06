@@ -17,13 +17,13 @@ import GHC.Show (asciiTab)
 
 import Instances.Data.Char ()
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, it, parallel, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 
-import Text.Show.Text (fromString)
-import Text.Show.Text.Data.Char (asciiTabB)
+import TextShow (fromString)
+import TextShow.Data.Char (asciiTabB)
 
 main :: IO ()
 main = hspec spec
@@ -31,8 +31,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Char" $
-        prop "Show instance"   (prop_matchesShow :: Int -> Char -> Bool)
+        prop "TextShow instance"   (prop_matchesTextShow :: Int -> Char -> Bool)
     describe "GeneralCategory" $
-        prop "Show instance"   (prop_matchesShow :: Int -> GeneralCategory -> Bool)
+        prop "TextShow instance"   (prop_matchesTextShow :: Int -> GeneralCategory -> Bool)
     describe "asciiTabB" $
-        it "equals asciiTab" $ map fromString asciiTab `shouldBe` elems asciiTabB
+        it "equals asciiTab" $     map fromString asciiTab `shouldBe` elems asciiTabB

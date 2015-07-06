@@ -23,7 +23,7 @@ import Test.Hspec (Spec, hspec, parallel)
 import Data.Monoid (All(..))
 import Data.Type.Coercion (Coercion)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -36,7 +36,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
     describe "Coercion All Bool" $
-        prop "Show instance" (prop_matchesShow :: Int -> Coercion All Bool -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Coercion All Bool -> Bool)
 #else
     pure ()
 #endif

@@ -16,7 +16,7 @@ import           Data.ByteString.Short (ShortByteString)
 
 import           Instances.Data.ByteString ()
 
-import           Spec.Utils (prop_matchesShow)
+import           Spec.Utils (prop_matchesTextShow)
 
 import           Test.Hspec (Spec, describe, hspec, parallel)
 import           Test.Hspec.QuickCheck (prop)
@@ -28,8 +28,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "strict ByteString" $
-        prop "Show instance" (prop_matchesShow :: Int -> BS.ByteString -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> BS.ByteString -> Bool)
     describe "lazy ByteString" $
-        prop "Show instance" (prop_matchesShow :: Int -> BL.ByteString -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> BL.ByteString -> Bool)
     describe "ShortByteString" $
-        prop "Show instance" (prop_matchesShow :: Int -> ShortByteString -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ShortByteString -> Bool)

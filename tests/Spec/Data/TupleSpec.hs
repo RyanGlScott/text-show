@@ -14,8 +14,8 @@ import Generics.Deriving.Instances ()
 
 import Instances.Data.Tuple ()
 
-import Spec.Utils (prop_matchesShow, prop_matchesShow2,
-                   prop_genericShow, prop_genericShow1)
+import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow2,
+                   prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -26,73 +26,73 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "()" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> () -> Bool)
-        prop "generic Show"
-            (prop_genericShow :: Int -> () -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> () -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow :: Int -> () -> Bool)
     describe "(Int, Int)" $ do
-        prop "Show2 instance"
-            (prop_matchesShow2 :: Int -> (Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int) -> Bool)
+        prop "TextShow2 instance"
+            (prop_matchesTextShow2 :: Int -> (Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int) -> Bool)
     describe "(Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow  :: Int -> (Int, Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow  :: Int -> (Int, Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow  :: Int -> (Int, Int, Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int, Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show"
-            (prop_genericShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic Show1"
-            (prop_genericShow1 :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow"
+            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "generic TextShow1"
+            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "Show instance"
-            (prop_matchesShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        prop "TextShow instance"
+            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)

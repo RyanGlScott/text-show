@@ -18,12 +18,11 @@ module Derived.MagicHash (TyCon#(..), TyFamily#(..)) where
 import GHC.Exts
 
 import Prelude ()
-import Prelude.Compat hiding (Show)
+import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
-import Text.Show as S (Show)
-import Text.Show.Text.TH (deriveShow)
+import TextShow.TH (deriveTextShow)
 
 -------------------------------------------------------------------------------
 
@@ -33,8 +32,8 @@ data TyCon# = TyCon# {
   , tcDouble# :: Double#
   , tcChar#   :: Char#
   , tcWord#   :: Word#
-} deriving S.Show
-$(deriveShow ''TyCon#)
+} deriving Show
+$(deriveTextShow ''TyCon#)
 
 -------------------------------------------------------------------------------
 
@@ -45,9 +44,9 @@ data instance TyFamily# = TyFamily# {
   , tfDouble# :: Double#
   , tfChar#   :: Char#
   , tfWord#   :: Word#
-} deriving S.Show
+} deriving Show
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow 'TyFamily#)
+$(deriveTextShow 'TyFamily#)
 #endif
 
 -------------------------------------------------------------------------------

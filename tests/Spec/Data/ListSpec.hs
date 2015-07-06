@@ -10,14 +10,14 @@ Portability: GHC
 -}
 module Spec.Data.ListSpec (main, spec) where
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import Text.Show (showListWith)
-import Text.Show.Text (fromString, showb)
-import Text.Show.Text.Data.List (showbListWith)
+import TextShow (fromString, showb)
+import TextShow.Data.List (showbListWith)
 
 main :: IO ()
 main = hspec spec
@@ -25,13 +25,13 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "String" $
-        prop "Show instance"                       (prop_matchesShow :: Int -> String -> Bool)
+        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> String -> Bool)
     describe "[String]" $
-        prop "Show instance"                       (prop_matchesShow :: Int -> [String] -> Bool)
+        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> [String] -> Bool)
     describe "[Int]" $
-        prop "Show instance"                       (prop_matchesShow :: Int -> [Int] -> Bool)
+        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> [Int] -> Bool)
     describe "showbListWith" $
-        prop "has the same output as showListWith" prop_showListWith
+        prop "has the same output as showListWith"     prop_showListWith
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
 prop_showListWith :: String -> Bool

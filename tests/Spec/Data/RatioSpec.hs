@@ -12,7 +12,7 @@ module Spec.Data.RatioSpec (main, spec) where
 
 import Data.Ratio (Ratio)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -22,4 +22,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Ratio Int" $ do
-    prop "Show instance" (prop_matchesShow :: Int -> Ratio Int -> Bool)
+    prop "TextShow instance" (prop_matchesTextShow :: Int -> Ratio Int -> Bool)

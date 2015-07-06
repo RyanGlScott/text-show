@@ -19,7 +19,7 @@ import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), oneof)
 
-import Text.Show.Text.Generic (ConType(..))
+import TextShow.Generic (ConType(..))
 
 instance Arbitrary ConType where
     arbitrary = oneof [pure Rec, pure Tup, pure Pref, Inf <$> arbitrary]

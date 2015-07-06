@@ -20,14 +20,14 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_template_haskell(2,7,0)
 import Derived.DataFamilies (NotAllShow)
 
-import Spec.Utils (prop_matchesShow2, prop_genericShow', prop_genericShow1)
+import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow', prop_genericTextShow1)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
 
 # if __GLASGOW_HASKELL__ >= 708
 import Derived.DataFamilies (NullaryData)
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 # endif
 #endif
 
@@ -38,13 +38,13 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "NotAllShow Int Int Int Int" $ do
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> NotAllShow Int Int Int Int -> Bool)
-        prop "generic Show"   (prop_genericShow' :: Int -> NotAllShow Int Int Int Int -> Bool)
-        prop "generic Show1"  (prop_genericShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> NotAllShow Int Int Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow' :: Int -> NotAllShow Int Int Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
 # if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
-        prop "Show instance"  (prop_matchesShow  :: Int -> NullaryData -> Bool)
-        prop "generic Show"   (prop_genericShow' :: Int -> NullaryData -> Bool)
+        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> NullaryData -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow' :: Int -> NullaryData -> Bool)
 # endif
 #else
     pure ()

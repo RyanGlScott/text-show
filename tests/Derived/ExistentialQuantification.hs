@@ -20,15 +20,14 @@ module Derived.ExistentialQuantification (TyCon(..), TyFamily(..)) where
 import GHC.Show (appPrec, appPrec1, showSpace)
 
 import Prelude ()
-import Prelude.Compat hiding (Show)
+import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), Gen, oneof)
 
-import Text.Show as S (Show)
-import Text.Show.Text as T (Show)
-import Text.Show.Text.TH (deriveShow, deriveShow1, deriveShow2)
+import TextShow (TextShow)
+import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat as S (Show1(..), Show2(..), showsBinaryWith)
+import TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
 
 -------------------------------------------------------------------------------
 
@@ -45,8 +44,8 @@ data TyCon a b c d where
                              -> TyCon Int z Int z
 
     TyConForalls             :: forall p q r s t u.
-                                (Arbitrary p, S.Show p, T.Show p,
-                                 Arbitrary q, S.Show q, T.Show q)
+                                (Arbitrary p, Show p, TextShow p,
+                                 Arbitrary q, Show q, TextShow q)
                              => p -> q -> u -> t
                              -> TyCon r s t u
 
@@ -72,8 +71,8 @@ data instance TyFamily a b c d where
                                 -> TyFamily Int z Int z
 
     TyFamilyForalls             :: forall p q r s t u.
-                                   (Arbitrary p, S.Show p, T.Show p,
-                                    Arbitrary q, S.Show q, T.Show q)
+                                   (Arbitrary p, Show p, TextShow p,
+                                    Arbitrary q, Show q, TextShow q)
                                 => p -> q -> u -> t
                                 -> TyFamily r s t u
 
@@ -97,10 +96,10 @@ instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyFamily a b c d) wh
 
 -------------------------------------------------------------------------------
 
-deriving instance (S.Show a, S.Show b, S.Show c, S.Show d) => S.Show (TyCon a b c d)
-instance (S.Show a, S.Show b, S.Show c) => S.Show1 (TyCon a b c) where
+deriving instance (Show a, Show b, Show c, Show d) => Show (TyCon a b c d)
+instance (Show a, Show b, Show c) => Show1 (TyCon a b c) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance (S.Show a, S.Show b) => S.Show2 (TyCon a b) where
+instance (Show a, Show b) => Show2 (TyCon a b) where
     showsPrecWith2 sp1 sp2 p (TyConClassConstraints a b c d) =
         showsFour sp1 sp2 "TyConClassConstraints" p a b c d
     showsPrecWith2 sp1 sp2 p (TyConEqualityConstraints a b c d) =
@@ -110,10 +109,10 @@ instance (S.Show a, S.Show b) => S.Show2 (TyCon a b) where
     showsPrecWith2 sp1 sp2 p (TyConForalls p' q d c) =
         showsFour sp2 sp1 "TyConForalls" p p' q d c
 
-deriving instance (S.Show a, S.Show b, S.Show c, S.Show d) => S.Show (TyFamily a b c d)
-instance (S.Show a, S.Show b, S.Show c) => S.Show1 (TyFamily a b c) where
+deriving instance (Show a, Show b, Show c, Show d) => Show (TyFamily a b c d)
+instance (Show a, Show b, Show c) => Show1 (TyFamily a b c) where
     showsPrecWith = showsPrecWith2 showsPrec
-instance (S.Show a, S.Show b) => S.Show2 (TyFamily a b) where
+instance (Show a, Show b) => Show2 (TyFamily a b) where
     showsPrecWith2 sp1 sp2 p (TyFamilyClassConstraints a b c d) =
         showsFour sp1 sp2 "TyFamilyClassConstraints" p a b c d
     showsPrecWith2 sp1 sp2 p (TyFamilyEqualityConstraints a b c d) =
@@ -123,7 +122,7 @@ instance (S.Show a, S.Show b) => S.Show2 (TyFamily a b) where
     showsPrecWith2 sp1 sp2 p (TyFamilyForalls p' q d c) =
         showsFour sp2 sp1 "TyFamilyForalls" p p' q d c
 
-showsFour :: (S.Show a, S.Show b)
+showsFour :: (Show a, Show b)
           => (Int -> c -> ShowS) -> (Int -> d -> ShowS)
           -> String -> Int -> a -> b -> c -> d -> ShowS
 showsFour sp1 sp2 name p a b c d = showParen (p > appPrec) $
@@ -135,12 +134,12 @@ showsFour sp1 sp2 name p a b c d = showParen (p > appPrec) $
 
 -------------------------------------------------------------------------------
 
-$(deriveShow  ''TyCon)
-$(deriveShow1 ''TyCon)
-$(deriveShow2 ''TyCon)
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow  'TyFamilyClassConstraints)
-$(deriveShow1 'TyFamilyEqualityConstraints)
-$(deriveShow2 'TyFamilyTypeRefinement)
+$(deriveTextShow  'TyFamilyClassConstraints)
+$(deriveTextShow1 'TyFamilyEqualityConstraints)
+$(deriveTextShow2 'TyFamilyTypeRefinement)
 #endif

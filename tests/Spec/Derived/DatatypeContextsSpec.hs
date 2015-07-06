@@ -14,7 +14,7 @@ module Spec.Derived.DatatypeContextsSpec (main, spec) where
 
 import Derived.DatatypeContexts
 
-import Spec.Utils (prop_matchesShow2)
+import Spec.Utils (prop_matchesTextShow2)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,8 +25,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TyCon Int Int Int" $
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyCon Int Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyCon Int Int Int -> Bool)
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int Int" $
-        prop "Show2 instance" (prop_matchesShow2 :: Int -> TyFamily Int Int Int -> Bool)
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> TyFamily Int Int Int -> Bool)
 #endif

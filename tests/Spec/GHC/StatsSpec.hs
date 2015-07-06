@@ -22,7 +22,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,5,0)
 import GHC.Stats (GCStats)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -35,7 +35,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,5,0)
     describe "GCStats" $
-        prop "Show instance" (prop_matchesShow :: Int -> GCStats -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> GCStats -> Bool)
 #else
     pure ()
 #endif

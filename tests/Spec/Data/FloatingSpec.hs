@@ -22,14 +22,14 @@ import Numeric.Compat (showEFloat, showFFloat, showGFloat,
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck (Gen, arbitrary, suchThat)
 
-import Text.Show.Text (Builder, fromString)
-import Text.Show.Text.Data.Floating (showbEFloat, showbFFloat, showbGFloat,
+import TextShow (Builder, fromString)
+import TextShow.Data.Floating (showbEFloat, showbFFloat, showbGFloat,
                                      showbFFloatAlt, showbGFloatAlt)
 
 main :: IO ()
@@ -38,21 +38,21 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Float" $
-        prop "Show instance"                          (prop_matchesShow :: Int -> Float -> Bool)
+        prop "TextShow instance"                          (prop_matchesTextShow :: Int -> Float -> Bool)
     describe "Double" $
-        prop "Show instance"                          (prop_matchesShow :: Int -> Double -> Bool)
+        prop "TextShow instance"                          (prop_matchesTextShow :: Int -> Double -> Bool)
     describe "showbEFloat" $
-        prop "has the same output as showEFloat" $    prop_showXFloat showEFloat showbEFloat
+        prop "has the same output as showEFloat" $        prop_showXFloat showEFloat showbEFloat
     describe "showbFFloat" $
-        prop "has the same output as showFFloat" $    prop_showXFloat showFFloat showbFFloat
+        prop "has the same output as showFFloat" $        prop_showXFloat showFFloat showbFFloat
     describe "showbGFloat" $
-        prop "has the same output as showGFloat" $    prop_showXFloat showGFloat showbGFloat
+        prop "has the same output as showGFloat" $        prop_showXFloat showGFloat showbGFloat
     describe "showbFFloatAlt" $
-        prop "has the same output as showFFloatAlt" $ prop_showXFloat showFFloatAlt showbFFloatAlt
+        prop "has the same output as showFFloatAlt" $     prop_showXFloat showFFloatAlt showbFFloatAlt
     describe "showbGFloatAlt" $
-        prop "has the same output as showFFloatAlt" $ prop_showXFloat showGFloatAlt showbGFloatAlt
+        prop "has the same output as showFFloatAlt" $     prop_showXFloat showGFloatAlt showbGFloatAlt
     describe "FPFormat" $
-        prop "Show instance"                          (prop_matchesShow :: Int -> FPFormat -> Bool)
+        prop "TextShow instance"                          (prop_matchesTextShow :: Int -> FPFormat -> Bool)
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
 -- is one of E, F, or G).

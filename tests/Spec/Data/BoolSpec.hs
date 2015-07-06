@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.BoolSpec (main, spec) where
 
-import Spec.Utils (prop_matchesShow, prop_genericShow)
+import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -22,5 +22,5 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Bool" $ do
-    prop "Show instance" (prop_matchesShow :: Int -> Bool -> Bool)
-    prop "generic Show"  (prop_genericShow :: Int -> Bool -> Bool)
+    prop "TextShow instance" (prop_matchesTextShow :: Int -> Bool -> Bool)
+    prop "generic TextShow"  (prop_genericTextShow :: Int -> Bool -> Bool)

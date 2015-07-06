@@ -22,7 +22,7 @@ import Instances.System.IO ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (ioProperty, prop_matchesShow)
+import Spec.Utils (ioProperty, prop_matchesTextShow)
 
 import System.IO (BufferMode, IOMode, HandlePosn, Newline,
                   NewlineMode, SeekMode, Handle, mkTextEncoding)
@@ -37,29 +37,29 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Handle" $
-        prop "Show instance" (prop_matchesShow :: Int -> Handle -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Handle -> Bool)
     describe "IOMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> IOMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> IOMode -> Bool)
     describe "BufferMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> BufferMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> BufferMode -> Bool)
     describe "HandlePosn" $
-        prop "Show instance" (prop_matchesShow :: Int -> HandlePosn -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> HandlePosn -> Bool)
     describe "SeekMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> SeekMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> SeekMode -> Bool)
     describe "TextEncoding" $
-        prop "Show instance" prop_showTextEncoding
+        prop "TextShow instance" prop_showTextEncoding
 #if MIN_VERSION_base(4,4,0)
     describe "CodingProgress" $
-        prop "Show instance" (prop_matchesShow :: Int -> CodingProgress -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CodingProgress -> Bool)
     describe "CodingFailureMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> CodingFailureMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CodingFailureMode -> Bool)
 #endif
     describe "Newline" $
-        prop "Show instance" (prop_matchesShow :: Int -> Newline -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Newline -> Bool)
     describe "NewlineMode" $
-        prop "Show instance" (prop_matchesShow :: Int -> NewlineMode -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> NewlineMode -> Bool)
 
--- | Verifies the 'Show' instance for 'TextEncoding' is accurate.
+-- | Verifies the 'TextShow' instance for 'TextEncoding' is accurate.
 prop_showTextEncoding :: Int -> Property
 prop_showTextEncoding p = ioProperty $ do
     -- Based on this description:
@@ -69,4 +69,4 @@ prop_showTextEncoding p = ioProperty $ do
                                        , "UTF-32", "UTF-32BE", "UTF-32LE"
                                        ]
     tenc <- mkTextEncoding utf
-    pure $ prop_matchesShow p tenc
+    pure $ prop_matchesTextShow p tenc

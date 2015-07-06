@@ -18,7 +18,7 @@ import Data.Word (Word8, Word16, Word32, Word64)
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -29,8 +29,8 @@ import Data.Char (intToDigit)
 import Numeric (showIntAtBase)
 import Test.QuickCheck (Gen, arbitrary, getNonNegative, suchThat)
 
-import Text.Show.Text (fromString)
-import Text.Show.Text.Data.Integral (showbIntAtBase)
+import TextShow (fromString)
+import TextShow.Data.Integral (showbIntAtBase)
 #endif
 
 main :: IO ()
@@ -39,27 +39,27 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Int" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Int -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int -> Bool)
     describe "Int8" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Int8 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int8 -> Bool)
     describe "Int16" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Int16 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int16 -> Bool)
     describe "Int32" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Int32 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int32 -> Bool)
     describe "Int64" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Int64 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int64 -> Bool)
     describe "Integer" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Integer -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Integer -> Bool)
     describe "Word" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Word -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word -> Bool)
     describe "Word8" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Word8 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word8 -> Bool)
     describe "Word16" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Word16 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word16 -> Bool)
     describe "Word32" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Word32 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word32 -> Bool)
     describe "Word64" $
-        prop "Show instance"                        (prop_matchesShow :: Int -> Word64 -> Bool)
+        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word64 -> Bool)
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why this diverges on Windows
     describe "showbIntAtBase" $

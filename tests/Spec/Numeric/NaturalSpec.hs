@@ -14,7 +14,7 @@ import Instances.Numeric.Natural ()
 
 import Numeric.Natural (Natural)
 
-import Spec.Utils (prop_matchesShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -24,4 +24,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Natural" $
-    prop "Show instance" (prop_matchesShow :: Int -> Natural -> Bool)
+    prop "TextShow instance" (prop_matchesTextShow :: Int -> Natural -> Bool)
