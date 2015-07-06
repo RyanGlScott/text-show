@@ -21,6 +21,9 @@ import Test.Hspec (Spec, hspec, parallel)
 
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
 import GHC.Event (Event)
+# if MIN_VERSION_base(4,8,1)
+import GHC.Event (Lifetime)
+#endif
 
 import Spec.Utils (prop_matchesTextShow)
 
@@ -39,6 +42,10 @@ spec = parallel $ do
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Event -> Bool)
 --     describe "FdKey" $
 --         prop "TextShow instance" (prop_matchesTextShow :: Int -> FdKey -> Bool)
+# if MIN_VERSION_base(4,8,1)
+    describe "Lifetime" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Lifetime -> Bool)
+# endif
 #else
     pure ()
 #endif

@@ -1,6 +1,7 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP             #-}
 
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 #endif
 {-|
@@ -23,10 +24,18 @@ module TextShow.GHC.Event (
 #else
       showbEvent
     , showbFdKeyPrec
+# if MIN_VERSION_base(4,8,1)
+    , showbLifetime
+# endif
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
+
 import GHC.Event (Event, FdKey)
+# if MIN_VERSION_base(4,8,1)
+import GHC.Event (Lifetime)
+# endif
+
 import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
 
 -- | Convert an 'Event' to a 'Builder'.
@@ -47,6 +56,17 @@ showbFdKeyPrec :: Int -> FdKey -> Builder
 showbFdKeyPrec p = showbPrec p . FromStringShow
 {-# INLINE showbFdKeyPrec #-}
 
+# if MIN_VERSION_base(4,8,1)
+-- | Convert a 'Lifetime' to a 'Builder'.
+-- This function is only available with @base-4.8.1.0@ or later and is not available
+-- on Windows.
+--
+-- /Since: 2/
+showbLifetime :: Lifetime -> Builder
+showbLifetime = showb
+{-# INLINE showbLifetime #-}
+# endif
+
 instance TextShow Event where
     showb = showbEvent
     {-# INLINE showb #-}
@@ -54,4 +74,8 @@ instance TextShow Event where
 instance TextShow FdKey where
     showbPrec = showbFdKeyPrec
     {-# INLINE showbPrec #-}
+
+# if MIN_VERSION_base(4,8,1)
+$(deriveTextShow1 ''Lifetime)
+# endif
 #endif

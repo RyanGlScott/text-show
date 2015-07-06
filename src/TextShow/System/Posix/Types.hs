@@ -65,8 +65,6 @@ module TextShow.System.Posix.Types (
 
 import Data.Text.Lazy.Builder (Builder)
 
-import Prelude hiding (Show)
-
 import System.Posix.Types
 
 import TextShow.Classes (TextShow(showb, showbPrec))

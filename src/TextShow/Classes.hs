@@ -287,8 +287,8 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
 
 -------------------------------------------------------------------------------
 
--- | The @Text@ 'T.Show' instance for 'FromStringShow' is based on its @String@
--- 'S.Show' instance. That is,
+-- | The 'TextShow' instance for 'FromStringShow' is based on its @String@
+-- 'Show' instance. That is,
 --
 -- @
 -- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
@@ -326,7 +326,7 @@ instance Show a => Show (FromStringShow a) where
     showsPrec p (FromStringShow x) = showsPrec p x
     INLINE_INST_FUN(showsPrec)
 
--- | The @String@ 'S.Show' instance for 'FromTextShow' is based on its
+-- | The @String@ 'Show' instance for 'FromTextShow' is based on its
 -- 'TextShow' instance. That is,
 --
 -- @

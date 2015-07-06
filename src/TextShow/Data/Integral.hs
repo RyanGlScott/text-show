@@ -48,7 +48,7 @@ import           GHC.Prim (Int#)
 import           GHC.Prim ((<#), (>#))
 
 import           Prelude ()
-import           Prelude.Compat hiding (Show)
+import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(showb, showbPrec))
 import           TextShow.Utils (toString)

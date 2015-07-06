@@ -15,6 +15,6 @@ main :: IO ()
 main = printT (Just "Hello, World!")
 ```
 
-If you desire it, there are also monomorphic versions of the `showb` function available in the submodules of `Text.Show.Text`. A naming convention is present in which functions that show different values depending on the precedence end with `Prec`(e.g., `showbIntPrec`), whereas functions that show the same values regardless of precedence do not end with `Prec` (e.g., `showbBool`).
+If you desire it, there are also monomorphic versions of the `showb` function available in the submodules of `Text.Show.Text`. See the [naming conventions](https://github.com/RyanGlScott/text-show/wiki/Naming-conventions) page for more information.
 
 Support for automatically deriving `TextShow` instances can be found in the `TextShow.TH` and `TextShow.Generic` modules. If you don't know which one to use, use `TextShow.TH`.

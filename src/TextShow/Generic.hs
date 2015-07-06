@@ -158,19 +158,19 @@ genericShowtl = toLazyText . genericShowb
 genericShowtPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> TS.Text
 genericShowtPrec p = toStrict . genericShowtlPrec p
 
--- | A 'Generic' implementation of 'showPrectl'.
+-- | A 'Generic' implementation of 'showtlPrec'.
 --
 -- /Since: 2/
 genericShowtlPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> TL.Text
 genericShowtlPrec p = toLazyText . genericShowbPrec p
 
--- | A 'Generic' implementation of 'showListt'.
+-- | A 'Generic' implementation of 'showtList'.
 --
 -- /Since: 2/
 genericShowtList :: (Generic a, GTextShow (Rep a)) => [a] -> TS.Text
 genericShowtList = toStrict . genericShowtlList
 
--- | A 'Generic' implementation of 'showListtl'.
+-- | A 'Generic' implementation of 'showtlList'.
 --
 -- /Since: 2/
 genericShowtlList :: (Generic a, GTextShow (Rep a)) => [a] -> TL.Text

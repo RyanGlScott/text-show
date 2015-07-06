@@ -35,7 +35,7 @@ module TransformersCompat (
     -- * Helper functions
     showsUnaryWith,
     showsBinaryWith,
-    -- * Conversion between @String@ and @Text@ 'Show1'/'Show2'
+    -- * Conversion between @Text-@ and @String@ @Show1@/@Show2@
     FromStringShow1(..),
     FromStringShow2(..)
     ) where

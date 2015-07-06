@@ -73,6 +73,7 @@
  * `mkTraceShow` → `makeTraceTextShow`
  * `mkTraceShowId` → `makeTraceTextShowId`
  * `mkTraceShowM` → `makeTraceTextShowM`
+* Added `TextShow Lifetime` instance in `TextShow.GHC.Event` (if using `base-4.8.1.0` or later)
 * Generalized `tracetM`, `tracetlM`, and `traceTextShowM` to use an `Applicative` constraint instead of `Monad`
 * Fixed a bug in which the `TextShow(1)` instances for `Proxy`, `(:~:)`, and `Coercion` didn't use `-XPolyKinds`
 * Fixed a bug in the Template Haskell deriver which would cause `deriveTextShow` to fail on type parameters with sufficiently high kinds
