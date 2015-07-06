@@ -30,13 +30,13 @@ module TextShow.GHC.Event (
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
-
 import GHC.Event (Event, FdKey)
+import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+
 # if MIN_VERSION_base(4,8,1)
 import GHC.Event (Lifetime)
+import TextShow.TH.Internal (deriveTextShow)
 # endif
-
-import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
 
 -- | Convert an 'Event' to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later and is not available
@@ -76,6 +76,6 @@ instance TextShow FdKey where
     {-# INLINE showbPrec #-}
 
 # if MIN_VERSION_base(4,8,1)
-$(deriveTextShow1 ''Lifetime)
+$(deriveTextShow ''Lifetime)
 # endif
 #endif
