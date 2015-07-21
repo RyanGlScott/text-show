@@ -11,7 +11,7 @@ Stability:   Provisional
 Portability: GHC
 
 Functions to mechanically derive 'TextShow', 'TextShow1', or 'TextShow2' instances,
-or to splice @show@-related expressions into Haskell source code. You need to enable
+or to splice their functions directly into Haskell source code. You need to enable
 the @TemplateHaskell@ language extension in order to use this module.
 
 This implementation is loosely based off of the @Data.Aeson.TH@ module from the
@@ -90,7 +90,7 @@ import           TextShow.Utils (isInfixTypeCon, isTupleString)
 {- $deriveTextShow
 
 'deriveTextShow' automatically generates a 'TextShow' instance declaration for a data
-type, a newtype, or a data family instance. This emulates what would (hypothetically)
+type, newtype, or data family instance. This emulates what would (hypothetically)
 happen if you could attach a @deriving 'TextShow'@ clause to the end of a data
 declaration.
 
@@ -98,7 +98,7 @@ Here are some examples of how to derive 'TextShow' for simple data types:
 
 @
 &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
-import TextShow.TH (deriveTextShow)
+import TextShow.TH
 
 data Letter = A | B | C
 $('deriveTextShow' ''Letter) -- instance TextShow Letter where ...
@@ -110,8 +110,9 @@ $('deriveTextShow' ''Box) -- instance TextShow a => TextShow (Box a) where ...
 If you are using @template-haskell-2.7.0.0@ or later (i.e., GHC 7.4 or later),
 'deriveTextShow' can also be used to derive 'TextShow' instances for data family
 instances (which requires the @-XTypeFamilies@ extension). To do so, pass the name of
-a data or newtype instance constructor to 'deriveTextShow'.  Note that the generated
-code may require the @-XFlexibleInstances@ extension. Some examples:
+a data or newtype instance constructor (NOT a data family name!) to 'deriveTextShow'.
+Note that the generated code may require the @-XFlexibleInstances@ extension.
+Some examples:
 
 @
 &#123;-&#35; LANGUAGE FlexibleInstances, TemplateHaskell, TypeFamilies &#35;-&#125;
@@ -138,22 +139,20 @@ Note that at the moment, there are some limitations:
   Phantom a = Phantom@, then @('deriveTextShow' ''Phantom)@ will generate @instance
   'TextShow' a => 'TextShow' (Phantom a) where ...@, even though @'TextShow' a@ is
   not required. If you want a proper 'TextShow' instance for @Phantom@, you will need
-  to use 'makeShowbPrec' (see the documentation of the 'make' functions for more
+  to use 'makeShowbPrec' (see the documentation of the @make@ functions for more
   information).
 
 * 'deriveTextShow' lacks the ability to properly detect data types with higher-kinded
    type parameters (e.g., @data HK f a = HK (f a)@) or with kinds other than @*@
    (e.g., @data List a (empty :: Bool)@). If you wish to derive 'TextShow'
-   instances for these data types, you will need to use 'makeShowbPrec' (see the
-   documentation of the 'make' functions for more information).
+   instances for these data types, you will need to use 'makeShowbPrec'.
 
 * Some data constructors have arguments whose 'TextShow' instance depends on a
   typeclass besides 'TextShow'. For example, consider @newtype MyFixed a = MyFixed
   (Fixed a)@. @'Fixed' a@ is a 'TextShow' instance only if @a@ is an instance of both
   @HasResolution@ and 'TextShow'. Unfortunately, 'deriveTextShow' cannot infer that
   'a' must be an instance of 'HasResolution', so it cannot create a 'TextShow'
-  instance for @MyFixed@. However, you can use 'makeShowbPrec' to get around this
-  (see the documentation of the 'make' functions for more information).
+  instance for @MyFixed@. However, you can use 'makeShowbPrec' to get around this.
 
 -}
 
@@ -167,16 +166,16 @@ deriveTextShow = deriveTextShowClass TextShow
 {- $deriveTextShow1
 
 'deriveTextShow1' automatically generates a 'Show1' instance declaration for a data
-type, a newtype, or a data family instance that has at least one type variable.
+type, newtype, or data family instance that has at least one type variable.
 This emulates what would (hypothetically) happen if you could attach a @deriving
 'TextShow1'@ clause to the end of a data declaration. Examples:
 
 @
 &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
-import TextShow.TH (deriveTextShow1)
+import TextShow.TH
 
 data Stream a = Stream a (Stream a)
-$('deriveTextShow1' ''Stream) -- instance Show1 TextStream where ...
+$('deriveTextShow1' ''Stream) -- instance TextShow1 TextStream where ...
 
 newtype WrappedFunctor f a = WrapFunctor (f a)
 $('deriveTextShow1' ''WrappedFunctor) -- instance TextShow1 f => TextShow1 (WrappedFunctor f) where ...
@@ -218,7 +217,7 @@ with some caveats:
   @
   data family Foo a b c
   data instance Foo Int y z = Foo Int y z
-  $(deriveTextShow1 'Foo)
+  $('deriveTextShow1' 'Foo)
   @
 
   To avoid this issue, it is recommened that you use the same type variables in the
@@ -227,7 +226,7 @@ with some caveats:
   @
   data family Foo a b c
   data instance Foo Int b c = Foo Int b c
-  $(deriveTextShow1 'Foo)
+  $('deriveTextShow1' 'Foo)
   @
 
 -}
@@ -242,13 +241,13 @@ deriveTextShow1 = deriveTextShowClass TextShow1
 {- $deriveTextShow2
 
 'deriveTextShow2' automatically generates a 'TextShow2' instance declaration for a data
-type, a newtype, or a data family instance that has at least two type variables.
+type, newtype, or data family instance that has at least two type variables.
 This emulates what would (hypothetically) happen if you could attach a @deriving
 'TextShow2'@ clause to the end of a data declaration. Examples:
 
 @
 &#123;-&#35; LANGUAGE TemplateHaskell &#35;-&#125;
-import TextShow.TH (deriveShow2)
+import TextShow.TH
 
 data OneOrNone a b = OneL a | OneR b | None
 $('deriveTextShow2' ''OneOrNone) -- instance TextShow2 OneOrNone where ...
@@ -301,24 +300,14 @@ deriveTextShow2 = deriveTextShowClass TextShow2
 
 There may be scenarios in which you want to show an arbitrary data type or data
 family instance without having to make the type an instance of 'TextShow'. For these
-cases, "TextShow.TH" provide several functions (all prefixed with @make@) that
+cases, this modules provides several functions (all prefixed with @make@-) that
 splice the appropriate lambda expression into your source code. Example:
 
-@
-&#123;-&#35; LANGUAGE OverloadedStrings, TemplateHaskell &#35;-&#125;
-import TextShow.TH (makeShowT)
-
-data ADT = ADT
-
-whichADT :: Bool
-whichADT = $(makeShowT ''ADT) ADT == \"ADT\"
-@
-
-@make@ functions are also useful for creating 'TextShow' instances for data types with
-sophisticated type parameters. For example, 'deriveTextShow' cannot infer the correct
-type context for @newtype HigherKinded f a = HigherKinded (f a)@, since @f@ is a
-higher-kinded type parameter. However, it is still possible to derive a 'TextShow'
-instance for @HigherKinded@ without too much trouble using 'makeShowbPrec':
+This is particularly useful for creating instances for sophisticated data types. For
+example, 'deriveTextShow' cannot infer the correct type context for
+@newtype HigherKinded f a = HigherKinded (f a)@, since @f@ is of kind @* -> *@.
+However, it is still possible to derive a 'TextShow' instance for @HigherKinded@
+without too much trouble using 'makeShowbPrec':
 
 @
 &#123;-&#35; LANGUAGE FlexibleContexts, TemplateHaskell &#35;-&#125;
@@ -539,11 +528,11 @@ makeShowbPrecClass tsClass tyConName = do
     info <- reify tyConName
     case info of
         TyConI{} -> withTyCon tyConName $ \ctxt tvbs decs ->
-            let (_, _, nbs) = cxtAndTypePlainTy tsClass tyConName ctxt tvbs
+            let (_, _, !nbs) = cxtAndTypePlainTy tsClass tyConName ctxt tvbs
              in makeTextShowForCons nbs decs
 #if MIN_VERSION_template_haskell(2,7,0)
         DataConI{} -> withDataFamInstCon tyConName $ \famTvbs ctxt parentName instTys cons ->
-            let (_, _, nbs) = cxtAndTypeDataFamInstCon tsClass parentName ctxt famTvbs instTys
+            let (_, _, !nbs) = cxtAndTypeDataFamInstCon tsClass parentName ctxt famTvbs instTys
              in makeTextShowForCons nbs cons
         FamilyI (FamilyD DataFam _ _ _) _ ->
             error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
@@ -772,7 +761,7 @@ withTyCon name f = do
             case dec of
                 DataD    ctxt _ tvbs cons _ -> f ctxt tvbs cons
                 NewtypeD ctxt _ tvbs con  _ -> f ctxt tvbs [con]
-                other -> error $ ns ++ "Unsupported type " ++ show other ++ ". Must be a data type or newtype."
+                _ -> error $ ns ++ "Unsupported type " ++ show dec ++ ". Must be a data type or newtype."
         _ -> error $ ns ++ "The name must be of a plain type constructor."
   where
     ns :: String
@@ -789,7 +778,7 @@ withDataFam name f = do
         FamilyI (FamilyD DataFam _ tvbs _) decs -> f tvbs decs
         FamilyI (FamilyD TypeFam _ _    _) _    ->
             error $ ns ++ "Cannot use a type family name."
-        other -> error $ ns ++ "Unsupported type " ++ show other ++ ". Must be a data family name."
+        _ -> error $ ns ++ "Unsupported type " ++ show info ++ ". Must be a data family name."
   where
     ns :: String
     ns = "TextShow.TH.withDataFam: "
@@ -818,7 +807,7 @@ withDataFamInstCon dficName f = do
 
                     in f famTvbs ctxt parentName instTys cons
                 _ -> error $ ns ++ "Data constructor " ++ show dficName ++ " is not from a data family instance."
-        other -> error $ ns ++ "Unsupported type " ++ show other ++ ". Must be a data family instance constructor."
+        _ -> error $ ns ++ "Unsupported type " ++ show dficInfo ++ ". Must be a data family instance constructor."
   where
     ns :: String
     ns = "TextShow.TH.withDataFamInstCon: "
@@ -831,12 +820,12 @@ cxtAndTypePlainTy :: TextShowClass -- TextShow, TextShow1, or TextShow2
                   -> Cxt           -- The datatype context
                   -> [TyVarBndr]   -- The type variables
                   -> (Cxt, Type, [NameBase])
-cxtAndTypePlainTy tsClass tyConName dataCxt tvbs =
-    if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
-       then derivingKindError tsClass tyConName
-    else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-       then datatypeContextError tsClass instanceType
-    else (instanceCxt, instanceType, droppedNbs)
+cxtAndTypePlainTy tsClass tyConName dataCxt tvbs
+    | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
+    = derivingKindError tsClass tyConName
+    | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
+    = datatypeContextError tsClass instanceType
+    | otherwise = (instanceCxt, instanceType, droppedNbs)
   where
     instanceCxt :: Cxt
     instanceCxt = map (applyShowConstraint)
@@ -866,14 +855,14 @@ cxtAndTypeDataFamInstCon :: TextShowClass -- TextShow, TextShow1, or TextShow2
                          -> [TyVarBndr]   -- The data family declaration's type variables
                          -> [Type]        -- The data family instance types
                          -> (Cxt, Type, [NameBase])
-cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds =
-    if remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
-       then derivingKindError tsClass parentName
-    else if any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-       then datatypeContextError tsClass instanceType
-    else if canEtaReduce remaining dropped -- If it is safe to drop the type variables
-       then (instanceCxt, instanceType, droppedNbs)
-    else etaReductionError instanceType
+cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
+    | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
+    = derivingKindError tsClass parentName
+    | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
+    = datatypeContextError tsClass instanceType
+    | canEtaReduce remaining dropped -- If it is safe to drop the type variables
+    = (instanceCxt, instanceType, droppedNbs)
+    | otherwise = etaReductionError instanceType
   where
     instanceCxt :: Cxt
     instanceCxt = map (applyShowConstraint)
