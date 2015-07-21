@@ -17,7 +17,9 @@ The 'TextShow', 'TextShow1', and 'TextShow2' typeclasses.
 -}
 module TextShow.Classes where
 
+#if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Typeable)
+#endif
 import           Data.Monoid.Compat ((<>))
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
