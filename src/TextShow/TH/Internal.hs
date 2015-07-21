@@ -573,7 +573,7 @@ makeTextShowForCon _ _ _ (NormalC conName [])
 makeTextShowForCon p tsClass tvis (NormalC conName [(_, argTy)]) = do
     arg <- newName "arg"
 
-    let showArg  = makeTextShowForArg appPrec1 tsClass (nameBase conName) tvis argTy arg
+    let showArg  = makeTextShowForArg appPrec1 tsClass conName tvis argTy arg
         namedArg = [| fromString $(stringE (parenInfixConName conName " ")) <> $(showArg) |]
 
     match (conP conName [varP arg])
@@ -584,7 +584,7 @@ makeTextShowForCon p tsClass tvis (NormalC conName ts) = do
 
     if isNonUnitTuple conName
        then do
-           let showArgs       = map (\(arg, (_, argTy)) -> makeTextShowForArg 0 tsClass (nameBase conName) tvis argTy arg)
+           let showArgs       = map (\(arg, (_, argTy)) -> makeTextShowForArg 0 tsClass conName tvis argTy arg)
                                     (zip args ts)
                parenCommaArgs = [| singleton '(' |] : intersperse [| singleton ',' |] showArgs
                mappendArgs    = foldr (`infixApp` [| (<>) |])
@@ -595,7 +595,7 @@ makeTextShowForCon p tsClass tvis (NormalC conName ts) = do
                  (normalB mappendArgs)
                  []
        else do
-           let showArgs = map (\(arg, (_, argTy)) -> makeTextShowForArg appPrec1 tsClass (nameBase conName) tvis argTy arg)
+           let showArgs = map (\(arg, (_, argTy)) -> makeTextShowForArg appPrec1 tsClass conName tvis argTy arg)
                               (zip args ts)
                mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
                namedArgs   = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
@@ -609,7 +609,7 @@ makeTextShowForCon _p tsClass tvis (RecC conName ts) = do
 
     let showArgs       = concatMap (\(arg, (argName, _, argTy))
                                       -> [ [| fromString $(stringE (nameBase argName ++ " = ")) |]
-                                         , makeTextShowForArg 0 tsClass (nameBase conName) tvis argTy arg
+                                         , makeTextShowForArg 0 tsClass conName tvis argTy arg
                                          , [| fromString ", "                                   |]
                                          ]
                                    )
@@ -644,9 +644,9 @@ makeTextShowForCon p tsClass tvis (InfixC (_, alTy) conName (_, arTy)) = do
 
     match (infixP (varP al) conName (varP ar))
           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
-                          [| $(makeTextShowForArg (conPrec + 1) tsClass opName tvis alTy al)
+                          [| $(makeTextShowForArg (conPrec + 1) tsClass conName tvis alTy al)
                           <> $(infixOpE)
-                          <> $(makeTextShowForArg (conPrec + 1) tsClass opName tvis arTy ar)
+                          <> $(makeTextShowForArg (conPrec + 1) tsClass conName tvis arTy ar)
                           |]
           )
           []
@@ -656,7 +656,7 @@ makeTextShowForCon p tsClass tvis (ForallC tvbs _ con) = makeTextShowForCon p ts
 -- constructor.
 makeTextShowForArg :: Int
                    -> TextShowClass
-                   -> String
+                   -> Name
                    -> [TyVarInfo]
                    -> Type
                    -> Name
@@ -669,7 +669,7 @@ makeTextShowForArg p tsClass conName tvis ty tyExpName = do
 -- constructor, after expanding all type synonyms.
 makeTextShowForArg' :: Int
                     -> TextShowClass
-                    -> String
+                    -> Name
                     -> [TyVarInfo]
                     -> Type
                     -> Name
@@ -716,7 +716,7 @@ makeTextShowForArg' p tsClass conName tvis ty tyExpName =
 -- 3. If the type is of kind * -> * -> * (T a b), apply
 --    showbPrecWith2 $(makeTextShowForType a) $(makeTextShowForType b)
 makeTextShowForType :: TextShowClass
-                    -> String
+                    -> Name
                     -> [TyVarInfo]
                     -> Type
                     -> Q Exp
@@ -742,7 +742,7 @@ makeTextShowForType tsClass conName tvis ty = do
     itf <- isTyFamily tyCon
     if any (`mentionsNameBase` tyVarNameBases) lhsArgs
           || itf && any (`mentionsNameBase` tyVarNameBases) tyArgs
-       then outOfPlaceTyVarError conName tyVarNameBases numLastArgs
+       then outOfPlaceTyVarError conName tyVarNameBases
        else appsE $ [ varE . showbPrecNameTable $ toEnum numLastArgs]
                     ++ map (makeTextShowForType tsClass conName tvis) rhsArgs
 
@@ -824,7 +824,7 @@ cxtAndTypePlainTy tsClass tyConName dataCxt tvbs
     | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
     = derivingKindError tsClass tyConName
     | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-    = datatypeContextError tsClass instanceType
+    = datatypeContextError tyConName instanceType
     | otherwise = (instanceCxt, instanceType, droppedNbs)
   where
     instanceCxt :: Cxt
@@ -859,7 +859,7 @@ cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
     | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
     = derivingKindError tsClass parentName
     | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
-    = datatypeContextError tsClass instanceType
+    = datatypeContextError parentName instanceType
     | canEtaReduce remaining dropped -- If it is safe to drop the type variables
     = (instanceCxt, instanceType, droppedNbs)
     | otherwise = etaReductionError instanceType
@@ -1007,39 +1007,25 @@ etaReductionError instanceType = error $
 
 -- | The data type has a DatatypeContext which mentions one of the eta-reduced
 -- type variables.
-datatypeContextError :: TextShowClass -> Type -> a
-datatypeContextError tsClass instanceType = error
+datatypeContextError :: Name -> Type -> a
+datatypeContextError dataName instanceType = error
     . showString "Can't make a derived instance of ‘"
     . showString (pprint instanceType)
     . showString "‘:\n\tData type ‘"
-    . showString className
+    . showString (nameBase dataName)
     . showString "‘ must not have a class context involving the last type argument(s)"
     $ ""
-  where
-    className :: String
-    className = nameBase $ textShowClassNameTable tsClass
 
 -- | The data type mentions one of the n eta-reduced type variables in a place other
 -- than the last nth positions of a data type in a constructor's field.
-outOfPlaceTyVarError :: String -> [NameBase] -> Int -> a
-outOfPlaceTyVarError conName tyVarNames numLastArgs = error
+outOfPlaceTyVarError :: Name -> [NameBase] -> a
+outOfPlaceTyVarError conName tyVarNames = error
     . showString "Constructor ‘"
-    . showString conName
-    . showString "‘ must use the type variable"
-    . plural id (showChar 's')
-    . showString " "
-    . showsPrec 0 tyVarNames
-    . showString " only in the last "
-    . plural id (showsPrec 0 numLastArgs)
-    . showString "argument"
-    . plural id (showChar 's')
-    . showString " of a data type"
+    . showString (nameBase conName)
+    . showString "‘ must use the type variable(s) "
+    . shows tyVarNames
+    . showString " only in the last argument(s) of a data type"
     $ ""
-    where
-      plural :: ShowS -> ShowS -> ShowS
-      plural one many = case numLastArgs of
-          1 -> one
-          _ -> many
 
 #if !(MIN_VERSION_template_haskell(2,7,0))
 -- | Template Haskell didn't list all of a data family's instances upon reification

@@ -1,6 +1,7 @@
 # 2.1
 * Added `showsToShowb` and `showbToShows` to `TextShow`
 * Added `TextShow1 FromStringShow` instance
+* Fixed mistakes in TH error output
 * Changed implementation of `showbThreadIdPrec` to avoid using `String`s as an intermediary
 
 # 2
