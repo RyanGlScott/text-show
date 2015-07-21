@@ -30,7 +30,7 @@ import Text.Read.Lex (Number)
 
 import TextShow.Classes (TextShow(showbPrec), showbUnaryWith)
 #if MIN_VERSION_base(4,6,0)
-import TextShow.Classes (FromStringShow(..))
+import TextShow.FromStringTextShow (FromStringShow(..))
 #else
 import TextShow.Data.Integral ()
 import TextShow.Data.Ratio ()

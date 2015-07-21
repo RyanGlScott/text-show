@@ -1,5 +1,8 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE MagicHash                #-}
+{-# LANGUAGE TemplateHaskell          #-}
+{-# LANGUAGE UnliftedFFITypes         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Control.Concurrent
@@ -19,11 +22,17 @@ module TextShow.Control.Concurrent (
     , showbBlockReason
     ) where
 
-import Data.Text.Lazy.Builder (Builder)
+import Data.Monoid.Compat ((<>))
+import Data.Text.Lazy.Builder (Builder, fromString)
 
-import GHC.Conc (BlockReason, ThreadId, ThreadStatus)
+import Foreign.C.Types
 
-import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+import GHC.Conc (BlockReason, ThreadStatus)
+import GHC.Conc.Sync (ThreadId(..))
+import GHC.Prim
+
+import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Foreign.C.Types (showbCIntPrec)
 import TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
@@ -32,8 +41,14 @@ import TextShow.TH.Internal (deriveTextShow)
 --
 -- /Since: 2/
 showbThreadIdPrec :: Int -> ThreadId -> Builder
-showbThreadIdPrec p = showbPrec p . FromStringShow
+showbThreadIdPrec p t = fromString "ThreadId " <> showbCIntPrec p (getThreadId t)
 {-# INLINE showbThreadIdPrec #-}
+
+-- Temporary workaround until Trac #8281 is fixed
+foreign import ccall unsafe "rts_getThreadId" getThreadId# :: Addr# -> CInt
+
+getThreadId :: ThreadId -> CInt
+getThreadId (ThreadId tid) = getThreadId# (unsafeCoerce# tid)
 
 -- | Convert a 'ThreadStatus' to a 'Builder' with the given precedence.
 --

@@ -30,8 +30,11 @@ module TextShow.GHC.Event (
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
+
 import GHC.Event (Event, FdKey)
-import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+
+import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.FromStringTextShow (FromStringShow(..))
 
 # if MIN_VERSION_base(4,8,1)
 import GHC.Event (Lifetime)

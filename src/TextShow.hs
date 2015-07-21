@@ -56,6 +56,8 @@ module TextShow (
       -- * Conversion between 'TextShow' and string @Show@
     , FromStringShow(..)
     , FromTextShow(..)
+    , showsToShowb
+    , showbToShows
     ) where
 
 import Data.Text.Lazy.Builder
@@ -63,5 +65,6 @@ import Data.Text.Lazy.Builder
 import Prelude ()
 
 import TextShow.Classes
+import TextShow.FromStringTextShow
 import TextShow.Instances ()
 import TextShow.Utils (toString, toText, lengthB, unlinesB, unwordsB)

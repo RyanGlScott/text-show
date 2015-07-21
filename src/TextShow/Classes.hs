@@ -1,21 +1,8 @@
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
-{-# LANGUAGE DeriveFoldable             #-}
-{-# LANGUAGE DeriveFunctor              #-}
-{-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric              #-}
-#else
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
-#endif
-
 #if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE AutoDeriveTypeable         #-}
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 #endif
 {-|
@@ -30,7 +17,7 @@ The 'TextShow', 'TextShow1', and 'TextShow2' typeclasses.
 -}
 module TextShow.Classes where
 
-import           Data.Data (Data, Typeable)
+import           Data.Data (Typeable)
 import           Data.Monoid.Compat ((<>))
 import           Data.Text         as TS (Text)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
@@ -39,26 +26,11 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
 
-#if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics (Generic1)
-# endif
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll)
-#endif
 import           GHC.Show (appPrec, appPrec1)
-
-import           Prelude ()
-import           Prelude.Compat
 
 import           System.IO (Handle)
 
-import           Text.Read (Read(..), readListPrecDefault)
-
 import           TextShow.Utils (toString)
-
-#include "inline.h"
 
 -------------------------------------------------------------------------------
 
@@ -218,6 +190,20 @@ hPrintTL :: TextShow a => Handle -> a -> IO ()
 hPrintTL h = TL.hPutStrLn h . showtl
 {-# INLINE hPrintTL #-}
 
+-- | Convert a @ShowS@-based show function to a @Builder@-based one.
+--
+-- /Since: 2.1/
+showsToShowb :: (Int -> a -> ShowS) -> Int -> a -> Builder
+showsToShowb sp p x = fromString $ sp p x ""
+{-# INLINE showsToShowb #-}
+
+-- | Convert a @Builder@-based show function to a @ShowS@-based one.
+--
+-- /Since: 2.1/
+showbToShows :: (Int -> a -> Builder) -> Int -> a -> ShowS
+showbToShows sp p = showString . toString . sp p
+{-# INLINE showbToShows #-}
+
 -------------------------------------------------------------------------------
 
 -- | Lifting of the 'TextShow' class to unary type constructors.
@@ -284,94 +270,3 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
     <> showbSpace <> sp1 appPrec1 x
     <> showbSpace <> sp2 appPrec1 y
 {-# INLINE showbBinaryWith #-}
-
--------------------------------------------------------------------------------
-
--- | The 'TextShow' instance for 'FromStringShow' is based on its @String@
--- 'Show' instance. That is,
---
--- @
--- showbPrec p ('FromStringShow' x) = 'fromString' (showsPrec p x "")
--- @
---
--- /Since: 2/
-newtype FromStringShow a = FromStringShow { fromStringShow :: a }
-  deriving ( Data
-           , Eq
-           , Foldable
-           , Functor
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-# if __GLASGOW_HASKELL__ >= 706
-           , Generic1
-# endif
-#endif
-           , Ord
-           , Traversable
-           , Typeable
-           )
-
-instance Read a => Read (FromStringShow a) where
-    readPrec = FromStringShow <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
-
-instance Show a => TextShow (FromStringShow a) where
-    showbPrec p (FromStringShow x) = fromString $ showsPrec p x ""
-    INLINE_INST_FUN(showbPrec)
-
-instance Show a => Show (FromStringShow a) where
-    showsPrec p (FromStringShow x) = showsPrec p x
-    INLINE_INST_FUN(showsPrec)
-
--- | The @String@ 'Show' instance for 'FromTextShow' is based on its
--- 'TextShow' instance. That is,
---
--- @
--- showsPrec p ('FromTextShow' x) = 'showString' ('toString' (showbPrec p x))
--- @
---
--- /Since: 2/
-newtype FromTextShow a = FromTextShow { fromTextShow :: a }
-  deriving ( Data
-           , Eq
-           , Foldable
-           , Functor
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-# if __GLASGOW_HASKELL__ >= 706
-           , Generic1
-# endif
-#endif
-           , Ord
-           , Traversable
-           , Typeable
-           )
-
-instance Read a => Read (FromTextShow a) where
-    readPrec = FromTextShow <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
-
-instance TextShow a => Show (FromTextShow a) where
-    showsPrec p (FromTextShow x) = showString . toString $ showbPrec p x
-    INLINE_INST_FUN(showsPrec)
-
-instance TextShow a => TextShow (FromTextShow a) where
-    showbPrec = showbPrec1
-    INLINE_INST_FUN(showbPrec)
-
-instance TextShow1 FromTextShow where
-    showbPrecWith sp p (FromTextShow x) = sp p x
-    INLINE_INST_FUN(showbPrecWith)
-
--------------------------------------------------------------------------------
-
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''FromStringShow)
-$(Generics.deriveAll ''FromTextShow)
-#endif

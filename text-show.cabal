@@ -122,6 +122,7 @@ library
                        TextShow.GHC.StaticPtr
   other-modules:       TextShow.Classes
                        TextShow.Data.Typeable.Utils
+                       TextShow.FromStringTextShow
                        TextShow.Instances
                        TextShow.TH.Internal
                        TextShow.Utils
@@ -296,6 +297,7 @@ test-suite text-show-spec
                      , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.2  && < 1
                      , base-orphans         >= 0.4    && < 1
+                     , bifunctors           >= 5      && < 6
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
                      , generic-deriving     >= 1.8.0  && < 2

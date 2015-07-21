@@ -29,7 +29,8 @@ import           Data.Text.Lazy.Builder (Builder)
 
 import           Prelude hiding (Show(show))
 
-import           TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+import           TextShow.Classes (TextShow(showb, showbPrec))
+import           TextShow.FromStringTextShow (FromStringShow(..))
 
 #if !(MIN_VERSION_bytestring(0,10,0))
 import           TextShow.TH.Internal (deriveTextShow)

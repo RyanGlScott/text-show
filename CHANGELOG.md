@@ -1,3 +1,8 @@
+# 2.1
+* Added `showsToShowb` and `showbToShows` to `TextShow`
+* Added `TextShow1 FromStringShow` instance
+* Changed implementation of `showbThreadIdPrec` to avoid using `String`s as an intermediary
+
 # 2
 * Changed the top-level module name from `Text.Show.Text` to `TextShow`, since the former was extremely verbose without much benefit. As a result, this will break all existing code that depends on `text-show`.
 * Several typeclasses and functions were renamed so as to not to clash with the `Prelude`:

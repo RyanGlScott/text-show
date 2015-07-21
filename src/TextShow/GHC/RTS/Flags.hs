@@ -38,13 +38,14 @@ import Data.Text.Lazy.Builder (Builder, singleton)
 
 import GHC.RTS.Flags
 
-import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+import TextShow.Classes (TextShow(showb, showbPrec))
 import TextShow.Data.Bool (showbBool)
 import TextShow.Data.Char ()
 import TextShow.Data.Floating (showbDoublePrec)
 import TextShow.Data.Integral (showbIntPrec, showbWord, showbWord64)
 import TextShow.Data.List ()
 import TextShow.Data.Maybe (showbMaybePrecWith)
+import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
 
 # if __GLASGOW_HASKELL__ < 711

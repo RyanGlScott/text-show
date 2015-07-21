@@ -49,7 +49,8 @@ import Data.Text.Lazy.Builder (Builder, fromString)
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (TextShow(showb, showbPrec), FromStringShow(..))
+import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
