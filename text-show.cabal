@@ -296,7 +296,7 @@ test-suite text-show-spec
   build-depends:       array                >= 0.3    && < 0.6
                      , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.2  && < 1
-                     , base-orphans         >= 0.4    && < 1
+                     , base-orphans         >= 0.4.2  && < 1
                      , bifunctors           >= 5      && < 6
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder

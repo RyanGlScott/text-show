@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Data.OrdSpec
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -12,11 +10,11 @@ Portability: GHC
 -}
 module Spec.Data.OrdSpec (main, spec) where
 
-#if MIN_VERSION_base(4,6,0)
-import Data.Ord (Down)
-#endif
+import Data.Orphans ()
 
 import Generics.Deriving.Instances ()
+
+import GHC.Exts (Down)
 
 import Instances.Data.Ord ()
 
@@ -33,7 +31,5 @@ spec = parallel $ do
     describe "Ordering" $ do
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Ordering -> Bool)
         prop "generic TextShow"  (prop_genericTextShow :: Int -> Ordering -> Bool)
-#if MIN_VERSION_base(4,6,0)
-    describe "Down Int" $ do
+    describe "Down Int" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Down Int -> Bool)
-#endif

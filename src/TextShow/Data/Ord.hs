@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -15,24 +14,15 @@ Monomorphic 'TextShow' functions for 'Ordering' and 'Down'.
 -}
 module TextShow.Data.Ord (
       showbOrdering
-#if MIN_VERSION_base(4,6,0)
     , showbDownPrecWith
-#endif
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (showb)
-import TextShow.TH.Internal (deriveTextShow)
+import GHC.Exts (Down)
 
-#if MIN_VERSION_base(4,6,0)
-import Data.Ord (Down)
-
-import TextShow.Classes (showbPrecWith)
-import TextShow.TH.Internal (deriveTextShow1)
-#endif
-
-#include "inline.h"
+import TextShow.Classes (showb, showbPrecWith)
+import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
 -- | Convert a 'Ordering' to a 'Builder'.
 --
@@ -41,19 +31,13 @@ showbOrdering :: Ordering -> Builder
 showbOrdering = showb
 {-# INLINE showbOrdering #-}
 
-#if MIN_VERSION_base(4,6,0)
 -- | Convert a 'Down' value to a 'Builder' with the given show function and precedence.
--- This function is only available with @base-4.6.0.0@ or later.
 --
 -- /Since: 2/
 showbDownPrecWith :: (Int -> a -> Builder) -> Int -> Down a -> Builder
 showbDownPrecWith = showbPrecWith
 {-# INLINE showbDownPrecWith #-}
-#endif
 
 $(deriveTextShow  ''Ordering)
-
-#if MIN_VERSION_base(4,6,0)
 $(deriveTextShow  ''Down)
 $(deriveTextShow1 ''Down)
-#endif
