@@ -125,6 +125,7 @@ library
                        TextShow.FromStringTextShow
                        TextShow.Instances
                        TextShow.TH.Internal
+                       TextShow.TH.Names
                        TextShow.Utils
   build-depends:       array              >= 0.3     && < 0.6
                      , base               >= 4.3     && < 5

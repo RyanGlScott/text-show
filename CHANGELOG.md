@@ -1,9 +1,10 @@
 # 2.1
 * Added `showsToShowb` and `showbToShows` to `TextShow`
 * Added `TextShow1 FromStringShow` instance
+* Added `showbGiveGCStats`, `showbDoCostCentres`, `showbDoHeapProfile`, and `showbDoTrace` to `TextShow.GHC.RTS.Flags` if using `base-4.8.2` or later
 * Exported `showbDownPrecWith` on earlier versions of GHC
 * Fixed mistakes in TH error output
-* Changed implementation of `showbThreadIdPrec` to avoid using `String`s as an intermediary
+* Changed implementation of `showbByteStringStrict`, `showbByteStrictLazy(Prec)`, `showbShortByteString` (in `TextShow.Data.ByteString`), `showbThreadIdPrec` (in `TextShow.Control.Concurrent`), `showbEvent`, and `showbFdKeyPrec` (in `TextShow.GHC.Event`) to avoid using `String`s as an intermediary
 
 # 2
 * Changed the top-level module name from `Text.Show.Text` to `TextShow`, since the former was extremely verbose without much benefit. As a result, this will break all existing code that depends on `text-show`.

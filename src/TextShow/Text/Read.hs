@@ -1,5 +1,5 @@
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Text.Read
@@ -23,20 +23,21 @@ module TextShow.Text.Read (
 
 import Data.Text.Lazy.Builder (Builder)
 
-import Text.Read.Lex (Lexeme(..))
+import Text.Read.Lex (Lexeme)
 #if MIN_VERSION_base(4,7,0)
 import Text.Read.Lex (Number)
 #endif
 
-import TextShow.Classes (TextShow(showbPrec), showbUnaryWith)
-#if MIN_VERSION_base(4,6,0)
-import TextShow.FromStringTextShow (FromStringShow(..))
-#else
+import TextShow.Classes (showbPrec)
+import TextShow.Data.Char     ()
 import TextShow.Data.Integral ()
-import TextShow.Data.Ratio ()
+import TextShow.Data.List     ()
+import TextShow.Data.Maybe    ()
+import TextShow.Data.Ratio    ()
+import TextShow.TH.Internal (deriveTextShow)
+#if MIN_VERSION_base(4,6,0)
+import TextShow.TH.Names (numberTypeName)
 #endif
-import TextShow.Data.Char ()
-import TextShow.Data.List ()
 
 #include "inline.h"
 
@@ -44,18 +45,8 @@ import TextShow.Data.List ()
 --
 -- /Since: 2/
 showbLexemePrec :: Int -> Lexeme -> Builder
-showbLexemePrec p (Char c)   = showbUnaryWith showbPrec "Char"   p c
-showbLexemePrec p (String s) = showbUnaryWith showbPrec "String" p s
-showbLexemePrec p (Punc pun) = showbUnaryWith showbPrec "Punc"   p pun
-showbLexemePrec p (Ident i)  = showbUnaryWith showbPrec "Ident"  p i
-showbLexemePrec p (Symbol s) = showbUnaryWith showbPrec "Symbol" p s
-#if MIN_VERSION_base(4,6,0)
-showbLexemePrec p (Number n) = showbUnaryWith showbPrec "Number" p $ FromStringShow n
-#else
-showbLexemePrec p (Int i)    = showbUnaryWith showbPrec "Int" p i
-showbLexemePrec p (Rat r)    = showbUnaryWith showbPrec "Rat" p r
-#endif
-showbLexemePrec _ EOF        = "EOF"
+showbLexemePrec = showbPrec
+{-# INLINE showbLexemePrec #-}
 
 #if MIN_VERSION_base(4,7,0)
 -- | Convert a 'Number' to a 'Builder' with the given precedence.
@@ -63,16 +54,11 @@ showbLexemePrec _ EOF        = "EOF"
 --
 -- /Since: 2/
 showbNumberPrec :: Int -> Number -> Builder
-showbNumberPrec p = showbPrec p . FromStringShow
+showbNumberPrec = showbPrec
 {-# INLINE showbNumberPrec #-}
 #endif
 
-instance TextShow Lexeme where
-    showbPrec = showbLexemePrec
-    INLINE_INST_FUN(showbPrec)
-
-#if MIN_VERSION_base(4,7,0)
-instance TextShow Number where
-    showbPrec = showbNumberPrec
-    {-# INLINE showbPrec #-}
+$(deriveTextShow ''Lexeme)
+#if MIN_VERSION_base(4,6,0)
+$(deriveTextShow numberTypeName)
 #endif
