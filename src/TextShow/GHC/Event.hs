@@ -39,6 +39,9 @@ import GHC.Event (Event, FdKey, evtRead, evtWrite)
 
 import Language.Haskell.TH.Lib (conT, varE)
 
+import Prelude ()
+import Prelude.Compat
+
 import TextShow.Classes (TextShow(showb, showbPrec))
 import TextShow.Data.Integral      ()
 import TextShow.System.Posix.Types ()

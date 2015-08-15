@@ -30,7 +30,9 @@ module TextShow.TH.Names (
 #endif
     ) where
 
+#if MIN_VERSION_base(4,4,0)
 import Language.Haskell.TH.Syntax
+#endif
 
 #if MIN_VERSION_base(4,7,0)
 import Text.Read.Lex (Number)

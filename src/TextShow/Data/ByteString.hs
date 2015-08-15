@@ -38,6 +38,12 @@ import           TextShow.Data.Char ()
 import           TextShow.Data.List ()
 
 #if !(MIN_VERSION_bytestring(0,10,0))
+import           Data.Word (Word8)
+
+import           Foreign.ForeignPtr (withForeignPtr)
+import           Foreign.Ptr (plusPtr)
+import           Foreign.Storable (peek, peekByteOff)
+
 import           TextShow.TH.Internal (deriveTextShow)
 #endif
 
@@ -46,9 +52,23 @@ import           TextShow.TH.Internal (deriveTextShow)
 -- | Convert a strict 'BS.ByteString' to a 'Builder'.
 --
 -- /Since: 2/
-showbByteStringStrict :: BS.ByteString -> Builder
-showbByteStringStrict = showb . BS.unpackChars
 {-# INLINE showbByteStringStrict #-}
+showbByteStringStrict :: BS.ByteString -> Builder
+#if MIN_VERSION_bytestring(0,10,0)
+showbByteStringStrict = showb . BS.unpackChars
+#else
+showbByteStringStrict = showb . unpackWith BS.w2c
+
+-- | /O(n)/ Converts a 'ByteString' to a '[a]', using a conversion function.
+unpackWith :: (Word8 -> a) -> BS.ByteString -> [a]
+unpackWith _ (BS.PS _  _ 0) = []
+unpackWith k (BS.PS ps s l) = BS.inlinePerformIO $ withForeignPtr ps $ \p ->
+        go (p `plusPtr` s) (l - 1) []
+    where
+        go !p !0 !acc = peek p          >>= \e -> return (k e : acc)
+        go !p !n !acc = peekByteOff p n >>= \e -> go p (n-1) (k e : acc)
+{-# INLINE unpackWith #-}
+#endif
 
 -- | Convert a lazy 'BL.ByteString' to a 'Builder'.
 --
