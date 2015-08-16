@@ -49,7 +49,7 @@ module TextShow.TH.Internal (
     ) where
 
 import           Data.Function (on)
-import           Data.List.Compat (find, foldl', intersperse)
+import           Data.List.Compat
 import qualified Data.List.NonEmpty as NE
 import           Data.List.NonEmpty (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, lookup)
