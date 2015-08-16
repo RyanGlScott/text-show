@@ -49,10 +49,7 @@ module TextShow.TH.Internal (
     ) where
 
 import           Data.Function (on)
-import           Data.List.Compat (foldl', intersperse)
-#if MIN_VERSION_template_haskell(2,7,0)
-import           Data.List.Compat (find)
-#endif
+import           Data.List.Compat (find, foldl', intersperse)
 import qualified Data.List.NonEmpty as NE
 import           Data.List.NonEmpty (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, lookup)
@@ -450,61 +447,16 @@ makeHPrintTL name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
 -- | Derive a TextShow(1)(2) instance declaration (depending on the TextShowClass
 -- argument's value).
 deriveTextShowClass :: TextShowClass -> Name -> Q [Dec]
-deriveTextShowClass tsClass tyConName = do
-    info <- reify tyConName
-    case info of
-        TyConI{} -> deriveTextShowPlainTy tsClass tyConName
-#if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> deriveTextShowDataFamInst tsClass tyConName
-        FamilyI (FamilyD DataFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
-        FamilyI (FamilyD TypeFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
-#else
-        DataConI{} -> dataConIError
-        _          -> error $ ns ++ "The name must be of a plain type constructor."
-#endif
+deriveTextShowClass tsClass name = withType name fromCons
   where
-    ns :: String
-    ns = "TextShow.TH.deriveTextShow: "
-
--- | Generates a TextShow(1)(2) instance declaration for a plain type constructor.
-deriveTextShowPlainTy :: TextShowClass -> Name -> Q [Dec]
-deriveTextShowPlainTy tsClass tyConName =
-    withTyCon tyConName fromCons
-  where
-    className :: Name
-    className = textShowClassNameTable tsClass
-
-    fromCons :: Cxt -> [TyVarBndr] -> [Con] -> Q [Dec]
-    fromCons ctxt tvbs cons = (:[]) <$>
+    fromCons :: Name -> Cxt -> [TyVarBndr] -> [Con] -> Maybe [Type] -> Q [Dec]
+    fromCons name' ctxt tvbs cons mbTys = (:[]) <$>
         instanceD (return instanceCxt)
-                  (return $ AppT (ConT className) instanceType)
+                  (return instanceType)
                   (showbPrecDecs droppedNbs cons)
       where
         (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypePlainTy tsClass tyConName ctxt tvbs
-
-#if MIN_VERSION_template_haskell(2,7,0)
--- | Generates a TextShow(1)(2) instance declaration for a data family instance
--- constructor.
-deriveTextShowDataFamInst :: TextShowClass -> Name -> Q [Dec]
-deriveTextShowDataFamInst tsClass dataFamInstName =
-    withDataFamInstCon dataFamInstName fromDec
-  where
-    className :: Name
-    className = textShowClassNameTable tsClass
-
-    fromDec :: [TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q [Dec]
-    fromDec famTvbs ctxt parentName instTys cons = (:[]) <$>
-        instanceD (return instanceCxt)
-                  (return $ AppT (ConT className) instanceType)
-                  (showbPrecDecs droppedNbs cons)
-      where
-        (instanceCxt, instanceType, droppedNbs) =
-            cxtAndTypeDataFamInstCon tsClass parentName ctxt famTvbs instTys
-#endif
+            buildTypeInstance tsClass name' ctxt tvbs mbTys
 
 -- | Generates a declaration defining the primary function corresponding to a
 -- particular class (showbPrec for TextShow, showbPrecWith for TextShow1, and
@@ -519,33 +471,17 @@ showbPrecDecs nbs cons =
     ]
   where
     classFuncName :: Name
-    classFuncName  = showbPrecNameTable . toEnum $ length nbs
+    classFuncName  = showbPrecName . toEnum $ length nbs
 
 -- | Generates a lambda expression which behaves like showbPrec (for TextShow),
 -- showbPrecWith (for TextShow1), or showbPrecWth2 (for TextShow2).
 makeShowbPrecClass :: TextShowClass -> Name -> Q Exp
-makeShowbPrecClass tsClass tyConName = do
-    info <- reify tyConName
-    case info of
-        TyConI{} -> withTyCon tyConName $ \ctxt tvbs decs ->
-            let (_, _, !nbs) = cxtAndTypePlainTy tsClass tyConName ctxt tvbs
-             in makeTextShowForCons nbs decs
-#if MIN_VERSION_template_haskell(2,7,0)
-        DataConI{} -> withDataFamInstCon tyConName $ \famTvbs ctxt parentName instTys cons ->
-            let (_, _, !nbs) = cxtAndTypeDataFamInstCon tsClass parentName ctxt famTvbs instTys
-             in makeTextShowForCons nbs cons
-        FamilyI (FamilyD DataFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a data family name. Use a data family instance constructor instead."
-        FamilyI (FamilyD TypeFam _ _ _) _ ->
-            error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "The name must be of a plain type constructor or data family instance constructor."
-#else
-        DataConI{} -> dataConIError
-        _          -> error $ ns ++ "The name must be of a plain type constructor."
-#endif
+makeShowbPrecClass tsClass name = withType name fromCons
   where
-    ns :: String
-    ns = "TextShow.TH.makeShowbPrec: "
+    fromCons :: Name -> Cxt -> [TyVarBndr] -> [Con] -> Maybe [Type] -> Q Exp
+    fromCons name' ctxt tvbs cons mbTys =
+        let (_, _, !nbs) = buildTypeInstance tsClass name' ctxt tvbs mbTys
+         in makeTextShowForCons nbs cons
 
 -- | Generates a lambda expression for showbPrec(With)(2) for the given constructors.
 -- All constructors must be from the same type.
@@ -559,7 +495,7 @@ makeTextShowForCons nbs cons = do
         tsClass = toEnum $ length nbs
     lamE (map varP $ sps ++ [p, value])
         . appsE
-        $ [ varE $ showbPrecConstNameTable tsClass
+        $ [ varE $ showbPrecConstName tsClass
           , caseE (varE value) $ map (makeTextShowForCon p tsClass tvis) cons
           ] ++ map varE sps
             ++ [varE p, varE value]
@@ -743,7 +679,7 @@ makeTextShowForType tsClass conName tvis ty = do
     if any (`mentionsNameBase` tyVarNameBases) lhsArgs
           || itf && any (`mentionsNameBase` tyVarNameBases) tyArgs
        then outOfPlaceTyVarError conName tyVarNameBases
-       else appsE $ [ varE . showbPrecNameTable $ toEnum numLastArgs]
+       else appsE $ [ varE . showbPrecName $ toEnum numLastArgs]
                     ++ map (makeTextShowForType tsClass conName tvis) rhsArgs
 
 -------------------------------------------------------------------------------
@@ -751,76 +687,75 @@ makeTextShowForType tsClass conName tvis ty = do
 -------------------------------------------------------------------------------
 
 -- | Extracts a plain type constructor's information.
-withTyCon :: Name -- ^ Name of the plain type constructor
-          -> (Cxt -> [TyVarBndr] -> [Con] -> Q a)
-          -> Q a
-withTyCon name f = do
-    info <- reify name
-    case info of
-        TyConI dec ->
-            case dec of
-                DataD    ctxt _ tvbs cons _ -> f ctxt tvbs cons
-                NewtypeD ctxt _ tvbs con  _ -> f ctxt tvbs [con]
-                _ -> error $ ns ++ "Unsupported type " ++ show dec ++ ". Must be a data type or newtype."
-        _ -> error $ ns ++ "The name must be of a plain type constructor."
-  where
-    ns :: String
-    ns = "TextShow.TH.withTyCon: "
-
+-- | Boilerplate for top level splices.
+--
+-- The given Name must meet one of two criteria:
+--
+-- 1. It must be the name of a type constructor of a plain data type or newtype.
+-- 2. It must be the name of a data family instance or newtype instance constructor.
+--
+-- Any other value will result in an exception.
+withType :: Name
+         -> (Name -> Cxt -> [TyVarBndr] -> [Con] -> Maybe [Type] -> Q a)
+         -> Q a
+withType name f = do
+  info <- reify name
+  case info of
+    TyConI dec ->
+      case dec of
+        DataD    ctxt _ tvbs cons _ -> f name ctxt tvbs cons Nothing
+        NewtypeD ctxt _ tvbs con  _ -> f name ctxt tvbs [con] Nothing
+        _ -> error $ ns ++ "Unsupported type: " ++ show dec
 #if MIN_VERSION_template_haskell(2,7,0)
--- | Extracts a data family name's information.
-withDataFam :: Name -- ^ Name of the data family
-            -> ([TyVarBndr] -> [Dec] -> Q a)
-            -> Q a
-withDataFam name f = do
-    info <- reify name
-    case info of
-        FamilyI (FamilyD DataFam _ tvbs _) decs -> f tvbs decs
-        FamilyI (FamilyD TypeFam _ _    _) _    ->
-            error $ ns ++ "Cannot use a type family name."
-        _ -> error $ ns ++ "Unsupported type " ++ show info ++ ". Must be a data family name."
-  where
-    ns :: String
-    ns = "TextShow.TH.withDataFam: "
-
--- | Extracts a data family instance constructor's information.
-withDataFamInstCon :: Name -- ^ Name of the data family instance constructor
-                   -> ([TyVarBndr] -> Cxt -> Name -> [Type] -> [Con] -> Q a)
-                   -> Q a
-withDataFamInstCon dficName f = do
-    dficInfo <- reify dficName
-    case dficInfo of
-        DataConI _ _ parentName _ -> do
-            parentInfo <- reify parentName
-            case parentInfo of
-                FamilyI (FamilyD DataFam _ _ _) _ -> withDataFam parentName $ \famTvbs decs ->
-                    let sameDefDec = flip find decs $ \dec ->
-                          case dec of
-                              DataInstD    _ _ _ cons' _ -> any ((dficName ==) . constructorName) cons'
-                              NewtypeInstD _ _ _ con   _ -> dficName == constructorName con
-                              _ -> error $ ns ++ "Must be a data or newtype instance."
-
-                        (ctxt, instTys, cons) = case sameDefDec of
-                              Just (DataInstD    ctxt' _ instTys' cons' _) -> (ctxt', instTys', cons')
-                              Just (NewtypeInstD ctxt' _ instTys' con   _) -> (ctxt', instTys', [con])
-                              _ -> error $ ns ++ "Could not find data or newtype instance constructor."
-
-                    in f famTvbs ctxt parentName instTys cons
-                _ -> error $ ns ++ "Data constructor " ++ show dficName ++ " is not from a data family instance."
-        _ -> error $ ns ++ "Unsupported type " ++ show dficInfo ++ ". Must be a data family instance constructor."
-  where
-    ns :: String
-    ns = "TextShow.TH.withDataFamInstCon: "
+# if __GLASGOW_HASKELL__ >= 711
+    DataConI _ _ parentName   -> do
+# else
+    DataConI _ _ parentName _ -> do
+# endif
+      parentInfo <- reify parentName
+      case parentInfo of
+        FamilyI (FamilyD DataFam _ tvbs _) decs ->
+          let instDec = flip find decs $ \dec -> case dec of
+                DataInstD    _ _ _ cons _ -> any ((name ==) . constructorName) cons
+                NewtypeInstD _ _ _ con  _ -> name == constructorName con
+                _ -> error $ ns ++ "Must be a data or newtype instance."
+           in case instDec of
+                Just (DataInstD    ctxt _ instTys cons _)
+                  -> f parentName ctxt tvbs cons $ Just instTys
+                Just (NewtypeInstD ctxt _ instTys con  _)
+                  -> f parentName ctxt tvbs [con] $ Just instTys
+                _ -> error $ ns ++
+                  "Could not find data or newtype instance constructor."
+        _ -> error $ ns ++ "Data constructor " ++ show name ++
+          " is not from a data family instance constructor."
+    FamilyI (FamilyD DataFam _ _ _) _ -> error $ ns ++
+      "Cannot use a data family name. Use a data family instance constructor instead."
+    _ -> error $ ns ++ "The name must be of a plain data type constructor, "
+                    ++ "or a data family instance constructor."
+#else
+    DataConI{} -> dataConIError
+    _          -> error $ ns ++ "The name must be of a plain type constructor."
 #endif
+  where
+    ns :: String
+    ns = "TextShow.TH.withType: "
 
--- | Deduces the TextShow(1)(2) instance context, instance head, and eta-reduced
--- type variables for a plain data type constructor.
-cxtAndTypePlainTy :: TextShowClass -- TextShow, TextShow1, or TextShow2
-                  -> Name          -- The datatype's name
-                  -> Cxt           -- The datatype context
-                  -> [TyVarBndr]   -- The type variables
+-- | Deduces the instance context, instance head, and eta-reduced type variables
+-- for an instance.
+buildTypeInstance :: TextShowClass
+                  -- ^ Bifunctor, Bifoldable, or Bitraversable
+                  -> Name
+                  -- ^ The type constructor or data family name
+                  -> Cxt
+                  -- ^ The datatype context
+                  -> [TyVarBndr]
+                  -- ^ The type variables from the data type/data family declaration
+                  -> Maybe [Type]
+                  -- ^ 'Just' the types used to instantiate a data family instance,
+                  -- or 'Nothing' if it's a plain data type
                   -> (Cxt, Type, [NameBase])
-cxtAndTypePlainTy tsClass tyConName dataCxt tvbs
+-- Plain data type/newtype case
+buildTypeInstance tsClass tyConName dataCxt tvbs Nothing
     | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
     = derivingKindError tsClass tyConName
     | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
@@ -832,7 +767,9 @@ cxtAndTypePlainTy tsClass tyConName dataCxt tvbs
                 $ filter (needsConstraint tsClass . tvbKind) remaining
 
     instanceType :: Type
-    instanceType = applyTyCon tyConName $ map (VarT . tvbName) remaining
+    instanceType = AppT (ConT $ textShowClassName tsClass)
+                 . applyTyCon tyConName
+                 $ map (VarT . tvbName) remaining
 
     remainingLength :: Int
     remainingLength = length tvbs - fromEnum tsClass
@@ -845,17 +782,8 @@ cxtAndTypePlainTy tsClass tyConName dataCxt tvbs
 
     droppedNbs :: [NameBase]
     droppedNbs = map (NameBase . tvbName) dropped
-
-#if MIN_VERSION_template_haskell(2,7,0)
--- | Deduces the TextShow(1)(2) instance context, instance head, and eta-reduced
--- type variables for a data family instnce constructor.
-cxtAndTypeDataFamInstCon :: TextShowClass -- TextShow, TextShow1, or TextShow2
-                         -> Name          -- The data family name
-                         -> Cxt           -- The datatype context
-                         -> [TyVarBndr]   -- The data family declaration's type variables
-                         -> [Type]        -- The data family instance types
-                         -> (Cxt, Type, [NameBase])
-cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
+-- Data family instance case
+buildTypeInstance tsClass parentName dataCxt tvbs (Just instTysAndKinds)
     | remainingLength < 0 || not (wellKinded droppedKinds) -- If we have enough well-kinded type variables
     = derivingKindError tsClass parentName
     | any (`predMentionsNameBase` droppedNbs) dataCxt -- If the last type variable(s) are mentioned in a datatype context
@@ -877,17 +805,18 @@ cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
     --
     -- To do this, we remove every kind ascription (i.e., strip off every 'SigT').
     instanceType :: Type
-    instanceType = applyTyCon parentName
+    instanceType = AppT (ConT $ textShowClassName tsClass)
+                 . applyTyCon parentName
                  $ map unSigT remaining
 
     remainingLength :: Int
-    remainingLength = length famTvbs - fromEnum tsClass
+    remainingLength = length tvbs - fromEnum tsClass
 
     remaining, dropped :: [Type]
     (remaining, dropped) = splitAt remainingLength rhsTypes
 
     droppedKinds :: [Kind]
-    droppedKinds = map tvbKind . snd $ splitAt remainingLength famTvbs
+    droppedKinds = map tvbKind . snd $ splitAt remainingLength tvbs
 
     droppedNbs :: [NameBase]
     droppedNbs = map varTToNameBase dropped
@@ -903,18 +832,18 @@ cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
     -- then dropping that number of entries from @instTysAndKinds@
     instTypes :: [Type]
     instTypes =
-# if __GLASGOW_HASKELL__ >= 710 || !(MIN_VERSION_template_haskell(2,8,0))
+#if __GLASGOW_HASKELL__ >= 710 || !(MIN_VERSION_template_haskell(2,8,0))
         instTysAndKinds
-# else
-        drop (Set.size . Set.unions $ map (distinctKindVars . tvbKind) famTvbs)
+#else
+        drop (Set.size . Set.unions $ map (distinctKindVars . tvbKind) tvbs)
              instTysAndKinds
-# endif
+#endif
 
     lhsTvbs :: [TyVarBndr]
     lhsTvbs = map (uncurry replaceTyVarName)
             . filter (isTyVar . snd)
             . take remainingLength
-            $ zip famTvbs rhsTypes
+            $ zip tvbs rhsTypes
 
     -- In GHC 7.8, only the @Type@s up to the rightmost non-eta-reduced type variable
     -- in @instTypes@ are provided (as a result of this extremely annoying bug:
@@ -946,13 +875,12 @@ cxtAndTypeDataFamInstCon tsClass parentName dataCxt famTvbs instTysAndKinds
     -- Thankfully, other versions of GHC don't seem to have this bug.
     rhsTypes :: [Type]
     rhsTypes =
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
             instTypes ++ map tvbToType
                              (drop (length instTypes)
-                                   famTvbs)
-# else
+                                   tvbs)
+#else
             instTypes
-# endif
 #endif
 
 -- | Given a TyVarBndr, apply a TextShow(1)(2) constraint to it, depending
@@ -962,7 +890,7 @@ applyShowConstraint (PlainTV  name)      = applyClass ''TextShow  name
 applyShowConstraint (KindedTV name kind) = applyClass className   name
   where
     className :: Name
-    className = textShowClassNameTable . toEnum $ numKindArrows kind
+    className = textShowClassName . toEnum $ numKindArrows kind
 
 -- | Can a kind signature inhabit a TextShow(1)(2) constraint?
 --
@@ -996,7 +924,7 @@ derivingKindError tsClass tyConName = error
     $ ""
   where
     className :: String
-    className = nameBase $ textShowClassNameTable tsClass
+    className = nameBase $ textShowClassName tsClass
 
 -- | One of the last type variables cannot be eta-reduced (see the canEtaReduce
 -- function for the criteria it would have to meet).
@@ -1094,20 +1022,20 @@ subst _ t                  = t
 data TextShowClass = TextShow | TextShow1 | TextShow2
   deriving (Enum, Eq, Ord)
 
-showbPrecConstNameTable :: TextShowClass -> Name
-showbPrecConstNameTable TextShow  = 'showbPrecConst
-showbPrecConstNameTable TextShow1 = 'showbPrecWithConst
-showbPrecConstNameTable TextShow2 = 'showbPrecWith2Const
+showbPrecConstName :: TextShowClass -> Name
+showbPrecConstName TextShow  = 'showbPrecConst
+showbPrecConstName TextShow1 = 'showbPrecWithConst
+showbPrecConstName TextShow2 = 'showbPrecWith2Const
 
-textShowClassNameTable :: TextShowClass -> Name
-textShowClassNameTable TextShow  = ''TextShow
-textShowClassNameTable TextShow1 = ''TextShow1
-textShowClassNameTable TextShow2 = ''TextShow2
+textShowClassName :: TextShowClass -> Name
+textShowClassName TextShow  = ''TextShow
+textShowClassName TextShow1 = ''TextShow1
+textShowClassName TextShow2 = ''TextShow2
 
-showbPrecNameTable :: TextShowClass -> Name
-showbPrecNameTable TextShow  = 'showbPrec
-showbPrecNameTable TextShow1 = 'showbPrecWith
-showbPrecNameTable TextShow2 = 'showbPrecWith2
+showbPrecName :: TextShowClass -> Name
+showbPrecName TextShow  = 'showbPrec
+showbPrecName TextShow1 = 'showbPrecWith
+showbPrecName TextShow2 = 'showbPrecWith2
 
 -- | A type-restricted version of 'const'. This is useful when generating the lambda
 -- expression in 'makeShowbPrec' for a data type with only nullary constructors (since
