@@ -41,7 +41,7 @@ showbCoercion = showb
 
 instance TextShow (Coercion a b) where
     showbPrec = $(makeShowbPrec ''Coercion)
-    {-# INLINE showb #-}
+    {-# INLINE showbPrec #-}
 
 instance TextShow1 (Coercion a) where
     showbPrecWith = $(makeShowbPrecWith ''Coercion)

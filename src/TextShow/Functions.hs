@@ -29,7 +29,7 @@ showbFunction = showb
 
 instance TextShow (a -> b) where
     showbPrec = showbPrecWith undefined
-    INLINE_INST_FUN(showb)
+    INLINE_INST_FUN(showbPrec)
 
 instance TextShow1 ((->) a) where
     showbPrecWith = showbPrecWith2 undefined

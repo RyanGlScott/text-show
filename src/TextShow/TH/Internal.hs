@@ -570,10 +570,18 @@ makeTextShowForCon p tsClass tvis (InfixC (_, alTy) conName (_, arTy)) = do
     ar   <- newName "argR"
     info <- reify conName
 
+#if __GLASGOW_HASKELL__ >= 711
+    conPrec <- case info of
+                        DataConI{} -> do
+                            Fixity prec _ <- reifyFixity conName
+                            return prec
+#else
     let conPrec  = case info of
                         DataConI _ _ _ (Fixity prec _) -> prec
-                        other -> error $ "TextShow.TH.makeTextShowForCon: Unsupported type: " ++ show other
-        opName   = nameBase conName
+#endif
+                        _ -> error $ "TextShow.TH.makeTextShowForCon: Unsupported type: " ++ show info
+
+    let opName   = nameBase conName
         infixOpE = if isInfixTypeCon opName
                       then [| fromString $(stringE $ " "  ++ opName ++ " " ) |]
                       else [| fromString $(stringE $ " `" ++ opName ++ "` ") |]
@@ -743,7 +751,7 @@ withType name f = do
 -- | Deduces the instance context, instance head, and eta-reduced type variables
 -- for an instance.
 buildTypeInstance :: TextShowClass
-                  -- ^ Bifunctor, Bifoldable, or Bitraversable
+                  -- ^ TextShow, TextShow1, or TextShow2
                   -> Name
                   -- ^ The type constructor or data family name
                   -> Cxt
