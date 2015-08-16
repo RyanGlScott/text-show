@@ -5,6 +5,16 @@
 [![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)][tl;dr Legal: BSD3]
 [![Build](https://img.shields.io/travis/RyanGlScott/text-show.svg)](https://travis-ci.org/RyanGlScott/text-show)
 
+[Hackage: text-show]:
+  http://hackage.haskell.org/package/text-show
+  "text-show package on Hackage"
+[Haskell.org]:
+  http://www.haskell.org
+  "The Haskell Programming Language"
+[tl;dr Legal: BSD3]:
+  https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29
+  "BSD 3-Clause License (Revised)"
+
 `text-show` offers a replacement for the `Show` typeclass intended for use with `Text` instead of `String`s. This package was created in the spirit of [`bytestring-show`](http://hackage.haskell.org/package/bytestring-show).
 
 At the moment, `text-show` provides instances for most data types in the [`array`](http://hackage.haskell.org/package/array), [`base`](http://hackage.haskell.org/package/base), [`bytestring`](http://hackage.haskell.org/package/bytestring), and [`text`](http://hackage.haskell.org/package/text) packages. Therefore, much of the source code for `text-show` consists of borrowed code from those packages in order to ensure that the behaviors of `Show` and `TextShow` coincide.
