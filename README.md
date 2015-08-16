@@ -1,4 +1,9 @@
-# `text-show` [![Hackage version](https://img.shields.io/hackage/v/text-show.svg?style=flat)](http://hackage.haskell.org/package/text-show) [![Build Status](https://img.shields.io/travis/RyanGlScott/text-show.svg?style=flat)](https://travis-ci.org/RyanGlScott/text-show)
+# `text-show`
+[![Hackage](https://img.shields.io/hackage/v/text-show.svg)][Hackage: text-show]
+[![Hackage Dependencies](https://img.shields.io/hackage-deps/v/text-show.svg)](http://packdeps.haskellers.com/reverse/text-show)
+[![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)][Haskell.org]
+[![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)][tl;dr Legal: BSD3]
+[![Build](https://img.shields.io/travis/RyanGlScott/text-show.svg)](https://travis-ci.org/RyanGlScott/text-show)
 
 `text-show` offers a replacement for the `Show` typeclass intended for use with `Text` instead of `String`s. This package was created in the spirit of [`bytestring-show`](http://hackage.haskell.org/package/bytestring-show).
 
