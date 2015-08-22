@@ -2,6 +2,7 @@
 
 #if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE GADTs           #-}
+{-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}

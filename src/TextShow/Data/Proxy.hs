@@ -1,7 +1,13 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds         #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-|
 Module:      TextShow.Data.Proxy
 Copyright:   (C) 2014-2015 Ryan Scott

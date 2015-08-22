@@ -4,6 +4,7 @@
 * Added `showbGiveGCStats`, `showbDoCostCentres`, `showbDoHeapProfile`, and `showbDoTrace` to `TextShow.GHC.RTS.Flags` if using `base-4.8.2` or later
 * Exported `showbDownPrecWith` on earlier versions of GHC
 * Fixed mistakes in TH error output
+* Make `Proxy`, `Coercion`, and `(:~:)` instances poly-kinded
 * Changed implementation of `showbByteStringStrict`, `showbByteStrictLazy(Prec)`, `showbShortByteString` (in `TextShow.Data.ByteString`), `showbThreadIdPrec` (in `TextShow.Control.Concurrent`), `showbEvent`, and `showbFdKeyPrec` (in `TextShow.GHC.Event`) to avoid using `String`s as an intermediary
 
 # 2
