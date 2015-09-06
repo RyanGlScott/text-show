@@ -45,6 +45,9 @@ import Control.Exception.Base
 
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
+#if MIN_VERSION_base(4,8,2)
+import Data.Text.Lazy.Builder (singleton)
+#endif
 
 import Prelude ()
 import Prelude.Compat
@@ -207,8 +210,14 @@ showbRecUpdError (RecUpdError err) = fromString err
 --
 -- /Since: 2/
 showbErrorCall :: ErrorCall -> Builder
+#if MIN_VERSION_base(4,8,2)
+showbErrorCall (ErrorCallWithLocation err "")  = fromString err
+showbErrorCall (ErrorCallWithLocation err loc) =
+  fromString err <> singleton '\n' <> fromString loc
+#else
 showbErrorCall (ErrorCall err) = fromString err
 {-# INLINE showbErrorCall #-}
+#endif
 
 -- | Convert a 'MaskingState' to a 'Builder'.
 --

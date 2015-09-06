@@ -715,14 +715,18 @@ withType name f = do
         NewtypeD ctxt _ tvbs con  _ -> f name ctxt tvbs [con] Nothing
         _ -> error $ ns ++ "Unsupported type: " ++ show dec
 #if MIN_VERSION_template_haskell(2,7,0)
-# if __GLASGOW_HASKELL__ >= 711
+# if MIN_VERSION_template_haskell(2,11,0)
     DataConI _ _ parentName   -> do
 # else
     DataConI _ _ parentName _ -> do
 # endif
       parentInfo <- reify parentName
       case parentInfo of
+# if MIN_VERSION_template_haskell(2,11,0)
+        FamilyI (DataFamilyD _ tvbs _) decs ->
+# else
         FamilyI (FamilyD DataFam _ tvbs _) decs ->
+# endif
           let instDec = flip find decs $ \dec -> case dec of
                 DataInstD    _ _ _ cons _ -> any ((name ==) . constructorName) cons
                 NewtypeInstD _ _ _ con  _ -> name == constructorName con
@@ -736,8 +740,13 @@ withType name f = do
                   "Could not find data or newtype instance constructor."
         _ -> error $ ns ++ "Data constructor " ++ show name ++
           " is not from a data family instance constructor."
-    FamilyI (FamilyD DataFam _ _ _) _ -> error $ ns ++
-      "Cannot use a data family name. Use a data family instance constructor instead."
+# if MIN_VERSION_template_haskell(2,11,0)
+    FamilyI DataFamilyD{} _ ->
+# else
+    FamilyI (FamilyD DataFam _ _ _) _ ->
+# endif
+      error $ ns ++
+        "Cannot use a data family name. Use a data family instance constructor instead."
     _ -> error $ ns ++ "The name must be of a plain data type constructor, "
                     ++ "or a data family instance constructor."
 #else
@@ -1188,10 +1197,15 @@ isTyFamily :: Type -> Q Bool
 isTyFamily (ConT n) = do
     info <- reify n
     return $ case info of
-#if MIN_VERSION_template_haskell(2,7,0)
+#if MIN_VERSION_template_haskell(2,11,0)
+         FamilyI OpenTypeFamilyD{} _       -> True
+#elif MIN_VERSION_template_haskell(2,7,0)
          FamilyI (FamilyD TypeFam _ _ _) _ -> True
 #else
          TyConI  (FamilyD TypeFam _ _ _)   -> True
+#endif
+#if MIN_VERSION_template_haskell(2,9,0)
+         FamilyI ClosedTypeFamilyD{} _     -> True
 #endif
          _ -> False
 isTyFamily _ = return False

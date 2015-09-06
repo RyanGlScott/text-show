@@ -97,10 +97,12 @@ instance Arbitrary RecSelError where
 instance Arbitrary RecUpdError where
     arbitrary = RecUpdError <$> arbitrary
 
--- ErrorCall is a newtype starting with base-4.7.0.0, but we'll
--- manually derive Arbitrary to support older versions of GHC.
 instance Arbitrary ErrorCall where
+#if MIN_VERSION_base(4,8,2)
+    arbitrary = ErrorCallWithLocation <$> arbitrary <*> arbitrary
+#else
     arbitrary = ErrorCall <$> arbitrary
+#endif
 
 deriving instance Bounded MaskingState
 deriving instance Enum MaskingState
