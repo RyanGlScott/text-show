@@ -24,7 +24,7 @@ module TextShow.GHC.Fingerprint (
     ) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Semigroup (timesN)
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 import Data.Word (Word64)
 
@@ -43,7 +43,7 @@ showbFingerprint (Fingerprint w1 w2) = hex16 w1 <> hex16 w2
   where
     hex16 :: Word64 -> Builder
     hex16 i = let hex = showbHex i
-              in timesN (fromIntegral . max 0 $ 16 - lengthB hex) (singleton '0') <> hex
+              in mtimesDefault (max 0 $ 16 - lengthB hex) (singleton '0') <> hex
 
 instance TextShow Fingerprint where
     showb = showbFingerprint

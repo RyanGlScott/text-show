@@ -1,4 +1,5 @@
 # 2.1
+* Require `semigroups` >= 0.17
 * Added `showsToShowb` and `showbToShows` to `TextShow`
 * Added `TextShow1 FromStringShow` instance
 * Added `showbGiveGCStats`, `showbDoCostCentres`, `showbDoHeapProfile`, and `showbDoTrace` to `TextShow.GHC.RTS.Flags` if using `base-4.8.2` or later

@@ -26,7 +26,7 @@ import TextShow.Classes (TextShow(showb))
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
 import Data.Monoid.Compat ((<>))
-import Data.Semigroup (timesN)
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (singleton)
 
 import TextShow.Data.Integral ()
@@ -69,7 +69,7 @@ showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
 showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder
 showbIntegerZeroes True _ 0 = mempty
 showbIntegerZeroes chopTrailingZeroes digits a
-    = timesN (fromIntegral . max 0 $ digits - lengthB sh) (singleton '0') <> sh'
+    = mtimesDefault (max 0 $ digits - lengthB sh) (singleton '0') <> sh'
   where
     sh, sh' :: Builder
     sh  = showb a
