@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
 
 {-|
@@ -10,11 +11,26 @@ Portability: GHC
 
 Miscellaneous utility functions.
 -}
-module TextShow.Utils where
+module TextShow.Utils (
+      i2d
+    , isInfixTypeCon
+    , isTupleString
+    , lengthB
+    , mtimesDefault
+    , toString
+    , toText
+    , unlinesB
+    , unwordsB
+    ) where
 
 import Data.Int (Int64)
 import Data.Text (Text)
 import Data.Monoid.Compat ((<>))
+#if MIN_VERSION_semigroups(0,17,0)
+import Data.Semigroup (mtimesDefault)
+#else
+import Data.Semigroup (timesN)
+#endif
 import Data.Text.Lazy (length, toStrict, unpack)
 import Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 
@@ -48,6 +64,15 @@ isTupleString _           = False
 lengthB :: Builder -> Int64
 lengthB = length . toLazyText
 {-# INLINE lengthB #-}
+
+#if !(MIN_VERSION_semigroups(0,17,0))
+-- | Repeat a value @n@ times.
+--
+-- > mtimesDefault n a = a <> a <> ... <> a  -- using <> (n-1) times
+mtimesDefault :: (Integral b, Monoid a) => b -> a -> a
+mtimesDefault = timesN . fromIntegral
+{-# INLINE mtimesDefault #-}
+#endif
 
 -- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
 -- as 'show' would).

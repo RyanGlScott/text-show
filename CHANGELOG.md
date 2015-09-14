@@ -1,3 +1,6 @@
+# 2.1.1
+* Restore support for `semigroups-0.16.1`
+
 # 2.1
 * Require `semigroups` >= 0.17
 * Added `showsToShowb` and `showbToShows` to `TextShow`

@@ -23,7 +23,6 @@ module TextShow.Foreign.Ptr (
     ) where
 
 import Data.Monoid.Compat ((<>))
-import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 
 import Foreign.ForeignPtr (ForeignPtr)
@@ -36,7 +35,7 @@ import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
 import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..))
 import TextShow.Data.Integral (showbHex, showbIntPrec, showbWord)
-import TextShow.Utils (lengthB)
+import TextShow.Utils (lengthB, mtimesDefault)
 
 #include "MachDeps.h"
 #include "inline.h"
