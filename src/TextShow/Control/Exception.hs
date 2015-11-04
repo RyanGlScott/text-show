@@ -45,7 +45,7 @@ import Control.Exception.Base
 
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString)
-#if MIN_VERSION_base(4,8,2)
+#if MIN_VERSION_base(4,9,0)
 import Data.Text.Lazy.Builder (singleton)
 #endif
 
@@ -210,7 +210,7 @@ showbRecUpdError (RecUpdError err) = fromString err
 --
 -- /Since: 2/
 showbErrorCall :: ErrorCall -> Builder
-#if MIN_VERSION_base(4,8,2)
+#if MIN_VERSION_base(4,9,0)
 showbErrorCall (ErrorCallWithLocation err "")  = fromString err
 showbErrorCall (ErrorCallWithLocation err loc) =
   fromString err <> singleton '\n' <> fromString loc

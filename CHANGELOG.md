@@ -1,3 +1,6 @@
+# next
+* Fixed GHC 7.10.3 build
+
 # 2.1.1
 * Restore support for `semigroups-0.16.1`
 

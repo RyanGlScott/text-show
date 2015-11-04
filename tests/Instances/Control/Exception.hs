@@ -98,7 +98,7 @@ instance Arbitrary RecUpdError where
     arbitrary = RecUpdError <$> arbitrary
 
 instance Arbitrary ErrorCall where
-#if MIN_VERSION_base(4,8,2)
+#if MIN_VERSION_base(4,9,0)
     arbitrary = ErrorCallWithLocation <$> arbitrary <*> arbitrary
 #else
     arbitrary = ErrorCall <$> arbitrary
