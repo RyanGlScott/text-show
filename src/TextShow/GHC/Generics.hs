@@ -1,6 +1,10 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TemplateHaskell  #-}
-{-# LANGUAGE TypeOperators    #-}
+{-# LANGUAGE CPP                  #-}
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE MagicHash            #-}
+{-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE TypeOperators        #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -32,18 +36,33 @@ module TextShow.GHC.Generics (
     , showbFixityPrec
     , showbAssociativity
     , showbArityPrec
+    , showbUCharPrec
+    , showbUDoublePrec
+    , showbUFloatPrec
+    , showbUIntPrec
+    , showbUWordPrec
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import Generics.Deriving.Base (U1(..), Par1, Rec1(..), K1(..),
-                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                               Fixity, Associativity, Arity)
+import Generics.Deriving.Base
 
 import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..), TextShow2(..))
+import TextShow.Data.Char     ()
+import TextShow.Data.Floating ()
 import TextShow.Data.Integral ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, makeShowbPrec,
                              makeShowbPrecWith, makeShowbPrecWith2)
+
+#if !(MIN_VERSION_template_haskell(2,7,0))
+import Data.Monoid.Compat ((<>))
+import Data.Text.Lazy.Builder (fromString, singleton)
+
+import GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
+import GHC.Show (appPrec)
+
+import TextShow.Classes (showbParen)
+#endif
 
 -- | Convert a 'U1' value to a 'Builder'.
 --
@@ -159,6 +178,41 @@ showbArityPrec :: Int -> Arity -> Builder
 showbArityPrec = showbPrec
 {-# INLINE showbArityPrec #-}
 
+-- | Convert a 'UChar' to a 'Builder' with the given precedence.
+--
+-- /Since: 2.2/
+showbUCharPrec :: Int -> UChar p -> Builder
+showbUCharPrec = showbPrec
+{-# INLINE showbUCharPrec #-}
+
+-- | Convert a 'UDouble' to a 'Builder' with the given precedence.
+--
+-- /Since: 2.2/
+showbUDoublePrec :: Int -> UDouble p -> Builder
+showbUDoublePrec = showbPrec
+{-# INLINE showbUDoublePrec #-}
+
+-- | Convert a 'UFloat' to a 'Builder' with the given precedence.
+--
+-- /Since: 2.2/
+showbUFloatPrec :: Int -> UFloat p -> Builder
+showbUFloatPrec = showbPrec
+{-# INLINE showbUFloatPrec #-}
+
+-- | Convert a 'UInt' to a 'Builder' with the given precedence.
+--
+-- /Since: 2.2/
+showbUIntPrec :: Int -> UInt p -> Builder
+showbUIntPrec = showbPrec
+{-# INLINE showbUIntPrec #-}
+
+-- | Convert a 'UWord' to a 'Builder' with the given precedence.
+--
+-- /Since: 2.2/
+showbUWordPrec :: Int -> UWord p -> Builder
+showbUWordPrec = showbPrec
+{-# INLINE showbUWordPrec #-}
+
 instance TextShow (U1 p) where
     showbPrec = showbPrecWith undefined
 $(deriveTextShow1 ''U1)
@@ -193,6 +247,68 @@ $(deriveTextShow1 ''(:*:))
 instance TextShow (f (g p)) => TextShow ((f :.: g) p) where
     showbPrec = $(makeShowbPrec ''(:.:))
 $(deriveTextShow1 ''(:.:))
+
+#if MIN_VERSION_template_haskell(2,7,0)
+instance TextShow (UChar p) where
+    showbPrec = $(makeShowbPrec 'UChar)
+$(deriveTextShow1 'UChar)
+
+instance TextShow (UDouble p) where
+    showbPrec = $(makeShowbPrec 'UDouble)
+$(deriveTextShow1 'UDouble)
+
+instance TextShow (UFloat p) where
+    showbPrec = $(makeShowbPrec 'UFloat)
+$(deriveTextShow1 'UFloat)
+
+instance TextShow (UInt p) where
+    showbPrec = $(makeShowbPrec 'UInt)
+$(deriveTextShow1 'UInt)
+
+instance TextShow (UWord p) where
+    showbPrec = $(makeShowbPrec 'UWord)
+$(deriveTextShow1 'UWord)
+#else
+instance TextShow (UChar p) where
+    showbPrec = showbPrecWith undefined
+instance TextShow1 UChar where
+    showbPrecWith _ p (UChar c) = showbParen (p > appPrec) $
+           fromString "UChar "    <> singleton '{'
+        <> fromString "uChar# = " <> showb (C# c)
+        <> singleton '}'
+
+instance TextShow (UDouble p) where
+    showbPrec = showbPrecWith undefined
+instance TextShow1 UDouble where
+    showbPrecWith _ p (UDouble d) = showbParen (p > appPrec) $
+           fromString "UDouble "    <> singleton '{'
+        <> fromString "uDouble# = " <> showb (D# d)
+        <> singleton '}'
+
+instance TextShow (UFloat p) where
+    showbPrec = showbPrecWith undefined
+instance TextShow1 UFloat where
+    showbPrecWith _ p (UFloat f) = showbParen (p > appPrec) $
+           fromString "UFloat "    <> singleton '{'
+        <> fromString "uFloat# = " <> showb (F# f)
+        <> singleton '}'
+
+instance TextShow (UInt p) where
+    showbPrec = showbPrecWith undefined
+instance TextShow1 UInt where
+    showbPrecWith _ p (UInt i) = showbParen (p > appPrec) $
+           fromString "UInt "    <> singleton '{'
+        <> fromString "uInt# = " <> showb (I# i)
+        <> singleton '}'
+
+instance TextShow (UWord p) where
+    showbPrec = showbPrecWith undefined
+instance TextShow1 UWord where
+    showbPrecWith _ p (UWord w) = showbParen (p > appPrec) $
+           fromString "UWord "    <> singleton '{'
+        <> fromString "uWord# = " <> showb (W# w)
+        <> singleton '}'
+#endif
 
 $(deriveTextShow ''Fixity)
 $(deriveTextShow ''Associativity)

@@ -4,6 +4,7 @@
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
 
 #if __GLASGOW_HASKELL__ >= 702
@@ -35,14 +36,11 @@ module Derived.PolyKinds (
 
 #include "generic.h"
 
-#if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import           GHC.Generics (Generic1)
-# endif
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll)
+import           Generics.Deriving.Base
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
 #endif
+
 import           GHC.Show (appPrec, appPrec1, showSpace)
 
 import           Test.QuickCheck (Arbitrary)
@@ -64,11 +62,11 @@ newtype TyConCompose f g h j k a b =
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyConCompose f g h j k a b)
 
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
                   ) => Generic1 (TyConCompose f g h j k a)
-# endif
+#endif
 
 deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   Show (TyConCompose f g h j k a b)
@@ -138,11 +136,11 @@ newtype instance TyFamilyCompose f g h j k a b =
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyFamilyCompose f g h j k a b)
 
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
                   ) => Generic1 (TyFamilyCompose f g h j k a)
-# endif
+#endif
 
 deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   Show (TyFamilyCompose f g h j k a b)
@@ -321,8 +319,50 @@ instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) wher
     showbPrecWith2 = $(makeShowbPrecWith2 'TyFamilyReallyHighKinds)
 #endif
 
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           ''TyConCompose)
+$(Generics.deriveRep1           ''TyConCompose)
+
+instance ( Functor (f (g (j a) (k a)))
+         , Functor (h (j a))
+         ) => Generic1 (TyConCompose f g h j k a) where
+    type Rep1 (TyConCompose f g h j k a) = $(Generics.makeRep1 ''TyConCompose) f g h j k a
+    from1 = $(Generics.makeFrom1 ''TyConCompose)
+    to1   = $(Generics.makeTo1   ''TyConCompose)
+
+$(Generics.deriveMeta           ''TyConProxy)
+$(Generics.deriveRepresentable1 ''TyConProxy)
+$(Generics.deriveMeta           ''TyConReallyHighKinds)
+$(Generics.deriveRepresentable1 ''TyConReallyHighKinds)
+#endif
+
 #if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''TyConCompose)
-$(Generics.deriveAll ''TyConProxy)
-$(Generics.deriveAll ''TyConReallyHighKinds)
+$(Generics.deriveRepresentable0 ''TyConCompose)
+$(Generics.deriveRepresentable0 ''TyConProxy)
+$(Generics.deriveRepresentable0 ''TyConReallyHighKinds)
+#endif
+
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           'TyFamilyCompose)
+$(Generics.deriveRep1           'TyFamilyCompose)
+
+instance ( Functor (f (g (j a) (k a)))
+         , Functor (h (j a))
+         ) => Generic1 (TyFamilyCompose f g h j k a) where
+    type Rep1 (TyFamilyCompose f g h j k a) = $(Generics.makeRep1 'TyFamilyCompose) f g h j k a
+    from1 = $(Generics.makeFrom1 'TyFamilyCompose)
+    to1   = $(Generics.makeTo1   'TyFamilyCompose)
+
+$(Generics.deriveMeta           'TyFamilyProxy)
+$(Generics.deriveRepresentable1 'TyFamilyProxy)
+$(Generics.deriveMeta           'TyFamilyReallyHighKinds)
+$(Generics.deriveRepresentable1 'TyFamilyReallyHighKinds)
+# endif
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveRepresentable0 'TyFamilyCompose)
+$(Generics.deriveRepresentable0 'TyFamilyProxy)
+$(Generics.deriveRepresentable0 'TyFamilyReallyHighKinds)
+# endif
 #endif

@@ -2,25 +2,23 @@
 {-# LANGUAGE DeriveDataTypeable   #-}
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE MagicHash            #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE TypeOperators        #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric        #-}
-#else
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric        #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds            #-}
 #endif
 
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE StandaloneDeriving   #-}
-#endif
 {-|
 Module:      TextShow.Generic
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -78,6 +76,8 @@ import           Generics.Deriving.Base
 #if __GLASGOW_HASKELL__ < 702
 import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
+
+import           GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import           GHC.Show (appPrec, appPrec1)
 
 import           Prelude ()
@@ -296,6 +296,26 @@ instance (GTextShow f, GTextShow g) => GTextShow (f :*: g) where
     -- If we have a product then it is not a nullary constructor
     isNullary _ = False
 
+instance GTextShow UChar where
+    gShowbPrec _ = gShowbUCharPrec
+    isNullary _ = False
+
+instance GTextShow UDouble where
+    gShowbPrec _ = gShowbUDoublePrec
+    isNullary _ = False
+
+instance GTextShow UFloat where
+    gShowbPrec _ = gShowbUFloatPrec
+    isNullary _ = False
+
+instance GTextShow UInt where
+    gShowbPrec _ = gShowbUIntPrec
+    isNullary _ = False
+
+instance GTextShow UWord where
+    gShowbPrec _ = gShowbUWordPrec
+    isNullary _ = False
+
 -------------------------------------------------------------------------------
 
 -- | Class of generic representation types ('Rep1') that can be converted to
@@ -351,6 +371,26 @@ instance (GTextShow1 f, GTextShow1 g) => GTextShow1 (f :*: g) where
 
 instance (TextShow1 f, GTextShow1 g) => GTextShow1 (f :.: g) where
     gShowbPrecWith t sp n (Comp1 c) = showbPrecWith (gShowbPrecWith t sp) n c
+    isNullary1 _ = False
+
+instance GTextShow1 UChar where
+    gShowbPrecWith _ _ = gShowbUCharPrec
+    isNullary1 _ = False
+
+instance GTextShow1 UDouble where
+    gShowbPrecWith _ _ = gShowbUDoublePrec
+    isNullary1 _ = False
+
+instance GTextShow1 UFloat where
+    gShowbPrecWith _ _ = gShowbUFloatPrec
+    isNullary1 _ = False
+
+instance GTextShow1 UInt where
+    gShowbPrecWith _ _ = gShowbUIntPrec
+    isNullary1 _ = False
+
+instance GTextShow1 UWord where
+    gShowbPrecWith _ _ = gShowbUWordPrec
     isNullary1 _ = False
 
 -------------------------------------------------------------------------------
@@ -436,6 +476,33 @@ gShowbProduct gsa gsb t@Pref n (a :*: b) =
        gsa t n a
     <> showbSpace
     <> gsb t n b
+
+gShowbUCharPrec :: Int -> UChar p -> Builder
+gShowbUCharPrec p (UChar c) = showbPrec (hashPrec p) (C# c) <> oneHash
+
+gShowbUDoublePrec :: Int -> UDouble p -> Builder
+gShowbUDoublePrec p (UDouble d) = showbPrec (hashPrec p) (D# d) <> twoHash
+
+gShowbUFloatPrec :: Int -> UFloat p -> Builder
+gShowbUFloatPrec p (UFloat f) = showbPrec (hashPrec p) (F# f) <> oneHash
+
+gShowbUIntPrec :: Int -> UInt p -> Builder
+gShowbUIntPrec p (UInt i) = showbPrec (hashPrec p) (I# i) <> oneHash
+
+gShowbUWordPrec :: Int -> UWord p -> Builder
+gShowbUWordPrec p (UWord w) = showbPrec (hashPrec p) (W# w) <> twoHash
+
+oneHash, twoHash :: Builder
+hashPrec :: Int -> Int
+#if __GLASGOW_HASKELL__ >= 711
+oneHash  = singleton '#'
+twoHash  = fromString "##"
+hashPrec = const 0
+#else
+oneHash  = mempty
+twoHash  = mempty
+hashPrec = id
+#endif
 
 -------------------------------------------------------------------------------
 

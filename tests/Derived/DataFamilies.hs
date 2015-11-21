@@ -27,7 +27,7 @@ Defines corner case-provoking data families.
 -}
 module Derived.DataFamilies (
       NotAllShow(..)
-# if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708
     , NullaryClass(..)
     , NullaryData(..)
 #endif
@@ -35,21 +35,25 @@ module Derived.DataFamilies (
 
 #include "generic.h"
 
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
+#endif
+
 #if __GLASGOW_HASKELL__ >= 706
-import GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import GHC.Generics (Generic1)
+import           GHC.Generics (Generic1)
 # endif
 #endif
-import GHC.Show (appPrec, appPrec1, showSpace)
+import           GHC.Show (appPrec, appPrec1, showSpace)
 
-import Prelude ()
-import Prelude.Compat
+import           Prelude ()
+import           Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), oneof)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #endif
 
 import TransformersCompat (Show1(..), Show2(..))
@@ -57,7 +61,7 @@ import TransformersCompat (Show1(..), Show2(..))
 -------------------------------------------------------------------------------
 
 data family NotAllShow
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKEL__ < 710
+#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
     a b c d :: *
 #else
     w x y z :: *
@@ -95,11 +99,20 @@ instance Show b => Show2 (NotAllShow Int b) where
 $(deriveTextShow  'NASShow1)
 $(deriveTextShow1 'NASShow2)
 $(deriveTextShow2 'NASShow1)
+
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           'NASShow1)
+$(Generics.deriveRepresentable1 'NASShow2)
+# endif
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveRepresentable0 'NASShow1)
+# endif
 #endif
 
 -------------------------------------------------------------------------------
 
-# if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708
 class NullaryClass where
     data NullaryData :: *
 
@@ -108,4 +121,8 @@ instance NullaryClass where
       deriving (Arbitrary, Show, Generic)
 
 $(deriveTextShow 'NullaryCon)
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveAll 'NullaryCon)
 # endif
+#endif

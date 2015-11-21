@@ -1,7 +1,10 @@
 {-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MagicHash                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -16,9 +19,9 @@ Portability: GHC
 -}
 module Instances.GHC.Generics () where
 
-import Generics.Deriving.Base (U1(..), Par1(..), Rec1(..), K1(..),
-                               M1(..), (:+:)(..), (:*:)(..), (:.:)(..),
-                               Fixity(..), Associativity(..), Arity(..))
+import Generics.Deriving.Base
+
+import GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 
 import Prelude ()
 import Prelude.Compat
@@ -50,3 +53,28 @@ instance Arbitrary Associativity where
 
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
+
+instance Arbitrary (UChar p) where
+    arbitrary = do
+        C# c <- arbitrary
+        pure $ UChar c
+
+instance Arbitrary (UDouble p) where
+    arbitrary = do
+        D# d <- arbitrary
+        pure $ UDouble d
+
+instance Arbitrary (UFloat p) where
+    arbitrary = do
+        F# f <- arbitrary
+        pure $ UFloat f
+
+instance Arbitrary (UInt p) where
+    arbitrary = do
+        I# i <- arbitrary
+        pure $ UInt i
+
+instance Arbitrary (UWord p) where
+    arbitrary = do
+        W# w <- arbitrary
+        pure $ UWord w

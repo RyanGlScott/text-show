@@ -5,13 +5,14 @@
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 
 #if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric              #-}
-#else
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
 #endif
+
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 
 {-|
 Module:      TransformersCompat
@@ -42,19 +43,22 @@ module TransformersCompat (
 
 import           Control.Applicative (Const(..))
 
-import           Data.Bifunctor (Bifunctor(..))
+import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
+                                    deriveBitraversable)
 #if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Data, Typeable)
 #endif
 import           Data.Functor.Identity (Identity(..))
+
+#if __GLASGOW_HASKELL__ < 706
+import qualified Generics.Deriving.TH as Generics
+#endif
 
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
 # if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
 # endif
-#else
-import qualified Generics.Deriving.TH as Generics
 #endif
 
 import           Prelude ()
@@ -209,10 +213,6 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
 #endif
            )
 
-instance Bifunctor f => Bifunctor (FromStringShow2 f) where
-    bimap f g = FromStringShow2 . bimap f g . fromStringShow2
-    INLINE_INST_FUN(bimap)
-
 instance Read (f a b) => Read (FromStringShow2 f a b) where
     readPrec = FromStringShow2 <$> readPrec
     INLINE_INST_FUN(readPrec)
@@ -268,10 +268,6 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
            , Typeable
 #endif
            )
-
-instance Bifunctor f => Bifunctor (FromTextShow2 f) where
-    bimap f g = FromTextShow2 . bimap f g . fromTextShow2
-    INLINE_INST_FUN(bimap)
 
 instance Read (f a b) => Read (FromTextShow2 f a b) where
     readPrec = FromTextShow2 <$> readPrec
@@ -374,7 +370,27 @@ instance Show1 FromTextShow where
 
 -------------------------------------------------------------------------------
 
+$(deriveBifunctor     ''FromStringShow2)
+$(deriveBifunctor     ''FromTextShow2)
+$(deriveBifoldable    ''FromStringShow2)
+$(deriveBifoldable    ''FromTextShow2)
+$(deriveBitraversable ''FromStringShow2)
+$(deriveBitraversable ''FromTextShow2)
+
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveMeta           ''FromStringShow1)
+$(Generics.deriveRepresentable1 ''FromStringShow1)
+$(Generics.deriveMeta           ''FromTextShow1)
+$(Generics.deriveRepresentable1 ''FromTextShow1)
+$(Generics.deriveMeta           ''FromStringShow2)
+$(Generics.deriveRepresentable1 ''FromStringShow2)
+$(Generics.deriveMeta           ''FromTextShow2)
+$(Generics.deriveRepresentable1 ''FromTextShow2)
+#endif
+
 #if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''FromStringShow1)
-$(Generics.deriveAll ''FromStringShow2)
+$(Generics.deriveRepresentable0 ''FromStringShow1)
+$(Generics.deriveRepresentable0 ''FromStringShow2)
+$(Generics.deriveRepresentable0 ''FromTextShow1)
+$(Generics.deriveRepresentable0 ''FromTextShow2)
 #endif

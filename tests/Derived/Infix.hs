@@ -1,10 +1,11 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE GADTs           #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies    #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 #if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE DeriveGeneric     #-}
 #endif
 
 {-|
@@ -26,22 +27,26 @@ module Derived.Infix (
 
 #include "generic.h"
 
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
+#endif
+
 #if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (Generic)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import GHC.Generics (Generic1)
+import           GHC.Generics (Generic)
+# if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic1)
 # endif
 #endif
-import GHC.Show (appPrec, appPrec1, showSpace)
+import           GHC.Show (appPrec, appPrec1, showSpace)
 
-import Prelude ()
-import Prelude.Compat
+import           Prelude ()
+import           Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), oneof)
 
-import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
+import           TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
 
 -------------------------------------------------------------------------------
 
@@ -54,7 +59,7 @@ data TyConPlain a b = (:!:) a b
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+# if __GLASGOW_HASKELL__ >= 706
            , Generic1
 # endif
 #endif
@@ -71,9 +76,7 @@ data TyConGADT a b where
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -228,4 +231,28 @@ $(deriveTextShow2 'TyFamilyPlain)
 $(deriveTextShow  '(:*))
 $(deriveTextShow1 '(:***))
 $(deriveTextShow2 '(:****))
+#endif
+
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveMeta           ''TyConPlain)
+$(Generics.deriveRepresentable1 ''TyConPlain)
+$(Generics.deriveAll0And1       ''TyConGADT)
+#endif
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveRepresentable0 ''TyConPlain)
+#endif
+
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           '(:#:))
+$(Generics.deriveRepresentable1 '(:$:))
+$(Generics.deriveMeta           '(:*))
+$(Generics.deriveRepresentable1 '(:**))
+# endif
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveRepresentable0 'TyFamilyPlain)
+$(Generics.deriveRepresentable0 '(:***))
+# endif
 #endif

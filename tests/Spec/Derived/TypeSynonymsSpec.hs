@@ -15,9 +15,6 @@ module Spec.Derived.TypeSynonymsSpec (main, spec) where
 import Derived.TypeSynonyms
 
 import Spec.Utils (prop_matchesTextShow, prop_genericTextShow, prop_genericTextShow1)
-#if MIN_VERSION_template_haskell(2,7,0)
-import Spec.Utils (prop_genericTextShow')
-#endif
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -34,6 +31,6 @@ spec = parallel $ do
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyFamily Int Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow' :: Int -> TyFamily Int Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyFamily Int Int -> Bool)
         prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyFamily Int Int -> Bool)
 #endif

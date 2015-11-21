@@ -23,13 +23,15 @@ module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
+#endif
+
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+# if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
 # endif
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll)
 #endif
 
 import           Prelude
@@ -70,7 +72,7 @@ newtype TyCon a b = TyCon
            , Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+# if __GLASGOW_HASKELL__ >= 706
            , Generic1
 # endif
 #endif
@@ -131,6 +133,22 @@ $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
 #endif
 
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveMeta           ''TyCon)
+$(Generics.deriveRepresentable1 ''TyCon)
+#endif
+
 #if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''TyCon)
+$(Generics.deriveRepresentable0 ''TyCon)
+#endif
+
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           'TyFamily)
+$(Generics.deriveRepresentable1 'TyFamily)
+# endif
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveRepresentable0 'TyFamily)
+# endif
 #endif

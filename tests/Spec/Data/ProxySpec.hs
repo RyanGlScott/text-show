@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module:      Spec.Data.ProxySpec
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -14,7 +16,10 @@ import Data.Proxy (Proxy)
 
 import Instances.Data.Proxy ()
 
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
+import Spec.Utils (prop_matchesTextShow)
+#if __GLASGOW_HASKELL__ >= 702
+import Spec.Utils (prop_genericTextShow)
+#endif
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,4 +30,6 @@ main = hspec spec
 spec :: Spec
 spec = parallel . describe "Proxy Int" $ do
     prop "TextShow instance" (prop_matchesTextShow :: Int -> Proxy Int -> Bool)
+#if __GLASGOW_HASKELL__ >= 702
     prop "generic TextShow"  (prop_genericTextShow :: Int -> Proxy Int -> Bool)
+#endif

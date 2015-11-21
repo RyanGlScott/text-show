@@ -16,19 +16,12 @@ module Spec.Utils (
     , prop_matchesTextShow1
     , prop_matchesTextShow2
     , prop_genericTextShow
-    , prop_genericTextShow'
     , prop_genericTextShow1
     ) where
 
 #include "generic.h"
 
-#if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic, Rep)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import           GHC.Generics (Generic1, Rep1)
-# endif
-import           TextShow.Generic
-#endif
+import           Generics.Deriving.Base
 
 #if MIN_VERSION_QuickCheck(2,7,0)
 import qualified Test.QuickCheck as QC (ioProperty)
@@ -39,6 +32,7 @@ import           Test.QuickCheck (Property, Testable)
 
 import           TextShow (TextShow(..), TextShow1(..), TextShow2(..),
                            Builder, FromStringShow(..))
+import           TextShow.Generic
 
 import           TransformersCompat (Show1, Show2,
                                     FromStringShow1(..), FromStringShow2(..))
@@ -79,35 +73,13 @@ showb42Prec p _ = showbPrec p $ Just (42 :: Int)
 
 -- | Verifies that a type's 'TextShow' instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
-#if __GLASGOW_HASKELL__ >= 702
 prop_genericTextShow :: (TextShow a, Generic a, GTextShow (Rep a))
                      => Int -> a -> Bool
 prop_genericTextShow p x = showbPrec p x == genericShowbPrec p x
-#else
-prop_genericTextShow :: Int -> a -> Bool
-prop_genericTextShow _ _ = True
-#endif
-
--- | Behaves exactly like 'prop_genericTextShow', except only for GHC 7.6 and above.
--- This is useful with type families, which couldn't properly have derived 'Generic'
--- instances until GHC 7.6 due to a bug.
-#if __GLASGOW_HASKELL__ >= 706
-prop_genericTextShow' :: (TextShow a, Generic a, GTextShow (Rep a))
-                       => Int -> a -> Bool
-prop_genericTextShow' = prop_genericTextShow
-#else
-prop_genericTextShow' :: Int -> f a -> Bool
-prop_genericTextShow' _ _ = True
-#endif
 
 -- | Verifies that a type's 'TextShow1' instance coincides with the output produced
 -- by the equivalent 'Generic1' functions.
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 prop_genericTextShow1 :: (TextShow1 f, Generic1 f, GTextShow1 (Rep1 f))
                       => Int -> f a -> Bool
 prop_genericTextShow1 p x = showbPrecWith showb27Prec p x
                         == genericShowbPrecWith showb27Prec p x
-#else
-prop_genericTextShow1 :: Int -> f a -> Bool
-prop_genericTextShow1 _ _ = True
-#endif

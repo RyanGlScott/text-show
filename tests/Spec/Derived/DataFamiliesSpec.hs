@@ -20,7 +20,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_template_haskell(2,7,0)
 import Derived.DataFamilies (NotAllShow)
 
-import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow', prop_genericTextShow1)
+import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -39,12 +39,12 @@ spec = parallel $ do
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "NotAllShow Int Int Int Int" $ do
         prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> NotAllShow Int Int Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow' :: Int -> NotAllShow Int Int Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
 # if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
         prop "TextShow instance"  (prop_matchesTextShow  :: Int -> NullaryData -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow' :: Int -> NullaryData -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> NullaryData -> Bool)
 # endif
 #else
     pure ()

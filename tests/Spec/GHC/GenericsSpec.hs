@@ -15,6 +15,7 @@ module Spec.GHC.GenericsSpec (main, spec) where
 import Data.Orphans ()
 
 import Generics.Deriving.Base (U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:),
+                               UChar, UDouble, UFloat, UInt, UWord,
                                Fixity, Associativity, Arity)
 import Generics.Deriving.Instances ()
 
@@ -54,12 +55,27 @@ spec = parallel $ do
     describe "M1 () () Maybe Int" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> M1 () () Maybe Int -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> M1 () () Maybe Int -> Bool)
-    describe "(Maybe :+: Maybe) Int " $ do
+    describe "(Maybe :+: Maybe) Int" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :+: Maybe) Int -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :+: Maybe) Int -> Bool)
-    describe "(Maybe :*: Maybe) Int " $ do
+    describe "(Maybe :*: Maybe) Int" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :*: Maybe) Int -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :*: Maybe) Int -> Bool)
-    describe "(Maybe :.: Maybe) Int " $ do
+    describe "(Maybe :.: Maybe) Int" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
+    describe "UChar Int" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UChar Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UChar Int -> Bool)
+    describe "UDouble Int" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UDouble Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UDouble Int -> Bool)
+    describe "UFloat Int" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UFloat Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UFloat Int -> Bool)
+    describe "UInt Int" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UInt Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UInt Int -> Bool)
+    describe "UWord Int" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UWord Int -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UWord Int -> Bool)

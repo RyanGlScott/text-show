@@ -1,5 +1,8 @@
 # next
 * Fixed GHC 7.10.3 build
+* Extended `TextShow.Generic` to allow `genericShowbPrec` (and friends) to be used on `Generic` datatypes with `Char#`, `Double#`, `Float#`, `Int#`, and `Word#` argument types, just like string `Show` does
+* Added `Generic1` instances for `FromStringShow` and `FromTextShow`
+* Added `TextShow` instances for `UChar`, `UDouble`, `UFloat`, `UInt`, and `UWord` in `TextShow.GHC.Generics`
 
 # 2.1.1
 * Restore support for `semigroups-0.16.1`
@@ -39,7 +42,7 @@
  * `genericShowList` → `genericShowtList`
  * `genericShowListLazy` → `genericShowtlList`
  * `genericPrint` → `genericPrintT`
- * `genericPrintLazy` → genericPrintTL``
+ * `genericPrintLazy` → `genericPrintTL`
  * `genericHPrint` → `genericHPrintT`
  * `genericHPrintLazy` → `genericHPrintTL`
  * `deriveShow` → `deriveTextShow`

@@ -20,25 +20,29 @@ module Derived.Records (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
+#endif
+
 #if __GLASGOW_HASKELL__ >= 702
-import GHC.Generics (Generic)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import GHC.Generics (Generic1)
+import           GHC.Generics (Generic)
+# if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic1)
 # endif
 #endif
-import GHC.Show (showSpace)
+import           GHC.Show (showSpace)
 #if __GLASGOW_HASKELL__ < 711
-import GHC.Show (appPrec)
+import           GHC.Show (appPrec)
 #endif
 
-import Prelude ()
-import Prelude.Compat
+import           Prelude ()
+import           Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), oneof)
 
-import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat (Show1(..), Show2(..))
+import           TransformersCompat (Show1(..), Show2(..))
 
 -------------------------------------------------------------------------------
 
@@ -48,7 +52,7 @@ data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+# if __GLASGOW_HASKELL__ >= 706
            , Generic1
 # endif
 #endif
@@ -127,4 +131,24 @@ $(deriveTextShow2 ''TyCon)
 $(deriveTextShow  'TyFamilyPrefix)
 $(deriveTextShow1 '(:!:))
 $(deriveTextShow2 'TyFamilyPrefix)
+#endif
+
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveMeta           ''TyCon)
+$(Generics.deriveRepresentable1 ''TyCon)
+#endif
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveRepresentable0 ''TyCon)
+#endif
+
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           'TyFamilyPrefix)
+$(Generics.deriveRepresentable1 '(:!:))
+# endif
+
+# if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveRepresentable0 'TyFamilyPrefix)
+# endif
 #endif
