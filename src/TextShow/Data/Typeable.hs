@@ -19,9 +19,14 @@ import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (TyCon(..), funTc, listTc)
+import Data.Typeable.Internal (TyCon, tyConName)
 # if MIN_VERSION_base(4,8,0)
 import Data.Typeable.Internal (typeRepKinds)
+# endif
+# if MIN_VERSION_base(4,9,0)
+import Data.Typeable.Internal (tcFun, tcList)
+# elif MIN_VERSION_base(4,4,0)
+import Data.Typeable.Internal (funTc, listTc)
 # endif
 #else
 import Data.Typeable (TyCon, mkTyCon, tyConString, typeOf)
@@ -41,8 +46,8 @@ showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p tyrep =
     case tys of
       [] -> showbTyCon tycon
-      [x]   | tycon == listTc -> singleton '[' <> showb x <> singleton ']'
-      [a,r] | tycon == funTc  -> showbParen (p > 8) $
+      [x]   | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
+      [a,r] | tycon == tcFun  -> showbParen (p > 8) $
                                     showbPrec 9 a
                                  <> " -> "
                                  <> showbPrec 8 r
@@ -65,12 +70,20 @@ showbTypeRepPrec p tyrep =
 
 #if !(MIN_VERSION_base(4,4,0))
 -- | The list 'TyCon'.
-listTc :: TyCon
-listTc = typeRepTyCon $ typeOf [()]
+tcList :: TyCon
+tcList = typeRepTyCon $ typeOf [()]
 
 -- | The function (@->@) 'TyCon'.
-funTc :: TyCon
-funTc = mkTyCon "->"
+tcFun :: TyCon
+tcFun = mkTyCon "->"
+#elif !(MIN_VERSION_base(4,9,0))
+-- | The list 'TyCon'.
+tcList :: TyCon
+tcList = listTc
+
+-- | The function (@->@) 'TyCon'.
+tcFun :: TyCon
+tcFun = funTc
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?
