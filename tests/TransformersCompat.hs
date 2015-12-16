@@ -5,11 +5,17 @@
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 
 #if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric              #-}
+#endif
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds                  #-}
 #endif
 
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
@@ -45,9 +51,7 @@ import           Control.Applicative (Const(..))
 
 import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
                                     deriveBitraversable)
-#if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Data, Typeable)
-#endif
 import           Data.Functor.Identity (Identity(..))
 
 #if __GLASGOW_HASKELL__ < 706
@@ -101,11 +105,11 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
            , Ord
            , Show1
            , Traversable
-#if __GLASGOW_HASKELL__ >= 708
-           , Data
            , Typeable
-#endif
            )
+
+deriving instance ( Data (f a), Typeable f, Typeable a
+                  ) => Data (FromStringShow1 f (a :: *))
 
 instance Read (f a) => Read (FromStringShow1 f a) where
     readPrec = FromStringShow1 <$> readPrec
@@ -159,11 +163,11 @@ newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
            , Ord
            , TextShow1
            , Traversable
-#if __GLASGOW_HASKELL__ >= 708
-           , Data
            , Typeable
-#endif
            )
+
+deriving instance ( Data (f a), Typeable f, Typeable a
+                  ) => Data (FromTextShow1 f (a :: *))
 
 instance Read (f a) => Read (FromTextShow1 f a) where
     readPrec = FromTextShow1 <$> readPrec
@@ -207,11 +211,11 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
            , Ord
            , Show2
            , Traversable
-#if __GLASGOW_HASKELL__ >= 708
-           , Data
            , Typeable
-#endif
            )
+
+deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
+                  ) => Data (FromStringShow2 f (a :: *) (b :: *))
 
 instance Read (f a b) => Read (FromStringShow2 f a b) where
     readPrec = FromStringShow2 <$> readPrec
@@ -263,11 +267,11 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
            , Ord
            , TextShow2
            , Traversable
-#if __GLASGOW_HASKELL__ >= 708
-           , Data
            , Typeable
-#endif
            )
+
+deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
+                  ) => Data (FromTextShow2 f (a :: *) (b :: *))
 
 instance Read (f a b) => Read (FromTextShow2 f a b) where
     readPrec = FromTextShow2 <$> readPrec
