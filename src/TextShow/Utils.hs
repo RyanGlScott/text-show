@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
 
 {-|
@@ -11,7 +12,8 @@ Portability: GHC
 Miscellaneous utility functions.
 -}
 module TextShow.Utils (
-      i2d
+      coerce
+    , i2d
     , isInfixTypeCon
     , isTupleString
     , lengthB
@@ -22,18 +24,33 @@ module TextShow.Utils (
     , unwordsB
     ) where
 
-import Data.Int (Int64)
-import Data.Text (Text)
-import Data.Monoid.Compat ((<>))
-import Data.Semigroup (mtimesDefault)
-import Data.Text.Lazy (length, toStrict, unpack)
-import Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
+import           Data.Int (Int64)
+import           Data.Text (Text)
+import           Data.Monoid.Compat ((<>))
+import           Data.Semigroup (mtimesDefault)
+import           Data.Text.Lazy (length, toStrict, unpack)
+import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 
-import GHC.Exts (Char(C#), Int(I#))
-import GHC.Prim ((+#), chr#, ord#)
+import           GHC.Exts (Char(C#), Int(I#))
+import           GHC.Prim ((+#), chr#, ord#)
 
-import Prelude ()
-import Prelude.Compat hiding (length)
+import           Prelude ()
+import           Prelude.Compat hiding (length)
+
+#if __GLASGOW_HASKELL__ >= 708
+import qualified Data.Coerce as C (Coercible, coerce)
+#else
+import           Unsafe.Coerce (unsafeCoerce)
+#endif
+
+-- On GHC 7.8+, this is 'Data.Coerce.coerce'. Otherwise, it's 'unsafeCoerce'.
+#if __GLASGOW_HASKELL__ >= 708
+coerce :: C.Coercible a b => a -> b
+coerce = C.coerce
+#else
+coerce :: a -> b
+coerce = unsafeCoerce
+#endif
 
 -- | Unsafe conversion for decimal digits.
 i2d :: Int -> Char

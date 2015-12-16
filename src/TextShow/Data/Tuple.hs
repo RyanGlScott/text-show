@@ -33,7 +33,7 @@ module TextShow.Data.Tuple (
 
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showb), TextShow2(..))
+import TextShow.Classes (TextShow(..), TextShow2(..))
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 #include "inline.h"

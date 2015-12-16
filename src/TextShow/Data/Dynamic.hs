@@ -21,7 +21,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Prelude ()
 
-import TextShow.Classes (TextShow(showb))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Typeable (showbTypeRepPrec)
 
 #include "inline.h"

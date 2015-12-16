@@ -30,7 +30,7 @@ import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
                                   funTc, listTc)
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 
-import TextShow.Classes (TextShow(showb, showbPrec), showbParen, showbSpace)
+import TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import TextShow.Utils (isTupleString)
 

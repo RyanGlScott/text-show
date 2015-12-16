@@ -37,7 +37,7 @@ import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleto
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 
-import           TextShow.Classes (TextShow(showb, showbPrec), showbParen)
+import           TextShow.Classes (TextShow(..), showbParen)
 import           TextShow.TH.Internal (deriveTextShow)
 import           TextShow.Utils (i2d)
 

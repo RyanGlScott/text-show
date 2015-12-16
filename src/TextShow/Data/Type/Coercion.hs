@@ -29,7 +29,7 @@ module TextShow.Data.Type.Coercion (
 import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Coercion (Coercion(..))
 
-import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..))
+import TextShow.Classes (TextShow(..), TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow2, makeShowbPrec, makeShowbPrecWith)
 
 -- | Convert a representational equality value to a 'Builder'.

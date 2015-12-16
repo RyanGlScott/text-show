@@ -29,7 +29,7 @@ import TextShow.Data.Integral (showbWord)
 import Numeric.Natural (Natural)
 #endif
 
-import TextShow.Classes (TextShow(showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral (showbIntegerPrec)
 
 #include "inline.h"

@@ -33,14 +33,13 @@ module TextShow.Data.Monoid (
 import Data.Monoid.Compat (All, Any, Dual, First, Last, Product, Sum)
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showbPrec), showbPrecWith)
+import TextShow.Classes (TextShow(..), TextShow1(..))
 import TextShow.Data.Bool ()
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Monoid (Alt)
-import TextShow.Classes (TextShow1)
 import TextShow.TH.Internal (makeShowbPrec)
 #endif
 

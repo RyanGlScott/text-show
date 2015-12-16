@@ -50,7 +50,7 @@ import           GHC.Prim ((<#), (>#))
 import           Prelude ()
 import           Prelude.Compat
 
-import           TextShow.Classes (TextShow(showb, showbPrec))
+import           TextShow.Classes (TextShow(..))
 import           TextShow.Utils (toString)
 
 #include "inline.h"

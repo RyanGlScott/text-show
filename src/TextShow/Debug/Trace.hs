@@ -85,7 +85,7 @@ import           Prelude.Compat
 
 import           System.IO.Unsafe (unsafePerformIO)
 
-import           TextShow.Classes (TextShow, showt)
+import           TextShow.Classes (TextShow(..))
 import           TextShow.Instances ()
 
 -- $tracing

@@ -6,6 +6,7 @@
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
@@ -68,11 +69,27 @@ import           GHC.Generics (Generic1)
 import           Prelude ()
 import           Prelude.Compat
 
-import           Text.Read (Read(..), readListPrecDefault)
+import           Text.ParserCombinators.ReadPrec (ReadPrec)
+import           Text.Read (Read(..))
 
-import           TextShow (TextShow(showbPrec), TextShow1(..), TextShow2(..),
+import           TextShow (TextShow(..), TextShow1(..), TextShow2(..),
                            FromStringShow(..), FromTextShow(..),
                            showsToShowb, showbToShows, showbPrec1, showbPrec2)
+
+#if __GLASGOW_HASKELL__ >= 708
+import qualified Data.Coerce as C (Coercible, coerce)
+#else
+import           Unsafe.Coerce (unsafeCoerce)
+#endif
+
+-- On GHC 7.8+, this is 'Data.Coerce.coerce'. Otherwise, it's 'unsafeCoerce'.
+#if __GLASGOW_HASKELL__ >= 708
+coerce :: C.Coercible a b => a -> b
+coerce = C.coerce
+#else
+coerce :: a -> b
+coerce = unsafeCoerce
+#endif
 
 -- | Lifting of the 'Show' class to unary type constructors.
 class Show1 f where
@@ -112,11 +129,10 @@ deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromStringShow1 f (a :: *))
 
 instance Read (f a) => Read (FromStringShow1 f a) where
-    readPrec = FromStringShow1 <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec (f a))
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a))
+    readList     = coerce (readList     :: ReadS [f a])
+    readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
 instance (Show1 f, Show a) => TextShow (FromStringShow1 f a) where
     showbPrec = showbPrecWith (showsToShowb showsPrec)
@@ -170,11 +186,10 @@ deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromTextShow1 f (a :: *))
 
 instance Read (f a) => Read (FromTextShow1 f a) where
-    readPrec = FromTextShow1 <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec (f a))
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a))
+    readList     = coerce (readList     :: ReadS [f a])
+    readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
 instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a) where
     showsPrec = showsPrecWith (showbToShows showbPrec)
@@ -218,11 +233,10 @@ deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
                   ) => Data (FromStringShow2 f (a :: *) (b :: *))
 
 instance Read (f a b) => Read (FromStringShow2 f a b) where
-    readPrec = FromStringShow2 <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec (f a b))
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a b))
+    readList     = coerce (readList     :: ReadS [f a b])
+    readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
 instance (Show2 f, Show a, Show b) => TextShow (FromStringShow2 f a b) where
     showbPrec = showbPrecWith (showsToShowb showsPrec)
@@ -274,11 +288,10 @@ deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
                   ) => Data (FromTextShow2 f (a :: *) (b :: *))
 
 instance Read (f a b) => Read (FromTextShow2 f a b) where
-    readPrec = FromTextShow2 <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec (f a b))
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a b))
+    readList     = coerce (readList     :: ReadS [f a b])
+    readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
 instance (TextShow2 f, TextShow a, TextShow b) => Show (FromTextShow2 f a b) where
     showsPrec = showsPrecWith (showbToShows showbPrec)

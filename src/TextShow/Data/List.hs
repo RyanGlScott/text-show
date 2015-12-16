@@ -12,7 +12,7 @@ Exports 'showbListWith'.
 -}
 module TextShow.Data.List (showbListWith) where
 
-import TextShow.Classes (TextShow(showb, showbList), TextShow1(..), showbListWith)
+import TextShow.Classes (TextShow(..), TextShow1(..), showbListWith)
 import TextShow.Data.Char ()
 import TextShow.Data.Integral ()
 

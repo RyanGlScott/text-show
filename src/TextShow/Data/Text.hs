@@ -38,7 +38,7 @@ import           Data.Text.Foreign (I16)
 import qualified Data.Text.Lazy as TL
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 
-import           TextShow.Classes (TextShow(showb, showbPrec))
+import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Char (showbString)
 import           TextShow.Data.Integral (showbHex)
 import           TextShow.TH.Internal (deriveTextShow)

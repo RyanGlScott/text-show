@@ -42,7 +42,7 @@ module TextShow.GHC.TypeLits (
 #if MIN_VERSION_base(4,6,0)
 
 import Data.Text.Lazy.Builder (Builder)
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 
 # if MIN_VERSION_base(4,7,0)
 import GHC.TypeLits (SomeNat(..), SomeSymbol(..), natVal, symbolVal)

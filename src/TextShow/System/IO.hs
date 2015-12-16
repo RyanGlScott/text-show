@@ -42,7 +42,7 @@ import GHC.IO.Handle.Types (Handle(..))
 
 import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral (showbIntegerPrec)
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow)

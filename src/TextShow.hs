@@ -14,12 +14,6 @@ module TextShow (
       -- * The @TextShow@ classes
       -- ** 'TextShow'
       TextShow(..)
-    , showt
-    , showtl
-    , showtPrec
-    , showtlPrec
-    , showtList
-    , showtlList
     , showbParen
     , showbSpace
       -- ** 'TextShow1'

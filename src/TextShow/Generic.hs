@@ -85,7 +85,7 @@ import           Prelude.Compat
 
 import           System.IO (Handle)
 
-import           TextShow.Classes (TextShow(showbPrec), TextShow1(..),
+import           TextShow.Classes (TextShow(..), TextShow1(..),
                                    showbListWith, showbParen, showbSpace)
 import           TextShow.Instances ()
 import           TextShow.Utils (isInfixTypeCon, isTupleString)

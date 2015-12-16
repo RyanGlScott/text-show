@@ -17,7 +17,7 @@ module TextShow.Control.Monad.ST (showbST) where
 
 import Control.Monad.ST (ST)
 import Data.Text.Lazy.Builder (Builder)
-import TextShow.Classes (TextShow(showb), TextShow1(..), TextShow2(..))
+import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 
 #include "inline.h"
 

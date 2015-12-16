@@ -52,7 +52,7 @@ import Data.Text.Lazy.Builder (singleton)
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
 

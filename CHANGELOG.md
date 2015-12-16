@@ -1,3 +1,6 @@
+# 3
+* TODO: Mention that `showt`/`showtl`/etc. are now part of `TextShow`
+
 # 2.1.2
 * Fixed GHC 7.10.3 build
 * Extended `TextShow.Generic` to allow `genericShowbPrec` (and friends) to be used on `Generic` datatypes with `Char#`, `Double#`, `Float#`, `Int#`, and `Word#` argument types, just like string `Show` does

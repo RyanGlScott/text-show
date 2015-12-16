@@ -18,7 +18,7 @@ module TextShow.Data.Functor.Identity (showbIdentityPrecWith) where
 import Data.Functor.Identity (Identity(..))
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showbPrec), TextShow1(..),
+import TextShow.Classes (TextShow(..), TextShow1(..),
                          showbPrec1, showbUnaryWith)
 
 #include "inline.h"

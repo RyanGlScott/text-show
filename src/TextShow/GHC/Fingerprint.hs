@@ -29,7 +29,7 @@ import Data.Word (Word64)
 
 import GHC.Fingerprint.Type (Fingerprint(..))
 
-import TextShow.Classes (TextShow(showb))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral (showbHex)
 import TextShow.Utils (lengthB, mtimesDefault)
 

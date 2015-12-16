@@ -20,7 +20,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (TextShow(showb))
+import TextShow.Classes (TextShow(..))
 
 #if MIN_VERSION_base(4,7,0)
 import Data.Fixed (Fixed(..))

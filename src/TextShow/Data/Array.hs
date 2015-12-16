@@ -34,7 +34,7 @@ import           GHC.Show (appPrec)
 import           Prelude ()
 import           Prelude.Compat
 
-import           TextShow.Classes (TextShow(showb, showbPrec), showbParen, showbSpace)
+import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Tuple ()
 

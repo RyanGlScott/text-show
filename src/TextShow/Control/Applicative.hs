@@ -19,7 +19,7 @@ import Control.Applicative (Const(..), ZipList)
 
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showbPrec), TextShow1(..),
+import TextShow.Classes (TextShow(..), TextShow1(..),
                          TextShow2(..), showbUnaryWith)
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)

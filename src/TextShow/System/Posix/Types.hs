@@ -67,7 +67,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import System.Posix.Types
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral ()
 import TextShow.Foreign.C.Types ()
 

@@ -20,7 +20,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Real (Ratio(..), ratioPrec, ratioPrec1)
 
-import TextShow.Classes (TextShow(showbPrec), showbParen)
+import TextShow.Classes (TextShow(..), showbParen)
 #if MIN_VERSION_base(4,4,0)
 import TextShow.Classes (TextShow1(..))
 #endif

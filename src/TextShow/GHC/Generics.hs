@@ -47,7 +47,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Generics.Deriving.Base
 
-import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..), TextShow2(..))
+import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.Data.Char     ()
 import TextShow.Data.Floating ()
 import TextShow.Data.Integral ()
@@ -180,35 +180,35 @@ showbArityPrec = showbPrec
 
 -- | Convert a 'UChar' to a 'Builder' with the given precedence.
 --
--- /Since: 2.2/
+-- /Since: 2.1.2/
 showbUCharPrec :: Int -> UChar p -> Builder
 showbUCharPrec = showbPrec
 {-# INLINE showbUCharPrec #-}
 
 -- | Convert a 'UDouble' to a 'Builder' with the given precedence.
 --
--- /Since: 2.2/
+-- /Since: 2.1.2/
 showbUDoublePrec :: Int -> UDouble p -> Builder
 showbUDoublePrec = showbPrec
 {-# INLINE showbUDoublePrec #-}
 
 -- | Convert a 'UFloat' to a 'Builder' with the given precedence.
 --
--- /Since: 2.2/
+-- /Since: 2.1.2/
 showbUFloatPrec :: Int -> UFloat p -> Builder
 showbUFloatPrec = showbPrec
 {-# INLINE showbUFloatPrec #-}
 
 -- | Convert a 'UInt' to a 'Builder' with the given precedence.
 --
--- /Since: 2.2/
+-- /Since: 2.1.2/
 showbUIntPrec :: Int -> UInt p -> Builder
 showbUIntPrec = showbPrec
 {-# INLINE showbUIntPrec #-}
 
 -- | Convert a 'UWord' to a 'Builder' with the given precedence.
 --
--- /Since: 2.2/
+-- /Since: 2.1.2/
 showbUWordPrec :: Int -> UWord p -> Builder
 showbUWordPrec = showbPrec
 {-# INLINE showbUWordPrec #-}

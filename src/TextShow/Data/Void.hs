@@ -18,7 +18,7 @@ import Data.Void (Void, absurd)
 
 import Prelude ()
 
-import TextShow.Classes (TextShow(showb))
+import TextShow.Classes (TextShow(..))
 
 -- | Since 'Void' values logically don't exist, attempting to convert one to a
 -- 'Builder' will never terminate.

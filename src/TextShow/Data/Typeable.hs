@@ -32,7 +32,7 @@ import Data.Typeable.Internal (funTc, listTc)
 import Data.Typeable (TyCon, mkTyCon, tyConString, typeOf)
 #endif
 
-import TextShow.Classes (TextShow(showb, showbPrec), showbParen, showbSpace)
+import TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import TextShow.Data.List ()
 import TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import TextShow.Utils (isTupleString)

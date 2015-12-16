@@ -16,7 +16,7 @@ Optional 'TextShow', 'TextShow1', and 'TextShow2' instances for functions.
 module TextShow.Functions (showbFunction) where
 
 import Data.Text.Lazy.Builder (Builder)
-import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..), TextShow2(..))
+import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 
 #include "inline.h"
 

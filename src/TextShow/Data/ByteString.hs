@@ -33,7 +33,7 @@ import           Data.Text.Lazy.Builder (Builder)
 
 import           GHC.Exts (ByteArray#, Char(C#), Int(I#), indexCharArray#)
 
-import           TextShow.Classes (TextShow(showb, showbPrec))
+import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Char ()
 import           TextShow.Data.List ()
 

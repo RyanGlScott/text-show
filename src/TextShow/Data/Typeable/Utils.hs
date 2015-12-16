@@ -16,7 +16,7 @@ import Data.Text.Lazy.Builder (Builder, singleton)
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (TextShow(showbPrec))
+import TextShow.Classes (TextShow(..))
 
 -- | Helper function for showing a list of arguments, each separated by the given
 -- 'Builder'.

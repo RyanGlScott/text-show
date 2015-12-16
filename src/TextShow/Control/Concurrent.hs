@@ -31,7 +31,7 @@ import GHC.Conc (BlockReason, ThreadStatus)
 import GHC.Conc.Sync (ThreadId(..))
 import GHC.Prim
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Foreign.C.Types (showbCIntPrec)
 import TextShow.TH.Internal (deriveTextShow)
 

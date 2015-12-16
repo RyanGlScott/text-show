@@ -42,10 +42,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import GHC.RTS.Flags
 
-import TextShow.Classes (TextShow(showbPrec))
-# if MIN_VERSION_base(4,8,2)
-import TextShow.Classes (showb)
-# endif
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Bool     ()
 import TextShow.Data.Char     ()
 import TextShow.Data.Floating ()

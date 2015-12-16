@@ -21,7 +21,7 @@ module TextShow.Data.Complex (showbComplexPrec) where
 import Data.Complex (Complex)
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Floating ()
 import TextShow.TH.Internal (makeShowbPrec)
 #if MIN_VERSION_base(4,4,0)

@@ -65,70 +65,112 @@ class TextShow a where
     -- /Since: 2/
     showbPrec :: Int -- ^ The operator precedence of the enclosing context (a number
                      -- from @0@ to @11@). Function application has precedence @10@.
-              -> a   -- ^ The value to be converted to a 'String'.
+              -> a   -- ^ The value to be converted to a 'Builder'.
               -> Builder
     showbPrec _ = showb
 
-    -- | A specialized variant of 'showbPrec' using precedence context zero.
+    -- | Converts a value to a strict 'TS.Text'. If you hand-define this, it should
+    -- satisfy:
+    --
+    -- @
+    -- 'showb' = 'showbPrec' 0
+    -- @
     --
     -- /Since: 2/
-    showb :: a -> Builder
+    showb :: a -- ^ The value to be converted to a 'Builder'.
+          -> Builder
     showb = showbPrec 0
 
-    -- | Allows for specialized display of lists. This is used, for example, when
-    -- showing lists of 'Char's.
+    -- | Converts a list of values to a 'Builder'. By default, this is defined as
+    -- @'showbList = 'showbListWith' 'showb'@, but it can be overridden to allow
+    -- for specialized displaying of lists (e.g., lists of 'Char's).
     --
     -- /Since: 2/
-    showbList :: [a] -> Builder
+    showbList :: [a] -- ^ The list of values to be converted to a 'Builder'.
+              -> Builder
     showbList = showbListWith showb
+
+    -- | Converts a value to a strict 'TS.Text' with the given precedence. This
+    -- can be overridden for efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showtPrec' p = 'toStrict' . 'showtlPrec' p
+    -- @
+    --
+    -- /Since: 3/
+    showtPrec :: Int -- ^ The operator precedence of the enclosing context (a number
+                     -- from @0@ to @11@). Function application has precedence @10@.
+              -> a   -- ^ The value to be converted to a strict 'TS.Text'.
+              -> TS.Text
+    showtPrec p = toStrict . showtlPrec p
+
+    -- | Converts a value to a strict 'TS.Text'. This can be overridden for
+    -- efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showt' = 'toStrict' . 'showtl'
+    -- @
+    --
+    -- /Since: 3/
+    showt :: a -- ^ The value to be converted to a strict 'TS.Text'.
+          -> TS.Text
+    showt = toStrict . showtl
+
+    -- | Converts a list of values to a strict 'TS.Text'. This can be overridden for
+    -- efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showtList' = 'toStrict' . 'showtlList'
+    -- @
+    --
+    -- /Since: 3/
+    showtList :: [a] -- ^ The list of values to be converted to a strict 'TS.Text'.
+              -> TS.Text
+    showtList = toStrict . showtlList
+
+    -- | Converts a value to a lazy 'TL.Text' with the given precedence. This
+    -- can be overridden for efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showtlPrec' p = 'toLazyText' . 'showbPrec' p
+    -- @
+    --
+    -- /Since: 3/
+    showtlPrec :: Int -- ^ The operator precedence of the enclosing context (a number
+                      -- from @0@ to @11@). Function application has precedence @10@.
+               -> a   -- ^ The value to be converted to a lazy 'TL.Text'.
+               -> TL.Text
+    showtlPrec p = toLazyText . showbPrec p
+
+    -- | Converts a value to a lazy 'TL.Text'. This can be overridden for
+    -- efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showtl' = 'toLazyText' . 'showb'
+    -- @
+    --
+    -- /Since: 3/
+    showtl :: a -- ^ The value to be converted to a lazy 'TL.Text'.
+           -> TL.Text
+    showtl = toLazyText . showb
+
+    -- | Converts a list of values to a lazy 'TL.Text'. This can be overridden for
+    -- efficiency, but it should satisfy:
+    --
+    -- @
+    -- 'showtlList' = 'toLazyText' . 'showbList'
+    -- @
+    --
+    -- /Since: 3/
+    showtlList :: [a] -- ^ The list of values to be converted to a lazy 'TL.Text'.
+               -> TL.Text
+    showtlList = toLazyText . showbList
 
 #if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
 
 deriving instance Typeable TextShow
 #endif
-
--- | Constructs a strict 'TS.Text' from a single value.
---
--- /Since: 2/
-showt :: TextShow a => a -> TS.Text
-showt = toStrict . showtl
-{-# INLINE showt #-}
-
--- | Constructs a lazy 'TL.Text' from a single value.
---
--- /Since: 2/
-showtl :: TextShow a => a -> TL.Text
-showtl = toLazyText . showb
-{-# INLINE showtl #-}
-
--- | Constructs a strict 'TS.Text' from a single value with the given precedence.
---
--- /Since: 2/
-showtPrec :: TextShow a => Int -> a -> TS.Text
-showtPrec p = toStrict . showtlPrec p
-{-# INLINE showtPrec #-}
-
--- | Constructs a lazy 'TL.Text' from a single value with the given precedence.
---
--- /Since: 2/
-showtlPrec :: TextShow a => Int -> a -> TL.Text
-showtlPrec p = toLazyText . showbPrec p
-{-# INLINE showtlPrec #-}
-
--- | Construct a strict 'TS.Text' from a list of values.
---
--- /Since: 2/
-showtList :: TextShow a => [a] -> TS.Text
-showtList = toStrict . showtlList
-{-# INLINE showtList #-}
-
--- | Construct a lazy 'TL.Text' from a list of values.
---
--- /Since: 2/
-showtlList :: TextShow a => [a] -> TL.Text
-showtlList = toLazyText . showbList
-{-# INLINE showtlList #-}
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 --

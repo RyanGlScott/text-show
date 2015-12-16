@@ -30,7 +30,7 @@ module TextShow.Data.Type.Equality (
 import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Equality ((:~:)(..))
 
-import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..))
+import TextShow.Classes (TextShow(..), TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow2, makeShowbPrec, makeShowbPrecWith)
 
 -- | Convert a propositional equality value to a 'Builder'.

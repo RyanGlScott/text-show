@@ -24,7 +24,7 @@ module TextShow.Data.Data (
 import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity, showConstr)
 import Data.Text.Lazy.Builder (Builder, fromString)
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.List ()
 import TextShow.Data.Ratio ()
 import TextShow.TH.Internal (deriveTextShow)

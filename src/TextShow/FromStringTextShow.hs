@@ -4,6 +4,7 @@
 {-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 
@@ -45,10 +46,12 @@ import           GHC.Generics (Generic1)
 import           Prelude ()
 import           Prelude.Compat
 
-import           Text.Read (Read(..), readListPrecDefault)
+import           Text.ParserCombinators.ReadPrec (ReadPrec)
+import           Text.Read (Read(..))
 
 import           TextShow.Classes (TextShow(..), TextShow1(..),
                                    showbToShows, showsToShowb)
+import           TextShow.Utils (coerce)
 
 #include "inline.h"
 
@@ -77,19 +80,25 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            )
 
 instance Read a => Read (FromStringShow a) where
-    readPrec = FromStringShow <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec a)
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS a)
+    readList     = coerce (readList     :: ReadS [a])
+    readListPrec = coerce (readListPrec :: ReadPrec [a])
 
 instance Show a => TextShow (FromStringShow a) where
     showbPrec p = showsToShowb showsPrec p . fromStringShow
     INLINE_INST_FUN(showbPrec)
 
+    showb = showsToShowb (const shows) 0 . fromStringShow
+    INLINE_INST_FUN(showb)
+
+    showbList l = showsToShowb (const showList) 0 (coerce l :: [a])
+    INLINE_INST_FUN(showbList)
+
 instance Show a => Show (FromStringShow a) where
-    showsPrec p = showsPrec p . fromStringShow
-    INLINE_INST_FUN(showsPrec)
+    showsPrec = coerce (showsPrec :: Int -> a -> ShowS)
+    show      = coerce (show      :: a -> String)
+    showList  = coerce (showList  :: [a] -> ShowS)
 
 instance TextShow1 FromStringShow where
     showbPrecWith sp p =
@@ -122,15 +131,20 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            )
 
 instance Read a => Read (FromTextShow a) where
-    readPrec = FromTextShow <$> readPrec
-    INLINE_INST_FUN(readPrec)
-
-    readListPrec = readListPrecDefault
-    INLINE_INST_FUN(readListPrec)
+    readPrec     = coerce (readPrec     :: ReadPrec a)
+    readsPrec    = coerce (readsPrec    :: Int -> ReadS a)
+    readList     = coerce (readList     :: ReadS [a])
+    readListPrec = coerce (readListPrec :: ReadPrec [a])
 
 instance TextShow a => Show (FromTextShow a) where
     showsPrec p = showbToShows showbPrec p . fromTextShow
     INLINE_INST_FUN(showsPrec)
+
+    show (FromTextShow x) = showbToShows (const showb) 0 x ""
+    INLINE_INST_FUN(show)
+
+    showList l = showbToShows (const showbList) 0 (coerce l :: [a])
+    INLINE_INST_FUN(showList)
 
 instance TextShow1 FromTextShow where
     showbPrecWith sp p = sp p . fromTextShow

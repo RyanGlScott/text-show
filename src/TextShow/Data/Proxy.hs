@@ -25,7 +25,7 @@ module TextShow.Data.Proxy (showbProxy) where
 import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec)
 
 #include "inline.h"

@@ -33,7 +33,7 @@ import GHC.Num (wordToInteger)
 import GHC.Ptr (Ptr(..))
 import GHC.Prim (addr2Int#, int2Word#, unsafeCoerce#)
 
-import TextShow.Classes (TextShow(showb, showbPrec), TextShow1(..))
+import TextShow.Classes (TextShow(..), TextShow1(..))
 import TextShow.Data.Integral (showbHex, showbIntPrec, showbWord)
 import TextShow.Utils (lengthB, mtimesDefault)
 

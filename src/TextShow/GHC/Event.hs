@@ -42,7 +42,7 @@ import Language.Haskell.TH.Lib (conT, varE)
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral      ()
 import TextShow.System.Posix.Types ()
 import TextShow.TH.Internal (deriveTextShow)

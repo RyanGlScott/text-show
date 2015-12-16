@@ -51,7 +51,7 @@ import Data.Text.Lazy.Builder (Builder)
 
 import Foreign.C.Types
 
-import TextShow.Classes (TextShow(showb, showbPrec))
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Floating ()
 import TextShow.Data.Integral ()
 
