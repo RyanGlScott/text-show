@@ -57,13 +57,13 @@ import           Data.Data (Data, Typeable)
 #endif
 import           Data.Functor.Identity (Identity(..))
 
-#if __GLASGOW_HASKELL__ < 706
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
 
 #if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
 import           GHC.Generics (Generic1)
 # endif
 #endif
@@ -115,6 +115,9 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
   deriving ( Eq
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            , Ord
            )
@@ -123,10 +126,6 @@ deriving instance Show1       f => Show1       (FromStringShow1 f)
 deriving instance Functor     f => Functor     (FromStringShow1 f)
 deriving instance Foldable    f => Foldable    (FromStringShow1 f)
 deriving instance Traversable f => Traversable (FromStringShow1 f)
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Functor f => Generic1 (FromStringShow1 f)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromStringShow1
@@ -176,6 +175,9 @@ newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
   deriving ( Eq
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            , Ord
            )
@@ -184,10 +186,6 @@ deriving instance TextShow1   f => TextShow1   (FromTextShow1 f)
 deriving instance Functor     f => Functor     (FromTextShow1 f)
 deriving instance Foldable    f => Foldable    (FromTextShow1 f)
 deriving instance Traversable f => Traversable (FromTextShow1 f)
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Functor f => Generic1 (FromTextShow1 f)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromTextShow1
@@ -227,6 +225,9 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
   deriving ( Eq
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            , Ord
            )
@@ -235,10 +236,6 @@ deriving instance Show2        f    => Show2       (FromStringShow2 f)
 deriving instance Functor     (f a) => Functor     (FromStringShow2 f a)
 deriving instance Foldable    (f a) => Foldable    (FromStringShow2 f a)
 deriving instance Traversable (f a) => Traversable (FromStringShow2 f a)
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Functor (f a) => Generic1 (FromStringShow2 f a)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromStringShow2
@@ -286,6 +283,9 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
   deriving ( Eq
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            , Ord
            )
@@ -294,10 +294,6 @@ deriving instance TextShow2    f    => TextShow2   (FromTextShow2 f)
 deriving instance Functor     (f a) => Functor     (FromTextShow2 f a)
 deriving instance Foldable    (f a) => Foldable    (FromTextShow2 f a)
 deriving instance Traversable (f a) => Traversable (FromTextShow2 f a)
-
-#if __GLASGOW_HASKELL__ >= 706
-deriving instance Functor (f a) => Generic1 (FromTextShow2 f a)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromTextShow2
@@ -412,7 +408,7 @@ $(deriveBifoldable    ''FromTextShow2)
 $(deriveBitraversable ''FromStringShow2)
 $(deriveBitraversable ''FromTextShow2)
 
-#if __GLASGOW_HASKELL__ < 706
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           ''FromStringShow1)
 $(Generics.deriveRepresentable1 ''FromStringShow1)
 $(Generics.deriveMeta           ''FromTextShow1)
