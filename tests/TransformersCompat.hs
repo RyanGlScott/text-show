@@ -113,8 +113,6 @@ showsPrec1 = showsPrecWith showsPrec
 -- /Since: ?.?/
 newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
   deriving ( Eq
-           , Functor
-           , Foldable
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if __GLASGOW_HASKELL__ >= 706
@@ -123,8 +121,11 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
 #endif
            , Ord
            , Show1
-           , Traversable
            )
+
+deriving instance Functor     f => Functor     (FromStringShow1 f)
+deriving instance Foldable    f => Foldable    (FromStringShow1 f)
+deriving instance Traversable f => Traversable (FromStringShow1 f)
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromStringShow1
@@ -172,8 +173,6 @@ showsPrec2 = showsPrecWith2 showsPrec showsPrec
 -- /Since: ?.?/
 newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
   deriving ( Eq
-           , Functor
-           , Foldable
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if __GLASGOW_HASKELL__ >= 706
@@ -182,8 +181,11 @@ newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
 #endif
            , Ord
            , TextShow1
-           , Traversable
            )
+
+deriving instance Functor     f => Functor     (FromTextShow1 f)
+deriving instance Foldable    f => Foldable    (FromTextShow1 f)
+deriving instance Traversable f => Traversable (FromTextShow1 f)
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromTextShow1
@@ -221,8 +223,6 @@ instance (TextShow1 f, TextShow a) => TextShow (FromTextShow1 f a) where
 -- /Since: ?.?/
 newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
   deriving ( Eq
-           , Functor
-           , Foldable
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -231,8 +231,11 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
 #endif
            , Ord
            , Show2
-           , Traversable
            )
+
+deriving instance Functor     (f a) => Functor     (FromStringShow2 f a)
+deriving instance Foldable    (f a) => Foldable    (FromStringShow2 f a)
+deriving instance Traversable (f a) => Traversable (FromStringShow2 f a)
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromStringShow2
@@ -278,8 +281,6 @@ instance (Show2 f, Show a) => Show1 (FromStringShow2 f a) where
 -- /Since: ?.?/
 newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
   deriving ( Eq
-           , Functor
-           , Foldable
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
@@ -288,8 +289,11 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
 #endif
            , Ord
            , TextShow2
-           , Traversable
            )
+
+deriving instance Functor     (f a) => Functor     (FromTextShow2 f a)
+deriving instance Foldable    (f a) => Foldable    (FromTextShow2 f a)
+deriving instance Traversable (f a) => Traversable (FromTextShow2 f a)
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromTextShow2
