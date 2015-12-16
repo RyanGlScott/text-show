@@ -52,7 +52,9 @@ import           Control.Applicative (Const(..))
 
 import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
                                     deriveBitraversable)
+#if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Data, Typeable)
+#endif
 import           Data.Functor.Identity (Identity(..))
 
 #if __GLASGOW_HASKELL__ < 706
@@ -122,11 +124,13 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
            , Ord
            , Show1
            , Traversable
-           , Typeable
            )
 
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable FromStringShow1
 deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromStringShow1 f (a :: *))
+#endif
 
 instance Read (f a) => Read (FromStringShow1 f a) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a))
@@ -179,11 +183,13 @@ newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
            , Ord
            , TextShow1
            , Traversable
-           , Typeable
            )
 
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable FromTextShow1
 deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromTextShow1 f (a :: *))
+#endif
 
 instance Read (f a) => Read (FromTextShow1 f a) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a))
@@ -226,11 +232,13 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
            , Ord
            , Show2
            , Traversable
-           , Typeable
            )
 
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable FromStringShow2
 deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
                   ) => Data (FromStringShow2 f (a :: *) (b :: *))
+#endif
 
 instance Read (f a b) => Read (FromStringShow2 f a b) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a b))
@@ -281,11 +289,13 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
            , Ord
            , TextShow2
            , Traversable
-           , Typeable
            )
 
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable FromTextShow2
 deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
                   ) => Data (FromTextShow2 f (a :: *) (b :: *))
+#endif
 
 instance Read (f a b) => Read (FromTextShow2 f a b) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a b))
