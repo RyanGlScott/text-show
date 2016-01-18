@@ -59,7 +59,10 @@ module TextShow.Generic (
     , genericShowbPrec1
       -- * The 'GTextShow' and 'GTextShow1' classes
     , GTextShow(..)
+    , GTextShowCon(..)
     , GTextShow1(..)
+    , GTextShow1Con(..)
+    , IsNullary(..)
     , ConType(..)
     ) where
 
@@ -186,7 +189,7 @@ genericShowb = genericShowbPrec 0
 --
 -- /Since: 2/
 genericShowbPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> Builder
-genericShowbPrec p = gShowbPrec Pref p . from
+genericShowbPrec p = gShowbPrec p . from
 
 -- | A 'Generic' implementation of 'showbList'.
 --
@@ -223,7 +226,7 @@ genericHPrintTL h = TL.hPutStrLn h . genericShowtl
 -- /Since: 2/
 genericShowbPrecWith :: (Generic1 f, GTextShow1 (Rep1 f))
                      => (Int -> a -> Builder) -> Int -> f a -> Builder
-genericShowbPrecWith sp p = gShowbPrecWith Pref sp p . from1
+genericShowbPrecWith sp p = gShowbPrecWith sp p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
 --
@@ -256,65 +259,65 @@ instance TextShow ConType where
 -- | Class of generic representation types ('Rep') that can be converted to
 -- a 'Builder'.
 --
--- /Since: 2/
+-- /Since: 3/
 class GTextShow f where
     -- | This is used as the default generic implementation of 'showbPrec'.
-    gShowbPrec :: ConType -> Int -> f a -> Builder
-    -- | Whether a representation type has any constructors.
-    isNullary :: f a -> Bool
-    isNullary = error "generic showbPrec (isNullary): unnecessary case"
-#if __GLASGOW_HASKELL__ >= 708
-    {-# MINIMAL gShowbPrec #-}
+    gShowbPrec :: Int -> f a -> Builder
 
+#if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow
 #endif
 
-instance GTextShow U1 where
-    gShowbPrec _ _ U1 = mempty
-    isNullary _ = True
-
-instance TextShow c => GTextShow (K1 i c) where
-    gShowbPrec _ n (K1 a) = showbPrec n a
-    isNullary _ = False
-
-instance (Constructor c, GTextShow f) => GTextShow (C1 c f) where
-    gShowbPrec = gShowbConstructor gShowbPrec isNullary
-
-instance (Selector s, GTextShow f) => GTextShow (S1 s f) where
-    gShowbPrec = gShowbSelector gShowbPrec
-    isNullary (M1 x) = isNullary x
-
 instance GTextShow f => GTextShow (D1 d f) where
-    gShowbPrec t n (M1 x) = gShowbPrec t n x
+    gShowbPrec n (M1 x) = gShowbPrec n x
 
 instance (GTextShow f, GTextShow g) => GTextShow (f :+: g) where
-    gShowbPrec t n (L1 x) = gShowbPrec t n x
-    gShowbPrec t n (R1 x) = gShowbPrec t n x
+    gShowbPrec n (L1 x) = gShowbPrec n x
+    gShowbPrec n (R1 x) = gShowbPrec n x
 
-instance (GTextShow f, GTextShow g) => GTextShow (f :*: g) where
-    gShowbPrec = gShowbProduct gShowbPrec gShowbPrec
-    -- If we have a product then it is not a nullary constructor
-    isNullary _ = False
+instance (Constructor c, GTextShowCon f, IsNullary f) => GTextShow (C1 c f) where
+    gShowbPrec = gShowbConstructor gShowbPrecCon
 
-instance GTextShow UChar where
-    gShowbPrec _ = gShowbUCharPrec
-    isNullary _ = False
+-- | Class of generic representation types ('Rep') for which the 'ConType'
+-- has been determined.
+class GTextShowCon f where
+    -- | Convert value of a specific 'ConType' to a 'Builder' with the given
+    -- precedence.
+    gShowbPrecCon :: ConType -> Int -> f a -> Builder
 
-instance GTextShow UDouble where
-    gShowbPrec _ = gShowbUDoublePrec
-    isNullary _ = False
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable GTextShowCon
+#endif
 
-instance GTextShow UFloat where
-    gShowbPrec _ = gShowbUFloatPrec
-    isNullary _ = False
+instance GTextShowCon V1 where
+    gShowbPrecCon = error "Void showbPrec"
 
-instance GTextShow UInt where
-    gShowbPrec _ = gShowbUIntPrec
-    isNullary _ = False
+instance GTextShowCon U1 where
+    gShowbPrecCon _ _ U1 = mempty
 
-instance GTextShow UWord where
-    gShowbPrec _ = gShowbUWordPrec
-    isNullary _ = False
+instance TextShow c => GTextShowCon (K1 i c) where
+    gShowbPrecCon _ n (K1 a) = showbPrec n a
+
+instance (Selector s, GTextShowCon f) => GTextShowCon (S1 s f) where
+    gShowbPrecCon = gShowbSelector gShowbPrecCon
+
+instance (GTextShowCon f, GTextShowCon g) => GTextShowCon (f :*: g) where
+    gShowbPrecCon = gShowbProduct gShowbPrecCon gShowbPrecCon
+
+instance GTextShowCon UChar where
+    gShowbPrecCon _ = gShowbUCharPrec
+
+instance GTextShowCon UDouble where
+    gShowbPrecCon _ = gShowbUDoublePrec
+
+instance GTextShowCon UFloat where
+    gShowbPrecCon _ = gShowbUFloatPrec
+
+instance GTextShowCon UInt where
+    gShowbPrecCon _ = gShowbUIntPrec
+
+instance GTextShowCon UWord where
+    gShowbPrecCon _ = gShowbUWordPrec
 
 -------------------------------------------------------------------------------
 
@@ -324,86 +327,125 @@ instance GTextShow UWord where
 -- /Since: 2/
 class GTextShow1 f where
     -- | This is used as the default generic implementation of 'showbPrecWith'.
-    gShowbPrecWith :: ConType -> (Int -> a -> Builder) -> Int -> f a -> Builder
-    -- | Whether a representation type has any constructors.
-    isNullary1 :: f a -> Bool
-    isNullary1 = error "generic showbPrecWith (isNullary1): unnecessary case"
-#if __GLASGOW_HASKELL__ >= 708
-    {-# MINIMAL gShowbPrecWith #-}
+    gShowbPrecWith :: (Int -> a -> Builder) -> Int -> f a -> Builder
 
+#if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow1
 #endif
 
-instance GTextShow1 U1 where
-    gShowbPrecWith _ _ _ U1 = mempty
-    isNullary1 _ = True
-
-instance GTextShow1 Par1 where
-    gShowbPrecWith _ sp n (Par1 p) = sp n p
-    isNullary1 _ = False
-
-instance TextShow c => GTextShow1 (K1 i c) where
-    gShowbPrecWith _ _ n (K1 a) = showbPrec n a
-    isNullary1 _ = False
-
-instance TextShow1 f => GTextShow1 (Rec1 f) where
-    gShowbPrecWith _ sp n (Rec1 r) = showbPrecWith sp n r
-    isNullary1 _ = False
-
-instance (Constructor c, GTextShow1 f) => GTextShow1 (C1 c f) where
-    gShowbPrecWith t sp = gShowbConstructor (flip gShowbPrecWith sp) isNullary1 t
-
-instance (Selector s, GTextShow1 f) => GTextShow1 (S1 s f) where
-    gShowbPrecWith t sp = gShowbSelector (flip gShowbPrecWith sp) t
-    isNullary1 (M1 x) = isNullary1 x
-
 instance GTextShow1 f => GTextShow1 (D1 d f) where
-    gShowbPrecWith t sp n (M1 x) = gShowbPrecWith t sp n x
+    gShowbPrecWith sp n (M1 x) = gShowbPrecWith sp n x
 
 instance (GTextShow1 f, GTextShow1 g) => GTextShow1 (f :+: g) where
-    gShowbPrecWith t sp n (L1 x) = gShowbPrecWith t sp n x
-    gShowbPrecWith t sp n (R1 x) = gShowbPrecWith t sp n x
+    gShowbPrecWith sp n (L1 x) = gShowbPrecWith sp n x
+    gShowbPrecWith sp n (R1 x) = gShowbPrecWith sp n x
 
-instance (GTextShow1 f, GTextShow1 g) => GTextShow1 (f :*: g) where
-    gShowbPrecWith t sp = gShowbProduct (flip gShowbPrecWith sp) (flip gShowbPrecWith sp) t
-    -- If we have a product then it is not a nullary constructor
-    isNullary1 _ = False
+instance (Constructor c, GTextShow1Con f, IsNullary f) => GTextShow1 (C1 c f) where
+    gShowbPrecWith sp = gShowbConstructor (`gShowbPrecWithCon` sp)
 
-instance (TextShow1 f, GTextShow1 g) => GTextShow1 (f :.: g) where
-    gShowbPrecWith t sp n (Comp1 c) = showbPrecWith (gShowbPrecWith t sp) n c
-    isNullary1 _ = False
+-- | Class of generic representation types ('Rep1') for which the 'ConType'
+-- has been determined.
+class GTextShow1Con f where
+    -- | Convert a value of a specific 'ConType' to a 'Builder' with the given
+    -- show function and precedence.
+    gShowbPrecWithCon :: ConType -> (Int -> a -> Builder) -> Int -> f a -> Builder
 
-instance GTextShow1 UChar where
-    gShowbPrecWith _ _ = gShowbUCharPrec
-    isNullary1 _ = False
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable GTextShow1Con
+#endif
 
-instance GTextShow1 UDouble where
-    gShowbPrecWith _ _ = gShowbUDoublePrec
-    isNullary1 _ = False
+instance GTextShow1Con V1 where
+    gShowbPrecWithCon = error "Void showbPrecWith"
 
-instance GTextShow1 UFloat where
-    gShowbPrecWith _ _ = gShowbUFloatPrec
-    isNullary1 _ = False
+instance GTextShow1Con U1 where
+    gShowbPrecWithCon _ _ _ U1 = mempty
 
-instance GTextShow1 UInt where
-    gShowbPrecWith _ _ = gShowbUIntPrec
-    isNullary1 _ = False
+instance GTextShow1Con Par1 where
+    gShowbPrecWithCon _ sp n (Par1 p) = sp n p
 
-instance GTextShow1 UWord where
-    gShowbPrecWith _ _ = gShowbUWordPrec
-    isNullary1 _ = False
+instance TextShow c => GTextShow1Con (K1 i c) where
+    gShowbPrecWithCon _ _ n (K1 a) = showbPrec n a
+
+instance TextShow1 f => GTextShow1Con (Rec1 f) where
+    gShowbPrecWithCon _ sp n (Rec1 r) = showbPrecWith sp n r
+
+instance (Selector s, GTextShow1Con f) => GTextShow1Con (S1 s f) where
+    gShowbPrecWithCon t sp = gShowbSelector (`gShowbPrecWithCon` sp) t
+
+instance (GTextShow1Con f, GTextShow1Con g) => GTextShow1Con (f :*: g) where
+    gShowbPrecWithCon t sp = gShowbProduct (`gShowbPrecWithCon` sp) (`gShowbPrecWithCon` sp) t
+
+instance (TextShow1 f, GTextShow1Con g) => GTextShow1Con (f :.: g) where
+    gShowbPrecWithCon t sp n (Comp1 c) = showbPrecWith (gShowbPrecWithCon t sp) n c
+
+instance GTextShow1Con UChar where
+    gShowbPrecWithCon _ _ = gShowbUCharPrec
+
+instance GTextShow1Con UDouble where
+    gShowbPrecWithCon _ _ = gShowbUDoublePrec
+
+instance GTextShow1Con UFloat where
+    gShowbPrecWithCon _ _ = gShowbUFloatPrec
+
+instance GTextShow1Con UInt where
+    gShowbPrecWithCon _ _ = gShowbUIntPrec
+
+instance GTextShow1Con UWord where
+    gShowbPrecWithCon _ _ = gShowbUWordPrec
 
 -------------------------------------------------------------------------------
 -- Shared code between GTextShow and GTextShow1
 -------------------------------------------------------------------------------
 
-gShowbConstructor :: forall c f p. Constructor c
+-- | Class of generic representation types that represent a constructor with
+-- zero or more fields.
+class IsNullary f where
+    -- Returns 'True' if the constructor has no fields.
+    isNullary :: f a -> Bool
+
+instance IsNullary U1 where
+    isNullary _ = True
+
+instance IsNullary Par1 where
+    isNullary _ = False
+
+instance IsNullary (K1 i c) where
+    isNullary _ = False
+
+instance IsNullary f => IsNullary (S1 s f) where
+    isNullary (M1 x) = isNullary x
+
+instance IsNullary (Rec1 f) where
+    isNullary _ = False
+
+instance IsNullary (f :*: g) where
+    isNullary _ = False
+
+instance IsNullary (f :.: g) where
+    isNullary _ = False
+
+instance IsNullary UChar where
+    isNullary _ = False
+
+instance IsNullary UDouble where
+    isNullary _ = False
+
+instance IsNullary UFloat where
+    isNullary _ = False
+
+instance IsNullary UInt where
+    isNullary _ = False
+
+instance IsNullary UWord where
+    isNullary _ = False
+
+gShowbConstructor :: forall c f p.
+                     (Constructor c, IsNullary f)
                   => (ConType -> Int -> f p -> Builder)
-                  -> (f p -> Bool)
-                  -> ConType -> Int -> C1 c f p -> Builder
-gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
+                  -> Int -> C1 c f p -> Builder
+gShowbConstructor gs n c@(M1 x) = case fixity of
     Prefix -> showbParen ( n > appPrec
-                           && not ( isNull x
+                           && not ( isNullary x
                                     || conIsTuple c
 #if __GLASGOW_HASKELL__ >= 711
                                     || conIsRecord c
@@ -415,7 +457,7 @@ gShowbConstructor gs isNull _ n c@(M1 x) = case fixity of
                else let cn = conName c
                     in showbParen (isInfixTypeCon cn) $ fromString cn
            )
-        <> (if isNull x || conIsTuple c
+        <> (if isNullary x || conIsTuple c
                then mempty
                else singleton ' '
            )

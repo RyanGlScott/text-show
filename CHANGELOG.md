@@ -1,5 +1,6 @@
 # 3
 * TODO: Mention that `showt`/`showtl`/etc. are now part of `TextShow`
+* Reworked internals of `TextShow.Generic`. Empty datatypes can now be have generic `TextShow` and `TextShow1` instances.
 
 # 2.1.2
 * Fixed GHC 7.10.3 build
