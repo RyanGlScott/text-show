@@ -25,6 +25,10 @@ import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow, prop_genericText
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
 
+# if __GLASGOW_HASKELL__ >= 706
+import Derived.DataFamilies (KindDistinguished)
+# endif
+
 # if __GLASGOW_HASKELL__ >= 708
 import Derived.DataFamilies (NullaryData)
 import Spec.Utils (prop_matchesTextShow)
@@ -41,6 +45,20 @@ spec = parallel $ do
         prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
+# if __GLASGOW_HASKELL__ >= 706
+    describe "KindDistinguished Int Int Int" $ do
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Int Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Int Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Int Int Int -> Bool)
+    describe "KindDistinguished Maybe Int Int" $ do
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Maybe Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Maybe Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Maybe Int Int -> Bool)
+    describe "KindDistinguished Either Int Int" $ do
+        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Either Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Either Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Either Int Int -> Bool)
+# endif
 # if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
         prop "TextShow instance"  (prop_matchesTextShow  :: Int -> NullaryData -> Bool)

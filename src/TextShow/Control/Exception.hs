@@ -210,10 +210,12 @@ showbRecUpdError (RecUpdError err) = fromString err
 --
 -- /Since: 2/
 showbErrorCall :: ErrorCall -> Builder
-showbErrorCall (ErrorCall err) = fromString err
 #if MIN_VERSION_base(4,9,0)
+showbErrorCall (ErrorCallWithLocation err "")  = fromString err
 showbErrorCall (ErrorCallWithLocation err loc) =
   fromString err <> singleton '\n' <> fromString loc
+#else
+showbErrorCall (ErrorCall err) = fromString err
 #endif
 
 -- | Convert a 'MaskingState' to a 'Builder'.

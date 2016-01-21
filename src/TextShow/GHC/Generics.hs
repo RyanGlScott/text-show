@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                  #-}
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE KindSignatures       #-}
 {-# LANGUAGE MagicHash            #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeOperators        #-}
@@ -35,7 +36,9 @@ module TextShow.GHC.Generics (
     , showbCompFunctorsPrecWith
     , showbFixityPrec
     , showbAssociativity
+#if !(MIN_VERSION_base(4,9,0))
     , showbArityPrec
+#endif
     , showbUCharPrec
     , showbUDoublePrec
     , showbUFloatPrec
@@ -149,7 +152,6 @@ showbCompFunctorsPrec = showbPrec
 {-# INLINE showbCompFunctorsPrec #-}
 
 -- | Convert a '(:.:)' value to a 'Builder' with the given show function and precedence.
--- This function is only available with @base-4.4.0.0@ or later.
 --
 -- /Since: 2/
 showbCompFunctorsPrecWith :: (TextShow1 f, TextShow1 g) => (Int -> p -> Builder) -> Int -> (f :.: g) p -> Builder
@@ -164,19 +166,21 @@ showbFixityPrec = showbPrec
 {-# INLINE showbFixityPrec #-}
 
 -- | Convert an 'Associativity' value to a 'Builder'.
--- This function is only available with @base-4.4.0.0@ or later.
 --
 -- /Since: 2/
 showbAssociativity :: Associativity -> Builder
 showbAssociativity = showb
 {-# INLINE showbAssociativity #-}
 
+#if !(MIN_VERSION_base(4,9,0))
 -- | Convert an 'Arity' value to a 'Builder' with the given precedence.
+-- This function is only available with @base-4.8@ or earlier.
 --
 -- /Since: 2/
 showbArityPrec :: Int -> Arity -> Builder
 showbArityPrec = showbPrec
 {-# INLINE showbArityPrec #-}
+#endif
 
 -- | Convert a 'UChar' to a 'Builder' with the given precedence.
 --
@@ -312,4 +316,6 @@ instance TextShow1 UWord where
 
 $(deriveTextShow ''Fixity)
 $(deriveTextShow ''Associativity)
+#if !(MIN_VERSION_base(4,9,0))
 $(deriveTextShow ''Arity)
+#endif

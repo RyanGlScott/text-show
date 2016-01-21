@@ -152,6 +152,8 @@ library
                      , template-haskell   >= 2.5     && < 2.12
                      , transformers       >= 0.2.1   && < 0.6
                      , void               >= 0.5     && < 1
+  if impl(ghc >= 8.0)
+    build-depends:     ghc-boot
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall
@@ -310,23 +312,24 @@ test-suite spec
                      , bifunctors           >= 5.1    && < 6
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
+                     , containers           >= 0.1    && < 0.6
                      , generic-deriving     >= 1.9    && < 2
                      , ghc-prim
                      , hspec                >= 2      && < 3
+                     , integer-gmp
                      , nats                 >= 0.1    && < 2
                      , QuickCheck           >= 2.5    && < 3
                      , quickcheck-instances >= 0.1    && < 0.4
+                     , semigroups           >= 0.17   && < 1
                      , tagged               >= 0.8.1  && < 1
+                     , template-haskell     >= 2.5    && < 2.12
                      , text                 >= 0.11.1 && < 1.3
                      , transformers         >= 0.2.1  && < 0.6
                      , transformers-compat  >= 0.3    && < 1
                      , void                 >= 0.5    && < 1
-  if flag(developer)
-    build-depends:     containers           >= 0.1    && < 0.6
-                     , integer-gmp
-                     , semigroups           >= 0.17   && < 1
-                     , template-haskell     >= 2.5    && < 2.12
-  else
+  if impl(ghc >= 8.0)
+    build-depends:     ghc-boot
+  if !flag(developer)
     build-depends:     text-show            == 2.1.2
 
   hs-source-dirs:      tests

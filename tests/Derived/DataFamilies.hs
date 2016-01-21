@@ -1,12 +1,17 @@
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 
 #if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric              #-}
+#endif
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds                  #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
@@ -27,6 +32,9 @@ Defines corner case-provoking data families.
 -}
 module Derived.DataFamilies (
       NotAllShow(..)
+#if __GLASGOW_HASKELL__ >= 706
+    , KindDistinguished(..)
+#endif
 #if __GLASGOW_HASKELL__ >= 708
     , NullaryClass(..)
     , NullaryData(..)
@@ -62,14 +70,14 @@ import TransformersCompat (Show1(..), Show2(..))
 
 data family NotAllShow
 #if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    a b c d :: *
+    (a :: *) (b :: *) (c :: *) (d :: *) :: *
 #else
-    w x y z :: *
+    (w :: *) (x :: *) (y :: *) (z :: *) :: *
 #endif
 
-data instance NotAllShow ()  ()  () d = NASNoShow
-data instance NotAllShow Int b   c  d = NASShow1 c b
-                                      | NASShow2 d
+data instance NotAllShow ()  ()  () _d = NASNoShow
+data instance NotAllShow Int b   c   d = NASShow1 c b
+                                       | NASShow2 d
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
@@ -107,6 +115,83 @@ $(Generics.deriveRepresentable1 'NASShow2)
 
 # if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'NASShow1)
+# endif
+#endif
+
+-------------------------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ >= 706
+data family KindDistinguished
+# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+    (a :: k) (b :: *) (c :: *) :: *
+# else
+    (x :: k) (y :: *) (z :: *) :: *
+# endif
+
+newtype instance KindDistinguished (a :: *) b c = KindDistinguished1 b
+  deriving ( Arbitrary
+           , Show
+           , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
+           )
+
+newtype instance KindDistinguished (a :: * -> *) b c = KindDistinguished2 b
+  deriving ( Arbitrary
+           , Show
+           , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
+           )
+
+newtype instance KindDistinguished Either b c = KindDistinguished3 b
+  deriving ( Arbitrary
+           , Show
+           , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
+           )
+
+instance Show b => Show1 (KindDistinguished (a :: *) b) where
+    showsPrecWith = showsPrecWith2 showsPrec
+instance Show2 (KindDistinguished (a :: *)) where
+    showsPrecWith2 sp1 _ p (KindDistinguished1 b) = showParen (p > appPrec) $
+          showString "KindDistinguished1 "
+        . sp1 appPrec1 b
+
+instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
+    showsPrecWith = showsPrecWith2 showsPrec
+instance Show2 (KindDistinguished (a :: * -> *)) where
+    showsPrecWith2 sp1 _ p (KindDistinguished2 b) = showParen (p > appPrec) $
+          showString "KindDistinguished2 "
+        . sp1 appPrec1 b
+
+instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
+    showsPrecWith = showsPrecWith2 showsPrec
+instance Show2 (KindDistinguished (Either :: * -> * -> *)) where
+    showsPrecWith2 sp1 _ p (KindDistinguished3 b) = showParen (p > appPrec) $
+          showString "KindDistinguished3 "
+        . sp1 appPrec1 b
+
+$(deriveTextShow  'KindDistinguished1)
+$(deriveTextShow1 'KindDistinguished1)
+$(deriveTextShow2 'KindDistinguished1)
+
+$(deriveTextShow  'KindDistinguished2)
+$(deriveTextShow1 'KindDistinguished2)
+$(deriveTextShow2 'KindDistinguished2)
+
+$(deriveTextShow  'KindDistinguished3)
+$(deriveTextShow1 'KindDistinguished3)
+$(deriveTextShow2 'KindDistinguished3)
+
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveAll1 'KindDistinguished1)
+$(Generics.deriveAll1 'KindDistinguished2)
+$(Generics.deriveAll1 'KindDistinguished3)
 # endif
 #endif
 

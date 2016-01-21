@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -51,8 +52,10 @@ deriving instance Enum Associativity
 instance Arbitrary Associativity where
     arbitrary = arbitraryBoundedEnum
 
+#if !(MIN_VERSION_base(4,9,0))
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
+#endif
 
 instance Arbitrary (UChar p) where
     arbitrary = do

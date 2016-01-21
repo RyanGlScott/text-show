@@ -46,6 +46,7 @@ module TransformersCompat (
     FromStringShow2(..), FromTextShow2(..)
     ) where
 
+#include "generic.h"
 #include "inline.h"
 
 import           Control.Applicative (Const(..))

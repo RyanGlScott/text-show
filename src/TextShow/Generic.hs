@@ -455,12 +455,10 @@ gShowbConstructor gs n c@(M1 x) = case fixity of
            (if conIsTuple c
                then mempty
                else let cn = conName c
-                    in showbParen (isInfixTypeCon cn) $ fromString cn
-           )
+                    in showbParen (isInfixTypeCon cn) $ fromString cn)
         <> (if isNullary x || conIsTuple c
                then mempty
-               else singleton ' '
-           )
+               else singleton ' ')
         <> showbBraces t (gs t appPrec1 x)
     Infix _ m -> showbParen (n > m) . showbBraces t $ gs t (m+1) x
   where

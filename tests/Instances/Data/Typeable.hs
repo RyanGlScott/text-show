@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP       #-}
+{-# LANGUAGE MagicHash #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -13,12 +14,26 @@ Portability: GHC
 -}
 module Instances.Data.Typeable () where
 
+#include "MachDeps.h"
+
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (TyCon(..), TypeRep(..))
+import Data.Typeable.Internal (TypeRep(..))
 import Instances.Utils ((<@>))
 #else
 import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
 import Test.QuickCheck (Gen)
+#endif
+
+#if MIN_VERSION_base(4,9,0)
+import GHC.Types (TyCon(..), TrName(..), Module(..))
+# if WORD_SIZE_IN_BITS < 64
+import GHC.Word (Word64(..))
+# else
+import GHC.Word (Word(..))
+# endif
+import Test.QuickCheck (oneof)
+#elif MIN_VERSION_base(4,4,0)
+import Data.Typeable.Internal (TyCon(..))
 #endif
 
 import Instances.GHC.Fingerprint ()
@@ -42,8 +57,26 @@ instance Arbitrary TypeRep where
 #endif
 
 instance Arbitrary TyCon where
-#if MIN_VERSION_base(4,4,0)
+#if MIN_VERSION_base(4,9,0)
+    arbitrary = do
+# if WORD_SIZE_IN_BITS < 64
+        W64# w1# <- arbitrary
+        W64# w2# <- arbitrary
+# else
+        W#   w1# <- arbitrary
+        W#   w2# <- arbitrary
+# endif
+        TyCon w1# w2# <$> arbitrary <*> arbitrary
+#elif MIN_VERSION_base(4,4,0)
     arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #else
     arbitrary = mkTyCon <$> arbitrary
+#endif
+
+#if MIN_VERSION_base(4,9,0)
+instance Arbitrary TrName where
+    arbitrary = oneof [pure (TrNameS "wat"#), TrNameD <$> arbitrary]
+
+instance Arbitrary Module where
+    arbitrary = Module <$> arbitrary <*> arbitrary
 #endif

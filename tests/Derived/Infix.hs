@@ -53,9 +53,11 @@ import           TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
 infixl 3 :!:
 infix  4 :@:
 infixr 5 `TyConPlain`
+infixr 6 `TyConFakeInfix`
 data TyConPlain a b = (:!:) a b
                     | a :@: b
                     | a `TyConPlain` b
+                    | TyConFakeInfix a b
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
@@ -92,9 +94,11 @@ data family TyFamilyPlain
 infixl 3 :#:
 infix  4 :$:
 infixr 5 `TyFamilyPlain`
+infixr 6 `TyFamilyFakeInfix`
 data instance TyFamilyPlain a b = (:#:) a b
                                 | a :$: b
                                 | a `TyFamilyPlain` b
+                                | TyFamilyFakeInfix a b
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
@@ -163,6 +167,8 @@ instance Show2 TyConPlain where
         showsInfix sp1 sp2 ":@:" p 4 a b
     showsPrecWith2 sp1 sp2 p (TyConPlain a b) =
         showsInfix sp1 sp2 "`TyConPlain`" p 5 a b
+    showsPrecWith2 sp1 sp2 p (TyConFakeInfix a b) =
+        showsBinaryWith sp1 sp2 "TyConFakeInfix" p a b
 
 instance Show a => Show1 (TyConGADT a) where
     showsPrecWith = showsPrecWith2 showsPrec
@@ -185,6 +191,8 @@ instance Show2 TyFamilyPlain where
         showsInfix sp1 sp2 ":$:" p 4 a b
     showsPrecWith2 sp1 sp2 p (TyFamilyPlain a b) =
         showsInfix sp1 sp2 "`TyFamilyPlain`" p 5 a b
+    showsPrecWith2 sp1 sp2 p (TyFamilyFakeInfix a b) =
+        showsBinaryWith sp1 sp2 "TyFamilyFakeInfix" p a b
 
 instance Show a => Show1 (TyFamilyGADT a) where
     showsPrecWith = showsPrecWith2 showsPrec

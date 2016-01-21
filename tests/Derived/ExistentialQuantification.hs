@@ -40,8 +40,9 @@ data TyCon a b c d where
                                 => e -> f -> g -> h
                              -> TyCon e f g h
 
-    TyConTypeRefinement      :: Int -> z
-                             -> TyCon Int z Int z
+    TyConTypeRefinement1,
+      TyConTypeRefinement2   :: Int -> z
+                             -> TyCon Int Int z z
 
     TyConForalls             :: forall p q r s t u.
                                 (Arbitrary p, Show p, TextShow p,
@@ -58,7 +59,7 @@ data family TyFamily
     w x y z :: *
 #endif
 
-data instance TyFamily a b c d where
+data instance TyFamily _a _b _c _d where
     TyFamilyClassConstraints    :: (Ord m, Ord n, Ord o, Ord p)
                                 => m -> n -> o -> p
                                 -> TyFamily m n o p
@@ -67,8 +68,9 @@ data instance TyFamily a b c d where
                                 => e -> f -> g -> h
                                 -> TyFamily e f g h
 
-    TyFamilyTypeRefinement      :: Int -> z
-                                -> TyFamily Int z Int z
+    TyFamilyTypeRefinement1,
+      TyFamilyTypeRefinement2   :: Int -> z
+                                -> TyFamily Int Int z z
 
     TyFamilyForalls             :: forall p q r s t u.
                                    (Arbitrary p, Show p, TextShow p,
@@ -81,7 +83,8 @@ data instance TyFamily a b c d where
 instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyCon a b c d) where
     arbitrary = oneof [ TyConClassConstraints    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
                       , TyConEqualityConstraints <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-                      , TyConTypeRefinement      <$> arbitrary <*> arbitrary
+                      , TyConTypeRefinement1     <$> arbitrary <*> arbitrary
+                      , TyConTypeRefinement2     <$> arbitrary <*> arbitrary
                       , TyConForalls             <$> (arbitrary :: Gen Int) <*> (arbitrary :: Gen Int)
                                                  <*> arbitrary              <*> arbitrary
                       ]
@@ -89,7 +92,8 @@ instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyCon a b c d) where
 instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyFamily a b c d) where
     arbitrary = oneof [ TyFamilyClassConstraints    <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
                       , TyFamilyEqualityConstraints <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-                      , TyFamilyTypeRefinement      <$> arbitrary <*> arbitrary
+                      , TyFamilyTypeRefinement1     <$> arbitrary <*> arbitrary
+                      , TyFamilyTypeRefinement2     <$> arbitrary <*> arbitrary
                       , TyFamilyForalls             <$> (arbitrary :: Gen Int) <*> (arbitrary :: Gen Int)
                                                     <*> arbitrary              <*> arbitrary
                       ]
@@ -104,8 +108,10 @@ instance (Show a, Show b) => Show2 (TyCon a b) where
         showsFour sp1 sp2 "TyConClassConstraints" p a b c d
     showsPrecWith2 sp1 sp2 p (TyConEqualityConstraints a b c d) =
         showsFour sp1 sp2 "TyConEqualityConstraints" p a b c d
-    showsPrecWith2 _   sp2 p (TyConTypeRefinement i d) =
-        showsBinaryWith showsPrec sp2 "TyConTypeRefinement" p i d
+    showsPrecWith2 _   sp2 p (TyConTypeRefinement1 i d) =
+        showsBinaryWith showsPrec sp2 "TyConTypeRefinement1" p i d
+    showsPrecWith2 _   sp2 p (TyConTypeRefinement2 i d) =
+        showsBinaryWith showsPrec sp2 "TyConTypeRefinement2" p i d
     showsPrecWith2 sp1 sp2 p (TyConForalls p' q d c) =
         showsFour sp2 sp1 "TyConForalls" p p' q d c
 
@@ -117,8 +123,10 @@ instance (Show a, Show b) => Show2 (TyFamily a b) where
         showsFour sp1 sp2 "TyFamilyClassConstraints" p a b c d
     showsPrecWith2 sp1 sp2 p (TyFamilyEqualityConstraints a b c d) =
         showsFour sp1 sp2 "TyFamilyEqualityConstraints" p a b c d
-    showsPrecWith2 _ sp2 p (TyFamilyTypeRefinement i d) =
-        showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement" p i d
+    showsPrecWith2 _ sp2 p (TyFamilyTypeRefinement1 i d) =
+        showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement1" p i d
+    showsPrecWith2 _ sp2 p (TyFamilyTypeRefinement2 i d) =
+        showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement2" p i d
     showsPrecWith2 sp1 sp2 p (TyFamilyForalls p' q d c) =
         showsFour sp2 sp1 "TyFamilyForalls" p p' q d c
 
@@ -140,6 +148,6 @@ $(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamilyClassConstraints)
-$(deriveTextShow1 'TyFamilyEqualityConstraints)
-$(deriveTextShow2 'TyFamilyTypeRefinement)
+$(deriveTextShow1 'TyFamilyTypeRefinement1)
+$(deriveTextShow2 'TyFamilyTypeRefinement2)
 #endif

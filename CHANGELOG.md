@@ -1,5 +1,7 @@
 # 3
+* GHC 8.0 support
 * TODO: Mention that `showt`/`showtl`/etc. are now part of `TextShow`
+* Rewrote `TextShow.TH`'s type inferencer. This avoids a nasty GHC 7.8 bug, and it allows `TextShow(1)(2)` to be derived for more datatypes that can only be expressed with `-XTypeInType` enabled.
 * Reworked internals of `TextShow.Generic`. Empty datatypes can now be have generic `TextShow` and `TextShow1` instances.
 
 # 2.1.2
