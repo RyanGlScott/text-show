@@ -35,12 +35,7 @@ data Ord a => TyCon a b c = TyCon a b c
 
 -------------------------------------------------------------------------------
 
-data family TyFamily
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    a b c :: *
-#else
-    x y z :: *
-#endif
+data family TyFamily x y z :: *
 
 data instance Ord a => TyFamily a b c = TyFamily a b c
   deriving Show

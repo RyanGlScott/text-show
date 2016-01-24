@@ -40,11 +40,16 @@ import Test.Hspec.QuickCheck (prop)
 main :: IO ()
 main = hspec spec
 
-type MD =
 #if MIN_VERSION_base(4,9,0)
-          ('MetaData "Example" "Module" "package" 'False)
+type MD = 'MetaData "Example" "Module" "package" 'False
+
+m1Description :: String
+m1Description = "M1 () ('MetaData \"Example\" \"Module\" \"package\" 'False) Maybe Int"
 #else
-          ()
+type MD = ()
+
+m1Description :: String
+m1Description = "M1 () () Maybe Int"
 #endif
 
 spec :: Spec
@@ -72,7 +77,7 @@ spec = parallel $ do
     describe "K1 () Int ()" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> K1 () Int () -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> K1 () Int () -> Bool)
-    describe "M1 () () Maybe Int" $ do
+    describe m1Description $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> M1 () MD Maybe Int -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> M1 () MD Maybe Int -> Bool)
     describe "(Maybe :+: Maybe) Int" $ do

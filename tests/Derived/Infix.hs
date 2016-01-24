@@ -84,12 +84,7 @@ data TyConGADT a b where
 
 -------------------------------------------------------------------------------
 
-data family TyFamilyPlain
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-                          a b :: *
-#else
-                          y z :: *
-#endif
+data family TyFamilyPlain y z :: *
 
 infixl 3 :#:
 infix  4 :$:
@@ -110,12 +105,7 @@ data instance TyFamilyPlain a b = (:#:) a b
 
 -------------------------------------------------------------------------------
 
-data family TyFamilyGADT
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-                         a b :: *
-#else
-                         y z :: *
-#endif
+data family TyFamilyGADT y z :: *
 
 infixr 1 :*, :***, :****
 data instance TyFamilyGADT a b where

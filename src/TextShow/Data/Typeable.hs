@@ -3,6 +3,10 @@
 {-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds         #-}
+#endif
 {-|
 Module:      TextShow.Data.Typeable
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -33,7 +37,8 @@ import Data.Typeable.Internal (tyConName)
 import Data.Typeable.Internal (typeRepKinds)
 # endif
 # if MIN_VERSION_base(4,9,0)
-import Data.Typeable.Internal (tcFun, tcList)
+import Data.Typeable.Internal (Proxy(..), Typeable, TypeRep(TypeRep), typeRep)
+import GHC.Exts (Levity(..), TYPE)
 # elif MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (funTc, listTc)
 # endif
@@ -65,7 +70,16 @@ showbTypeRepPrec :: Int -> TypeRep -> Builder
 showbTypeRepPrec p tyrep =
     case tys of
       [] -> showbTyCon tycon
-      [x]   | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
+#if MIN_VERSION_base(4,9,0)
+      [x@(TypeRep _ argCon _ _)]
+#else
+      [x]
+#endif
+        | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
+#if MIN_VERSION_base(4,9,0)
+        | tycon == tcTYPE && argCon == tc'Lifted   -> singleton '*'
+        | tycon == tcTYPE && argCon == tc'Unlifted -> singleton '#'
+#endif
       [a,r] | tycon == tcFun  -> showbParen (p > 8) $
                                     showbPrec 9 a
                                  <> " -> "
@@ -87,15 +101,25 @@ showbTypeRepPrec p tyrep =
     kinds = typeRepKinds tyrep
 #endif
 
-#if !(MIN_VERSION_base(4,4,0))
--- | The list 'TyCon'.
-tcList :: TyCon
-tcList = typeRepTyCon $ typeOf [()]
+#if MIN_VERSION_base(4,9,0)
+tyConOf :: Typeable a => Proxy a -> TyCon
+tyConOf = typeRepTyCon . typeRep
 
--- | The function (@->@) 'TyCon'.
 tcFun :: TyCon
-tcFun = mkTyCon "->"
-#elif !(MIN_VERSION_base(4,9,0))
+tcFun = tyConOf (Proxy :: Proxy (Int -> Int))
+
+tcList :: TyCon
+tcList = tyConOf (Proxy :: Proxy [])
+
+tcTYPE :: TyCon
+tcTYPE = tyConOf (Proxy :: Proxy TYPE)
+
+tc'Lifted :: TyCon
+tc'Lifted = tyConOf (Proxy :: Proxy 'Lifted)
+
+tc'Unlifted :: TyCon
+tc'Unlifted = tyConOf (Proxy :: Proxy 'Unlifted)
+#elif MIN_VERSION_base(4,4,0)
 -- | The list 'TyCon'.
 tcList :: TyCon
 tcList = listTc
@@ -103,6 +127,14 @@ tcList = listTc
 -- | The function (@->@) 'TyCon'.
 tcFun :: TyCon
 tcFun = funTc
+#else
+-- | The list 'TyCon'.
+tcList :: TyCon
+tcList = typeRepTyCon $ typeOf [()]
+
+-- | The function (@->@) 'TyCon'.
+tcFun :: TyCon
+tcFun = mkTyCon "->"
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?

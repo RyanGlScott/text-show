@@ -40,12 +40,7 @@ deriving instance (Show a, Show b) => Show (TyCon a b)
 
 -------------------------------------------------------------------------------
 
-data family TyFamily
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-                     a b :: *
-#else
-                     x y :: *
-#endif
+data family TyFamily x y :: *
 
 data instance TyFamily a b = TyFamily (forall a. Tagged2 a Int b)
                                       (forall b. Tagged2 b a   a)

@@ -103,15 +103,7 @@ newtype TyConReallyHighKinds f a b c d e = TyConReallyHighKinds (f a b c d e)
 -------------------------------------------------------------------------------
 
 data family TyFamilyCompose
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    (f :: k1 -> k2 -> *)
-    (g :: k3 -> k4 -> k1)
-    (h :: k3 -> k4 -> k2)
-    (j :: k5 -> k3)
-    (k :: k5 -> k4)
-    (a :: k5)
-    (b :: k5)
-#elif __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
     (t :: k1 -> k2 -> *)
     (u :: k3 -> k4 -> k1)
     (v :: k3 -> k4 -> k2)
@@ -145,16 +137,14 @@ deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
 -------------------------------------------------------------------------------
 
 data family TyFamilyProxy
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    (a :: k1) (b :: k2)
-#elif __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
     (x :: k1) (y :: k2)
 #else
     (x :: *)  (y :: *)
 #endif
     :: *
 
-newtype instance TyFamilyProxy _a _b where
+newtype instance TyFamilyProxy a b where
     TyFamilyProxy :: () -> TyFamilyProxy a b
   deriving ( Arbitrary
            , Show
@@ -166,14 +156,7 @@ newtype instance TyFamilyProxy _a _b where
 -------------------------------------------------------------------------------
 
 data family TyFamilyReallyHighKinds
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    (f :: k1 -> k2 -> k3 -> k4 -> k5 -> *)
-    (a :: k1)
-    (b :: k2)
-    (c :: k3)
-    (d :: k4)
-    (e :: k5)
-#elif __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
     (g :: k1 -> k2 -> k3 -> k4 -> k5 -> *)
     (v :: k1)
     (w :: k2)

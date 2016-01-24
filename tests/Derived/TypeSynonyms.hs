@@ -80,12 +80,7 @@ newtype TyCon a b = TyCon
 
 -------------------------------------------------------------------------------
 
-data family TyFamily
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-                     a b :: *
-#else
-                     y z :: *
-#endif
+data family TyFamily y z :: *
 
 newtype instance TyFamily a b = TyFamily
     ( Id (FakeOut (Id a))

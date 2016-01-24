@@ -49,6 +49,9 @@ module TextShow.TH.Internal (
     ) where
 
 import           Control.Monad (liftM, unless, when)
+#if MIN_VERSION_template_haskell(2,11,0)
+import           Control.Monad ((<=<))
+#endif
 import           Data.Foldable.Compat
 import           Data.List.Compat
 import qualified Data.List.NonEmpty as NE (drop, length, reverse, splitAt)
@@ -815,9 +818,27 @@ buildTypeInstance tsClass parentName dataCxt tvbs (Just instTysAndKinds) = do
         numKindVars :: Int
         numKindVars = length kindVarNames
 
-        givenKinds :: [Kind]
-        givenTys   :: [Type]
+        givenKinds, givenKinds' :: [Kind]
+        givenTys                :: [Type]
         (givenKinds, givenTys) = splitAt numKindVars instTysAndKinds
+        givenKinds' = map sanitizeStars givenKinds
+
+        -- A GHC 7.6-specific bug requires us to replace all occurrences of
+        -- (ConT GHC.Prim.*) with StarT, or else Template Haskell will reject it.
+        -- Luckily, (ConT GHC.Prim.*) only seems to occur in this one spot.
+        sanitizeStars :: Kind -> Kind
+        sanitizeStars = go
+          where
+            go :: Kind -> Kind
+            go (AppT t1 t2)                 = AppT (go t1) (go t2)
+            go (SigT t k)                   = SigT (go t) (go k)
+            go (ConT n) | n == starKindName = StarT
+            go t                            = t
+
+            -- It's quite awkward to import * from GHC.Prim, so we'll just
+            -- hack our way around it.
+            starKindName :: Name
+            starKindName = mkNameG_tc "ghc-prim" "GHC.Prim" "*"
 
     -- If we run this code with GHC 7.8, we might have to generate extra type
     -- variables to compensate for any type variables that Template Haskell
@@ -840,7 +861,7 @@ buildTypeInstance tsClass parentName dataCxt tvbs (Just instTysAndKinds) = do
         -- compensate, we use stealKindForType to explicitly annotate any
         -- types without kind annotations.
         instTys :: [Type]
-        instTys = map (substNamesWithKinds (zip kindVarNames givenKinds))
+        instTys = map (substNamesWithKinds (zip kindVarNames givenKinds'))
                   -- ^ Note that due to a GHC 7.8-specific bug
                   --   (see Note [Polykinded data families in Template Haskell]),
                   --   there may be more kind variable names than there are kinds
@@ -1322,12 +1343,16 @@ canRealizeKindStar t
 #endif
                      _               -> NotKindStar
 
+-- | Returns 'Just' the kind variable 'Name' of a 'StarKindStatus' if it exists.
+-- Otherwise, returns 'Nothing'.
+starKindStatusToName :: StarKindStatus -> Maybe Name
+starKindStatusToName (IsKindVar n) = Just n
+starKindStatusToName _             = Nothing
+
 -- | Concat together all of the StarKindStatuses that are IsKindVar and extract
 -- the kind variables' Names out.
 catKindVarNames :: [StarKindStatus] -> [Name]
-catKindVarNames = foldl' (\q sts -> case sts of
-                                         IsKindVar k -> k:q
-                                         _           ->   q) []
+catKindVarNames = mapMaybe starKindStatusToName
 
 -------------------------------------------------------------------------------
 -- Assorted utilities
@@ -1359,9 +1384,9 @@ tyVarNamesOfType = go
   where
     go :: Type -> [Name]
     go (AppT t1 t2) = go t1 ++ go t2
-    go (SigT t k)   = go t
+    go (SigT t _k)  = go t
 #if MIN_VERSION_template_haskell(2,8,0)
-                            ++ go k
+                           ++ go _k
 #endif
     go (VarT n)     = [n]
     go _            = []
@@ -1426,7 +1451,7 @@ tvbKind (KindedTV _ k) = k
 
 -- | Convert a TyVarBndr to a Type.
 tvbToType :: TyVarBndr -> Type
-tvbToType (PlainTV n) = VarT n
+tvbToType (PlainTV n)    = VarT n
 tvbToType (KindedTV n k) = SigT (VarT n) k
 
 -- | Applies a typeclass constraint to a type.
@@ -1601,8 +1626,8 @@ constructorName (RecC    name      _  ) = name
 constructorName (InfixC  _    name _  ) = name
 constructorName (ForallC _    _    con) = constructorName con
 # if MIN_VERSION_template_haskell(2,11,0)
-constructorName (GadtC    names _ _)   = head names
-constructorName (RecGadtC names _ _)   = head names
+constructorName (GadtC    names _ _)    = head names
+constructorName (RecGadtC names _ _)    = head names
 # endif
 #endif
 

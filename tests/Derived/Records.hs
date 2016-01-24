@@ -60,12 +60,7 @@ data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
 
 -------------------------------------------------------------------------------
 
-data family TyFamily
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    a b :: *
-#else
-    y z :: *
-#endif
+data family TyFamily y z :: *
 
 infixl 4 :!:
 data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2 :: b }

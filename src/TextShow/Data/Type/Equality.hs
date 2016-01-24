@@ -31,7 +31,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Equality ((:~:)(..))
 
 import TextShow.Classes (TextShow(..), TextShow1(..))
-import TextShow.TH.Internal (deriveTextShow2, makeShowbPrec, makeShowbPrecWith)
+import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeShowbPrecWith)
 
 -- | Convert a propositional equality value to a 'Builder'.
 -- This function is only available with @base-4.7.0.0@ or later.
@@ -41,9 +41,7 @@ showbPropEquality :: (a :~: b) -> Builder
 showbPropEquality = showb
 {-# INLINE showbPropEquality #-}
 
-instance TextShow (a :~: b) where
-    showbPrec = $(makeShowbPrec ''(:~:))
-    {-# INLINE showbPrec #-}
+$(deriveTextShow ''(:~:))
 
 instance TextShow1 ((:~:) a) where
     showbPrecWith = $(makeShowbPrecWith ''(:~:))

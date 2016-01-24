@@ -68,16 +68,11 @@ import TransformersCompat (Show1(..), Show2(..))
 
 -------------------------------------------------------------------------------
 
-data family NotAllShow
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    (a :: *) (b :: *) (c :: *) (d :: *) :: *
-#else
-    (w :: *) (x :: *) (y :: *) (z :: *) :: *
-#endif
+data family NotAllShow (w :: *) (x :: *) (y :: *) (z :: *) :: *
 
-data instance NotAllShow ()  ()  () _d = NASNoShow
-data instance NotAllShow Int b   c   d = NASShow1 c b
-                                       | NASShow2 d
+data instance NotAllShow ()  ()  () d = NASNoShow
+data instance NotAllShow Int b   c  d = NASShow1 c b
+                                      | NASShow2 d
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
@@ -121,12 +116,7 @@ $(Generics.deriveRepresentable0 'NASShow1)
 -------------------------------------------------------------------------------
 
 #if __GLASGOW_HASKELL__ >= 706
-data family KindDistinguished
-# if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
-    (a :: k) (b :: *) (c :: *) :: *
-# else
-    (x :: k) (y :: *) (z :: *) :: *
-# endif
+data family KindDistinguished (x :: k) (y :: *) (z :: *) :: *
 
 newtype instance KindDistinguished (a :: *) b c = KindDistinguished1 b
   deriving ( Arbitrary
