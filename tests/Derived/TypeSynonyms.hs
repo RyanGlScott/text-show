@@ -23,6 +23,13 @@ module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
+import           Data.Functor.Classes ( Show1(..)
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+                                      , Show2(..)
+                                      , showsUnaryWith
+#endif
+                                      )
+
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -40,8 +47,6 @@ import           Test.QuickCheck (Arbitrary)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import           TransformersCompat (Show1(..), Show2(..), showsUnaryWith)
-
 -------------------------------------------------------------------------------
 
 type FakeOut a = Int
@@ -52,13 +57,15 @@ type Flip f a b = f b a
 instance Functor ((,,,) a b c) where
     fmap f (a, b, c, d) = (a, b, c, f d)
 
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
 instance (Show a, Show b) => Show2 ((,,,) a b) where
-    showsPrecWith2 sp1 sp2 _ (a, b, c, d) =
+    liftShowsPrec2 sp1 _ sp2 _ _ (a, b, c, d) =
                           showChar '('
         . showsPrec 0 a . showChar ','
         . showsPrec 0 b . showChar ','
         . sp1       0 c . showChar ','
         . sp2       0 d . showChar ')'
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -100,21 +107,32 @@ newtype instance TyFamily a b = TyFamily
 
 -------------------------------------------------------------------------------
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance Show a => Show1 (TyCon a) where
-    showsPrecWith = showsPrecWith2 showsPrec
-instance Show2 TyCon where
-    showsPrecWith2 sp1 sp2 p (TyCon x) =
-        showsUnaryWith (showsPrecWith2 (showsPrecWith2 showsPrec sp1)
-                                       (showsPrecWith2 sp1       sp2)
-                       ) "TyCon" p x
-
+    showsPrec1 = showsPrec
 instance Show a => Show1 (TyFamily a) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+#else
+instance Show a => Show1 (TyCon a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show a => Show1 (TyFamily a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show2 TyCon where
+    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyCon x) =
+        showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
+                                       (liftShowList2  showsPrec showList sp1 sl1)
+                                       (liftShowsPrec2 sp1       sl1      sp2 sl2)
+                                       (liftShowList2  sp1       sl1      sp2 sl2)
+                       ) "TyCon" p x
 instance Show2 TyFamily where
-    showsPrecWith2 sp1 sp2 p (TyFamily x) =
-        showsUnaryWith (showsPrecWith2 (showsPrecWith2 showsPrec sp1)
-                                       (showsPrecWith2 sp1       sp2)
+    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily x) =
+        showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
+                                       (liftShowList2  showsPrec showList sp1 sl1)
+                                       (liftShowsPrec2 sp1       sl1      sp2 sl2)
+                                       (liftShowList2  sp1       sl1      sp2 sl2)
                        ) "TyFamily" p x
+#endif
 
 -------------------------------------------------------------------------------
 

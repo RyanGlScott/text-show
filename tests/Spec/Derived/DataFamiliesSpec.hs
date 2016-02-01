@@ -20,7 +20,7 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_template_haskell(2,7,0)
 import Derived.DataFamilies (NotAllShow)
 
-import Spec.Utils (prop_matchesTextShow2, prop_genericTextShow, prop_genericTextShow1)
+import Spec.Utils (prop_matchesTextShow1, prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
@@ -42,20 +42,20 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "NotAllShow Int Int Int Int" $ do
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> NotAllShow Int Int Int Int -> Bool)
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
 # if __GLASGOW_HASKELL__ >= 706
     describe "KindDistinguished Int Int Int" $ do
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Int Int Int -> Bool)
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Int Int Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Int Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Int Int Int -> Bool)
     describe "KindDistinguished Maybe Int Int" $ do
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Maybe Int Int -> Bool)
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Maybe Int Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Maybe Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Maybe Int Int -> Bool)
     describe "KindDistinguished Either Int Int" $ do
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> KindDistinguished Either Int Int -> Bool)
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Either Int Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Either Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Either Int Int -> Bool)
 # endif

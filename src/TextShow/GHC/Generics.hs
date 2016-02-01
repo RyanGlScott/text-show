@@ -22,18 +22,18 @@ Monomorphic 'TextShow' functions for generics-related data types.
 -}
 module TextShow.GHC.Generics (
       showbU1
-    , showbPar1PrecWith
+    , liftShowbPar1Prec
     , showbRec1Prec
-    , showbRec1PrecWith
-    , showbK1PrecWith
+    , liftShowbRec1Prec
+    , liftShowbK1Prec
     , showbM1Prec
-    , showbM1PrecWith
+    , liftShowbM1Prec
     , showbSumTypePrec
-    , showbSumTypePrecWith
+    , liftShowbSumTypePrec
     , showbProductTypePrec
-    , showbProductTypePrecWith
+    , liftShowbProductTypePrec
     , showbCompFunctorsPrec
-    , showbCompFunctorsPrecWith
+    , liftShowbCompFunctorsPrec
     , showbFixityPrec
     , showbAssociativity
 #if !(MIN_VERSION_base(4,9,0))
@@ -55,7 +55,7 @@ import TextShow.Data.Char     ()
 import TextShow.Data.Floating ()
 import TextShow.Data.Integral ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, makeShowbPrec,
-                             makeShowbPrecWith, makeShowbPrecWith2)
+                             makeLiftShowbPrec, makeLiftShowbPrec2)
 
 #if !(MIN_VERSION_template_haskell(2,7,0))
 import Data.Monoid.Compat ((<>))
@@ -76,10 +76,10 @@ showbU1 = showb
 
 -- | Convert a 'Par1' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbPar1PrecWith :: (Int -> p -> Builder) -> Int -> Par1 p -> Builder
-showbPar1PrecWith = showbPrecWith
-{-# INLINE showbPar1PrecWith #-}
+-- /Since: 3/
+liftShowbPar1Prec :: (Int -> p -> Builder) -> Int -> Par1 p -> Builder
+liftShowbPar1Prec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbPar1Prec #-}
 
 -- | Convert a 'Rec1' value to a 'Builder' with the given precedence.
 --
@@ -90,17 +90,18 @@ showbRec1Prec = showbPrec
 
 -- | Convert a 'Rec1' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbRec1PrecWith :: TextShow1 f => (Int -> p -> Builder) -> Int -> Rec1 f p -> Builder
-showbRec1PrecWith = showbPrecWith
-{-# INLINE showbRec1PrecWith #-}
+-- /Since: 3/
+liftShowbRec1Prec :: TextShow1 f => (Int -> p -> Builder) -> ([p] -> Builder)
+                  -> Int -> Rec1 f p -> Builder
+liftShowbRec1Prec = liftShowbPrec
+{-# INLINE liftShowbRec1Prec #-}
 
 -- | Convert a 'K1' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbK1PrecWith :: (Int -> c -> Builder) -> Int -> K1 i c p -> Builder
-showbK1PrecWith sp = showbPrecWith2 sp undefined
-{-# INLINE showbK1PrecWith #-}
+-- /Since: 3/
+liftShowbK1Prec :: (Int -> c -> Builder) -> Int -> K1 i c p -> Builder
+liftShowbK1Prec sp = liftShowbPrec2 sp undefined undefined undefined
+{-# INLINE liftShowbK1Prec #-}
 
 -- | Convert an 'M1' value to a 'Builder' with the given precedence.
 --
@@ -111,10 +112,11 @@ showbM1Prec = showbPrec
 
 -- | Convert an 'M1' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbM1PrecWith :: TextShow1 f => (Int -> p -> Builder) -> Int -> M1 i c f p -> Builder
-showbM1PrecWith = showbPrecWith
-{-# INLINE showbM1PrecWith #-}
+-- /Since: 3/
+liftShowbM1Prec :: TextShow1 f => (Int -> p -> Builder) -> ([p] -> Builder)
+                -> Int -> M1 i c f p -> Builder
+liftShowbM1Prec = liftShowbPrec
+{-# INLINE liftShowbM1Prec #-}
 
 -- | Convert a '(:+:)' value to a 'Builder' with the given precedence.
 --
@@ -125,10 +127,12 @@ showbSumTypePrec = showbPrec
 
 -- | Convert a '(:+:)' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbSumTypePrecWith :: (TextShow1 f, TextShow1 g) => (Int -> p -> Builder) -> Int -> (f :+: g) p -> Builder
-showbSumTypePrecWith = showbPrecWith
-{-# INLINE showbSumTypePrecWith #-}
+-- /Since: 3/
+liftShowbSumTypePrec :: (TextShow1 f, TextShow1 g)
+                     => (Int -> p -> Builder) -> ([p] -> Builder)
+                     -> Int -> (f :+: g) p -> Builder
+liftShowbSumTypePrec = liftShowbPrec
+{-# INLINE liftShowbSumTypePrec #-}
 
 -- | Convert a '(:*:)' value to a 'Builder' with the given precedence.
 --
@@ -139,10 +143,12 @@ showbProductTypePrec = showbPrec
 
 -- | Convert a '(:*:)' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbProductTypePrecWith :: (TextShow1 f, TextShow1 g) => (Int -> p -> Builder) -> Int -> (f :*: g) p -> Builder
-showbProductTypePrecWith = showbPrecWith
-{-# INLINE showbProductTypePrecWith #-}
+-- /Since: 3/
+liftShowbProductTypePrec :: (TextShow1 f, TextShow1 g)
+                         => (Int -> p -> Builder) -> ([p] -> Builder)
+                         -> Int -> (f :*: g) p -> Builder
+liftShowbProductTypePrec = liftShowbPrec
+{-# INLINE liftShowbProductTypePrec #-}
 
 -- | Convert a '(:.:)' value to a 'Builder' with the given precedence.
 --
@@ -153,10 +159,12 @@ showbCompFunctorsPrec = showbPrec
 
 -- | Convert a '(:.:)' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbCompFunctorsPrecWith :: (TextShow1 f, TextShow1 g) => (Int -> p -> Builder) -> Int -> (f :.: g) p -> Builder
-showbCompFunctorsPrecWith = showbPrecWith
-{-# INLINE showbCompFunctorsPrecWith #-}
+-- /Since: 3/
+liftShowbCompFunctorsPrec :: (TextShow1 f, TextShow1 g)
+                          => (Int -> p -> Builder) -> ([p] -> Builder)
+                          -> Int -> (f :.: g) p -> Builder
+liftShowbCompFunctorsPrec = liftShowbPrec
+{-# INLINE liftShowbCompFunctorsPrec #-}
 
 -- | Convert a 'Fixity' value to a 'Builder' with the given precedence.
 --
@@ -218,7 +226,7 @@ showbUWordPrec = showbPrec
 {-# INLINE showbUWordPrec #-}
 
 instance TextShow (U1 p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 $(deriveTextShow1 ''U1)
 
 $(deriveTextShow  ''Par1)
@@ -229,16 +237,16 @@ instance TextShow (f p) => TextShow (Rec1 f p) where
 $(deriveTextShow1 ''Rec1)
 
 instance TextShow c => TextShow (K1 i c p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow c => TextShow1 (K1 i c) where
-    showbPrecWith = showbPrecWith2 showbPrec
+    liftShowbPrec = liftShowbPrec2 showbPrec showbList
 instance TextShow2 (K1 i) where
-    showbPrecWith2 = $(makeShowbPrecWith2 ''K1)
+    liftShowbPrec2 = $(makeLiftShowbPrec2 ''K1)
 
 instance TextShow (f p) => TextShow (M1 i c f p) where
     showbPrec = $(makeShowbPrec ''M1)
 instance TextShow1 f => TextShow1 (M1 i c f) where
-    showbPrecWith = $(makeShowbPrecWith ''M1)
+    liftShowbPrec = $(makeLiftShowbPrec ''M1)
 
 instance (TextShow (f p), TextShow (g p)) => TextShow ((f :+: g) p) where
     showbPrec = $(makeShowbPrec ''(:+:))
@@ -274,41 +282,41 @@ instance TextShow (UWord p) where
 $(deriveTextShow1 'UWord)
 #else
 instance TextShow (UChar p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow1 UChar where
-    showbPrecWith _ p (UChar c) = showbParen (p > appPrec) $
+    liftShowbPrec _ _ p (UChar c) = showbParen (p > appPrec) $
            fromString "UChar "    <> singleton '{'
         <> fromString "uChar# = " <> showb (C# c)
         <> singleton '}'
 
 instance TextShow (UDouble p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow1 UDouble where
-    showbPrecWith _ p (UDouble d) = showbParen (p > appPrec) $
+    liftShowbPrec _ _ p (UDouble d) = showbParen (p > appPrec) $
            fromString "UDouble "    <> singleton '{'
         <> fromString "uDouble# = " <> showb (D# d)
         <> singleton '}'
 
 instance TextShow (UFloat p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow1 UFloat where
-    showbPrecWith _ p (UFloat f) = showbParen (p > appPrec) $
+    liftShowbPrec _ _ p (UFloat f) = showbParen (p > appPrec) $
            fromString "UFloat "    <> singleton '{'
         <> fromString "uFloat# = " <> showb (F# f)
         <> singleton '}'
 
 instance TextShow (UInt p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow1 UInt where
-    showbPrecWith _ p (UInt i) = showbParen (p > appPrec) $
+    liftShowbPrec _ _ p (UInt i) = showbParen (p > appPrec) $
            fromString "UInt "    <> singleton '{'
         <> fromString "uInt# = " <> showb (I# i)
         <> singleton '}'
 
 instance TextShow (UWord p) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
 instance TextShow1 UWord where
-    showbPrecWith _ p (UWord w) = showbParen (p > appPrec) $
+    liftShowbPrec _ _ p (UWord w) = showbParen (p > appPrec) $
            fromString "UWord "    <> singleton '{'
         <> fromString "uWord# = " <> showb (W# w)
         <> singleton '}'

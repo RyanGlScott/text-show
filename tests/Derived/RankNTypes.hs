@@ -20,16 +20,20 @@ Defines data types with rank-n voodoo.
 -}
 module Derived.RankNTypes (TyCon(..), TyFamily(..)) where
 
+import Data.Functor.Classes (Show1(..))
+
 import Prelude ()
 import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
-import TextShow (Show(..), Show1(..), Show2(..))
+import TextShow (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2,
-                    makeShowbPrec, makeShowbPrecWith, makeShowbPrecWith2)
+                    makeShowbPrec, makeLiftShowbPrec, makeLiftShowbPrec2)
 
-import TransformersCompat (Show1(..), Show2(..), showsUnaryWith, showsBinaryWith)
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+import Data.Functor.Classes (Show2(..), showsUnaryWith, showsBinaryWith)
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -70,55 +74,61 @@ instance Arbitrary (TyFamily Int Int) where
 
 -------------------------------------------------------------------------------
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance Show a => Show1 (TyCon a) where
-    showsPrecWith = showsPrecWith2 showsPrec
-instance Show2 TyCon where
-    showsPrecWith2 sp1 sp2 p (TyCon b a) =
-        showsForall sp1 sp2 "TyCon" p b a
-
+    showsPrec1 = showsPrec
 instance Show a => Show1 (TyFamily a) where
-    showsPrecWith = showsPrecWith2 showsPrec
-instance Show2 TyFamily where
-    showsPrecWith2 sp1 sp2 p (TyFamily b a) =
-        showsForall sp1 sp2 "TyFamily" p b a
+    showsPrec1 = showsPrec
+#else
+instance Show1 (Tagged2 s t) where
+    liftShowsPrec = liftShowsPrec2 undefined undefined
+instance Show a => Show1 (TyCon a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show a => Show1 (TyFamily a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-showsForall :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
+instance Show2 (Tagged2 s) where
+    liftShowsPrec2 _ _ sp _ p (Tagged2 b) = showsUnaryWith sp "Tagged2" p b
+instance Show2 TyCon where
+    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyCon b a) =
+        showsForall sp1 sl1 sp2 sl2 "TyCon" p b a
+instance Show2 TyFamily where
+    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily b a) =
+        showsForall sp1 sl1 sp2 sl2 "TyFamily" p b a
+
+showsForall :: (Int -> a -> ShowS) -> ([a] -> ShowS)
+            -> (Int -> b -> ShowS) -> ([b] -> ShowS)
             -> String -> Int
             -> (forall a. Tagged2 a Int b)
             -> (forall b. Tagged2 b a a)
             -> ShowS
-showsForall sp1 sp2 name p b a =
-        showsBinaryWith (showsPrecWith2 showsPrec sp2)
-                        (showsPrecWith2 sp1       sp1)
+showsForall sp1 sl1 sp2 sl2 name p b a =
+        showsBinaryWith (liftShowsPrec2 showsPrec showList sp2 sl2)
+                        (liftShowsPrec2 sp1       sl1      sp1 sl1)
                         name p b a
+#endif
 
 -------------------------------------------------------------------------------
 
-$(deriveShow  ''TyCon)
-$(deriveShow1 ''TyCon)
-$(deriveShow2 ''TyCon)
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow  'TyFamily)
-$(deriveShow1 'TyFamily)
-$(deriveShow2 'TyFamily)
+$(deriveTextShow  'TyFamily)
+$(deriveTextShow1 'TyFamily)
+$(deriveTextShow2 'TyFamily)
 #endif
 
 -------------------------------------------------------------------------------
 
 $(return [])
 
-instance TextShow1 (Tagged2 s t) where
-    showsPrecWith sp p (Tagged2 b) = showsUnaryWith sp "Tagged2" p b
-
-instance TextShow2 (Tagged2 s) where
-    showsPrecWith2 _ = showsPrecWith
-
 instance TextShow c => TextShow (Tagged2 s t c) where
     showbPrec = $(makeShowbPrec ''Tagged2)
 
 instance TextShow1 (Tagged2 s t) where
-    showbPrecWith = $(makeShowbPrecWith ''Tagged2)
+    liftShowbPrec = $(makeLiftShowbPrec ''Tagged2)
 
 instance TextShow2 (Tagged2 s) where
-    showbPrecWith2 = $(makeShowbPrecWith2 ''Tagged2)
+    liftShowbPrec2 = $(makeLiftShowbPrec2 ''Tagged2)

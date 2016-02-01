@@ -1,6 +1,16 @@
 # 3
 * GHC 8.0 support
 * TODO: Mention that `showt`/`showtl`/etc. are now part of `TextShow`
+* Renamed the class methods of `TextShow1` and `TextShow2` to be consistent with the naming conventions of `transformers-0.5`. They following were renamed:
+  * `showbPrecWith` → `liftShowbPrec`
+  * `showbPrecWith2` → `liftShowbPrec2`
+  * `makeShowbPrecWith` → `makeLiftShowbPrec`
+  * `makeShowbPrecWith2` → `makeLiftShowbPrec2`
+  * `genericShowbPrecWith` → `genericLiftShowbPrec`
+
+  In addition, many other monomorphic functions from the various `TextShow` submodules were also renamed to be consistent with the new `lift-` prefix.
+* `showsToShowb` and `showbToShows` now only convert functions that ignore precedence (i.e., of type `a -> ShowS` or `a -> Builder`). Their former role has been given to the new functions `showsPrecToShowbPrec` and `showbPrecToShowsPrec`
+* Added `FromStringShow1`, `FromTextShow1`, `FromStringShow2`, and `FromTextShow2`, which allow defining string `Show1`/`Show2` instances in terms of `TextShow1`/`TextShow2` instances, and vice versa. Be aware that many of these instances cannot be provided if you are using `tranformers-0.4`, since its version of `Data.Functor.Classes` uses a very differenltly designed `Show1` typeclass (and does not have `Show2` at all).
 * Rewrote `TextShow.TH`'s type inferencer. This avoids a nasty GHC 7.8 bug, and it allows `TextShow(1)(2)` to be derived for more datatypes that can only be expressed with `-XTypeInType` enabled.
 * Reworked internals of `TextShow.Generic`. Empty datatypes can now be have generic `TextShow` and `TextShow1` instances.
 
@@ -26,78 +36,78 @@
 # 2
 * Changed the top-level module name from `Text.Show.Text` to `TextShow`, since the former was extremely verbose without much benefit. As a result, this will break all existing code that depends on `text-show`.
 * Several typeclasses and functions were renamed so as to not to clash with the `Prelude`:
- * `Show` → `TextShow`
- * `Show1` → `TextShow1`
- * `Show2` → `TextShow2`
- * `show` → `showt`
- * `showLazy` → `showtl`
- * `showPrec` → `showtPrec`
- * `showPrecLazy` → `showtlPrec`
- * `showList` → `showtList`
- * `showListLazy` → `showtlList`
- * `print` → `printT`
- * `printLazy` → `printTL`
- * `hPrint` → `hPrintT`
- * `hPrintLazy` → `hPrintTL`
- * `GShow` → `GTextShow`
- * `GShow1` → `GTextShow1`
- * `genericShow` → `genericShowt`
- * `genericShowLazy` → `genericShowtl`
- * `genericShowPrec` → `genericShowtPrec`
- * `genericShowPrecLazy` → `genericShowtlPrec`
- * `genericShowList` → `genericShowtList`
- * `genericShowListLazy` → `genericShowtlList`
- * `genericPrint` → `genericPrintT`
- * `genericPrintLazy` → `genericPrintTL`
- * `genericHPrint` → `genericHPrintT`
- * `genericHPrintLazy` → `genericHPrintTL`
- * `deriveShow` → `deriveTextShow`
- * `deriveShow1` → `deriveTextShow1`
- * `deriveShow2` → `deriveTextShow2`
- * `mkShow` → `makeShowt`
- * `mkShowLazy` → `makeShowtl`
- * `mkShowPrec` → `makeShowtPrec`
- * `mkShowPrecLazy` → `makeShowtlPrec`
- * `mkShowList` → `makeShowtList`
- * `mkShowListLazy` → `makeShowtlList`
- * `mkShowb` → `makeShowb`
- * `mkShowbPrec` → `makeShowbPrec`
- * `mkShowbList` → `makeShowbList`
- * `mkPrint` → `makePrintT`
- * `mkPrintLazy` → `makePrintTL`
- * `mkHPrint` → `makeHPrintT`
- * `mkHPrintLazy` → `makeHPrintTL`
- * `mkShowbPrecWith` → `makeShowbPrecWith`
- * `mkShowbPrec1` → `makeShowbPrec1`
- * `mkShowbPrecWith2` → `makeShowbPrecWith2`
- * `mkShowbPrec2` → `makeShowbPrec2`
- * `trace` → `tracet`
- * `traceLazy` → `tracetl`
- * `traceId` → `tracetId`
- * `traceIdLazy` → `tracetlId`
- * `traceShow` → `traceTextShow`
- * `traceShowId` → `traceTextShowId`
- * `traceStack` → `tracetStack`
- * `traceStackLazy` → `tracetlStack`
- * `traceIO` → `tracetIO`
- * `traceIOLazy` → `tracetlIO`
- * `traceM` → `tracetM`
- * `traceMLazy` → `tracetlM`
- * `traceShowM` → `traceTextShowM`
- * `traceEvent` → `tracetEvent`
- * `traceEventLazy` → `tracetlEvent`
- * `traceEventIO` → `travetEventIO`
- * `traceEventIOLazy` → `tracetlEventIO`
- * `traceMarker` → `tracetMarker`
- * `traceMarkerLazy` → `tracetlMarker`
- * `traceMarkerIO` → `tracetMarkerIO`
- * `traceMarkerIOLazy` → `tracetlMarkerIO`
- * `genericTraceShow` → `genericTraceTextShow`
- * `genericTraceShowId` → `genericTraceTextShowId`
- * `genericTraceShowM` → `genericTraceTextShowM`
- * `mkTraceShow` → `makeTraceTextShow`
- * `mkTraceShowId` → `makeTraceTextShowId`
- * `mkTraceShowM` → `makeTraceTextShowM`
+  * `Show` → `TextShow`
+  * `Show1` → `TextShow1`
+  * `Show2` → `TextShow2`
+  * `show` → `showt`
+  * `showLazy` → `showtl`
+  * `showPrec` → `showtPrec`
+  * `showPrecLazy` → `showtlPrec`
+  * `showList` → `showtList`
+  * `showListLazy` → `showtlList`
+  * `print` → `printT`
+  * `printLazy` → `printTL`
+  * `hPrint` → `hPrintT`
+  * `hPrintLazy` → `hPrintTL`
+  * `GShow` → `GTextShow`
+  * `GShow1` → `GTextShow1`
+  * `genericShow` → `genericShowt`
+  * `genericShowLazy` → `genericShowtl`
+  * `genericShowPrec` → `genericShowtPrec`
+  * `genericShowPrecLazy` → `genericShowtlPrec`
+  * `genericShowList` → `genericShowtList`
+  * `genericShowListLazy` → `genericShowtlList`
+  * `genericPrint` → `genericPrintT`
+  * `genericPrintLazy` → `genericPrintTL`
+  * `genericHPrint` → `genericHPrintT`
+  * `genericHPrintLazy` → `genericHPrintTL`
+  * `deriveShow` → `deriveTextShow`
+  * `deriveShow1` → `deriveTextShow1`
+  * `deriveShow2` → `deriveTextShow2`
+  * `mkShow` → `makeShowt`
+  * `mkShowLazy` → `makeShowtl`
+  * `mkShowPrec` → `makeShowtPrec`
+  * `mkShowPrecLazy` → `makeShowtlPrec`
+  * `mkShowList` → `makeShowtList`
+  * `mkShowListLazy` → `makeShowtlList`
+  * `mkShowb` → `makeShowb`
+  * `mkShowbPrec` → `makeShowbPrec`
+  * `mkShowbList` → `makeShowbList`
+  * `mkPrint` → `makePrintT`
+  * `mkPrintLazy` → `makePrintTL`
+  * `mkHPrint` → `makeHPrintT`
+  * `mkHPrintLazy` → `makeHPrintTL`
+  * `mkShowbPrecWith` → `makeShowbPrecWith`
+  * `mkShowbPrec1` → `makeShowbPrec1`
+  * `mkShowbPrecWith2` → `makeShowbPrecWith2`
+  * `mkShowbPrec2` → `makeShowbPrec2`
+  * `trace` → `tracet`
+  * `traceLazy` → `tracetl`
+  * `traceId` → `tracetId`
+  * `traceIdLazy` → `tracetlId`
+  * `traceShow` → `traceTextShow`
+  * `traceShowId` → `traceTextShowId`
+  * `traceStack` → `tracetStack`
+  * `traceStackLazy` → `tracetlStack`
+  * `traceIO` → `tracetIO`
+  * `traceIOLazy` → `tracetlIO`
+  * `traceM` → `tracetM`
+  * `traceMLazy` → `tracetlM`
+  * `traceShowM` → `traceTextShowM`
+  * `traceEvent` → `tracetEvent`
+  * `traceEventLazy` → `tracetlEvent`
+  * `traceEventIO` → `travetEventIO`
+  * `traceEventIOLazy` → `tracetlEventIO`
+  * `traceMarker` → `tracetMarker`
+  * `traceMarkerLazy` → `tracetlMarker`
+  * `traceMarkerIO` → `tracetMarkerIO`
+  * `traceMarkerIOLazy` → `tracetlMarkerIO`
+  * `genericTraceShow` → `genericTraceTextShow`
+  * `genericTraceShowId` → `genericTraceTextShowId`
+  * `genericTraceShowM` → `genericTraceTextShowM`
+  * `mkTraceShow` → `makeTraceTextShow`
+  * `mkTraceShowId` → `makeTraceTextShowId`
+  * `mkTraceShowM` → `makeTraceTextShowM`
 * Added `TextShow Lifetime` instance in `TextShow.GHC.Event` (if using `base-4.8.1.0` or later)
 * Generalized `tracetM`, `tracetlM`, and `traceTextShowM` to use an `Applicative` constraint instead of `Monad`
 * Fixed a bug in which the `TextShow(1)` instances for `Proxy`, `(:~:)`, and `Coercion` didn't use `-XPolyKinds`

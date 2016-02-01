@@ -234,18 +234,32 @@ hPrintTL :: TextShow a => Handle -> a -> IO ()
 hPrintTL h = TL.hPutStrLn h . showtl
 {-# INLINE hPrintTL #-}
 
+-- | Convert a precedence-aware @ShowS@-based show function to a @Builder@-based one.
+--
+-- /Since: 3/
+showsPrecToShowbPrec :: (Int -> a -> ShowS) -> Int -> a -> Builder
+showsPrecToShowbPrec sp p x = fromString $ sp p x ""
+{-# INLINE showsPrecToShowbPrec #-}
+
 -- | Convert a @ShowS@-based show function to a @Builder@-based one.
 --
--- /Since: 2.1/
-showsToShowb :: (Int -> a -> ShowS) -> Int -> a -> Builder
-showsToShowb sp p x = fromString $ sp p x ""
+-- /Since: 3/
+showsToShowb :: (a -> ShowS) -> a -> Builder
+showsToShowb sf x = fromString $ sf x ""
 {-# INLINE showsToShowb #-}
+
+-- | Convert a precedence-aware @Builder@-based show function to a @ShowS@-based one.
+--
+-- /Since: 3/
+showbPrecToShowsPrec :: (Int -> a -> Builder) -> Int -> a -> ShowS
+showbPrecToShowsPrec sp p = showString . toString . sp p
+{-# INLINE showbPrecToShowsPrec #-}
 
 -- | Convert a @Builder@-based show function to a @ShowS@-based one.
 --
--- /Since: 2.1/
-showbToShows :: (Int -> a -> Builder) -> Int -> a -> ShowS
-showbToShows sp p = showString . toString . sp p
+-- /Since: 3/
+showbToShows :: (a -> Builder) -> a -> ShowS
+showbToShows sl = showString . toString . sl
 {-# INLINE showbToShows #-}
 
 -------------------------------------------------------------------------------
@@ -254,20 +268,35 @@ showbToShows sp p = showString . toString . sp p
 --
 -- /Since: 2/
 class TextShow1 f where
-    -- | Lifts a 'showbPrec' function through the type constructor.
+    -- | 'showbPrec' function for an application of the type constructor
+    -- based on 'showbPrec' and 'showbList' functions for the argument type.
     --
-    -- /Since: 2/
-    showbPrecWith :: (Int -> a -> Builder) -> Int -> f a -> Builder
+    -- /Since: 3/
+    liftShowbPrec :: (Int -> a -> Builder) -> ([a] -> Builder)
+                  -> Int -> f a -> Builder
+
+    -- | 'showbList' function for an application of the type constructor
+    -- based on 'showbPrec' and 'showbList' functions for the argument type.
+    -- The default implementation using standard list syntax is correct
+    -- for most types.
+    --
+    -- /Since: 3/
+    liftShowbList :: (Int -> a -> Builder) -> ([a] -> Builder)
+                  -> [f a] -> Builder
+    liftShowbList sp sl = showbListWith (liftShowbPrec sp sl 0)
 
 #if __GLASGOW_HASKELL__ >= 708
+    {-# MINIMAL liftShowbPrec #-}
+
 deriving instance Typeable TextShow1
 #endif
 
--- | Lift the standard 'showbPrec' function through the type constructor.
+-- | Lift the standard 'showbPrec' and 'showbList' functions through the
+-- type constructor.
 --
 -- /Since: 2/
 showbPrec1 :: (TextShow1 f, TextShow a) => Int -> f a -> Builder
-showbPrec1 = showbPrecWith showbPrec
+showbPrec1 = liftShowbPrec showbPrec showbList
 {-# INLINE showbPrec1 #-}
 
 -- | @'showbUnaryWith' sp n p x@ produces the 'Builder' representation of a unary data
@@ -286,13 +315,29 @@ showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
 --
 -- /Since: 2/
 class TextShow2 f where
-    -- | Lifts 'showbPrec' functions through the type constructor.
+    -- | 'showbPrec' function for an application of the type constructor
+    -- based on 'showbPrec' and 'showbList' functions for the argument types.
     --
-    -- /Since: 2/
-    showbPrecWith2 :: (Int -> a -> Builder) -> (Int -> b -> Builder) ->
-        Int -> f a b -> Builder
+    -- /Since: 3/
+    liftShowbPrec2 :: (Int -> a -> Builder) -> ([a] -> Builder)
+                   -> (Int -> b -> Builder) -> ([b] -> Builder)
+                   -> Int -> f a b -> Builder
+
+    -- | 'showbList' function for an application of the type constructor
+    -- based on 'showbPrec' and 'showbList' functions for the argument types.
+    -- The default implementation using standard list syntax is correct
+    -- for most types.
+    --
+    -- /Since: 3/
+    liftShowbList2 :: (Int -> a -> Builder) -> ([a] -> Builder)
+                   -> (Int -> b -> Builder) -> ([b] -> Builder)
+                   -> [f a b] -> Builder
+    liftShowbList2 sp1 sl1 sp2 sl2 =
+        showbListWith (liftShowbPrec2 sp1 sl1 sp2 sl2 0)
 
 #if __GLASGOW_HASKELL__ >= 708
+    {-# MINIMAL liftShowbPrec2 #-}
+
 deriving instance Typeable TextShow2
 #endif
 
@@ -300,7 +345,7 @@ deriving instance Typeable TextShow2
 --
 -- /Since: 2/
 showbPrec2 :: (TextShow2 f, TextShow a, TextShow b) => Int -> f a b -> Builder
-showbPrec2 = showbPrecWith2 showbPrec showbPrec
+showbPrec2 = liftShowbPrec2 showbPrec showbList showbPrec showbList
 {-# INLINE showbPrec2 #-}
 
 -- | @'showbBinaryWith' sp n p x y@ produces the 'Builder' representation of a binary

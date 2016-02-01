@@ -19,6 +19,8 @@ Defines data types with fields that have unlifted types.
 -}
 module Derived.MagicHash (TyCon#(..), TyFamily#(..)) where
 
+import           Data.Functor.Classes (Show1(..))
+
 #if __GLASGOW_HASKELL__ < 711
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -26,10 +28,6 @@ import qualified Generics.Deriving.TH as Generics
 import           GHC.Exts
 #if __GLASGOW_HASKELL__ >= 711
 import           GHC.Generics (Generic, Generic1)
-#endif
-import           GHC.Show (showSpace)
-#if __GLASGOW_HASKELL__ < 711
-import           GHC.Show (appPrec)
 #endif
 
 import           Prelude ()
@@ -39,7 +37,13 @@ import           Test.QuickCheck (Arbitrary(..))
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import           TransformersCompat (Show1(..), Show2(..))
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+import           Data.Functor.Classes (Show2(..))
+import           GHC.Show (showSpace)
+# if __GLASGOW_HASKELL__ < 711
+import           GHC.Show (appPrec)
+# endif
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -103,17 +107,23 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily# a b) where
 
 -------------------------------------------------------------------------------
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance Show a => Show1 (TyCon# a) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+instance Show a => Show1 (TyFamily# a) where
+    showsPrec1 = showsPrec
+#else
+instance Show a => Show1 (TyCon# a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show a => Show1 (TyFamily# a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+
 instance Show2 TyCon# where
-    showsPrecWith2 sp1 sp2 p (TyCon# a b i f d c w) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyCon# a b i f d c w) =
         showsHash sp1 sp2 "TyCon#" "tcA" "tcB" "tcInt#" "tcFloat#"
                   "tcDouble#" "tcChar#" "tcWord#" p a b i f d c w
-
-instance Show a => Show1 (TyFamily# a) where
-    showsPrecWith = showsPrecWith2 showsPrec
 instance Show2 TyFamily# where
-    showsPrecWith2 sp1 sp2 p (TyFamily# a b i f d c w) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyFamily# a b i f d c w) =
         showsHash sp1 sp2 "TyFamily#" "tfA" "tfB" "tfInt#" "tfFloat#"
                   "tfDouble#" "tfChar#" "tfWord#" p a b i f d c w
 
@@ -122,9 +132,9 @@ showsHash :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
           -> Int -> a -> b -> Int# -> Float# -> Double# -> Char# -> Word#
           -> ShowS
 showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 _p a b i f d c w =
-#if __GLASGOW_HASKELL__ < 711
+# if __GLASGOW_HASKELL__ < 711
     showParen (_p > appPrec) $
-#endif
+# endif
           showString con . showSpace
         . showChar '{'
         . showString rec1 . equals . sp1 0 a                . comma
@@ -141,12 +151,13 @@ showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 _p a b i f d c w =
     equals = showString " = "
 
     oneHash, twoHash :: ShowS
-#if __GLASGOW_HASKELL__ >= 711
+# if __GLASGOW_HASKELL__ >= 711
     oneHash  = showChar '#'
     twoHash  = showString "##"
-#else
+# else
     oneHash  = id
     twoHash  = id
+# endif
 #endif
 
 -------------------------------------------------------------------------------

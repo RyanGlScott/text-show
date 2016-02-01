@@ -13,7 +13,7 @@ Monomorphic 'TextShow' function for 'Identity' values.
 
 /Since: 2/
 -}
-module TextShow.Data.Functor.Identity (showbIdentityPrecWith) where
+module TextShow.Data.Functor.Identity (liftShowbIdentityPrec) where
 
 import Data.Functor.Identity (Identity(..))
 import Data.Text.Lazy.Builder (Builder)
@@ -26,17 +26,17 @@ import TextShow.Classes (TextShow(..), TextShow1(..),
 -- | Convert an 'Identity' value to a 'Builder' with the given show function
 -- and precedence.
 --
--- /Since: 2/
-showbIdentityPrecWith :: (Int -> a -> Builder) -> Int -> Identity a -> Builder
+-- /Since: 3/
+liftShowbIdentityPrec :: (Int -> a -> Builder) -> Int -> Identity a -> Builder
 -- This would be equivalent to the derived instance of 'Identity' if the
 -- 'runIdentity' field were removed.
-showbIdentityPrecWith sp p (Identity x) = showbUnaryWith sp "Identity" p x
-{-# INLINE showbIdentityPrecWith #-}
+liftShowbIdentityPrec sp p (Identity x) = showbUnaryWith sp "Identity" p x
+{-# INLINE liftShowbIdentityPrec #-}
 
 instance TextShow a => TextShow (Identity a) where
     showbPrec = showbPrec1
     {-# INLINE showbPrec #-}
 
 instance TextShow1 Identity where
-    showbPrecWith = showbIdentityPrecWith
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec sp _ = liftShowbIdentityPrec sp
+    INLINE_INST_FUN(liftShowbPrec)

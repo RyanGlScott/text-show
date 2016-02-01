@@ -77,11 +77,11 @@ showbForeignPtr = showb
 {-# INLINE showbForeignPtr #-}
 
 instance TextShow (Ptr a) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
     INLINE_INST_FUN(showbPrec)
 
 instance TextShow1 Ptr where
-    showbPrecWith _ _ (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
+    liftShowbPrec _ _ _ (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
       where
         padOut :: Builder -> Builder
         padOut ls =
@@ -90,12 +90,12 @@ instance TextShow1 Ptr where
           <> ls
 
 instance TextShow (FunPtr a) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
     INLINE_INST_FUN(showbPrec)
 
 instance TextShow1 FunPtr where
-    showbPrecWith _ _ = showb . castFunPtrToPtr
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec _ _ _ = showb . castFunPtrToPtr
+    INLINE_INST_FUN(liftShowbPrec)
 
 instance TextShow IntPtr where
     showbPrec = showbIntPtrPrec
@@ -106,9 +106,9 @@ instance TextShow WordPtr where
     INLINE_INST_FUN(showb)
 
 instance TextShow (ForeignPtr a) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
     INLINE_INST_FUN(showbPrec)
 
 instance TextShow1 ForeignPtr where
-    showbPrecWith _ _ = showb . unsafeForeignPtrToPtr
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec _ _ _ = showb . unsafeForeignPtrToPtr
+    INLINE_INST_FUN(liftShowbPrec)

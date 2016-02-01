@@ -14,7 +14,7 @@ import Generics.Deriving.Instances ()
 
 import Instances.Data.Tuple ()
 
-import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow2,
+import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow1,
                    prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
@@ -31,8 +31,8 @@ spec = parallel $ do
         prop "generic TextShow"
             (prop_genericTextShow :: Int -> () -> Bool)
     describe "(Int, Int)" $ do
-        prop "TextShow2 instance"
-            (prop_matchesTextShow2 :: Int -> (Int, Int) -> Bool)
+        prop "TextShow1 instance"
+            (prop_matchesTextShow1 :: Int -> (Int, Int) -> Bool)
         prop "generic TextShow"
             (prop_genericTextShow  :: Int -> (Int, Int) -> Bool)
         prop "generic TextShow1"

@@ -17,7 +17,7 @@ Defines data types with existentially quantified type variables.
 -}
 module Derived.ExistentialQuantification (TyCon(..), TyFamily(..)) where
 
-import GHC.Show (appPrec, appPrec1, showSpace)
+import Data.Functor.Classes (Show1(..))
 
 import Prelude ()
 import Prelude.Compat
@@ -27,7 +27,10 @@ import Test.QuickCheck (Arbitrary(..), Gen, oneof)
 import TextShow (TextShow)
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import TransformersCompat (Show1(..), Show2(..), showsBinaryWith)
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+import Data.Functor.Classes (Show2(..), showsBinaryWith)
+import GHC.Show (appPrec, appPrec1, showSpace)
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -96,33 +99,40 @@ instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyFamily a b c d) wh
 -------------------------------------------------------------------------------
 
 deriving instance (Show a, Show b, Show c, Show d) => Show (TyCon a b c d)
-instance (Show a, Show b, Show c) => Show1 (TyCon a b c) where
-    showsPrecWith = showsPrecWith2 showsPrec
-instance (Show a, Show b) => Show2 (TyCon a b) where
-    showsPrecWith2 sp1 sp2 p (TyConClassConstraints a b c d) =
-        showsFour sp1 sp2 "TyConClassConstraints" p a b c d
-    showsPrecWith2 sp1 sp2 p (TyConEqualityConstraints a b c d) =
-        showsFour sp1 sp2 "TyConEqualityConstraints" p a b c d
-    showsPrecWith2 _   sp2 p (TyConTypeRefinement1 i d) =
-        showsBinaryWith showsPrec sp2 "TyConTypeRefinement1" p i d
-    showsPrecWith2 _   sp2 p (TyConTypeRefinement2 i d) =
-        showsBinaryWith showsPrec sp2 "TyConTypeRefinement2" p i d
-    showsPrecWith2 sp1 sp2 p (TyConForalls p' q d c) =
-        showsFour sp2 sp1 "TyConForalls" p p' q d c
-
 deriving instance (Show a, Show b, Show c, Show d) => Show (TyFamily a b c d)
+
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
+instance (Show a, Show b, Show c) => Show1 (TyCon a b c) where
+    showsPrec1 = showsPrec
 instance (Show a, Show b, Show c) => Show1 (TyFamily a b c) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+#else
+instance (Show a, Show b, Show c) => Show1 (TyCon a b c) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance (Show a, Show b, Show c) => Show1 (TyFamily a b c) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance (Show a, Show b) => Show2 (TyCon a b) where
+    liftShowsPrec2 sp1 _ sp2 _ p (TyConClassConstraints a b c d) =
+        showsFour sp1 sp2 "TyConClassConstraints" p a b c d
+    liftShowsPrec2 sp1 _ sp2 _ p (TyConEqualityConstraints a b c d) =
+        showsFour sp1 sp2 "TyConEqualityConstraints" p a b c d
+    liftShowsPrec2 _ _ sp2 _ p (TyConTypeRefinement1 i d) =
+        showsBinaryWith showsPrec sp2 "TyConTypeRefinement1" p i d
+    liftShowsPrec2 _ _ sp2 _ p (TyConTypeRefinement2 i d) =
+        showsBinaryWith showsPrec sp2 "TyConTypeRefinement2" p i d
+    liftShowsPrec2 sp1 _ sp2 _ p (TyConForalls p' q d c) =
+        showsFour sp2 sp1 "TyConForalls" p p' q d c
 instance (Show a, Show b) => Show2 (TyFamily a b) where
-    showsPrecWith2 sp1 sp2 p (TyFamilyClassConstraints a b c d) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyClassConstraints a b c d) =
         showsFour sp1 sp2 "TyFamilyClassConstraints" p a b c d
-    showsPrecWith2 sp1 sp2 p (TyFamilyEqualityConstraints a b c d) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyEqualityConstraints a b c d) =
         showsFour sp1 sp2 "TyFamilyEqualityConstraints" p a b c d
-    showsPrecWith2 _ sp2 p (TyFamilyTypeRefinement1 i d) =
+    liftShowsPrec2 _ _ sp2 _ p (TyFamilyTypeRefinement1 i d) =
         showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement1" p i d
-    showsPrecWith2 _ sp2 p (TyFamilyTypeRefinement2 i d) =
+    liftShowsPrec2 _ _ sp2 _ p (TyFamilyTypeRefinement2 i d) =
         showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement2" p i d
-    showsPrecWith2 sp1 sp2 p (TyFamilyForalls p' q d c) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyForalls p' q d c) =
         showsFour sp2 sp1 "TyFamilyForalls" p p' q d c
 
 showsFour :: (Show a, Show b)
@@ -134,6 +144,7 @@ showsFour sp1 sp2 name p a b c d = showParen (p > appPrec) $
     . showsPrec appPrec1 b . showSpace
     . sp1 appPrec1 c       . showSpace
     . sp2 appPrec1 d
+#endif
 
 -------------------------------------------------------------------------------
 

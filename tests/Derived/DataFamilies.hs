@@ -43,6 +43,8 @@ module Derived.DataFamilies (
 
 #include "generic.h"
 
+import           Data.Functor.Classes (Show1(..))
+
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -53,7 +55,6 @@ import           GHC.Generics (Generic)
 import           GHC.Generics (Generic1)
 # endif
 #endif
-import           GHC.Show (appPrec, appPrec1, showSpace)
 
 import           Prelude ()
 import           Prelude.Compat
@@ -64,7 +65,10 @@ import           Test.QuickCheck (Arbitrary(..), oneof)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #endif
 
-import TransformersCompat (Show1(..), Show2(..))
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+import           Data.Functor.Classes (Show2(..))
+import           GHC.Show (appPrec, appPrec1, showSpace)
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -87,16 +91,21 @@ instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b 
                       , NASShow2 <$> arbitrary
                       ]
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+#else
+instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show b => Show2 (NotAllShow Int b) where
-    showsPrecWith2 sp1 _ p (NASShow1 c b) = showParen (p > appPrec) $
+    liftShowsPrec2 sp1 _ _ _ p (NASShow1 c b) = showParen (p > appPrec) $
           showString "NASShow1 "
         . sp1 appPrec1 c . showSpace
         . showsPrec appPrec1 b
-    showsPrecWith2 _ sp2 p (NASShow2 d) = showParen (p > appPrec) $
+    liftShowsPrec2 _ _ sp2 _ p (NASShow2 d) = showParen (p > appPrec) $
           showString "NASShow2 "
         . sp2 appPrec1 d
+#endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'NASShow1)
@@ -145,26 +154,34 @@ newtype instance KindDistinguished Either b c = KindDistinguished3 b
 # endif
            )
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance Show b => Show1 (KindDistinguished (a :: *) b) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
+    showsPrec1 = showsPrec
+instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
+    showsPrec1 = showsPrec
+#else
+instance Show b => Show1 (KindDistinguished (a :: *) b) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+
 instance Show2 (KindDistinguished (a :: *)) where
-    showsPrecWith2 sp1 _ p (KindDistinguished1 b) = showParen (p > appPrec) $
+    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished1 b) = showParen (p > appPrec) $
           showString "KindDistinguished1 "
         . sp1 appPrec1 b
-
-instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
-    showsPrecWith = showsPrecWith2 showsPrec
 instance Show2 (KindDistinguished (a :: * -> *)) where
-    showsPrecWith2 sp1 _ p (KindDistinguished2 b) = showParen (p > appPrec) $
+    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished2 b) = showParen (p > appPrec) $
           showString "KindDistinguished2 "
         . sp1 appPrec1 b
-
-instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
-    showsPrecWith = showsPrecWith2 showsPrec
 instance Show2 (KindDistinguished (Either :: * -> * -> *)) where
-    showsPrecWith2 sp1 _ p (KindDistinguished3 b) = showParen (p > appPrec) $
+    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished3 b) = showParen (p > appPrec) $
           showString "KindDistinguished3 "
         . sp1 appPrec1 b
+#endif
 
 $(deriveTextShow  'KindDistinguished1)
 $(deriveTextShow1 'KindDistinguished1)

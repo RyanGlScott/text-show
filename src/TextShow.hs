@@ -50,7 +50,13 @@ module TextShow (
       -- * Conversion between 'TextShow' and string @Show@
     , FromStringShow(..)
     , FromTextShow(..)
+    , FromStringShow1(..)
+    , FromTextShow1(..)
+    , FromStringShow2(..)
+    , FromTextShow2(..)
+    , showsPrecToShowbPrec
     , showsToShowb
+    , showbPrecToShowsPrec
     , showbToShows
     ) where
 

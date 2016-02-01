@@ -14,14 +14,14 @@ Monomorphic 'TextShow' functions for 'Ordering' and 'Down'.
 -}
 module TextShow.Data.Ord (
       showbOrdering
-    , showbDownPrecWith
+    , liftShowbDownPrec
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Exts (Down)
 
-import TextShow.Classes (showb, showbPrecWith)
+import TextShow.Classes (showb, liftShowbPrec)
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
 -- | Convert a 'Ordering' to a 'Builder'.
@@ -33,10 +33,10 @@ showbOrdering = showb
 
 -- | Convert a 'Down' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbDownPrecWith :: (Int -> a -> Builder) -> Int -> Down a -> Builder
-showbDownPrecWith = showbPrecWith
-{-# INLINE showbDownPrecWith #-}
+-- /Since: 3/
+liftShowbDownPrec :: (Int -> a -> Builder) -> Int -> Down a -> Builder
+liftShowbDownPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbDownPrec #-}
 
 $(deriveTextShow  ''Ordering)
 $(deriveTextShow  ''Down)

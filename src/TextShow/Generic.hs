@@ -55,7 +55,7 @@ module TextShow.Generic (
     , genericPrintTL
     , genericHPrintT
     , genericHPrintTL
-    , genericShowbPrecWith
+    , genericLiftShowbPrec
     , genericShowbPrec1
       -- * The 'GTextShow' and 'GTextShow1' classes
     , GTextShow(..)
@@ -113,7 +113,7 @@ instance TextShow a => TextShow (D a) where
     showbPrec = 'genericShowbPrec'
 
 instance TextShow1 D where
-    showbPrecWith = 'genericShowbPrecWith'
+    liftShowbPrec = 'genericLiftShowbPrec'
 @
 -}
 
@@ -221,19 +221,20 @@ genericHPrintT h = TS.hPutStrLn h . genericShowt
 genericHPrintTL :: (Generic a, GTextShow (Rep a)) => Handle -> a -> IO ()
 genericHPrintTL h = TL.hPutStrLn h . genericShowtl
 
--- | A 'Generic1' implementation of 'showbPrecWith'.
+-- | A 'Generic1' implementation of 'genericLiftShowbPrec'.
 --
 -- /Since: 2/
-genericShowbPrecWith :: (Generic1 f, GTextShow1 (Rep1 f))
-                     => (Int -> a -> Builder) -> Int -> f a -> Builder
-genericShowbPrecWith sp p = gShowbPrecWith sp p . from1
+genericLiftShowbPrec :: (Generic1 f, GTextShow1 (Rep1 f))
+                     => (Int -> a -> Builder) -> ([a] -> Builder)
+                     -> Int -> f a -> Builder
+genericLiftShowbPrec sp sl p = gLiftShowbPrec sp sl p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
 --
 -- /Since: 2/
 genericShowbPrec1 :: (Generic a, Generic1 f, GTextShow (Rep a), GTextShow1 (Rep1 f))
                   => Int -> f a -> Builder
-genericShowbPrec1 = genericShowbPrecWith genericShowbPrec
+genericShowbPrec1 = genericLiftShowbPrec genericShowbPrec genericShowbList
 
 -------------------------------------------------------------------------------
 
@@ -269,11 +270,11 @@ deriving instance Typeable GTextShow
 #endif
 
 instance GTextShow f => GTextShow (D1 d f) where
-    gShowbPrec n (M1 x) = gShowbPrec n x
+    gShowbPrec p (M1 x) = gShowbPrec p x
 
 instance (GTextShow f, GTextShow g) => GTextShow (f :+: g) where
-    gShowbPrec n (L1 x) = gShowbPrec n x
-    gShowbPrec n (R1 x) = gShowbPrec n x
+    gShowbPrec p (L1 x) = gShowbPrec p x
+    gShowbPrec p (R1 x) = gShowbPrec p x
 
 instance (Constructor c, GTextShowCon f, IsNullary f) => GTextShow (C1 c f) where
     gShowbPrec = gShowbConstructor gShowbPrecCon
@@ -296,7 +297,7 @@ instance GTextShowCon U1 where
     gShowbPrecCon _ _ U1 = mempty
 
 instance TextShow c => GTextShowCon (K1 i c) where
-    gShowbPrecCon _ n (K1 a) = showbPrec n a
+    gShowbPrecCon _ p (K1 x) = showbPrec p x
 
 instance (Selector s, GTextShowCon f) => GTextShowCon (S1 s f) where
     gShowbPrecCon = gShowbSelector gShowbPrecCon
@@ -327,71 +328,79 @@ instance GTextShowCon UWord where
 -- /Since: 2/
 class GTextShow1 f where
     -- | This is used as the default generic implementation of 'showbPrecWith'.
-    gShowbPrecWith :: (Int -> a -> Builder) -> Int -> f a -> Builder
+    gLiftShowbPrec :: (Int -> a -> Builder) -> ([a] -> Builder) -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow1
 #endif
 
 instance GTextShow1 f => GTextShow1 (D1 d f) where
-    gShowbPrecWith sp n (M1 x) = gShowbPrecWith sp n x
+    gLiftShowbPrec sp sl p (M1 x) = gLiftShowbPrec sp sl p x
+
+instance GTextShow1 V1 where
+    gLiftShowbPrec = error "Void showbPrecWith"
 
 instance (GTextShow1 f, GTextShow1 g) => GTextShow1 (f :+: g) where
-    gShowbPrecWith sp n (L1 x) = gShowbPrecWith sp n x
-    gShowbPrecWith sp n (R1 x) = gShowbPrecWith sp n x
+    gLiftShowbPrec sp sl p (L1 x) = gLiftShowbPrec sp sl p x
+    gLiftShowbPrec sp sl p (R1 x) = gLiftShowbPrec sp sl p x
 
 instance (Constructor c, GTextShow1Con f, IsNullary f) => GTextShow1 (C1 c f) where
-    gShowbPrecWith sp = gShowbConstructor (`gShowbPrecWithCon` sp)
+    gLiftShowbPrec sp sl =
+      gShowbConstructor (\t' -> gLiftShowbPrecCon t' sp sl)
 
 -- | Class of generic representation types ('Rep1') for which the 'ConType'
 -- has been determined.
 class GTextShow1Con f where
     -- | Convert a value of a specific 'ConType' to a 'Builder' with the given
     -- show function and precedence.
-    gShowbPrecWithCon :: ConType -> (Int -> a -> Builder) -> Int -> f a -> Builder
+    gLiftShowbPrecCon :: ConType -> (Int -> a -> Builder) -> ([a] -> Builder)
+                      -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow1Con
 #endif
 
-instance GTextShow1Con V1 where
-    gShowbPrecWithCon = error "Void showbPrecWith"
-
 instance GTextShow1Con U1 where
-    gShowbPrecWithCon _ _ _ U1 = mempty
+    gLiftShowbPrecCon _ _ _ _ U1 = mempty
 
 instance GTextShow1Con Par1 where
-    gShowbPrecWithCon _ sp n (Par1 p) = sp n p
+    gLiftShowbPrecCon _ sp _ p (Par1 x) = sp p x
 
 instance TextShow c => GTextShow1Con (K1 i c) where
-    gShowbPrecWithCon _ _ n (K1 a) = showbPrec n a
+    gLiftShowbPrecCon _ _ _ p (K1 x) = showbPrec p x
 
 instance TextShow1 f => GTextShow1Con (Rec1 f) where
-    gShowbPrecWithCon _ sp n (Rec1 r) = showbPrecWith sp n r
+    gLiftShowbPrecCon _ sp sl p (Rec1 x) = liftShowbPrec sp sl p x
 
 instance (Selector s, GTextShow1Con f) => GTextShow1Con (S1 s f) where
-    gShowbPrecWithCon t sp = gShowbSelector (`gShowbPrecWithCon` sp) t
+    gLiftShowbPrecCon t sp sl =
+      gShowbSelector (\t' -> gLiftShowbPrecCon t' sp sl) t
 
 instance (GTextShow1Con f, GTextShow1Con g) => GTextShow1Con (f :*: g) where
-    gShowbPrecWithCon t sp = gShowbProduct (`gShowbPrecWithCon` sp) (`gShowbPrecWithCon` sp) t
+    gLiftShowbPrecCon t sp sl =
+      gShowbProduct (\t' -> gLiftShowbPrecCon t' sp sl)
+                    (\t' -> gLiftShowbPrecCon t' sp sl) t
 
 instance (TextShow1 f, GTextShow1Con g) => GTextShow1Con (f :.: g) where
-    gShowbPrecWithCon t sp n (Comp1 c) = showbPrecWith (gShowbPrecWithCon t sp) n c
+    gLiftShowbPrecCon t sp sl p (Comp1 x) =
+      liftShowbPrec (gLiftShowbPrecCon t sp sl)
+                    (showbListWith (gLiftShowbPrecCon t sp sl 0))
+                    p x
 
 instance GTextShow1Con UChar where
-    gShowbPrecWithCon _ _ = gShowbUCharPrec
+    gLiftShowbPrecCon _ _ _ = gShowbUCharPrec
 
 instance GTextShow1Con UDouble where
-    gShowbPrecWithCon _ _ = gShowbUDoublePrec
+    gLiftShowbPrecCon _ _ _ = gShowbUDoublePrec
 
 instance GTextShow1Con UFloat where
-    gShowbPrecWithCon _ _ = gShowbUFloatPrec
+    gLiftShowbPrecCon _ _ _ = gShowbUFloatPrec
 
 instance GTextShow1Con UInt where
-    gShowbPrecWithCon _ _ = gShowbUIntPrec
+    gLiftShowbPrecCon _ _ _ = gShowbUIntPrec
 
 instance GTextShow1Con UWord where
-    gShowbPrecWithCon _ _ = gShowbUWordPrec
+    gLiftShowbPrecCon _ _ _ = gShowbUWordPrec
 
 -------------------------------------------------------------------------------
 -- Shared code between GTextShow and GTextShow1
@@ -443,8 +452,8 @@ gShowbConstructor :: forall c f p.
                      (Constructor c, IsNullary f)
                   => (ConType -> Int -> f p -> Builder)
                   -> Int -> C1 c f p -> Builder
-gShowbConstructor gs n c@(M1 x) = case fixity of
-    Prefix -> showbParen ( n > appPrec
+gShowbConstructor gs p c@(M1 x) = case fixity of
+    Prefix -> showbParen ( p > appPrec
                            && not ( isNullary x
                                     || conIsTuple c
 #if __GLASGOW_HASKELL__ >= 711
@@ -460,7 +469,7 @@ gShowbConstructor gs n c@(M1 x) = case fixity of
                then mempty
                else singleton ' ')
         <> showbBraces t (gs t appPrec1 x)
-    Infix _ m -> showbParen (n > m) . showbBraces t $ gs t (m+1) x
+    Infix _ m -> showbParen (p > m) $ gs t (m+1) x
   where
     fixity :: Fixity
     fixity = conFixity c
@@ -486,8 +495,8 @@ gShowbConstructor gs n c@(M1 x) = case fixity of
 gShowbSelector :: Selector s
                => (ConType -> Int -> f p -> Builder)
                -> ConType -> Int -> S1 s f p -> Builder
-gShowbSelector gs t n sel@(M1 x)
-    | selName sel == "" = gs t n x
+gShowbSelector gs t p sel@(M1 x)
+    | selName sel == "" = gs t p x
     | otherwise         = fromString (selName sel) <> " = " <> gs t 0 x
 
 gShowbProduct :: (ConType -> Int -> f p -> Builder)
@@ -497,12 +506,12 @@ gShowbProduct gsa gsb t@Rec _ (a :*: b) =
        gsa t 0 a
     <> ", "
     <> gsb t 0 b
-gShowbProduct gsa gsb t@(Inf o) n (a :*: b) =
-       gsa t n a
+gShowbProduct gsa gsb t@(Inf o) p (a :*: b) =
+       gsa t p a
     <> showbSpace
     <> infixOp
     <> showbSpace
-    <> gsb t n b
+    <> gsb t p b
   where
     infixOp :: Builder
     infixOp = if isInfixTypeCon o
@@ -512,10 +521,10 @@ gShowbProduct gsa gsb t@Tup _ (a :*: b) =
        gsa t 0 a
     <> singleton ','
     <> gsb t 0 b
-gShowbProduct gsa gsb t@Pref n (a :*: b) =
-       gsa t n a
+gShowbProduct gsa gsb t@Pref p (a :*: b) =
+       gsa t p a
     <> showbSpace
-    <> gsb t n b
+    <> gsb t p b
 
 gShowbUCharPrec :: Int -> UChar p -> Builder
 gShowbUCharPrec p (UChar c) = showbPrec (hashPrec p) (C# c) <> oneHash

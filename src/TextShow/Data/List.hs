@@ -26,5 +26,5 @@ instance TextShow a => TextShow [a] where
     INLINE_INST_FUN(showb)
 
 instance TextShow1 [] where
-    showbPrecWith sp _ = showbListWith (sp 0)
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec _ sl _ = sl
+    INLINE_INST_FUN(liftShowbPrec)

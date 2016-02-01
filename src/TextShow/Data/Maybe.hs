@@ -13,21 +13,21 @@ Monomorphic 'TextShow' function for 'Maybe' values.
 
 /Since: 2/
 -}
-module TextShow.Data.Maybe (showbMaybePrecWith) where
+module TextShow.Data.Maybe (liftShowbMaybePrec) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (showbPrecWith)
+import TextShow.Classes (liftShowbPrec)
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
 #include "inline.h"
 
 -- | Convert a 'Maybe' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbMaybePrecWith :: (Int -> a -> Builder) -> Int -> Maybe a -> Builder
-showbMaybePrecWith = showbPrecWith
-{-# INLINE showbMaybePrecWith #-}
+-- /Since: 3/
+liftShowbMaybePrec :: (Int -> a -> Builder) -> Int -> Maybe a -> Builder
+liftShowbMaybePrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbMaybePrec #-}
 
 $(deriveTextShow  ''Maybe)
 $(deriveTextShow1 ''Maybe)

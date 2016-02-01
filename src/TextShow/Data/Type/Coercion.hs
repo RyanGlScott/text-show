@@ -30,7 +30,7 @@ import Data.Text.Lazy.Builder (Builder)
 import Data.Type.Coercion (Coercion(..))
 
 import TextShow.Classes (TextShow(..), TextShow1(..))
-import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeShowbPrecWith)
+import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeLiftShowbPrec)
 
 -- | Convert a representational equality value to a 'Builder'.
 -- This function is only available with @base-4.7.0.0@ or later.
@@ -43,8 +43,7 @@ showbCoercion = showb
 $(deriveTextShow ''Coercion)
 
 instance TextShow1 (Coercion a) where
-    showbPrecWith = $(makeShowbPrecWith ''Coercion)
-    {-# INLINE showbPrecWith #-}
+    liftShowbPrec = $(makeLiftShowbPrec ''Coercion)
 
 $(deriveTextShow2 ''Coercion)
 #endif

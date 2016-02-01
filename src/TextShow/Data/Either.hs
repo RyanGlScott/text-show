@@ -13,11 +13,11 @@ Monomorphic 'TextShow' function for 'Either' values.
 
 /Since: 2/
 -}
-module TextShow.Data.Either (showbEitherPrecWith2) where
+module TextShow.Data.Either (liftShowbEitherPrec2) where
 
 import Data.Text.Lazy.Builder (Builder)
 
-import TextShow.Classes (showbPrecWith2)
+import TextShow.Classes (liftShowbPrec2)
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 #include "inline.h"
@@ -25,11 +25,11 @@ import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 -- | Convert a 'Either' value to a 'Builder' with the given show functions
 -- and precedence.
 --
--- /Since: 2/
-showbEitherPrecWith2 :: (Int -> a -> Builder) -> (Int -> b -> Builder)
+-- /Since: 3/
+liftShowbEitherPrec2 :: (Int -> a -> Builder) -> (Int -> b -> Builder)
                      -> Int -> Either a b -> Builder
-showbEitherPrecWith2 = showbPrecWith2
-{-# INLINE showbEitherPrecWith2 #-}
+liftShowbEitherPrec2 sp1 sp2 = liftShowbPrec2 sp1 undefined sp2 undefined
+{-# INLINE liftShowbEitherPrec2 #-}
 
 $(deriveTextShow  ''Either)
 $(deriveTextShow1 ''Either)

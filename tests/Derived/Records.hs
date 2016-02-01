@@ -20,6 +20,8 @@ module Derived.Records (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
+import           Data.Functor.Classes (Show1(..))
+
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -30,10 +32,6 @@ import           GHC.Generics (Generic)
 import           GHC.Generics (Generic1)
 # endif
 #endif
-import           GHC.Show (showSpace)
-#if __GLASGOW_HASKELL__ < 711
-import           GHC.Show (appPrec)
-#endif
 
 import           Prelude ()
 import           Prelude.Compat
@@ -42,7 +40,13 @@ import           Test.QuickCheck (Arbitrary(..), oneof)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-import           TransformersCompat (Show1(..), Show2(..))
+#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+import           Data.Functor.Classes (Show2(..))
+import           GHC.Show (showSpace)
+# if __GLASGOW_HASKELL__ < 711
+import           GHC.Show (appPrec)
+# endif
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -88,33 +92,40 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
 
 -------------------------------------------------------------------------------
 
+#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
 instance Show a => Show1 (TyCon a) where
-    showsPrecWith = showsPrecWith2 showsPrec
-instance Show2 TyCon where
-    showsPrecWith2 sp1 sp2 p (TyConPrefix a b) =
-        showsRecord sp1 sp2 "TyConPrefix" "tc1" "tc2" p a b
-    showsPrecWith2 sp1 sp2 p (a :@: b) =
-        showsRecord sp2 sp1 "(:@:)" "tc3" "tc4" p a b
-
+    showsPrec1 = showsPrec
 instance Show a => Show1 (TyFamily a) where
-    showsPrecWith = showsPrecWith2 showsPrec
+    showsPrec1 = showsPrec
+#else
+instance Show a => Show1 (TyCon a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Show a => Show1 (TyFamily a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+instance Show2 TyCon where
+    liftShowsPrec2 sp1 _ sp2 _ p (TyConPrefix a b) =
+        showsRecord sp1 sp2 "TyConPrefix" "tc1" "tc2" p a b
+    liftShowsPrec2 sp1 _ sp2 _ p (a :@: b) =
+        showsRecord sp2 sp1 "(:@:)" "tc3" "tc4" p a b
 instance Show2 TyFamily where
-    showsPrecWith2 sp1 sp2 p (TyFamilyPrefix a b) =
+    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyPrefix a b) =
         showsRecord sp1 sp2 "TyFamilyPrefix" "tf1" "tf2" p a b
-    showsPrecWith2 sp1 sp2 p (a :!: b) =
+    liftShowsPrec2 sp1 _ sp2 _ p (a :!: b) =
         showsRecord sp2 sp1 "(:!:)" "tf3" "tf4" p a b
 
 showsRecord :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
             -> String -> String -> String -> Int -> a -> b -> ShowS
 showsRecord sp1 sp2 con rec1 rec2 _p a b =
-#if __GLASGOW_HASKELL__ < 711
+# if __GLASGOW_HASKELL__ < 711
     showParen (_p > appPrec) $
-#endif
+# endif
           showString con . showSpace
         . showChar '{'
         . showString rec1 . showString " = " . sp1 0 a . showString ", "
         . showString rec2 . showString " = " . sp2 0 b
         . showChar '}'
+#endif
 
 -------------------------------------------------------------------------------
 

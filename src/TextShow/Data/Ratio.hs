@@ -60,9 +60,9 @@ instance
 
 #if MIN_VERSION_base(4,4,0)
 instance TextShow1 Ratio where
-    showbPrecWith sp p (numer :% denom) = showbParen (p > ratioPrec) $
+    liftShowbPrec sp _ p (numer :% denom) = showbParen (p > ratioPrec) $
            sp ratioPrec1 numer
         <> " % "
         <> sp ratioPrec1 denom
-    INLINE_INST_FUN(showbPrecWith)
+    INLINE_INST_FUN(liftShowbPrec)
 #endif

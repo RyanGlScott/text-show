@@ -19,14 +19,14 @@ Monomorphic 'Show' functions for 'Monoid'-related newtypes.
 module TextShow.Data.Monoid (
       showbAllPrec
     , showbAnyPrec
-    , showbDualPrecWith
-    , showbFirstPrecWith
-    , showbLastPrecWith
-    , showbProductPrecWith
-    , showbSumPrecWith
+    , liftShowbDualPrec
+    , liftShowbFirstPrec
+    , liftShowbLastPrec
+    , liftShowbProductPrec
+    , liftShowbSumPrec
 #if MIN_VERSION_base(4,8,0)
     , showbAltPrec
-    , showbAltPrecWith
+    , liftShowbAltPrec
 #endif
     ) where
 
@@ -61,39 +61,39 @@ showbAnyPrec = showbPrec
 
 -- | Convert a 'Dual' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbDualPrecWith :: (Int -> a -> Builder) -> Int -> Dual a -> Builder
-showbDualPrecWith = showbPrecWith
-{-# INLINE showbDualPrecWith #-}
+-- /Since: 3/
+liftShowbDualPrec :: (Int -> a -> Builder) -> Int -> Dual a -> Builder
+liftShowbDualPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbDualPrec #-}
 
 -- | Convert a 'First' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbFirstPrecWith :: (Int -> a -> Builder) -> Int -> First a -> Builder
-showbFirstPrecWith = showbPrecWith
-{-# INLINE showbFirstPrecWith #-}
+-- /Since: 3/
+liftShowbFirstPrec :: (Int -> a -> Builder) -> Int -> First a -> Builder
+liftShowbFirstPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbFirstPrec #-}
 
 -- | Convert a 'Last' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbLastPrecWith :: (Int -> a -> Builder) -> Int -> Last a -> Builder
-showbLastPrecWith = showbPrecWith
-{-# INLINE showbLastPrecWith #-}
+-- /Since: 3/
+liftShowbLastPrec :: (Int -> a -> Builder) -> Int -> Last a -> Builder
+liftShowbLastPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbLastPrec #-}
 
 -- | Convert a 'Product' value to a 'Builder' with the given show function
 -- and precedence.
 --
--- /Since: 2/
-showbProductPrecWith :: (Int -> a -> Builder) -> Int -> Product a -> Builder
-showbProductPrecWith = showbPrecWith
-{-# INLINE showbProductPrecWith #-}
+-- /Since: 3/
+liftShowbProductPrec :: (Int -> a -> Builder) -> Int -> Product a -> Builder
+liftShowbProductPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbProductPrec #-}
 
 -- | Convert a 'Sum' value to a 'Builder' with the given show function and precedence.
 --
--- /Since: 2/
-showbSumPrecWith :: (Int -> a -> Builder) -> Int -> Sum a -> Builder
-showbSumPrecWith = showbPrecWith
-{-# INLINE showbSumPrecWith #-}
+-- /Since: 3/
+liftShowbSumPrec :: (Int -> a -> Builder) -> Int -> Sum a -> Builder
+liftShowbSumPrec sp = liftShowbPrec sp undefined
+{-# INLINE liftShowbSumPrec #-}
 
 #if MIN_VERSION_base(4,8,0)
 -- | Convert an 'Alt' value to a 'Builder' with the given precedence.
@@ -107,9 +107,11 @@ showbAltPrec = showbPrec
 -- | Convert an 'Alt' value to a 'Builder' with the given show function and precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
 --
--- /Since: 2/
-showbAltPrecWith :: TextShow1 f => (Int -> a -> Builder) -> Int -> Alt f a -> Builder
-showbAltPrecWith = showbPrecWith
+-- /Since: 3/
+liftShowbAltPrec :: TextShow1 f => (Int -> a -> Builder) -> ([a] -> Builder)
+                 -> Int -> Alt f a -> Builder
+liftShowbAltPrec = liftShowbPrec
+{-# INLINE liftShowbAltPrec #-}
 #endif
 
 $(deriveTextShow  ''All)

@@ -11,6 +11,7 @@ Portability: GHC
 module Spec.Control.ApplicativeSpec (main, spec) where
 
 import Control.Applicative (Const, ZipList)
+import Control.Monad.Trans.Instances ()
 
 import Data.Orphans ()
 
@@ -18,7 +19,7 @@ import Generics.Deriving.Instances ()
 
 import Instances.Control.Applicative ()
 
-import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow2,
+import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow1,
                    prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
@@ -30,7 +31,7 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Const Int Int" $
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> Const Int Int -> Bool)
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Const Int Int -> Bool)
     describe "ZipList Int" $ do
         prop "TextShow instance"  (prop_matchesTextShow  :: Int -> ZipList Int -> Bool)
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> ZipList Int -> Bool)

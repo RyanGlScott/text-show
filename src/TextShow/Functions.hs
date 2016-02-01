@@ -28,13 +28,13 @@ showbFunction = showb
 {-# INLINE showbFunction #-}
 
 instance TextShow (a -> b) where
-    showbPrec = showbPrecWith undefined
+    showbPrec = liftShowbPrec undefined undefined
     INLINE_INST_FUN(showbPrec)
 
 instance TextShow1 ((->) a) where
-    showbPrecWith = showbPrecWith2 undefined
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec = liftShowbPrec2 undefined undefined
+    INLINE_INST_FUN(liftShowbPrec)
 
 instance TextShow2 (->) where
-    showbPrecWith2 _ _ _ _ = "<function>"
-    INLINE_INST_FUN(showbPrecWith2)
+    liftShowbPrec2 _ _ _ _ _ _ = "<function>"
+    INLINE_INST_FUN(liftShowbPrec2)

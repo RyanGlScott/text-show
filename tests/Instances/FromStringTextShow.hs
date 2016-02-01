@@ -16,9 +16,9 @@ Portability: GHC
 module Instances.FromStringTextShow () where
 
 import Test.QuickCheck (Arbitrary)
-import TextShow (FromStringShow(..), FromTextShow(..))
-import TransformersCompat (FromStringShow1(..), FromStringShow2(..),
-                           FromTextShow1(..), FromTextShow2(..))
+import TextShow (FromStringShow(..), FromTextShow(..),
+                 FromStringShow1(..), FromStringShow2(..),
+                 FromTextShow1(..), FromTextShow2(..))
 
 deriving instance Arbitrary a       => Arbitrary (FromStringShow a)
 deriving instance Arbitrary (f a)   => Arbitrary (FromStringShow1 f a)

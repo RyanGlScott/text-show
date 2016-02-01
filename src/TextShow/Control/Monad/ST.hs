@@ -29,13 +29,13 @@ showbST = showb
 {-# INLINE showbST #-}
 
 instance TextShow (ST s a) where
-    showb = showbPrecWith undefined 0
+    showb = liftShowbPrec undefined undefined 0
     INLINE_INST_FUN(showb)
 
 instance TextShow1 (ST s) where
-    showbPrecWith = showbPrecWith2 undefined
-    INLINE_INST_FUN(showbPrecWith)
+    liftShowbPrec = liftShowbPrec2 undefined undefined
+    INLINE_INST_FUN(liftShowbPrec)
 
 instance TextShow2 ST where
-    showbPrecWith2 _ _ _ _ = "<<ST action>>"
-    INLINE_INST_FUN(showbPrecWith2)
+    liftShowbPrec2 _ _ _ _ _ _ = "<<ST action>>"
+    INLINE_INST_FUN(liftShowbPrec2)
