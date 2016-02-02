@@ -19,6 +19,10 @@
 {-# LANGUAGE PolyKinds            #-}
 #endif
 
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE DeriveLift           #-}
+#endif
+
 {-|
 Module:      TextShow.Generic
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -82,6 +86,8 @@ import qualified Generics.Deriving.TH as Generics (deriveAll)
 
 import           GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import           GHC.Show (appPrec, appPrec1)
+
+import           Language.Haskell.TH.Lift
 
 import           Prelude ()
 import           Prelude.Compat
@@ -250,6 +256,9 @@ data ConType = Rec | Tup | Pref | Inf String
            , Typeable
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
 #endif
            )
 
@@ -557,4 +566,8 @@ hashPrec = id
 
 #if __GLASGOW_HASKELL__ < 702
 $(Generics.deriveAll ''ConType)
+#endif
+
+#if __GLASGOW_HASKELL__ < 800
+$(deriveLift ''ConType)
 #endif

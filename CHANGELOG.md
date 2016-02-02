@@ -4,6 +4,7 @@
 * Added the `TextShow.Data.Functor.Compose`, `TextShow.Data.Functor.Product`, `TextShow.Data.Functor.Sum`, and `TextShow.Data.Semigroup` modules
 * Added `TextShow` instance for `TypeError` in `TextShow.Control.Exception` (GHC 8.0+)
 * Added `TextShow` instances for `TrName` and `Module` in `TextShow.Data.Typeable` (GHC 8.0+)
+* Added `Lift` instances for the datatypes in `TextShow` and `TextShow.Generic`
 * Renamed the class methods of `TextShow1` and `TextShow2` to be consistent with the naming conventions of `transformers-0.5`. They following were renamed:
   * `showbPrecWith` → `liftShowbPrec`
   * `showbPrecWith2` → `liftShowbPrec2`

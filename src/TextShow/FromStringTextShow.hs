@@ -24,6 +24,10 @@
 {-# LANGUAGE PolyKinds                  #-}
 #endif
 
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE DeriveLift                 #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 
 {-|
@@ -63,6 +67,8 @@ import           GHC.Generics (Generic1)
 # endif
 #endif
 
+import           Language.Haskell.TH.Lift
+
 import           Prelude ()
 import           Prelude.Compat
 
@@ -101,6 +107,9 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
 # if __GLASGOW_HASKELL__ >= 706
            , Generic1
 # endif
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
 #endif
            , Ord
            , Traversable
@@ -164,6 +173,9 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , Generic1
 # endif
 #endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
+#endif
            , Ord
            , TextShow
            , Traversable
@@ -222,6 +234,9 @@ newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
 #endif
            , Ord
            )
@@ -290,6 +305,9 @@ newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
 #endif
            , Ord
            )
@@ -363,6 +381,9 @@ newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
 #endif
            , Ord
            )
@@ -454,6 +475,9 @@ newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
            , Generic1
 # endif
 #endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
+#endif
            , Ord
            )
 
@@ -542,6 +566,21 @@ $(deriveBifoldable    ''FromStringShow2)
 $(deriveBifoldable    ''FromTextShow2)
 $(deriveBitraversable ''FromStringShow2)
 $(deriveBitraversable ''FromTextShow2)
+
+#if __GLASGOW_HASKELL__ < 800
+$(deriveLift ''FromStringShow)
+$(deriveLift ''FromTextShow)
+
+instance Lift (f a) => Lift (FromStringShow1 f a) where
+    lift = $(makeLift ''FromStringShow1)
+instance Lift (f a) => Lift (FromTextShow1 f a) where
+    lift = $(makeLift ''FromTextShow1)
+
+instance Lift (f a b) => Lift (FromStringShow2 f a b) where
+    lift = $(makeLift ''FromStringShow2)
+instance Lift (f a b) => Lift (FromTextShow2 f a b) where
+    lift = $(makeLift ''FromTextShow2)
+#endif
 
 #if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveMeta           ''FromStringShow)
