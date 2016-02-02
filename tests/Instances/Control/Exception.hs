@@ -79,6 +79,11 @@ instance Arbitrary AllocationLimitExceeded where
     arbitrary = pure AllocationLimitExceeded
 #endif
 
+#if MIN_VERSION_base(4,9,0)
+instance Arbitrary TypeError where
+    arbitrary = TypeError <$> arbitrary
+#endif
+
 instance Arbitrary Deadlock where
     arbitrary = pure Deadlock
 

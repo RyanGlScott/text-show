@@ -31,6 +31,9 @@ module TextShow.Control.Exception (
 #if MIN_VERSION_base(4,8,0)
   , showbAllocationLimitExceeded
 #endif
+#if MIN_VERSION_base(4,9,0)
+  , showbTypeError
+#endif
   , showbDeadlock
   , showbNoMethodError
   , showbPatternMatchFail
@@ -164,6 +167,16 @@ showbAllocationLimitExceeded AllocationLimitExceeded = "allocation limit exceede
 {-# INLINE showbAllocationLimitExceeded #-}
 #endif
 
+#if MIN_VERSION_base(4,9,0)
+-- | Convert a 'TypeError' to a 'Builder'.
+-- This function is only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
+showbTypeError :: TypeError -> Builder
+showbTypeError (TypeError err) = fromString err
+{-# INLINE showbTypeError #-}
+#endif
+
 -- | Convert a 'Deadlock' exception to a 'Builder'.
 --
 -- /Since: 2/
@@ -274,6 +287,12 @@ instance TextShow BlockedIndefinitelyOnSTM where
 #if MIN_VERSION_base(4,8,0)
 instance TextShow AllocationLimitExceeded where
     showb = showbAllocationLimitExceeded
+    {-# INLINE showb #-}
+#endif
+
+#if MIN_VERSION_base(4,9,0)
+instance TextShow TypeError where
+    showb = showbTypeError
     {-# INLINE showb #-}
 #endif
 

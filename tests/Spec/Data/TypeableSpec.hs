@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module:      Spec.Data.TypeableSpec
 Copyright:   (C) 2014-2015 Ryan Scott
@@ -11,6 +13,10 @@ Portability: GHC
 module Spec.Data.TypeableSpec (main, spec) where
 
 import Data.Typeable (TyCon, TypeRep)
+
+#if MIN_VERSION_base(4,9,0)
+import GHC.Types (TrName, Module)
+#endif
 
 import Instances.Data.Typeable ()
 
@@ -28,3 +34,9 @@ spec = parallel $ do
         prop "TextShow instance" (prop_matchesTextShow :: Int -> TypeRep -> Bool)
     describe "TyCon" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> TyCon -> Bool)
+#if MIN_VERSION_base(4,9,0)
+    describe "TrName" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TrName -> Bool)
+    describe "Module" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Module -> Bool)
+#endif

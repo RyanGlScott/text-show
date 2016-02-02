@@ -1,20 +1,20 @@
 {-|
-Module:      Spec.Data.Functor.IdentitySpec
+Module:      Spec.Data.Functor.ProductSpec
 Copyright:   (C) 2014-2015 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-@hspec@ test for 'Identity'.
+@hspec@ test for 'Product'.
 -}
-module Spec.Data.Functor.IdentitySpec (main, spec) where
+module Spec.Data.Functor.ProductSpec (main, spec) where
 
 import Control.Monad.Trans.Instances ()
 
-import Data.Functor.Identity (Identity)
+import Data.Functor.Product (Product)
 
-import Instances.Data.Functor.Identity ()
+import Instances.Data.Functor.Product ()
 
 import Spec.Utils (prop_matchesTextShow1)
 
@@ -25,5 +25,5 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel . describe "Identity Int" $
-    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Identity Int -> Bool)
+spec = parallel . describe "Product Maybe Maybe Int" $
+    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Product Maybe Maybe Int -> Bool)

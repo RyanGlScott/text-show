@@ -36,7 +36,11 @@ module TextShow.GHC.Generics (
     , liftShowbCompFunctorsPrec
     , showbFixityPrec
     , showbAssociativity
-#if !(MIN_VERSION_base(4,9,0))
+#if MIN_VERSION_base(4,9,0)
+    , showbSourceUnpackedness
+    , showbSourceStrictness
+    , showbDecidedStrictness
+#else
     , showbArityPrec
 #endif
     , showbUCharPrec
@@ -180,7 +184,31 @@ showbAssociativity :: Associativity -> Builder
 showbAssociativity = showb
 {-# INLINE showbAssociativity #-}
 
-#if !(MIN_VERSION_base(4,9,0))
+#if MIN_VERSION_base(4,9,0)
+-- | Convert a 'SourceUnpackedness' value to a 'Builder'.
+-- This function is only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
+showbSourceUnpackedness :: SourceUnpackedness -> Builder
+showbSourceUnpackedness = showb
+{-# INLINE showbSourceUnpackedness #-}
+
+-- | Convert a 'SourceStrictness' value to a 'Builder'.
+-- This function is only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
+showbSourceStrictness :: SourceStrictness -> Builder
+showbSourceStrictness = showb
+{-# INLINE showbSourceStrictness #-}
+
+-- | Convert a 'DecidedStrictness' value to a 'Builder'.
+-- This function is only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
+showbDecidedStrictness :: DecidedStrictness -> Builder
+showbDecidedStrictness = showb
+{-# INLINE showbDecidedStrictness #-}
+#else
 -- | Convert an 'Arity' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8@ or earlier.
 --
@@ -324,6 +352,10 @@ instance TextShow1 UWord where
 
 $(deriveTextShow ''Fixity)
 $(deriveTextShow ''Associativity)
-#if !(MIN_VERSION_base(4,9,0))
+#if MIN_VERSION_base(4,9,0)
+$(deriveTextShow ''SourceUnpackedness)
+$(deriveTextShow ''SourceStrictness)
+$(deriveTextShow ''DecidedStrictness)
+#else
 $(deriveTextShow ''Arity)
 #endif

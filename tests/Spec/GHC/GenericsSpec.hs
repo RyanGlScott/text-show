@@ -23,7 +23,8 @@ import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
                               , UChar, UDouble, UFloat, UInt, UWord
                               , Fixity, Associativity
 #if MIN_VERSION_base(4,9,0)
-                              , Meta(MetaData)
+                              , Meta(MetaData), SourceUnpackedness
+                              , SourceStrictness, DecidedStrictness
 #else
                               , Arity
 #endif
@@ -60,7 +61,17 @@ spec = parallel $ do
     describe "Associativity" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> Associativity -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> Associativity -> Bool)
-#if !(MIN_VERSION_base(4,9,0))
+#if MIN_VERSION_base(4,9,0)
+    describe "SourceUnpackedness" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> SourceUnpackedness -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> SourceUnpackedness -> Bool)
+    describe "SourceStrictness" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> SourceStrictness -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> SourceStrictness -> Bool)
+    describe "DecidedStrictness" $ do
+        prop "TextShow instance" (prop_matchesTextShow  :: Int -> DecidedStrictness -> Bool)
+        prop "generic TextShow"  (prop_genericTextShow  :: Int -> DecidedStrictness -> Bool)
+#else
     describe "Arity" $ do
         prop "TextShow instance" (prop_matchesTextShow  :: Int -> Arity -> Bool)
         prop "generic TextShow"  (prop_genericTextShow  :: Int -> Arity -> Bool)

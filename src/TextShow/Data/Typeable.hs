@@ -7,6 +7,7 @@
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds         #-}
 #endif
+
 {-|
 Module:      TextShow.Data.Typeable
 Copyright:   (C) 2014-2015 Ryan Scott

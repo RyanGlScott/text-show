@@ -54,6 +54,10 @@ spec = parallel . describe "TextShow.Control.Exception" $ do
     describe "AllocationLimitExceeded" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> AllocationLimitExceeded -> Bool)
 #endif
+#if MIN_VERSION_base(4,9,0)
+    describe "TypeError" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TypeError -> Bool)
+#endif
     describe "Deadlock" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Deadlock -> Bool)
     describe "NoMethodError" $

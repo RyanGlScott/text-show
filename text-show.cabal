@@ -79,18 +79,23 @@ library
                        TextShow.Data.Either
                        TextShow.Data.Fixed
                        TextShow.Data.Floating
+                       TextShow.Data.Functor.Compose
                        TextShow.Data.Functor.Identity
+                       TextShow.Data.Functor.Product
+                       TextShow.Data.Functor.Sum
                        TextShow.Debug.Trace
                        TextShow.Debug.Trace.Generic
                        TextShow.Debug.Trace.TH
                        TextShow.Generic
                        TextShow.Data.Integral
                        TextShow.Data.List
+                       TextShow.Data.List.NonEmpty
                        TextShow.Data.Maybe
                        TextShow.Data.Monoid
                        TextShow.Data.Ord
                        TextShow.Data.Proxy
                        TextShow.Data.Ratio
+                       TextShow.Data.Semigroup
                        TextShow.Data.Text
                        TextShow.Data.Tuple
                        TextShow.Data.Typeable
@@ -186,10 +191,15 @@ test-suite spec
                        Instances.Data.Data
                        Instances.Data.Dynamic
                        Instances.Data.Floating
+                       Instances.Data.Functor.Compose
                        Instances.Data.Functor.Identity
+                       Instances.Data.Functor.Product
+                       Instances.Data.Functor.Sum
+                       Instances.Data.List.NonEmpty
                        Instances.Data.Monoid
                        Instances.Data.Ord
                        Instances.Data.Proxy
+                       Instances.Data.Semigroup
                        Instances.Data.Text
                        Instances.Data.Tuple
                        Instances.Data.Typeable
@@ -245,14 +255,19 @@ test-suite spec
                        Spec.Data.EitherSpec
                        Spec.Data.FixedSpec
                        Spec.Data.FloatingSpec
+                       Spec.Data.Functor.ComposeSpec
                        Spec.Data.Functor.IdentitySpec
+                       Spec.Data.Functor.ProductSpec
+                       Spec.Data.Functor.SumSpec
                        Spec.Data.IntegralSpec
                        Spec.Data.ListSpec
+                       Spec.Data.List.NonEmptySpec
                        Spec.Data.MaybeSpec
                        Spec.Data.MonoidSpec
                        Spec.Data.OrdSpec
                        Spec.Data.ProxySpec
                        Spec.Data.RatioSpec
+                       Spec.Data.SemigroupSpec
                        Spec.Data.TextSpec
                        Spec.Data.TupleSpec
                        Spec.Data.TypeableSpec
@@ -320,7 +335,7 @@ test-suite spec
                      , QuickCheck           >= 2.5    && < 3
                      , quickcheck-instances >= 0.1    && < 0.4
                      , semigroups           >= 0.17   && < 1
-                     , tagged               >= 0.8.1  && < 1
+                     , tagged               >= 0.8.3  && < 1
                      , template-haskell     >= 2.5    && < 2.12
                      , text                 >= 0.11.1 && < 1.3
                      , transformers         >= 0.2.1  && < 0.6

@@ -24,6 +24,8 @@
 {-# LANGUAGE PolyKinds                  #-}
 #endif
 
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+
 {-|
 Module:      TextShow.FromStringTextShow
 Copyright:   (C) 2014-2015 Ryan Scott

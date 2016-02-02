@@ -52,7 +52,22 @@ deriving instance Enum Associativity
 instance Arbitrary Associativity where
     arbitrary = arbitraryBoundedEnum
 
-#if !(MIN_VERSION_base(4,9,0))
+#if MIN_VERSION_base(4,9,0)
+deriving instance Bounded SourceUnpackedness
+deriving instance Enum SourceUnpackedness
+instance Arbitrary SourceUnpackedness where
+    arbitrary = arbitraryBoundedEnum
+
+deriving instance Bounded SourceStrictness
+deriving instance Enum SourceStrictness
+instance Arbitrary SourceStrictness where
+    arbitrary = arbitraryBoundedEnum
+
+deriving instance Bounded DecidedStrictness
+deriving instance Enum DecidedStrictness
+instance Arbitrary DecidedStrictness where
+    arbitrary = arbitraryBoundedEnum
+#else
 instance Arbitrary Arity where
     arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
 #endif
