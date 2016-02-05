@@ -26,10 +26,11 @@ import TextShow.Classes (TextShow(..))
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
 import Data.Monoid.Compat ((<>))
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (singleton)
 
 import TextShow.Data.Integral ()
-import TextShow.Utils (lengthB, mtimesDefault)
+import TextShow.Utils (lengthB)
 #else
 import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)

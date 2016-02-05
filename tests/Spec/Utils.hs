@@ -22,8 +22,6 @@ module Spec.Utils (
     , prop_genericTextShow1
     ) where
 
-#include "generic.h"
-
 import           Data.Functor.Classes (Show1, showsPrec1)
 
 import           Generics.Deriving.Base

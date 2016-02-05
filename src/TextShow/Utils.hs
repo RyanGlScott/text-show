@@ -17,7 +17,6 @@ module TextShow.Utils (
     , isInfixTypeCon
     , isTupleString
     , lengthB
-    , mtimesDefault
     , toString
     , toText
     , unlinesB
@@ -27,7 +26,6 @@ module TextShow.Utils (
 import           Data.Int (Int64)
 import           Data.Text (Text)
 import           Data.Monoid.Compat ((<>))
-import           Data.Semigroup (mtimesDefault)
 import           Data.Text.Lazy (length, toStrict, unpack)
 import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 

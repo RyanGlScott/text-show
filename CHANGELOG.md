@@ -1,6 +1,6 @@
 # 3
 * GHC 8.0 support
-* TODO: Mention that `showt`/`showtl`/etc. are now part of `TextShow`
+* The functions `showt`, `showtl`, `showtPrec`, `showtlPrec`, `showtList`, and `showtlList` are now part of the `TextShow` class. This was done to allow overriding their definitions with more efficient versions specifically for strict or lazy `Text`. (Currently, no `TextShow` instance in the `text-show` package does this, but this may change in the future.)
 * Added the `TextShow.Data.Functor.Compose`, `TextShow.Data.Functor.Product`, `TextShow.Data.Functor.Sum`, and `TextShow.Data.Semigroup` modules
 * Added `TextShow` instance for `TypeError` in `TextShow.Control.Exception` (GHC 8.0+)
 * Added `TextShow` instances for `TrName` and `Module` in `TextShow.Data.Typeable` (GHC 8.0+)

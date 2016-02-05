@@ -30,12 +30,11 @@ import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 liftShowbConstPrec :: (Int -> a -> Builder) -> Int -> Const a b -> Builder
 liftShowbConstPrec sp = liftShowbPrec2 sp undefined undefined undefined
 
--- | Convert a 'ZipList' to a 'Builder' with the given show functions and precedence.
+-- | Convert a 'ZipList' to a 'Builder' with the given show function and precedence.
 --
 -- /Since: 3/
-liftShowbZipListPrec :: (Int -> a -> Builder) -> ([a] -> Builder)
-                     -> Int -> ZipList a -> Builder
-liftShowbZipListPrec = liftShowbPrec
+liftShowbZipListPrec :: ([a] -> Builder) -> Int -> ZipList a -> Builder
+liftShowbZipListPrec sl = liftShowbPrec undefined sl
 
 instance TextShow a => TextShow (Const a b) where
     showbPrec = liftShowbPrec undefined undefined

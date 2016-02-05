@@ -24,6 +24,7 @@ module TextShow.GHC.Fingerprint (
     ) where
 
 import Data.Monoid.Compat ((<>))
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 import Data.Word (Word64)
 
@@ -31,7 +32,7 @@ import GHC.Fingerprint.Type (Fingerprint(..))
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral (showbHex)
-import TextShow.Utils (lengthB, mtimesDefault)
+import TextShow.Utils (lengthB)
 
 -- | Convert a 'Fingerprint' to a 'Builder'.
 -- This function is only available with @base-4.4.0.0@ or later.

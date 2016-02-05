@@ -60,11 +60,8 @@ import           Data.Functor.Classes (Show1(..))
 import qualified Generics.Deriving.TH as Generics
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
-import           GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics (Generic1)
-# endif
+#if __GLASGOW_HASKELL__ >= 706
+import           GHC.Generics (Generic, Generic1)
 #endif
 
 import           Language.Haskell.TH.Lift
@@ -102,11 +99,9 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Eq
            , Foldable
            , Functor
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if __GLASGOW_HASKELL__ >= 706
            , Generic1
-# endif
 #endif
 #if __GLASGOW_HASKELL__ >= 800
            , Lift
@@ -167,11 +162,9 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , Eq
            , Foldable
            , Functor
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if __GLASGOW_HASKELL__ >= 706
            , Generic1
-# endif
 #endif
 #if __GLASGOW_HASKELL__ >= 800
            , Lift
@@ -229,7 +222,7 @@ instance TextShow1 FromTextShow where
 -- /Since: 3/
 newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
   deriving ( Eq
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
@@ -300,7 +293,7 @@ instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
 -- /Since: 3/
 newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
   deriving ( Eq
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
@@ -376,7 +369,7 @@ instance (TextShow1 f, TextShow a) => TextShow (FromTextShow1 f a) where
 -- /Since: 3/
 newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
   deriving ( Eq
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
@@ -469,7 +462,7 @@ instance (Show2 f, Show a) => Show1 (FromStringShow2 f a) where
 -- /Since: 3/
 newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
   deriving ( Eq
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 706
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
@@ -582,13 +575,6 @@ instance Lift (f a b) => Lift (FromTextShow2 f a b) where
     lift = $(makeLift ''FromTextShow2)
 #endif
 
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveMeta           ''FromStringShow)
-$(Generics.deriveRepresentable1 ''FromStringShow)
-$(Generics.deriveMeta           ''FromTextShow)
-$(Generics.deriveRepresentable1 ''FromTextShow)
-#endif
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           ''FromStringShow1)
 $(Generics.deriveRepresentable1 ''FromStringShow1)
@@ -600,9 +586,9 @@ $(Generics.deriveMeta           ''FromTextShow2)
 $(Generics.deriveRepresentable1 ''FromTextShow2)
 #endif
 
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveRepresentable0 ''FromStringShow)
-$(Generics.deriveRepresentable0 ''FromTextShow)
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveAll0And1       ''FromStringShow)
+$(Generics.deriveAll0And1       ''FromTextShow)
 $(Generics.deriveRepresentable0 ''FromStringShow1)
 $(Generics.deriveRepresentable0 ''FromStringShow2)
 $(Generics.deriveRepresentable0 ''FromTextShow1)
