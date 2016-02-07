@@ -10,7 +10,7 @@
 
 {-|
 Module:      Instances.GHC.Generics
-Copyright:   (C) 2014-2015 Ryan Scott
+Copyright:   (C) 2014-2016 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
 Stability:   Provisional
