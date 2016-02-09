@@ -1,5 +1,6 @@
 ### 3.0.1
 * Added the `TextShow.GHC.Stack` module, which provides `TextShow` instances for `CallStack` and `SrcLoc` on `base-4.8.1` and up.
+* Fix Haddock rendering error
 
 # 3
 * GHC 8.0 support

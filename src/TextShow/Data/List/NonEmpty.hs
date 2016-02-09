@@ -22,6 +22,10 @@ import TextShow.Classes (TextShow1(..))
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
+-- | Convert a 'NonEmpty' value to a 'Builder' with the given show functions
+-- and precedence.
+--
+-- /Since: 3/
 liftShowbNonEmptyPrec :: (Int -> a -> Builder) -> ([a] -> Builder)
                       -> Int -> NonEmpty a -> Builder
 liftShowbNonEmptyPrec = liftShowbPrec
