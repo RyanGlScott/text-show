@@ -35,7 +35,7 @@ import TextShow.Data.List     ()
 import TextShow.Data.Tuple    ()
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Conver a 'StaticPtrInfo' value to a 'Builder' with the given precedence.
+-- | Convert a 'StaticPtrInfo' value to a 'Builder' with the given precedence.
 -- This function is only available with @base-4.8.0.0@ or later.
 --
 -- /Since: 2/

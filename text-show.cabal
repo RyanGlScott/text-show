@@ -135,6 +135,9 @@ library
                        -- Only exports functions if base >= 4.8
                        TextShow.GHC.RTS.Flags
                        TextShow.GHC.StaticPtr
+
+                       -- Only exports functions if base >= 4.8.1
+                       TextShow.GHC.Stack
   other-modules:       TextShow.Classes
                        TextShow.Data.Typeable.Utils
                        TextShow.FromStringTextShow
@@ -241,6 +244,9 @@ test-suite spec
                        Instances.GHC.RTS.Flags
                        Instances.GHC.StaticPtr
 
+                       -- Only exports instances if base >= 4.9
+                       Instances.GHC.Stack
+
                        Spec.BuilderSpec
                        Spec.Control.ApplicativeSpec
                        Spec.Control.ConcurrentSpec
@@ -320,6 +326,9 @@ test-suite spec
                        -- Only exports tests if base >= 4.8
                        Spec.GHC.RTS.FlagsSpec
                        Spec.GHC.StaticPtrSpec
+
+                       -- Only exports tests if base >= 4.9
+                       Spec.GHC.StackSpec
   build-depends:       array                >= 0.3    && < 0.6
                      , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.2  && < 1
@@ -339,6 +348,7 @@ test-suite spec
                      , tagged               >= 0.8.3  && < 1
                      , template-haskell     >= 2.5    && < 2.12
                      , text                 >= 0.11.1 && < 1.3
+                     , th-lift              >= 0.7.6  && < 1
                      , transformers         >= 0.2.1  && < 0.6
                      , transformers-compat  >= 0.5    && < 1
                      , void                 >= 0.5    && < 1
