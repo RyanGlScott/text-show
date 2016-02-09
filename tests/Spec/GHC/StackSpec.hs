@@ -32,7 +32,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if MIN_VERSION_base(4,9,0)
     describe "CallStack" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> CallStack -> Bool)

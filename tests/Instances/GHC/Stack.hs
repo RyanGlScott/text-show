@@ -18,11 +18,11 @@ module Instances.GHC.Stack () where
 -- the API doesn't provide any way to construct values of those types, so we're
 -- pretty much out of luck.
 #if MIN_VERSION_base(4,9,0)
-import GHC.Stack (CallStack(..), SrcLoc(..))
+import GHC.Stack.Types (CallStack(..), SrcLoc(..))
 
 import Instances.Utils ((<@>))
 
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), oneof)
 
 instance Arbitrary CallStack where
     arbitrary = oneof [ pure EmptyCallStack
