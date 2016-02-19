@@ -41,7 +41,8 @@ import qualified Data.Coerce as C (Coercible, coerce)
 import           Unsafe.Coerce (unsafeCoerce)
 #endif
 
--- On GHC 7.8+, this is 'Data.Coerce.coerce'. Otherwise, it's 'unsafeCoerce'.
+-- | On GHC 7.8 and later, this is 'C.coerce' from "Data.Coerce". Otherwise, it's
+-- 'unsafeCoerce'.
 #if __GLASGOW_HASKELL__ >= 708
 coerce :: C.Coercible a b => a -> b
 coerce = C.coerce

@@ -29,7 +29,6 @@ import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
                               , Arity
 #endif
                               )
-import Generics.Deriving.Instances ()
 
 import Instances.GHC.Generics ()
 
