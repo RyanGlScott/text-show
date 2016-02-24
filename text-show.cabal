@@ -99,6 +99,7 @@ library
                        TextShow.Data.Text
                        TextShow.Data.Tuple
                        TextShow.Data.Typeable
+                       TextShow.Data.Vector
                        TextShow.Data.Version
                        TextShow.Data.Void
                        TextShow.Foreign.C.Types
@@ -163,6 +164,7 @@ library
                      , th-lift             >= 0.7.6  && < 1
                      , transformers        >= 0.2.1  && < 0.6
                      , transformers-compat >= 0.5    && < 1
+                     , vector
                      , void                >= 0.5    && < 1
   if impl(ghc >= 8.0)
     build-depends:     ghc-boot
@@ -278,6 +280,7 @@ test-suite spec
                        Spec.Data.TextSpec
                        Spec.Data.TupleSpec
                        Spec.Data.TypeableSpec
+                       Spec.Data.VectorSpec
                        Spec.Data.VersionSpec
                        Spec.Derived.DatatypeContextsSpec
                        Spec.Derived.ExistentialQuantificationSpec
@@ -351,6 +354,7 @@ test-suite spec
                      , th-lift              >= 0.7.6  && < 1
                      , transformers         >= 0.2.1  && < 0.6
                      , transformers-compat  >= 0.5    && < 1
+                     , vector
                      , void                 >= 0.5    && < 1
   if impl(ghc >= 8.0)
     build-depends:     ghc-boot

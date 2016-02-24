@@ -46,6 +46,7 @@ import TextShow.Data.Tuple            ()
 import TextShow.Data.Type.Coercion    ()
 import TextShow.Data.Type.Equality    ()
 import TextShow.Data.Typeable         ()
+import TextShow.Data.Vector           ()
 import TextShow.Data.Version          ()
 import TextShow.Data.Void             ()
 
