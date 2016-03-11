@@ -20,6 +20,8 @@ Portability: GHC
 -}
 module Instances.GHC.Generics () where
 
+import Data.Orphans ()
+
 import Generics.Deriving.Base
 
 import GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
@@ -47,24 +49,16 @@ instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :*: g) p) where
 instance Arbitrary Fixity where
     arbitrary = oneof [pure Prefix, Infix <$> arbitrary <*> arbitrary]
 
-deriving instance Bounded Associativity
-deriving instance Enum Associativity
 instance Arbitrary Associativity where
     arbitrary = arbitraryBoundedEnum
 
 #if MIN_VERSION_base(4,9,0)
-deriving instance Bounded SourceUnpackedness
-deriving instance Enum SourceUnpackedness
 instance Arbitrary SourceUnpackedness where
     arbitrary = arbitraryBoundedEnum
 
-deriving instance Bounded SourceStrictness
-deriving instance Enum SourceStrictness
 instance Arbitrary SourceStrictness where
     arbitrary = arbitraryBoundedEnum
 
-deriving instance Bounded DecidedStrictness
-deriving instance Enum DecidedStrictness
 instance Arbitrary DecidedStrictness where
     arbitrary = arbitraryBoundedEnum
 #else

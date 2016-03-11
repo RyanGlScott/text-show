@@ -1,3 +1,6 @@
+## 3.1
+* Made the derived `TextShow` output of record datatypes match that of `Show` in GHC 8.0 (now that Trac #2530 has been reverted)
+
 ### 3.0.1
 * Added the `TextShow.GHC.Stack` module, which provides `TextShow` instances for `CallStack` and `SrcLoc` on `base-4.8.1` and up.
 * Fix Haddock rendering error
