@@ -120,18 +120,26 @@ instance Show a => Show1 (TyFamily a) where
 
 instance Show2 TyCon where
     liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyCon x) =
-        showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
-                                       (liftShowList2  showsPrec showList sp1 sl1)
-                                       (liftShowsPrec2 sp1       sl1      sp2 sl2)
-                                       (liftShowList2  sp1       sl1      sp2 sl2)
-                       ) "TyCon" p x
+        showsTypeSynonym sp1 sl1 sp2 sl2 "TyCon"    p x
 instance Show2 TyFamily where
     liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily x) =
-        showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
-                                       (liftShowList2  showsPrec showList sp1 sl1)
-                                       (liftShowsPrec2 sp1       sl1      sp2 sl2)
-                                       (liftShowList2  sp1       sl1      sp2 sl2)
-                       ) "TyFamily" p x
+        showsTypeSynonym sp1 sl1 sp2 sl2 "TyFamily" p x
+
+showsTypeSynonym :: (Int -> a -> ShowS) -> ([a] -> ShowS)
+                 -> (Int -> b -> ShowS) -> ([b] -> ShowS)
+                 -> String -> Int
+                 -> ( Id (FakeOut (Id a))
+                    , Id (FakeOut (Id b))
+                    , Id (Flip Either (Id a) (Id Int))
+                    , Id (Flip Either (Id b) (Id a))
+                    )
+                -> ShowS
+showsTypeSynonym sp1 sl1 sp2 sl2 name p x =
+    showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
+                                   (liftShowList2  showsPrec showList sp1 sl1)
+                                   (liftShowsPrec2 sp1       sl1      sp2 sl2)
+                                   (liftShowList2  sp1       sl1      sp2 sl2)
+                   ) name p x
 #endif
 
 -------------------------------------------------------------------------------

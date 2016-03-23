@@ -11,6 +11,7 @@
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE PolyKinds                  #-}
 #endif
 
@@ -66,8 +67,7 @@ import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #endif
 
 #if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import           Data.Functor.Classes (Show2(..))
-import           GHC.Show (appPrec, appPrec1, showSpace)
+import           Data.Functor.Classes (Show2(..), showsUnaryWith, showsBinaryWith)
 #endif
 
 -------------------------------------------------------------------------------
@@ -98,13 +98,10 @@ instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
 instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show b => Show2 (NotAllShow Int b) where
-    liftShowsPrec2 sp1 _ _ _ p (NASShow1 c b) = showParen (p > appPrec) $
-          showString "NASShow1 "
-        . sp1 appPrec1 c . showSpace
-        . showsPrec appPrec1 b
-    liftShowsPrec2 _ _ sp2 _ p (NASShow2 d) = showParen (p > appPrec) $
-          showString "NASShow2 "
-        . sp2 appPrec1 d
+    liftShowsPrec2 sp1 _ _ _ p (NASShow1 c b) =
+        showsBinaryWith sp1 showsPrec "NASShow1" p c b
+    liftShowsPrec2 _ _ sp2 _ p (NASShow2 d) =
+        showsUnaryWith sp2 "NASShow2" p d
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
@@ -127,78 +124,60 @@ $(Generics.deriveRepresentable0 'NASShow1)
 #if __GLASGOW_HASKELL__ >= 706
 data family KindDistinguished (x :: k) (y :: *) (z :: *) :: *
 
-newtype instance KindDistinguished (a :: *) b c = KindDistinguished1 b
-  deriving ( Arbitrary
-           , Show
+data instance KindDistinguished (a :: ()) b c = KindDistinguishedUnit b c
+  deriving ( Show
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
            )
 
-newtype instance KindDistinguished (a :: * -> *) b c = KindDistinguished2 b
-  deriving ( Arbitrary
-           , Show
+data instance KindDistinguished (a :: Bool) b c = KindDistinguishedBool b c
+  deriving ( Show
            , Generic
 # if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 # endif
            )
 
-newtype instance KindDistinguished Either b c = KindDistinguished3 b
-  deriving ( Arbitrary
-           , Show
-           , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-# endif
-           )
+instance (Arbitrary b, Arbitrary c)
+      => Arbitrary (KindDistinguished (a :: ()) b c) where
+    arbitrary = KindDistinguishedUnit <$> arbitrary <*> arbitrary
+
+instance (Arbitrary b, Arbitrary c)
+      => Arbitrary (KindDistinguished (a :: Bool) b c) where
+    arbitrary = KindDistinguishedBool <$> arbitrary <*> arbitrary
 
 #if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show b => Show1 (KindDistinguished (a :: *) b) where
+instance Show b => Show1 (KindDistinguished (a :: ())   b) where
     showsPrec1 = showsPrec
-instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
-    showsPrec1 = showsPrec
-instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
+instance Show b => Show1 (KindDistinguished (a :: Bool) b) where
     showsPrec1 = showsPrec
 #else
-instance Show b => Show1 (KindDistinguished (a :: *) b) where
+instance Show b => Show1 (KindDistinguished (a :: ())   b) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show b => Show1 (KindDistinguished (a :: * -> *) b) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show b => Show1 (KindDistinguished (Either :: * -> * -> *) b) where
+instance Show b => Show1 (KindDistinguished (a :: Bool) b) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 (KindDistinguished (a :: *)) where
-    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished1 b) = showParen (p > appPrec) $
-          showString "KindDistinguished1 "
-        . sp1 appPrec1 b
-instance Show2 (KindDistinguished (a :: * -> *)) where
-    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished2 b) = showParen (p > appPrec) $
-          showString "KindDistinguished2 "
-        . sp1 appPrec1 b
-instance Show2 (KindDistinguished (Either :: * -> * -> *)) where
-    liftShowsPrec2 sp1 _ _ _ p (KindDistinguished3 b) = showParen (p > appPrec) $
-          showString "KindDistinguished3 "
-        . sp1 appPrec1 b
+instance Show2 (KindDistinguished (a :: ())) where
+    liftShowsPrec2 sp1 _ sp2 _ p (KindDistinguishedUnit b c) =
+        showsBinaryWith sp1 sp2 "KindDistinguishedUnit" p b c
+instance Show2 (KindDistinguished (a :: Bool)) where
+    liftShowsPrec2 sp1 _ sp2 _ p (KindDistinguishedBool b c) =
+        showsBinaryWith sp1 sp2 "KindDistinguishedBool" p b c
 #endif
 
-$(deriveTextShow  'KindDistinguished1)
-$(deriveTextShow1 'KindDistinguished1)
-$(deriveTextShow2 'KindDistinguished1)
+$(deriveTextShow  'KindDistinguishedUnit)
+$(deriveTextShow1 'KindDistinguishedUnit)
+$(deriveTextShow2 'KindDistinguishedUnit)
 
-$(deriveTextShow  'KindDistinguished2)
-$(deriveTextShow1 'KindDistinguished2)
-$(deriveTextShow2 'KindDistinguished2)
-
-$(deriveTextShow  'KindDistinguished3)
-$(deriveTextShow1 'KindDistinguished3)
-$(deriveTextShow2 'KindDistinguished3)
+$(deriveTextShow  'KindDistinguishedBool)
+$(deriveTextShow1 'KindDistinguishedBool)
+$(deriveTextShow2 'KindDistinguishedBool)
 
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveAll1 'KindDistinguished1)
-$(Generics.deriveAll1 'KindDistinguished2)
-$(Generics.deriveAll1 'KindDistinguished3)
+$(Generics.deriveAll1 'KindDistinguishedUnit)
+$(Generics.deriveAll1 'KindDistinguishedBool)
 # endif
 #endif
 

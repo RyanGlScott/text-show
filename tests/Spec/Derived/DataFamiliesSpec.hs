@@ -1,5 +1,9 @@
 {-# LANGUAGE CPP #-}
 
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds #-}
+#endif
+
 {-|
 Module:      Spec.Derived.DataFamiliesSpec
 Copyright:   (C) 2014-2016 Ryan Scott
@@ -46,18 +50,14 @@ spec = parallel $ do
         prop "generic TextShow"   (prop_genericTextShow  :: Int -> NotAllShow Int Int Int Int -> Bool)
         prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
 # if __GLASGOW_HASKELL__ >= 706
-    describe "KindDistinguished Int Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Int Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Int Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Int Int Int -> Bool)
-    describe "KindDistinguished Maybe Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Maybe Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Maybe Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Maybe Int Int -> Bool)
-    describe "KindDistinguished Either Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished Either Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished Either Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished Either Int Int -> Bool)
+    describe "KindDistinguished '() Int Int" $ do
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished '() Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished '() Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished '() Int Int -> Bool)
+    describe "KindDistinguished 'True Int Int" $ do
+        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished 'True Int Int -> Bool)
+        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished 'True Int Int -> Bool)
+        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished 'True Int Int -> Bool)
 # endif
 # if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
