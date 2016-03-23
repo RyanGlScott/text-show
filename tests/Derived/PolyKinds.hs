@@ -43,7 +43,7 @@ module Derived.PolyKinds (
 import           Data.Functor.Classes (Show1(..))
 
 import           Generics.Deriving.Base
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__) || MIN_VERSION_template_haskell(2,7,0)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
 
