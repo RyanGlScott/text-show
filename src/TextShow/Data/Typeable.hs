@@ -2,11 +2,12 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds         #-}
 #endif
+
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
 Module:      TextShow.Data.Typeable
@@ -39,7 +40,7 @@ import Data.Typeable.Internal (typeRepKinds)
 # endif
 # if MIN_VERSION_base(4,9,0)
 import Data.Typeable.Internal (Proxy(..), Typeable, TypeRep(TypeRep), typeRep)
-import GHC.Exts (Levity(..), TYPE)
+import GHC.Exts (RuntimeRep(..), TYPE)
 # elif MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (funTc, listTc)
 # endif
@@ -116,10 +117,10 @@ tcTYPE :: TyCon
 tcTYPE = tyConOf (Proxy :: Proxy TYPE)
 
 tc'Lifted :: TyCon
-tc'Lifted = tyConOf (Proxy :: Proxy 'Lifted)
+tc'Lifted = tyConOf (Proxy :: Proxy 'PtrRepLifted)
 
 tc'Unlifted :: TyCon
-tc'Unlifted = tyConOf (Proxy :: Proxy 'Unlifted)
+tc'Unlifted = tyConOf (Proxy :: Proxy 'PtrRepUnlifted)
 #elif MIN_VERSION_base(4,4,0)
 -- | The list 'TyCon'.
 tcList :: TyCon

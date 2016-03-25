@@ -537,7 +537,7 @@ makeTextShowForCon p tsClass spls (NormalC conName _) = do
     return [m]
 makeTextShowForCon p tsClass spls (RecC conName []) =
     makeTextShowForCon p tsClass spls $ NormalC conName []
-makeTextShowForCon _p tsClass spls (RecC conName ts) = do
+makeTextShowForCon p tsClass spls (RecC conName ts) = do
     (argTys, tvMap) <- reifyConTys tsClass spls conName
     args <- newNameList "arg" $ length argTys
 
@@ -556,13 +556,7 @@ makeTextShowForCon _p tsClass spls (RecC conName ts) = do
 
     m <- match
            (conP conName $ map varP args)
-           (normalB
-#if __GLASGOW_HASKELL__ >= 711
-                     namedArgs
-#else
-                     [| showbParen ($(varE _p) > $(lift appPrec)) $(namedArgs) |]
-#endif
-           )
+           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
            []
     return [m]
 makeTextShowForCon p tsClass spls (InfixC _ conName _) = do

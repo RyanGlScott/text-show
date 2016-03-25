@@ -43,9 +43,7 @@ import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
 import           Data.Functor.Classes (Show2(..))
 import           GHC.Show (showSpace)
-# if __GLASGOW_HASKELL__ < 711
 import           GHC.Show (appPrec)
-# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -116,10 +114,8 @@ instance Show2 TyFamily where
 
 showsRecord :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
             -> String -> String -> String -> Int -> a -> b -> ShowS
-showsRecord sp1 sp2 con rec1 rec2 _p a b =
-# if __GLASGOW_HASKELL__ < 711
-    showParen (_p > appPrec) $
-# endif
+showsRecord sp1 sp2 con rec1 rec2 p a b =
+    showParen (p > appPrec) $
           showString con . showSpace
         . showChar '{'
         . showString rec1 . showString " = " . sp1 0 a . showString ", "

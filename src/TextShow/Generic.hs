@@ -463,12 +463,7 @@ gShowbConstructor :: forall c f p.
                   -> Int -> C1 c f p -> Builder
 gShowbConstructor gs p c@(M1 x) = case fixity of
     Prefix -> showbParen ( p > appPrec
-                           && not ( isNullary x
-                                    || conIsTuple c
-#if __GLASGOW_HASKELL__ >= 711
-                                    || conIsRecord c
-#endif
-                                  )
+                           && not (isNullary x || conIsTuple c)
                          ) $
            (if conIsTuple c
                then mempty

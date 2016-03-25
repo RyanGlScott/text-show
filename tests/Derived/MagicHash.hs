@@ -40,9 +40,7 @@ import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
 import           Data.Functor.Classes (Show2(..))
 import           GHC.Show (showSpace)
-# if __GLASGOW_HASKELL__ < 711
 import           GHC.Show (appPrec)
-# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -131,10 +129,8 @@ showsHash :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
           -> String -> String -> String -> String -> String -> String -> String -> String
           -> Int -> a -> b -> Int# -> Float# -> Double# -> Char# -> Word#
           -> ShowS
-showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 _p a b i f d c w =
-# if __GLASGOW_HASKELL__ < 711
-    showParen (_p > appPrec) $
-# endif
+showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 p a b i f d c w =
+    showParen (p > appPrec) $
           showString con . showSpace
         . showChar '{'
         . showString rec1 . equals . sp1 0 a                . comma

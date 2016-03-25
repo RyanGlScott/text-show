@@ -43,7 +43,7 @@ module Derived.PolyKinds (
 import           Data.Functor.Classes (Show1(..))
 
 import           Generics.Deriving.Base
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__) || MIN_VERSION_template_haskell(2,7,0)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
 
@@ -138,6 +138,12 @@ newtype instance TyFamilyCompose f g h j k a b =
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyFamilyCompose f g h j k a b)
 
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
+deriving instance ( Functor (f (g (j a) (k a)))
+                  , Functor (h (j a))
+                  ) => Generic1 (TyFamilyCompose f g h j k a)
+#endif
+
 deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   Show (TyFamilyCompose f g h j k a b)
 
@@ -157,6 +163,9 @@ newtype instance TyFamilyProxy a b where
            , Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            )
 
@@ -186,6 +195,9 @@ newtype instance TyFamilyReallyHighKinds f a b c d e =
            , Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
+# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+# endif
 #endif
            )
 
@@ -384,7 +396,7 @@ $(Generics.deriveRepresentable0 ''TyConReallyHighKinds)
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
--- TODO: Reinstate CPP bounds once Trac #11357 is fixed
+# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamilyCompose)
 $(Generics.deriveRep1           'TyFamilyCompose)
 
@@ -399,6 +411,7 @@ $(Generics.deriveMeta           'TyFamilyProxy)
 $(Generics.deriveRepresentable1 'TyFamilyProxy)
 $(Generics.deriveMeta           'TyFamilyReallyHighKinds)
 $(Generics.deriveRepresentable1 'TyFamilyReallyHighKinds)
+# endif
 
 # if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'TyFamilyCompose)
