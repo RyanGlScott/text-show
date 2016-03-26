@@ -1,15 +1,18 @@
-{-# LANGUAGE CPP                  #-}
-{-# LANGUAGE DeriveDataTypeable   #-}
-{-# LANGUAGE FlexibleContexts     #-}
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE MagicHash            #-}
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE StandaloneDeriving   #-}
-{-# LANGUAGE TypeOperators        #-}
-{-# LANGUAGE TemplateHaskell      #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE BangPatterns          #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE EmptyDataDecls        #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MagicHash             #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE StandaloneDeriving    #-}
+{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeSynonymInstances  #-}
 
 #if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric        #-}
@@ -35,8 +38,8 @@ Generic versions of 'TextShow' and 'TextShow1' class functions, as an alternativ
 "TextShow.TH", which uses Template Haskell. Because there is no 'Generic2'
 class, 'TextShow2' cannot be implemented generically.
 
-This implementation is based off of the @Generics.Deriving.Show@ module from the
-@generic-deriving@ library.
+This implementation is loosely based off of the @Generics.Deriving.Show@ module
+from the @generic-deriving@ library.
 
 /Since: 2/
 -}
@@ -61,16 +64,17 @@ module TextShow.Generic (
     , genericHPrintTL
     , genericLiftShowbPrec
     , genericShowbPrec1
-      -- * The 'GTextShow' and 'GTextShow1' classes
+      -- * 'GTextShow' and friends
     , GTextShow(..)
     , GTextShowCon(..)
-    , GTextShow1(..)
-    , GTextShow1Con(..)
     , IsNullary(..)
     , ConType(..)
+    , Zero
+    , One
     ) where
 
 import           Data.Monoid.Compat ((<>))
+import           Data.Proxy (Proxy(..))
 import qualified Data.Text    as TS (Text)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -136,109 +140,112 @@ instance TextShow Oops where
 @
 
 If you forget to add a @deriving 'Generic'@ clause to your data type, at
-compile-time, you will get an error message that begins roughly as follows:
+compile-time, you might get an error message that begins roughly as follows:
 
 @
-No instance for ('GTextShow' (Rep Oops))
+No instance for ('GTextShow' 'Zero' (Rep Oops))
 @
 
 This error can be confusing, but don't let it intimidate you. The correct fix is
 simply to add the missing \"@deriving 'Generic'@\" clause.
 
-Similarly, if the compiler complains about not having an instance for @('GTextShow1'
-(Rep1 Oops1))@, add a \"@deriving 'Generic1'@\" clause.
+Similarly, if the compiler complains about not having an instance for @('GTextShow'
+'One' (Rep1 Oops1))@, add a \"@deriving 'Generic1'@\" clause.
 -}
 
 -- | A 'Generic' implementation of 'showt'.
 --
 -- /Since: 2/
-genericShowt :: (Generic a, GTextShow (Rep a)) => a -> TS.Text
+genericShowt :: (Generic a, GTextShow Zero (Rep a)) => a -> TS.Text
 genericShowt = toStrict . genericShowtl
 
 -- | A 'Generic' implementation of 'showtl'.
 --
 -- /Since: 2/
-genericShowtl :: (Generic a, GTextShow (Rep a)) => a -> TL.Text
+genericShowtl :: (Generic a, GTextShow Zero (Rep a)) => a -> TL.Text
 genericShowtl = toLazyText . genericShowb
 
 -- | A 'Generic' implementation of 'showPrect'.
 --
 -- /Since: 2/
-genericShowtPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> TS.Text
+genericShowtPrec :: (Generic a, GTextShow Zero (Rep a)) => Int -> a -> TS.Text
 genericShowtPrec p = toStrict . genericShowtlPrec p
 
 -- | A 'Generic' implementation of 'showtlPrec'.
 --
 -- /Since: 2/
-genericShowtlPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> TL.Text
+genericShowtlPrec :: (Generic a, GTextShow Zero (Rep a)) => Int -> a -> TL.Text
 genericShowtlPrec p = toLazyText . genericShowbPrec p
 
 -- | A 'Generic' implementation of 'showtList'.
 --
 -- /Since: 2/
-genericShowtList :: (Generic a, GTextShow (Rep a)) => [a] -> TS.Text
+genericShowtList :: (Generic a, GTextShow Zero (Rep a)) => [a] -> TS.Text
 genericShowtList = toStrict . genericShowtlList
 
 -- | A 'Generic' implementation of 'showtlList'.
 --
 -- /Since: 2/
-genericShowtlList :: (Generic a, GTextShow (Rep a)) => [a] -> TL.Text
+genericShowtlList :: (Generic a, GTextShow Zero (Rep a)) => [a] -> TL.Text
 genericShowtlList = toLazyText . genericShowbList
 
 -- | A 'Generic' implementation of 'showb'.
 --
 -- /Since: 2/
-genericShowb :: (Generic a, GTextShow (Rep a)) => a -> Builder
+genericShowb :: (Generic a, GTextShow Zero (Rep a)) => a -> Builder
 genericShowb = genericShowbPrec 0
 
 -- | A 'Generic' implementation of 'showbPrec'.
 --
 -- /Since: 2/
-genericShowbPrec :: (Generic a, GTextShow (Rep a)) => Int -> a -> Builder
-genericShowbPrec p = gShowbPrec p . from
+genericShowbPrec :: (Generic a, GTextShow Zero (Rep a)) => Int -> a -> Builder
+genericShowbPrec p = gShowbPrec (Proxy :: Proxy Zero) undefined undefined p . from
 
 -- | A 'Generic' implementation of 'showbList'.
 --
 -- /Since: 2/
-genericShowbList :: (Generic a, GTextShow (Rep a)) => [a] -> Builder
+genericShowbList :: (Generic a, GTextShow Zero (Rep a)) => [a] -> Builder
 genericShowbList = showbListWith genericShowb
 
 -- | A 'Generic' implementation of 'printT'.
 --
 -- /Since: 2/
-genericPrintT :: (Generic a, GTextShow (Rep a)) => a -> IO ()
+genericPrintT :: (Generic a, GTextShow Zero (Rep a)) => a -> IO ()
 genericPrintT = TS.putStrLn . genericShowt
 
 -- | A 'Generic' implementation of 'printTL'.
 --
 -- /Since: 2/
-genericPrintTL :: (Generic a, GTextShow (Rep a)) => a -> IO ()
+genericPrintTL :: (Generic a, GTextShow Zero (Rep a)) => a -> IO ()
 genericPrintTL = TL.putStrLn . genericShowtl
 
 -- | A 'Generic' implementation of 'hPrintT'.
 --
 -- /Since: 2/
-genericHPrintT :: (Generic a, GTextShow (Rep a)) => Handle -> a -> IO ()
+genericHPrintT :: (Generic a, GTextShow Zero (Rep a)) => Handle -> a -> IO ()
 genericHPrintT h = TS.hPutStrLn h . genericShowt
 
 -- | A 'Generic' implementation of 'hPrintTL'.
 --
 -- /Since: 2/
-genericHPrintTL :: (Generic a, GTextShow (Rep a)) => Handle -> a -> IO ()
+genericHPrintTL :: (Generic a, GTextShow Zero (Rep a)) => Handle -> a -> IO ()
 genericHPrintTL h = TL.hPutStrLn h . genericShowtl
 
 -- | A 'Generic1' implementation of 'genericLiftShowbPrec'.
 --
 -- /Since: 2/
-genericLiftShowbPrec :: (Generic1 f, GTextShow1 (Rep1 f))
+genericLiftShowbPrec :: (Generic1 f, GTextShow One (Rep1 f))
                      => (Int -> a -> Builder) -> ([a] -> Builder)
                      -> Int -> f a -> Builder
-genericLiftShowbPrec sp sl p = gLiftShowbPrec sp sl p . from1
+genericLiftShowbPrec sp sl p = gShowbPrec (Proxy :: Proxy One) sp sl p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
 --
 -- /Since: 2/
-genericShowbPrec1 :: (Generic a, Generic1 f, GTextShow (Rep a), GTextShow1 (Rep1 f))
+genericShowbPrec1 :: ( Generic a, Generic1 f
+                     , GTextShow Zero (Rep  a)
+                     , GTextShow One  (Rep1 f)
+                     )
                   => Int -> f a -> Builder
 genericShowbPrec1 = genericLiftShowbPrec genericShowbPrec genericShowbList
 
@@ -266,154 +273,175 @@ instance TextShow ConType where
     showbPrec = genericShowbPrec
     INLINE_INST_FUN(showbPrec)
 
--- | Class of generic representation types ('Rep') that can be converted to
--- a 'Builder'.
+-- | A type-level indicator that 'TextShow' is being derived generically.
 --
--- /Since: 3/
-class GTextShow f where
-    -- | This is used as the default generic implementation of 'showbPrec'.
-    gShowbPrec :: Int -> f a -> Builder
+-- / Since: 3.2/
+data Zero
+
+-- | A type-level indicator that 'TextShow1' is being derived generically.
+--
+-- / Since: 3.2/
+data One
+
+-- | Class of generic representation types that can be converted to
+-- a 'Builder'. The @arity@ type variable indicates which type class is
+-- used. @'GTextShow' 'Zero'@ indicates 'TextShow' behavior, and
+-- @'GTextShow' 'One'@ indicates 'TextShow1' behavior.
+--
+-- /Since: 3.2/
+class GTextShow arity f where
+    -- | This is used as the default generic implementation of 'showbPrec' (if the
+    -- @arity@ is 'Zero') or 'liftShowbPrec' (if the @arity@ is 'One').
+    gShowbPrec :: Proxy arity
+               -> (Int -> a -> Builder) -> ([a] -> Builder)
+               -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow
 #endif
 
-instance GTextShow f => GTextShow (D1 d f) where
-    gShowbPrec p (M1 x) = gShowbPrec p x
+instance GTextShow arity f => GTextShow arity (D1 d f) where
+    gShowbPrec pa sp sl p (M1 x) = gShowbPrec pa sp sl p x
 
-instance (GTextShow f, GTextShow g) => GTextShow (f :+: g) where
-    gShowbPrec p (L1 x) = gShowbPrec p x
-    gShowbPrec p (R1 x) = gShowbPrec p x
+instance GTextShow Zero V1 where
+    gShowbPrec _ _ _ _ !_ = error "Void showbPrec"
 
-instance (Constructor c, GTextShowCon f, IsNullary f) => GTextShow (C1 c f) where
-    gShowbPrec = gShowbConstructor gShowbPrecCon
+instance GTextShow One V1 where
+    gShowbPrec _ _ _ _ !_ = error "Void liftShowbPrec"
 
--- | Class of generic representation types ('Rep') for which the 'ConType'
--- has been determined.
-class GTextShowCon f where
+instance (GTextShow arity f, GTextShow arity g) => GTextShow arity (f :+: g) where
+    gShowbPrec pa sp sl p (L1 x) = gShowbPrec pa sp sl p x
+    gShowbPrec pa sp sl p (R1 x) = gShowbPrec pa sp sl p x
+
+instance (Constructor c, GTextShowCon arity f, IsNullary f)
+      => GTextShow arity (C1 c f) where
+    gShowbPrec pa sp sl p c@(M1 x) = case fixity of
+        Prefix -> showbParen ( p > appPrec
+                               && not (isNullary x || conIsTuple c)
+                             ) $
+               (if conIsTuple c
+                   then mempty
+                   else let cn = conName c
+                        in showbParen (isInfixTypeCon cn) $ fromString cn)
+            <> (if isNullary x || conIsTuple c
+                   then mempty
+                   else singleton ' ')
+            <> showbBraces t (gShowbPrecCon pa t sp sl appPrec1 x)
+        Infix _ m -> showbParen (p > m) $ gShowbPrecCon pa t sp sl (m+1) x
+      where
+        fixity :: Fixity
+        fixity = conFixity c
+
+        t :: ConType
+        t = if conIsRecord c
+            then Rec
+            else case conIsTuple c of
+                True  -> Tup
+                False -> case fixity of
+                    Prefix    -> Pref
+                    Infix _ _ -> Inf $ conName c
+
+        showbBraces :: ConType -> Builder -> Builder
+        showbBraces Rec     b = singleton '{' <> b <> singleton '}'
+        showbBraces Tup     b = singleton '(' <> b <> singleton ')'
+        showbBraces Pref    b = b
+        showbBraces (Inf _) b = b
+
+        conIsTuple :: C1 c f p -> Bool
+        conIsTuple = isTupleString . conName
+
+-- | Class of generic representation types for which the 'ConType' has been
+-- determined. The @arity@ type variable indicates which type class is
+-- used. @'GTextShow' 'Zero'@ indicates 'TextShow' behavior, and
+-- @'GTextShow' 'One'@ indicates 'TextShow1' behavior.
+class GTextShowCon arity f where
     -- | Convert value of a specific 'ConType' to a 'Builder' with the given
     -- precedence.
-    gShowbPrecCon :: ConType -> Int -> f a -> Builder
+    gShowbPrecCon :: Proxy arity -> ConType
+                  -> (Int -> a -> Builder) -> ([a] -> Builder)
+                  -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShowCon
 #endif
 
-instance GTextShowCon V1 where
-    gShowbPrecCon = error "Void showbPrec"
+instance GTextShowCon arity U1 where
+    gShowbPrecCon _ _ _ _ _ U1 = mempty
 
-instance GTextShowCon U1 where
-    gShowbPrecCon _ _ U1 = mempty
+instance GTextShowCon One Par1 where
+    gShowbPrecCon _ _ sp _ p (Par1 x) = sp p x
 
-instance TextShow c => GTextShowCon (K1 i c) where
-    gShowbPrecCon _ p (K1 x) = showbPrec p x
+instance TextShow c => GTextShowCon arity (K1 i c) where
+    gShowbPrecCon _ _ _ _ p (K1 x) = showbPrec p x
 
-instance (Selector s, GTextShowCon f) => GTextShowCon (S1 s f) where
-    gShowbPrecCon = gShowbSelector gShowbPrecCon
+instance TextShow1 f => GTextShowCon One (Rec1 f) where
+    gShowbPrecCon _ _ sp sl p (Rec1 x) = liftShowbPrec sp sl p x
 
-instance (GTextShowCon f, GTextShowCon g) => GTextShowCon (f :*: g) where
-    gShowbPrecCon = gShowbProduct gShowbPrecCon gShowbPrecCon
+instance (Selector s, GTextShowCon arity f) => GTextShowCon arity (S1 s f) where
+    gShowbPrecCon pa t sp sl p sel@(M1 x)
+      | selName sel == "" = gShowbPrecCon pa t sp sl p x
+      | otherwise         = fromString (selName sel)
+                            <> " = "
+                            <> gShowbPrecCon pa t sp sl 0 x
 
-instance GTextShowCon UChar where
-    gShowbPrecCon _ = gShowbUCharPrec
+instance (GTextShowCon arity f, GTextShowCon arity g)
+      => GTextShowCon arity (f :*: g) where
+    gShowbPrecCon pa t@Rec sp sl _ (a :*: b) =
+           gShowbPrecCon pa t sp sl 0 a
+        <> ", "
+        <> gShowbPrecCon pa t sp sl 0 b
+    gShowbPrecCon pa t@(Inf o) sp sl p (a :*: b) =
+           gShowbPrecCon pa t sp sl p a
+        <> showbSpace
+        <> infixOp
+        <> showbSpace
+        <> gShowbPrecCon pa t sp sl p b
+      where
+        infixOp :: Builder
+        infixOp = if isInfixTypeCon o
+                     then fromString o
+                     else singleton '`' <> fromString o <> singleton '`'
+    gShowbPrecCon pa t@Tup sp sl _ (a :*: b) =
+           gShowbPrecCon pa t sp sl 0 a
+        <> singleton ','
+        <> gShowbPrecCon pa t sp sl 0 b
+    gShowbPrecCon pa t@Pref sp sl p (a :*: b) =
+           gShowbPrecCon pa t sp sl p a
+        <> showbSpace
+        <> gShowbPrecCon pa t sp sl p b
 
-instance GTextShowCon UDouble where
-    gShowbPrecCon _ = gShowbUDoublePrec
-
-instance GTextShowCon UFloat where
-    gShowbPrecCon _ = gShowbUFloatPrec
-
-instance GTextShowCon UInt where
-    gShowbPrecCon _ = gShowbUIntPrec
-
-instance GTextShowCon UWord where
-    gShowbPrecCon _ = gShowbUWordPrec
-
--------------------------------------------------------------------------------
-
--- | Class of generic representation types ('Rep1') that can be converted to
--- a 'Builder' by lifting through a unary type constructor.
---
--- /Since: 2/
-class GTextShow1 f where
-    -- | This is used as the default generic implementation of 'showbPrecWith'.
-    gLiftShowbPrec :: (Int -> a -> Builder) -> ([a] -> Builder) -> Int -> f a -> Builder
-
-#if __GLASGOW_HASKELL__ >= 708
-deriving instance Typeable GTextShow1
-#endif
-
-instance GTextShow1 f => GTextShow1 (D1 d f) where
-    gLiftShowbPrec sp sl p (M1 x) = gLiftShowbPrec sp sl p x
-
-instance GTextShow1 V1 where
-    gLiftShowbPrec = error "Void showbPrecWith"
-
-instance (GTextShow1 f, GTextShow1 g) => GTextShow1 (f :+: g) where
-    gLiftShowbPrec sp sl p (L1 x) = gLiftShowbPrec sp sl p x
-    gLiftShowbPrec sp sl p (R1 x) = gLiftShowbPrec sp sl p x
-
-instance (Constructor c, GTextShow1Con f, IsNullary f) => GTextShow1 (C1 c f) where
-    gLiftShowbPrec sp sl =
-      gShowbConstructor (\t' -> gLiftShowbPrecCon t' sp sl)
-
--- | Class of generic representation types ('Rep1') for which the 'ConType'
--- has been determined.
-class GTextShow1Con f where
-    -- | Convert a value of a specific 'ConType' to a 'Builder' with the given
-    -- show function and precedence.
-    gLiftShowbPrecCon :: ConType -> (Int -> a -> Builder) -> ([a] -> Builder)
-                      -> Int -> f a -> Builder
-
-#if __GLASGOW_HASKELL__ >= 708
-deriving instance Typeable GTextShow1Con
-#endif
-
-instance GTextShow1Con U1 where
-    gLiftShowbPrecCon _ _ _ _ U1 = mempty
-
-instance GTextShow1Con Par1 where
-    gLiftShowbPrecCon _ sp _ p (Par1 x) = sp p x
-
-instance TextShow c => GTextShow1Con (K1 i c) where
-    gLiftShowbPrecCon _ _ _ p (K1 x) = showbPrec p x
-
-instance TextShow1 f => GTextShow1Con (Rec1 f) where
-    gLiftShowbPrecCon _ sp sl p (Rec1 x) = liftShowbPrec sp sl p x
-
-instance (Selector s, GTextShow1Con f) => GTextShow1Con (S1 s f) where
-    gLiftShowbPrecCon t sp sl =
-      gShowbSelector (\t' -> gLiftShowbPrecCon t' sp sl) t
-
-instance (GTextShow1Con f, GTextShow1Con g) => GTextShow1Con (f :*: g) where
-    gLiftShowbPrecCon t sp sl =
-      gShowbProduct (\t' -> gLiftShowbPrecCon t' sp sl)
-                    (\t' -> gLiftShowbPrecCon t' sp sl) t
-
-instance (TextShow1 f, GTextShow1Con g) => GTextShow1Con (f :.: g) where
-    gLiftShowbPrecCon t sp sl p (Comp1 x) =
-      liftShowbPrec (gLiftShowbPrecCon t sp sl)
-                    (showbListWith (gLiftShowbPrecCon t sp sl 0))
+instance (TextShow1 f, GTextShowCon One g) => GTextShowCon One (f :.: g) where
+    gShowbPrecCon pa t sp sl p (Comp1 x) =
+      liftShowbPrec (gShowbPrecCon pa t sp sl)
+                    (showbListWith (gShowbPrecCon pa t sp sl 0))
                     p x
 
-instance GTextShow1Con UChar where
-    gLiftShowbPrecCon _ _ _ = gShowbUCharPrec
+instance GTextShowCon arity UChar where
+    gShowbPrecCon _ _ _ _ p (UChar c)   = showbPrec (hashPrec p) (C# c) <> oneHash
 
-instance GTextShow1Con UDouble where
-    gLiftShowbPrecCon _ _ _ = gShowbUDoublePrec
+instance GTextShowCon arity UDouble where
+    gShowbPrecCon _ _ _ _ p (UDouble d) = showbPrec (hashPrec p) (D# d) <> twoHash
 
-instance GTextShow1Con UFloat where
-    gLiftShowbPrecCon _ _ _ = gShowbUFloatPrec
+instance GTextShowCon arity UFloat where
+    gShowbPrecCon _ _ _ _ p (UFloat f)  = showbPrec (hashPrec p) (F# f) <> oneHash
 
-instance GTextShow1Con UInt where
-    gLiftShowbPrecCon _ _ _ = gShowbUIntPrec
+instance GTextShowCon arity UInt where
+    gShowbPrecCon _ _ _ _ p (UInt i)    = showbPrec (hashPrec p) (I# i) <> oneHash
 
-instance GTextShow1Con UWord where
-    gLiftShowbPrecCon _ _ _ = gShowbUWordPrec
+instance GTextShowCon arity UWord where
+    gShowbPrecCon _ _ _ _ p (UWord w)   = showbPrec (hashPrec p) (W# w) <> twoHash
 
--------------------------------------------------------------------------------
--- Shared code between GTextShow and GTextShow1
--------------------------------------------------------------------------------
+oneHash, twoHash :: Builder
+hashPrec :: Int -> Int
+#if __GLASGOW_HASKELL__ >= 711
+oneHash  = singleton '#'
+twoHash  = fromString "##"
+hashPrec = const 0
+#else
+oneHash  = mempty
+twoHash  = mempty
+hashPrec = id
+#endif
 
 -- | Class of generic representation types that represent a constructor with
 -- zero or more fields.
@@ -456,106 +484,6 @@ instance IsNullary UInt where
 
 instance IsNullary UWord where
     isNullary _ = False
-
-gShowbConstructor :: forall c f p.
-                     (Constructor c, IsNullary f)
-                  => (ConType -> Int -> f p -> Builder)
-                  -> Int -> C1 c f p -> Builder
-gShowbConstructor gs p c@(M1 x) = case fixity of
-    Prefix -> showbParen ( p > appPrec
-                           && not (isNullary x || conIsTuple c)
-                         ) $
-           (if conIsTuple c
-               then mempty
-               else let cn = conName c
-                    in showbParen (isInfixTypeCon cn) $ fromString cn)
-        <> (if isNullary x || conIsTuple c
-               then mempty
-               else singleton ' ')
-        <> showbBraces t (gs t appPrec1 x)
-    Infix _ m -> showbParen (p > m) $ gs t (m+1) x
-  where
-    fixity :: Fixity
-    fixity = conFixity c
-
-    t :: ConType
-    t = if conIsRecord c
-        then Rec
-        else case conIsTuple c of
-            True  -> Tup
-            False -> case fixity of
-                Prefix    -> Pref
-                Infix _ _ -> Inf $ conName c
-
-    showbBraces :: ConType -> Builder -> Builder
-    showbBraces Rec     b = singleton '{' <> b <> singleton '}'
-    showbBraces Tup     b = singleton '(' <> b <> singleton ')'
-    showbBraces Pref    b = b
-    showbBraces (Inf _) b = b
-
-    conIsTuple :: C1 c f p -> Bool
-    conIsTuple = isTupleString . conName
-
-gShowbSelector :: Selector s
-               => (ConType -> Int -> f p -> Builder)
-               -> ConType -> Int -> S1 s f p -> Builder
-gShowbSelector gs t p sel@(M1 x)
-    | selName sel == "" = gs t p x
-    | otherwise         = fromString (selName sel) <> " = " <> gs t 0 x
-
-gShowbProduct :: (ConType -> Int -> f p -> Builder)
-              -> (ConType -> Int -> g p -> Builder)
-              -> ConType -> Int -> ((f :*: g) p) -> Builder
-gShowbProduct gsa gsb t@Rec _ (a :*: b) =
-       gsa t 0 a
-    <> ", "
-    <> gsb t 0 b
-gShowbProduct gsa gsb t@(Inf o) p (a :*: b) =
-       gsa t p a
-    <> showbSpace
-    <> infixOp
-    <> showbSpace
-    <> gsb t p b
-  where
-    infixOp :: Builder
-    infixOp = if isInfixTypeCon o
-                 then fromString o
-                 else singleton '`' <> fromString o <> singleton '`'
-gShowbProduct gsa gsb t@Tup _ (a :*: b) =
-       gsa t 0 a
-    <> singleton ','
-    <> gsb t 0 b
-gShowbProduct gsa gsb t@Pref p (a :*: b) =
-       gsa t p a
-    <> showbSpace
-    <> gsb t p b
-
-gShowbUCharPrec :: Int -> UChar p -> Builder
-gShowbUCharPrec p (UChar c) = showbPrec (hashPrec p) (C# c) <> oneHash
-
-gShowbUDoublePrec :: Int -> UDouble p -> Builder
-gShowbUDoublePrec p (UDouble d) = showbPrec (hashPrec p) (D# d) <> twoHash
-
-gShowbUFloatPrec :: Int -> UFloat p -> Builder
-gShowbUFloatPrec p (UFloat f) = showbPrec (hashPrec p) (F# f) <> oneHash
-
-gShowbUIntPrec :: Int -> UInt p -> Builder
-gShowbUIntPrec p (UInt i) = showbPrec (hashPrec p) (I# i) <> oneHash
-
-gShowbUWordPrec :: Int -> UWord p -> Builder
-gShowbUWordPrec p (UWord w) = showbPrec (hashPrec p) (W# w) <> twoHash
-
-oneHash, twoHash :: Builder
-hashPrec :: Int -> Int
-#if __GLASGOW_HASKELL__ >= 711
-oneHash  = singleton '#'
-twoHash  = fromString "##"
-hashPrec = const 0
-#else
-oneHash  = mempty
-twoHash  = mempty
-hashPrec = id
-#endif
 
 -------------------------------------------------------------------------------
 

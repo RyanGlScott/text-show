@@ -1,3 +1,6 @@
+## 3.2
+* Rewrote `TextShow.Generic` to enable more code reuse. The `GTextShow1` and `GTextShow1Con` classes were eliminated, and `GTextShow` and `GTextShowCon` were redesigned to be able to generically implement both `showbPrec` and `liftShowbPrec`. The latter two classes now take an additional `arity` type parameter which is `Zero` if `TextShow` is being derived and `One` is `TextShow1` is being derived.
+
 ## 3.1
 * Made the derived `TextShow` output of record datatypes match that of `Show` in GHC 8.0 (now that Trac #2530 has been reverted)
 * Fixed GHC 8.0 build (again)

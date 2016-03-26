@@ -68,13 +68,15 @@ prop_matchesTextShow2 p x = fromString (showsPrec2 p x "") == showbPrec2 p x
 
 -- | Verifies that a type's 'TextShow' instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
-prop_genericTextShow :: (TextShow a, Generic a, GTextShow (Rep a))
+prop_genericTextShow :: (TextShow a, Generic a, GTextShow Zero (Rep a))
                      => Int -> a -> Bool
 prop_genericTextShow p x = showbPrec p x == genericShowbPrec p x
 
 -- | Verifies that a type's 'TextShow1' instance coincides with the output produced
 -- by the equivalent 'Generic1' functions.
-prop_genericTextShow1 :: (TextShow1 f, Generic1 f, GTextShow1 (Rep1 f), TextShow a)
+prop_genericTextShow1 :: ( TextShow1 f, Generic1 f
+                         , GTextShow One (Rep1 f), TextShow a
+                         )
                       => Int -> f a -> Bool
 prop_genericTextShow1 p x =
     showbPrec1 p x == genericLiftShowbPrec showbPrec showbList p x
