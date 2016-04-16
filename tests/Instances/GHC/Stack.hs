@@ -26,7 +26,7 @@ import Test.QuickCheck (Arbitrary(..), oneof)
 
 instance Arbitrary CallStack where
     arbitrary = oneof [ pure EmptyCallStack
-                      , PushCallStack <$> arbitrary <@> EmptyCallStack
+                      , PushCallStack <$> arbitrary <*> arbitrary <@> EmptyCallStack
                       , pure $ FreezeCallStack EmptyCallStack
                       ]
 
