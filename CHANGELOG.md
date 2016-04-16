@@ -1,4 +1,4 @@
-### next
+### 3.2.1
 * Fixed compilation on GHC 8.0
 
 ## 3.2
