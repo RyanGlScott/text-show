@@ -1,3 +1,6 @@
+## next
+* Added benchmarks
+
 ### 3.2.1
 * Fixed compilation on GHC 8.0
 
