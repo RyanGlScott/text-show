@@ -45,7 +45,7 @@ sampleGroup title leaf branch empty showFun =
     pile :: (Int -> a, a -> a -> a, a, a -> b)
     pile = (leaf, branch, empty, showFun)
 
-type Sample = forall a b. NFData b =>
+type Sample = forall a b.
     ( Int -> a
     , a -> a -> a
     , a
