@@ -44,10 +44,6 @@ matrix:
 before_install:
  - unset CC
  - export PATH=$HOME/.cabal/bin:/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
- - if [ "$GHCVER" != "7.0.4" && "$GHCVER" != "7.2.2" ];
-   then
-     export BENCH="yes";
-   fi
 
 install:
  - cabal --version
@@ -92,7 +88,7 @@ script:
  - cabal configure --enable-tests --enable-benchmarks -v2  # -v2 provides useful information for debugging
  - cabal build -j1 --ghc-option=-Werror # this builds all libraries and executables (including tests/benchmarks)
  - cabal test -j1 --show-details=always
- - if [ "$BENCH" = "yes" ]; then cabal bench -j1; fi
+ - cabal bench -j1
  - cabal check
  - cabal sdist   # tests that a source-distribution can be generated
 
