@@ -1,4 +1,4 @@
-## next
+### 3.2.2
 * Added benchmarks
 
 ### 3.2.1

@@ -1,5 +1,5 @@
 name:                text-show
-version:             3.2.1
+version:             3.2.2
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
@@ -355,7 +355,7 @@ test-suite spec
   if impl(ghc >= 8.0)
     build-depends:     ghc-boot
   if !flag(developer)
-    build-depends:     text-show            == 3.2.1
+    build-depends:     text-show            == 3.2.2
 
   hs-source-dirs:      tests
   if flag(developer)
@@ -400,7 +400,7 @@ benchmark bench
   if flag(developer)
     hs-source-dirs:    src
   else
-    build-depends:     text-show == 3.2.1
+    build-depends:     text-show == 3.2.2
   hs-source-dirs:      benchmarks
   default-language:    Haskell2010
   ghc-options:         -Wall
