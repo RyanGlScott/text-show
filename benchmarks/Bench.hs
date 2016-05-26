@@ -28,9 +28,9 @@ import TextShow.TH (deriveTextShow)
 
 main :: IO ()
 main = defaultMain
-    [ sampleGroup "String Show"          BTSLeaf    BTSBranch    BTSEmpty    show
-    , sampleGroup "Text Show (TH)"       BTTSTHLeaf BTTSTHBranch BTTSTHEmpty showtl
-    , sampleGroup "Text Show (generics)" BTTSGLeaf  BTTSGBranch  BTTSGEmpty  showtl
+    [ sampleGroup "String Show"          BTLeaf1 BTBranch1 BTEmpty1 show
+    , sampleGroup "Text Show (TH)"       BTLeaf2 BTBranch2 BTEmpty2 showtl
+    , sampleGroup "Text Show (generics)" BTLeaf3 BTBranch3 BTEmpty3 showtl
     ]
 
 sampleGroup :: forall a b. NFData b
@@ -76,21 +76,22 @@ largeSample (leaf, branch, empty, showFun) =
         (leaf 1234567 `branch` leaf 123456)
 {-# NOINLINE largeSample #-}
 
-data BinTreeShow a = BTSEmpty
-                   | BTSLeaf a
-                   | BTSBranch (BinTreeShow a) (BinTreeShow a)
+-- NB: constructors must be same length!
+data BinTree1 a = BTEmpty1
+                | BTLeaf1 a
+                | BTBranch1 (BinTree1 a) (BinTree1 a)
   deriving Show
 
-data BinTreeTextShowTH a = BTTSTHEmpty
-                         | BTTSTHLeaf a
-                         | BTTSTHBranch (BinTreeTextShowTH a)
-                                        (BinTreeTextShowTH a)
-data BinTreeTextShowGenerics a = BTTSGEmpty
-                               | BTTSGLeaf a
-                               | BTTSGBranch (BinTreeTextShowGenerics a)
-                                             (BinTreeTextShowGenerics a)
+data BinTree2 a = BTEmpty2
+                | BTLeaf2 a
+                | BTBranch2 (BinTree2 a) (BinTree2 a)
+
+data BinTree3 a = BTEmpty3
+                | BTLeaf3 a
+                | BTBranch3 (BinTree3 a) (BinTree3 a)
   deriving Generic
-instance TextShow a => TextShow (BinTreeTextShowGenerics a) where
+
+instance TextShow a => TextShow (BinTree3 a) where
     showbPrec = genericShowbPrec
 
-$(deriveTextShow ''BinTreeTextShowTH)
+$(deriveTextShow ''BinTree2)
