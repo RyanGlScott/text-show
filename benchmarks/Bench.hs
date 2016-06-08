@@ -14,23 +14,25 @@ Benchmarks for @text-show@.
 -}
 module Main (main) where
 
-import Control.DeepSeq (NFData)
+import           Control.DeepSeq (NFData)
 
-import Criterion.Main (Benchmark, bench, bgroup, defaultMain, nf)
+import           Criterion.Main (Benchmark, bench, bgroup, defaultMain, nf)
 
-import Data.List (foldl')
+import           Data.List (foldl')
+import qualified Data.Text.Lazy as T (pack)
 
-import GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 
-import TextShow (TextShow(..))
-import TextShow.Generic (genericShowbPrec)
-import TextShow.TH (deriveTextShow)
+import           TextShow (TextShow(..))
+import           TextShow.Generic (genericShowbPrec)
+import           TextShow.TH (deriveTextShow)
 
 main :: IO ()
 main = defaultMain
-    [ sampleGroup "String Show"          BTLeaf1 BTBranch1 BTEmpty1 show
-    , sampleGroup "Text Show (TH)"       BTLeaf2 BTBranch2 BTEmpty2 showtl
-    , sampleGroup "Text Show (generics)" BTLeaf3 BTBranch3 BTEmpty3 showtl
+    [ sampleGroup "String Show"                 BTLeaf1 BTBranch1 BTEmpty1 show
+    , sampleGroup "String Show, then Text.pack" BTLeaf1 BTBranch1 BTEmpty1 (T.pack . show)
+    , sampleGroup "Text Show (TH)"              BTLeaf2 BTBranch2 BTEmpty2 showtl
+    , sampleGroup "Text Show (generics)"        BTLeaf3 BTBranch3 BTEmpty3 showtl
     ]
 
 sampleGroup :: forall a b. NFData b
