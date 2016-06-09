@@ -20,6 +20,7 @@ import           Criterion.Main (Benchmark, bench, bgroup, defaultMain, nf)
 
 import           Data.List (foldl')
 import qualified Data.Text.Lazy as T (pack)
+import qualified Data.Text      as S
 
 import           GHC.Generics (Generic)
 
@@ -33,6 +34,11 @@ main = defaultMain
     , sampleGroup "String Show, then Text.pack" BTLeaf1 BTBranch1 BTEmpty1 (T.pack . show)
     , sampleGroup "Text Show (TH)"              BTLeaf2 BTBranch2 BTEmpty2 showtl
     , sampleGroup "Text Show (generics)"        BTLeaf3 BTBranch3 BTEmpty3 showtl
+    , bgroup "Enumeration Type (strict Text)"
+      [ bench "String Show, then Text.pack"  $ nf (S.pack . show) Violet
+      , bench "Text Show (TH)" $ nf showt Violet
+      , bench "Manually written text show"  $ nf manualColorRendering Violet
+      ]
     ]
 
 sampleGroup :: forall a b. NFData b
@@ -96,4 +102,23 @@ data BinTree3 a = BTEmpty3
 instance TextShow a => TextShow (BinTree3 a) where
     showbPrec = genericShowbPrec
 
+------------------------------------------
+-- Simple enumeration types
+-------------------------------------------
+
+data Color = Red | Green | Blue | Orange | Violet
+  deriving (Show)
+
+manualColorRendering :: Color -> S.Text
+manualColorRendering c = case c of
+  Red    -> S.pack "Red"
+  Green  -> S.pack "Green"
+  Blue   -> S.pack "Blue"
+  Orange -> S.pack "Orange"
+  Violet -> S.pack "Violet"
+
+
 $(deriveTextShow ''BinTree2)
+
+$(deriveTextShow ''Color)
+
