@@ -40,9 +40,8 @@ import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 #if defined(NEW_FUNCTOR_CLASSES)
-# if MIN_VERSION_template_haskell(2,7,0)
 import           Text.Show.Deriving (deriveShow2)
-# else
+# if !(MIN_VERSION_template_haskell(2,7,0))
 import           Data.Functor.Classes (Show1(..), Show2(..))
 import           GHC.Show (showSpace)
 import           GHC.Show (appPrec)

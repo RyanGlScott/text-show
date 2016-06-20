@@ -34,10 +34,8 @@ import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2,
 
 #if defined(NEW_FUNCTOR_CLASSES)
 import Data.Functor.Classes (Show2(..))
-import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
-# if MIN_VERSION_template_haskell(2,7,0)
-import Text.Show.Deriving (deriveShow2)
-# else
+import Text.Show.Deriving (deriveShow2, makeLiftShowsPrec, makeLiftShowsPrec2)
+# if !(MIN_VERSION_template_haskell(2,7,0))
 import Data.Functor.Classes (showsBinaryWith)
 # endif
 #else
