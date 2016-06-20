@@ -20,8 +20,6 @@ module Derived.Records (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
-import           Data.Functor.Classes (Show1(..))
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -38,12 +36,17 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..), oneof)
 
+import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import           Data.Functor.Classes (Show2(..))
+#if defined(NEW_FUNCTOR_CLASSES)
+# if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow2)
+# else
+import           Data.Functor.Classes (Show1(..), Show2(..))
 import           GHC.Show (showSpace)
 import           GHC.Show (appPrec)
+# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -90,22 +93,33 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show a => Show1 (TyCon a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamily a) where
-    showsPrec1 = showsPrec
+$(deriveShow1 ''TyCon)
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2 ''TyCon)
+#endif
+
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
+
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveMeta           ''TyCon)
+$(Generics.deriveRepresentable1 ''TyCon)
+#endif
+
+#if __GLASGOW_HASKELL__ < 702
+$(Generics.deriveRepresentable0 ''TyCon)
+#endif
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'TyFamilyPrefix)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 'TyFamilyPrefix)
+$(deriveShow2 '(:!:))
 #else
-instance Show a => Show1 (TyCon a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show a => Show1 (TyFamily a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 TyCon where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyConPrefix a b) =
-        showsRecord sp1 sp2 "TyConPrefix" "tc1" "tc2" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :@: b) =
-        showsRecord sp2 sp1 "(:@:)" "tc3" "tc4" p a b
 instance Show2 TyFamily where
     liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyPrefix a b) =
         showsRecord sp1 sp2 "TyFamilyPrefix" "tf1" "tf2" p a b
@@ -123,28 +137,11 @@ showsRecord sp1 sp2 con rec1 rec2 p a b =
         . showChar '}'
 #endif
 
--------------------------------------------------------------------------------
-
-$(deriveTextShow  ''TyCon)
-$(deriveTextShow1 ''TyCon)
-$(deriveTextShow2 ''TyCon)
-
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamilyPrefix)
 $(deriveTextShow1 '(:!:))
 $(deriveTextShow2 'TyFamilyPrefix)
-#endif
 
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveMeta           ''TyCon)
-$(Generics.deriveRepresentable1 ''TyCon)
-#endif
-
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveRepresentable0 ''TyCon)
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamilyPrefix)
 $(Generics.deriveRepresentable1 '(:!:))

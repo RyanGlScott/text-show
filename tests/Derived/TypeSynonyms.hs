@@ -23,13 +23,6 @@ module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 
 #include "generic.h"
 
-import           Data.Functor.Classes ( Show1(..)
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-                                      , Show2(..)
-                                      , showsUnaryWith
-#endif
-                                      )
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -45,7 +38,16 @@ import           Prelude
 
 import           Test.QuickCheck (Arbitrary)
 
+import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
+
+#if defined(NEW_FUNCTOR_CLASSES)
+# if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow2)
+# else
+import           Data.Functor.Classes (Show1(..), Show2(..), showsUnaryWith)
+# endif
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -56,16 +58,6 @@ type Flip f a b = f b a
 -- Needed for the Generic1 instances
 instance Functor ((,,,) a b c) where
     fmap f (a, b, c, d) = (a, b, c, f d)
-
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-instance (Show a, Show b) => Show2 ((,,,) a b) where
-    liftShowsPrec2 sp1 _ sp2 _ _ (a, b, c, d) =
-                          showChar '('
-        . showsPrec 0 a . showChar ','
-        . showsPrec 0 b . showChar ','
-        . sp1       0 c . showChar ','
-        . sp2       0 d . showChar ')'
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -107,20 +99,30 @@ newtype instance TyFamily a b = TyFamily
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show a => Show1 (TyCon a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamily a) where
-    showsPrec1 = showsPrec
+-- TODO: Replace these with non-orphan instances
+$(deriveShow1 ''(,,,))
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2 ''(,,,))
+#endif
+
+$(deriveShow1 ''TyCon)
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2 ''TyCon)
+#endif
+
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'TyFamily)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 'TyFamily)
+$(deriveShow2 'TyFamily)
 #else
-instance Show a => Show1 (TyCon a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show a => Show1 (TyFamily a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 TyCon where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyCon x) =
-        showsTypeSynonym sp1 sl1 sp2 sl2 "TyCon"    p x
 instance Show2 TyFamily where
     liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily x) =
         showsTypeSynonym sp1 sl1 sp2 sl2 "TyFamily" p x
@@ -141,12 +143,6 @@ showsTypeSynonym sp1 sl1 sp2 sl2 name p x =
                                    (liftShowList2  sp1       sl1      sp2 sl2)
                    ) name p x
 #endif
-
--------------------------------------------------------------------------------
-
-$(deriveTextShow  ''TyCon)
-$(deriveTextShow1 ''TyCon)
-$(deriveTextShow2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamily)

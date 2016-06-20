@@ -19,8 +19,6 @@ Defines data types with fields that have unlifted types.
 -}
 module Derived.MagicHash (TyCon#(..), TyFamily#(..)) where
 
-import           Data.Functor.Classes (Show1(..))
-
 #if __GLASGOW_HASKELL__ < 711
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -35,12 +33,17 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
+import           Text.Show.Deriving (deriveShow1Options, legacyOptions)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import           Data.Functor.Classes (Show2(..))
+#if defined(NEW_FUNCTOR_CLASSES)
+# if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow2Options)
+# else
+import           Data.Functor.Classes (Show1(..), Show2(..))
 import           GHC.Show (showSpace)
 import           GHC.Show (appPrec)
+# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -105,21 +108,24 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily# a b) where
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show a => Show1 (TyCon# a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamily# a) where
-    showsPrec1 = showsPrec
+$(deriveShow1Options legacyOptions ''TyCon#)
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2Options legacyOptions ''TyCon#)
+#endif
+
+$(deriveTextShow  ''TyCon#)
+$(deriveTextShow1 ''TyCon#)
+$(deriveTextShow2 ''TyCon#)
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1Options legacyOptions 'TyFamily#)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1Options legacyOptions 'TyFamily#)
+$(deriveShow2Options legacyOptions 'TyFamily#)
 #else
-instance Show a => Show1 (TyCon# a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show a => Show1 (TyFamily# a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 TyCon# where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyCon# a b i f d c w) =
-        showsHash sp1 sp2 "TyCon#" "tcA" "tcB" "tcInt#" "tcFloat#"
-                  "tcDouble#" "tcChar#" "tcWord#" p a b i f d c w
 instance Show2 TyFamily# where
     liftShowsPrec2 sp1 _ sp2 _ p (TyFamily# a b i f d c w) =
         showsHash sp1 sp2 "TyFamily#" "tfA" "tfB" "tfInt#" "tfFloat#"
@@ -156,11 +162,6 @@ showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 p a b i f d c w =
 # endif
 #endif
 
--------------------------------------------------------------------------------
-
-$(deriveTextShow  ''TyCon#)
-$(deriveTextShow1 ''TyCon#)
-$(deriveTextShow2 ''TyCon#)
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamily#)
 $(deriveTextShow1 'TyFamily#)

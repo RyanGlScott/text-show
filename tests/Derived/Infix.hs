@@ -27,8 +27,6 @@ module Derived.Infix (
 
 #include "generic.h"
 
-import           Data.Functor.Classes (Show1(..))
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -45,11 +43,16 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..), oneof)
 
+import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import           Data.Functor.Classes (Show2(..), showsBinaryWith)
+#if defined(NEW_FUNCTOR_CLASSES)
+# if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow2)
+# else
+import           Data.Functor.Classes (Show1(..), Show2(..), showsBinaryWith)
 import           GHC.Show (appPrec, appPrec1, showSpace)
+# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -152,43 +155,37 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show a => Show1 (TyConPlain a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyConGADT a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamilyPlain a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamilyGADT a) where
-    showsPrec1 = showsPrec
+$(deriveShow1 ''TyConPlain)
+$(deriveShow1 ''TyConGADT)
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2 ''TyConPlain)
+$(deriveShow2 ''TyConGADT)
+#endif
+
+$(deriveTextShow  ''TyConPlain)
+$(deriveTextShow1 ''TyConPlain)
+$(deriveTextShow2 ''TyConPlain)
+
+$(deriveTextShow  ''TyConGADT)
+$(deriveTextShow1 ''TyConGADT)
+$(deriveTextShow2 ''TyConGADT)
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 '(:#:))
+
+$(deriveShow1 '(:*))
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 '(:#:))
+$(deriveShow2 '(:$:))
+
+$(deriveShow1 '(:*))
+$(deriveShow2 '(:***))
 #else
-instance Show a => Show1 (TyConPlain a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show a => Show1 (TyConGADT a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show a => Show1 (TyFamilyPlain a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 instance Show a => Show1 (TyFamilyGADT a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 TyConPlain where
-    liftShowsPrec2 sp1 _ sp2 _ p (a :!: b) =
-        showsBinaryWith sp1 sp2 "(:!:)" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :@: b) =
-        showsInfix sp1 sp2 ":@:" p 4 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (TyConPlain a b) =
-        showsInfix sp1 sp2 "`TyConPlain`" p 5 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (TyConFakeInfix a b) =
-        showsBinaryWith sp1 sp2 "TyConFakeInfix" p a b
-instance Show2 TyConGADT where
-    liftShowsPrec2 sp1 _ sp2 _ p (a :. b) =
-        showsInfix sp1 sp2 ":." p 1 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :.. b) =
-        showsBinaryWith sp1 sp2 "(:..)" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p ((:...) a b i) =
-        showsTernaryWith sp1 sp2 "(:...)" p a b i
-    liftShowsPrec2 sp1 _ sp2 _ p (a :.... b) =
-        showsBinaryWith sp1 sp2 "(:....)" p a b
 instance Show2 TyFamilyPlain where
     liftShowsPrec2 sp1 _ sp2 _ p (a :#: b) =
         showsBinaryWith sp1 sp2 "(:#:)" p a b
@@ -223,16 +220,6 @@ showsTernaryWith sp1 sp2 name p a b i = showParen (p > appPrec) $
     . sp2 appPrec1 b  . showSpace
     . showsPrec appPrec1 i
 #endif
-
--------------------------------------------------------------------------------
-
-$(deriveTextShow  ''TyConPlain)
-$(deriveTextShow1 ''TyConPlain)
-$(deriveTextShow2 ''TyConPlain)
-
-$(deriveTextShow  ''TyConGADT)
-$(deriveTextShow1 ''TyConGADT)
-$(deriveTextShow2 ''TyConGADT)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  '(:#:))

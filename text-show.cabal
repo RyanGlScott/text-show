@@ -63,6 +63,21 @@ flag developer
   default:             False
   manual:              True
 
+flag base-4-9
+  description:         Use base-4.9 or later.
+  default:             True
+
+flag template-haskell-2-11
+  description:         Use template-haskell-2.11.0.0 or later.
+  default:             True
+
+flag new-functor-classes
+  description:         Use a version of transformers or transformers-compat with a
+                       modern-style Data.Functor.Classes module. This flag cannot be
+                       used when building with transformers-0.4, since it comes with
+                       a different version of Data.Functor.Classes.
+  default:             True
+
 library
   exposed-modules:     TextShow
                        TextShow.Control.Applicative
@@ -146,7 +161,6 @@ library
                        TextShow.TH.Names
                        TextShow.Utils
   build-depends:       array               >= 0.3    && < 0.6
-                     , base                >= 4.3    && < 5
                      , base-compat         >= 0.8.1  && < 1
                      , bifunctors          >= 5.1    && < 6
                      , bytestring          >= 0.9    && < 0.11
@@ -159,13 +173,28 @@ library
                      , semigroups          >= 0.17   && < 1
                      , tagged              >= 0.4.4  && < 1
                      , text                >= 0.11.1 && < 1.3
-                     , template-haskell    >= 2.5    && < 2.12
                      , th-lift             >= 0.7.6  && < 1
-                     , transformers        >= 0.2.1  && < 0.6
-                     , transformers-compat >= 0.5    && < 1
                      , void                >= 0.5    && < 1
-  if impl(ghc >= 8.0)
-    build-depends:     ghc-boot
+
+  if flag(base-4-9)
+    build-depends:     base                >= 4.9 && < 5
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     base                >= 4.3 && < 4.9
+
+  if flag(template-haskell-2-11)
+    build-depends:     template-haskell    >= 2.11 && < 2.12
+                     , ghc-boot-th
+  else
+    build-depends:     template-haskell    >= 2.5  && < 2.11
+
+  if flag(new-functor-classes)
+    build-depends:     transformers        (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.6)
+                     , transformers-compat >= 0.5 && < 1
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     transformers        == 0.4.*
+
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall
@@ -330,13 +359,13 @@ test-suite spec
                        -- Only exports tests if base >= 4.9
                        Spec.GHC.StackSpec
   build-depends:       array                >= 0.3    && < 0.6
-                     , base                 >= 4.3    && < 5
                      , base-compat          >= 0.8.2  && < 1
                      , base-orphans         >= 0.5.2  && < 1
                      , bifunctors           >= 5.1    && < 6
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
                      , containers           >= 0.1    && < 0.6
+                     , deriving-compat      >= 0.2.2  && < 1
                      , generic-deriving     >= 1.10.3 && < 2
                      , ghc-prim
                      , hspec                >= 2      && < 3
@@ -346,21 +375,35 @@ test-suite spec
                      , quickcheck-instances >= 0.1    && < 0.4
                      , semigroups           >= 0.17   && < 1
                      , tagged               >= 0.8.3  && < 1
-                     , template-haskell     >= 2.5    && < 2.12
                      , text                 >= 0.11.1 && < 1.3
                      , th-lift              >= 0.7.6  && < 1
-                     , transformers         >= 0.2.1  && < 0.6
                      , transformers-compat  >= 0.5    && < 1
                      , void                 >= 0.5    && < 1
-  if impl(ghc >= 8.0)
-    build-depends:     ghc-boot
-  if !flag(developer)
-    build-depends:     text-show            == 3.2.2
 
-  hs-source-dirs:      tests
+  if flag(base-4-9)
+    build-depends:     base                >= 4.9 && < 5
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     base                >= 4.3 && < 4.9
+
+  if flag(template-haskell-2-11)
+    build-depends:     template-haskell    >= 2.11 && < 2.12
+                     , ghc-boot-th
+  else
+    build-depends:     template-haskell    >= 2.5  && < 2.11
+
+  if flag(new-functor-classes)
+    build-depends:     transformers        (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.6)
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     transformers        == 0.4.*
+
   if flag(developer)
     hs-source-dirs:    src
+  else
+    build-depends:     text-show == 3.2.2
 
+  hs-source-dirs:      tests
   default-language:    Haskell2010
   ghc-options:         -Wall -threaded -rtsopts
   include-dirs:        include
@@ -377,7 +420,6 @@ benchmark bench
   type:                exitcode-stdio-1.0
   main-is:             Bench.hs
   build-depends:       array               >= 0.3    && < 0.6
-                     , base                >= 4.5    && < 5
                      , base-compat         >= 0.8.1  && < 1
                      , bifunctors          >= 5.1    && < 6
                      , bytestring          >= 0.9    && < 0.11
@@ -392,15 +434,33 @@ benchmark bench
                      , semigroups          >= 0.17   && < 1
                      , tagged              >= 0.4.4  && < 1
                      , text                >= 0.11.1 && < 1.3
-                     , template-haskell    >= 2.5    && < 2.12
                      , th-lift             >= 0.7.6  && < 1
-                     , transformers        >= 0.2.1  && < 0.6
-                     , transformers-compat >= 0.5    && < 1
                      , void                >= 0.5    && < 1
+
+  if flag(base-4-9)
+    build-depends:     base                >= 4.9 && < 5
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     base                >= 4.5 && < 4.9
+
+  if flag(template-haskell-2-11)
+    build-depends:     template-haskell    >= 2.11 && < 2.12
+                     , ghc-boot-th
+  else
+    build-depends:     template-haskell    >= 2.5  && < 2.11
+
+  if flag(new-functor-classes)
+    build-depends:     transformers        (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.6)
+                     , transformers-compat >= 0.5 && < 1
+    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
+  else
+    build-depends:     transformers        == 0.4.*
+
   if flag(developer)
     hs-source-dirs:    src
   else
     build-depends:     text-show == 3.2.2
+
   hs-source-dirs:      benchmarks
   default-language:    Haskell2010
   ghc-options:         -Wall

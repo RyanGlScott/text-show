@@ -44,8 +44,6 @@ module Derived.DataFamilies (
 
 #include "generic.h"
 
-import           Data.Functor.Classes (Show1(..))
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
 #endif
@@ -63,11 +61,17 @@ import           Prelude.Compat
 import           Test.QuickCheck (Arbitrary(..), oneof)
 
 #if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 #endif
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import           Data.Functor.Classes (Show2(..), showsUnaryWith, showsBinaryWith)
+#if defined(NEW_FUNCTOR_CLASSES)
+# if MIN_VERSION_template_haskell(2,7,0)
+import           Text.Show.Deriving (deriveShow2)
+# else
+import           Data.Functor.Classes (Show1(..), Show2(..),
+                                       showsUnaryWith, showsBinaryWith)
+# endif
 #endif
 
 -------------------------------------------------------------------------------
@@ -91,9 +95,11 @@ instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b 
                       , NASShow2 <$> arbitrary
                       ]
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
-    showsPrec1 = showsPrec
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'NASShow1)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 'NASShow1)
+$(deriveShow2 'NASShow2)
 #else
 instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
@@ -148,11 +154,16 @@ instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: Bool) b c) where
     arbitrary = KindDistinguishedBool <$> arbitrary <*> arbitrary
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show b => Show1 (KindDistinguished (a :: ())   b) where
-    showsPrec1 = showsPrec
-instance Show b => Show1 (KindDistinguished (a :: Bool) b) where
-    showsPrec1 = showsPrec
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'KindDistinguishedUnit)
+
+$(deriveShow1 'KindDistinguishedBool)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 'KindDistinguishedUnit)
+$(deriveShow2 'KindDistinguishedUnit)
+
+$(deriveShow1 'KindDistinguishedBool)
+$(deriveShow2 'KindDistinguishedBool)
 #else
 instance Show b => Show1 (KindDistinguished (a :: ())   b) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList

@@ -2,6 +2,7 @@
 {-# LANGUAGE DatatypeContexts #-}
 {-# LANGUAGE TemplateHaskell  #-}
 {-# LANGUAGE TypeFamilies     #-}
+-- I don't know how to silence the -XDatatypeContexts warnings otherwise...
 {-# OPTIONS_GHC -w #-}
 
 {-|
@@ -26,9 +27,16 @@ import Test.QuickCheck (Arbitrary(..))
 import TextShow (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.TH (makeShowbPrec, makeLiftShowbPrec, makeLiftShowbPrec2)
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 import Data.Functor.Classes (Show2(..))
+import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
+# if MIN_VERSION_template_haskell(2,7,0)
+import Text.Show.Deriving (deriveShow2)
+# else
 import GHC.Show (appPrec, appPrec1, showSpace)
+# endif
+#else
+import Text.Show.Deriving (makeShowsPrec1)
 #endif
 
 -------------------------------------------------------------------------------
@@ -53,20 +61,32 @@ instance (Ord a, Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (TyFamily a
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
+$(return [])
+
 instance (Ord a, Show a, Show b) => Show1 (TyCon a b) where
-    showsPrec1 = showsPrec
-instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
-    showsPrec1 = showsPrec
+#if defined(NEW_FUNCTOR_CLASSES)
+    liftShowsPrec = $(makeLiftShowsPrec ''TyCon)
 #else
-instance (Ord a, Show a, Show b) => Show1 (TyCon a b) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
+    showsPrec1 = $(makeShowsPrec1 ''TyCon)
+#endif
+#if defined(NEW_FUNCTOR_CLASSES)
+instance (Ord a, Show a) => Show2 (TyCon a) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 ''TyCon)
+#endif
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
+    showsPrec1 = $(makeShowsPrec1 'TyFamily)
+#elif MIN_VERSION_template_haskell(2,7,0)
+instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
+    liftShowsPrec = $(makeLiftShowsPrec 'TyFamily)
+
+instance (Ord a, Show a) => Show2 (TyFamily a) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamily)
+#else
 instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance (Ord a, Show a) => Show2 (TyCon a) where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyCon a b c) =
-        showsThree sp1 sp2 "TyCon" p a b c
 instance (Ord a, Show a) => Show2 (TyFamily a) where
     liftShowsPrec2 sp1 _ sp2 _ p (TyFamily a b c) =
         showsThree sp1 sp2 "TyFamily" p a b c
@@ -80,10 +100,6 @@ showsThree sp1 sp2 name p a b c = showParen (p > appPrec) $
     . sp1 appPrec1 b       . showSpace
     . sp2 appPrec1 c
 #endif
-
--------------------------------------------------------------------------------
-
-$(return [])
 
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyCon a b c) where
     showbPrec = $(makeShowbPrec ''TyCon)

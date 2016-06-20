@@ -78,10 +78,10 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showbToShows, showsToShowb)
 import           TextShow.Utils (coerce)
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-import           Text.Show (showListWith)
-#else
+#if defined(NEW_FUNCTOR_CLASSES)
 import           Data.Functor.Classes (Show2(..), showsPrec1, showsPrec2)
+#else
+import           Text.Show (showListWith)
 #endif
 
 -------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ instance Show a => Show (FromStringShow a) where
     showList  = coerce (showList  :: [a] -> ShowS)
 
 instance Show1 FromStringShow where
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
     liftShowList  _  sl   = sl   . coerceList
       where
         coerceList :: [FromStringShow a] -> [a]
@@ -187,7 +187,7 @@ instance TextShow a => Show (FromTextShow a) where
     showList l = showbToShows showbList (coerce l :: [a])
 
 instance Show1 FromTextShow where
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
     liftShowList _ sl = showbToShows (showsToShowb sl) . coerceList
       where
         coerceList :: [FromTextShow a] -> [a]
@@ -260,7 +260,7 @@ instance Read (f a) => Read (FromStringShow1 f a) where
     readList     = coerce (readList     :: ReadS [f a])
     readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
 instance (Show1 f, Show a) => TextShow (FromStringShow1 f a) where
     showbPrec = liftShowbPrec (showsPrecToShowbPrec showsPrec)
@@ -338,7 +338,7 @@ instance Read (f a) => Read (FromTextShow1 f a) where
     readList     = coerce (readList     :: ReadS [f a])
     readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
 instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a) where
     showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
@@ -348,7 +348,7 @@ instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a) where
 #endif
 
 instance TextShow1 f => Show1 (FromTextShow1 f) where
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
     liftShowList sp sl =
         showbToShows (liftShowbList (showsPrecToShowbPrec sp)
                                     (showsToShowb         sl))
@@ -419,7 +419,7 @@ instance Read (f a b) => Read (FromStringShow2 f a b) where
     readList     = coerce (readList     :: ReadS [f a b])
     readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 -- TODO: Manually implement this when you can derive Show2 (someday)
 -- | Not available if using @transformers-0.4@
 deriving instance Show2 f => Show2 (FromStringShow2 f)
@@ -520,7 +520,7 @@ instance Read (f a b) => Read (FromTextShow2 f a b) where
     readList     = coerce (readList     :: ReadS [f a b])
     readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
 instance (TextShow2 f, TextShow a, TextShow b) => Show (FromTextShow2 f a b) where
     showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
@@ -564,7 +564,7 @@ instance (TextShow2 f, TextShow a) => TextShow1 (FromTextShow2 f a) where
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
+#if !defined(NEW_FUNCTOR_CLASSES)
 liftShowsPrec :: (Show1 f, Show a) => (Int -> a -> ShowS) -> ([a] -> ShowS)
               -> Int -> f a -> ShowS
 liftShowsPrec _ _ = showsPrec1

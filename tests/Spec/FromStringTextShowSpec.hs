@@ -21,7 +21,7 @@ import Test.Hspec.QuickCheck (prop)
 
 import TextShow (FromStringShow(..), FromTextShow(..))
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
 import Spec.Utils (prop_matchesTextShow2)
 import TextShow (FromStringShow1(..), FromStringShow2(..),
                  FromTextShow1(..), FromTextShow2(..))
@@ -44,7 +44,7 @@ spec = parallel $ do
     describe "FromTextShow String" $ do
         prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromTextShow String -> Bool)
         prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromTextShow String -> Bool)
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
+#if defined(NEW_FUNCTOR_CLASSES)
     describe "FromStringShow1 Maybe Int" $ do
         prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromStringShow1 Maybe Int -> Bool)
         prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromStringShow1 Maybe Int -> Bool)

@@ -27,12 +27,21 @@ import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
+import Text.Show.Deriving (deriveShow1)
 import TextShow (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2,
                     makeShowbPrec, makeLiftShowbPrec, makeLiftShowbPrec2)
 
-#if !(MIN_VERSION_transformers(0,4,0)) || MIN_VERSION_transformers(0,5,0)
-import Data.Functor.Classes (Show2(..), showsUnaryWith, showsBinaryWith)
+#if defined(NEW_FUNCTOR_CLASSES)
+import Data.Functor.Classes (Show2(..))
+import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
+# if MIN_VERSION_template_haskell(2,7,0)
+import Text.Show.Deriving (deriveShow2)
+# else
+import Data.Functor.Classes (showsBinaryWith)
+# endif
+#else
+import Text.Show.Deriving (makeShowsPrec1)
 #endif
 
 -------------------------------------------------------------------------------
@@ -74,24 +83,37 @@ instance Arbitrary (TyFamily Int Int) where
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_transformers(0,4,0) && !(MIN_VERSION_transformers(0,5,0))
-instance Show a => Show1 (TyCon a) where
-    showsPrec1 = showsPrec
-instance Show a => Show1 (TyFamily a) where
-    showsPrec1 = showsPrec
-#else
+$(return [])
+
 instance Show1 (Tagged2 s t) where
-    liftShowsPrec = liftShowsPrec2 undefined undefined
-instance Show a => Show1 (TyCon a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
+#if defined(NEW_FUNCTOR_CLASSES)
+    liftShowsPrec = $(makeLiftShowsPrec ''Tagged2)
+#else
+    showsPrec1 = $(makeShowsPrec1 ''Tagged2)
+#endif
+#if defined(NEW_FUNCTOR_CLASSES)
+instance Show2 (Tagged2 s) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 ''Tagged2)
+#endif
+
+$(deriveShow1 ''TyCon)
+#if defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow2 ''TyCon)
+#endif
+
+$(deriveTextShow  ''TyCon)
+$(deriveTextShow1 ''TyCon)
+$(deriveTextShow2 ''TyCon)
+
+#if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'TyFamily)
+#elif MIN_VERSION_template_haskell(2,7,0)
+$(deriveShow1 'TyFamily)
+$(deriveShow2 'TyFamily)
+#else
 instance Show a => Show1 (TyFamily a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
 
-instance Show2 (Tagged2 s) where
-    liftShowsPrec2 _ _ sp _ p (Tagged2 b) = showsUnaryWith sp "Tagged2" p b
-instance Show2 TyCon where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyCon b a) =
-        showsForall sp1 sl1 sp2 sl2 "TyCon" p b a
 instance Show2 TyFamily where
     liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily b a) =
         showsForall sp1 sl1 sp2 sl2 "TyFamily" p b a
@@ -108,12 +130,6 @@ showsForall sp1 sl1 sp2 sl2 name p b a =
                         name p b a
 #endif
 
--------------------------------------------------------------------------------
-
-$(deriveTextShow  ''TyCon)
-$(deriveTextShow1 ''TyCon)
-$(deriveTextShow2 ''TyCon)
-
 #if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
@@ -121,8 +137,6 @@ $(deriveTextShow2 'TyFamily)
 #endif
 
 -------------------------------------------------------------------------------
-
-$(return [])
 
 instance TextShow c => TextShow (Tagged2 s t c) where
     showbPrec = $(makeShowbPrec ''Tagged2)
