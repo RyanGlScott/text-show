@@ -19,9 +19,7 @@ import           Control.DeepSeq (NFData)
 import           Criterion.Main (Benchmark, bench, bgroup, defaultMain, nf)
 
 import           Data.List (foldl')
-import qualified Data.Text.Lazy as T (pack)
-import qualified Data.Text      as S
-import qualified Data.Text.Lazy.Builder as LBuilder
+import qualified Data.Text as T
 
 import           GHC.Generics (Generic)
 
@@ -33,16 +31,20 @@ main :: IO ()
 main = defaultMain
     [ sampleGroup "String Show"                 BTLeaf1 BTBranch1 BTEmpty1 show
     , sampleGroup "String Show, then Text.pack" BTLeaf1 BTBranch1 BTEmpty1 (T.pack . show)
-    , sampleGroup "Text Show (TH)"              BTLeaf2 BTBranch2 BTEmpty2 showtl
-    , sampleGroup "Text Show (generics)"        BTLeaf3 BTBranch3 BTEmpty3 showtl
-    , bgroup "Enumeration Type (strict Text)"
-      [ bench "String Show, then Text.pack"  $ nf (S.pack . show) Violet
-      , bench "Text Show (TH)" $ nf showt Violet
-      , bench "Text Show (showtPrec lambda)" $ nf showt (Color2 Violet)
-      , bench "Text Show (showtPrec non-lambda)" $ nf showt (Color3 Violet)
-      , bench "Manually written text show"  $ nf manualColorRendering Violet
+    , sampleGroup "TextShow (TH)"               BTLeaf2 BTBranch2 BTEmpty2 showt
+    , sampleGroup "TextShow (generics)"         BTLeaf3 BTBranch3 BTEmpty3 showt
+    , bgroup "Enumeration type"
+      [ bench "String Show"                 $ nf show            Violet
+      , bench "String Show, then Text.pack" $ nf (T.pack . show) Violet
+      , bench "TextShow (TH)"               $ nf showt           Violet
+      , bench "TextShow (generics)"         $ nf showt         $ Color2 Violet
+      , bench "Manually written showt"      $ nf colorShowt      Violet
       ]
     ]
+
+-------------------------------------------------------------------------------
+-- Tree-like ADTs
+-------------------------------------------------------------------------------
 
 sampleGroup :: forall a b. NFData b
             => String -> (Int -> a) -> (a -> a -> a) -> a -> (a -> b) -> Benchmark
@@ -65,27 +67,24 @@ type Sample = forall a b.
 
 smallSample :: Sample
 smallSample (leaf, branch, _, showFun) =
-    showFun $
-        (leaf 12345 `branch` leaf 1234) `branch`
-        leaf 123456 `branch`
-        (leaf 1234567 `branch` leaf 123456)
+    showFun $ sampleTree leaf branch
 {-# NOINLINE smallSample #-}
 
 mediumSample :: Sample
 mediumSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 1000 $
-        (leaf 12345 `branch` leaf 1234) `branch`
-        leaf 123456 `branch`
-        (leaf 1234567 `branch` leaf 123456)
+    showFun . foldl' branch empty . replicate 1000 $ sampleTree leaf branch
 {-# NOINLINE mediumSample #-}
 
 largeSample :: Sample
 largeSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 100000 $
-        (leaf 12345 `branch` leaf 1234) `branch`
-        leaf 123456 `branch`
-        (leaf 1234567 `branch` leaf 123456)
+    showFun . foldl' branch empty . replicate 100000 $ sampleTree leaf branch
 {-# NOINLINE largeSample #-}
+
+sampleTree :: (Int -> a) -> (a -> a -> a) -> a
+sampleTree leaf branch =
+    (leaf 12345 `branch` leaf 1234) `branch`
+    leaf 123456 `branch`
+    (leaf 1234567 `branch` leaf 123456)
 
 -- NB: constructors must be same length!
 data BinTree1 a = BTEmpty1
@@ -105,46 +104,27 @@ data BinTree3 a = BTEmpty3
 instance TextShow a => TextShow (BinTree3 a) where
     showbPrec = genericShowbPrec
 
-------------------------------------------
+-------------------------------------------------------------------------------
 -- Simple enumeration types
--------------------------------------------
+-------------------------------------------------------------------------------
 
 data Color = Red | Green | Blue | Orange | Violet
-  deriving (Show)
+  deriving (Generic, Show)
 
 newtype Color2 = Color2 Color
-newtype Color3 = Color3 Color
 
 instance TextShow Color2 where
-  showb = error "Color2: did not write this"
-  showt = showtPrec 0
-  showtPrec = \_ (Color2 c) -> case c of
-    Red    -> S.pack "Red"
-    Green  -> S.pack "Green"
-    Blue   -> S.pack "Blue"
-    Orange -> S.pack "Orange"
-    Violet -> S.pack "Violet"
+    showbPrec p (Color2 c) = genericShowbPrec p c
 
-instance TextShow Color3 where
-  showb = error "Color2: did not write this"
-  showt = showtPrec 0
-  showtPrec _ (Color3 c) = case c of
-    Red    -> S.pack "Red"
-    Green  -> S.pack "Green"
-    Blue   -> S.pack "Blue"
-    Orange -> S.pack "Orange"
-    Violet -> S.pack "Violet"
+colorShowt :: Color -> T.Text
+colorShowt c = case c of
+  Red    -> T.pack "Red"
+  Green  -> T.pack "Green"
+  Blue   -> T.pack "Blue"
+  Orange -> T.pack "Orange"
+  Violet -> T.pack "Violet"
 
-manualColorRendering :: Color -> S.Text
-manualColorRendering c = case c of
-  Red    -> S.pack "Red"
-  Green  -> S.pack "Green"
-  Blue   -> S.pack "Blue"
-  Orange -> S.pack "Orange"
-  Violet -> S.pack "Violet"
-
+-------------------------------------------------------------------------------
 
 $(deriveTextShow ''BinTree2)
-
 $(deriveTextShow ''Color)
-
