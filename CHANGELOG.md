@@ -1,5 +1,5 @@
 # next
-* Add benchmark group that tests the performance of using `String` `show` followed by `Text.pack`
+* Made benchmark suite more comprehensive, including benchmarks for showing an enumeration type
 
 ### 3.2.2
 * Added benchmarks
