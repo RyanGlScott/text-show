@@ -53,6 +53,10 @@ spec = parallel $ do
         prop "TextShow instance" prop_showTraceFlags
     describe "TickyFlags" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> TickyFlags -> Bool)
+# if __GLASGOW_HASKELL__ >= 801
+    describe "ParFlags" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ParFlags -> Bool)
+# endif
 #else
     pure ()
 #endif

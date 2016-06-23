@@ -18,5 +18,10 @@ import GHC.StaticPtr (StaticPtrInfo(..))
 import Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary StaticPtrInfo where
-    arbitrary = StaticPtrInfo <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-#endif 
+    arbitrary = StaticPtrInfo <$> arbitrary
+                              <*> arbitrary
+                              <*> arbitrary
+# if __GLASGOW_HASKELL__ < 801
+                              <*> arbitrary
+# endif
+#endif

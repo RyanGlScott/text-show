@@ -30,6 +30,9 @@ module TextShow.GHC.RTS.Flags (
     , showbProfFlagsPrec
     , showbTraceFlagsPrec
     , showbTickyFlagsPrec
+# if __GLASGOW_HASKELL__ >= 801
+    , showbParFlagsPrec
+# endif
 # if MIN_VERSION_base(4,8,2)
     , showbGiveGCStats
     , showbDoCostCentres
@@ -124,6 +127,16 @@ showbTickyFlagsPrec :: Int -> TickyFlags -> Builder
 showbTickyFlagsPrec = showbPrec
 {-# INLINE showbTickyFlagsPrec #-}
 
+# if __GLASGOW_HASKELL__ >= 801
+-- | Convert a 'ParFlags' value to a 'Builder' with the given precedence.
+-- This function is only available with GHC 8.1 or later.
+--
+-- /Since: 3.3/
+showbParFlagsPrec :: Int -> ParFlags -> Builder
+showbParFlagsPrec = showbPrec
+{-# INLINE showbParFlagsPrec #-}
+# endif
+
 # if MIN_VERSION_base(4,8,2)
 -- | Convert a 'GiveGCStats' value to a 'Builder'.
 -- This function is only available with @base-4.8.2.0@ or later.
@@ -167,6 +180,9 @@ $(deriveTextShow ''CCFlags)
 $(deriveTextShow ''ProfFlags)
 $(deriveTextShow ''TraceFlags)
 $(deriveTextShow ''TickyFlags)
+# if __GLASGOW_HASKELL__ >= 801
+$(deriveTextShow ''ParFlags)
+# endif
 
 $(deriveTextShow giveGCStatsTypeName)
 $(deriveTextShow doCostCentresTypeName)

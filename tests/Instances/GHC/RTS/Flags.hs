@@ -16,7 +16,9 @@ module Instances.GHC.RTS.Flags () where
 #if MIN_VERSION_base(4,8,0)
 import GHC.RTS.Flags
 import Test.QuickCheck (Arbitrary(..))
+#endif
 
+#if MIN_VERSION_base(4,8,0)
 instance Arbitrary ConcFlags where
     arbitrary = ConcFlags <$> arbitrary <*> arbitrary
 
@@ -32,4 +34,11 @@ instance Arbitrary DebugFlags where
 
 instance Arbitrary TickyFlags where
     arbitrary = TickyFlags <$> arbitrary <*> arbitrary
+#endif
+
+#if __GLASGOW_HASKELL__ >= 801
+instance Arbitrary ParFlags where
+    arbitrary = ParFlags <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+                         <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+                         <*> arbitrary <*> arbitrary
 #endif

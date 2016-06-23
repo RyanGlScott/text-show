@@ -278,6 +278,8 @@ instance TextShow ConType where
 -- | A 'ShowFuns' value either stores nothing (for 'TextShow') or it stores
 -- the two function arguments that show occurrences of the type parameter (for
 -- 'TextShow1').
+--
+-- /Since: 3.3/
 data ShowFuns arity a where
     NoShowFuns :: ShowFuns Zero a
     Show1Funs  :: (Int -> a -> Builder) -> ([a] -> Builder) -> ShowFuns One a
@@ -289,12 +291,12 @@ instance Contravariant (ShowFuns arity) where
 
 -- | A type-level indicator that 'TextShow' is being derived generically.
 --
--- / Since: 3.2/
+-- /Since: 3.2/
 data Zero
 
 -- | A type-level indicator that 'TextShow1' is being derived generically.
 --
--- / Since: 3.2/
+-- /Since: 3.2/
 data One
 
 -- | Class of generic representation types that can be converted to
