@@ -4,6 +4,7 @@
 {-# LANGUAGE EmptyDataDecls        #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MagicHash             #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
@@ -69,12 +70,13 @@ module TextShow.Generic (
     , GTextShowCon(..)
     , IsNullary(..)
     , ConType(..)
+    , ShowFuns(..)
     , Zero
     , One
     ) where
 
+import           Data.Functor.Contravariant (Contravariant(..))
 import           Data.Monoid.Compat ((<>))
-import           Data.Proxy (Proxy(..))
 import qualified Data.Text    as TS (Text)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
@@ -199,7 +201,7 @@ genericShowb = genericShowbPrec 0
 --
 -- /Since: 2/
 genericShowbPrec :: (Generic a, GTextShow Zero (Rep a)) => Int -> a -> Builder
-genericShowbPrec p = gShowbPrec (Proxy :: Proxy Zero) undefined undefined p . from
+genericShowbPrec p = gShowbPrec NoShowFuns p . from
 
 -- | A 'Generic' implementation of 'showbList'.
 --
@@ -237,7 +239,7 @@ genericHPrintTL h = TL.hPutStrLn h . genericShowtl
 genericLiftShowbPrec :: (Generic1 f, GTextShow One (Rep1 f))
                      => (Int -> a -> Builder) -> ([a] -> Builder)
                      -> Int -> f a -> Builder
-genericLiftShowbPrec sp sl p = gShowbPrec (Proxy :: Proxy One) sp sl p . from1
+genericLiftShowbPrec sp sl p = gShowbPrec (Show1Funs sp sl) p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
 --
@@ -273,6 +275,18 @@ instance TextShow ConType where
     showbPrec = genericShowbPrec
     INLINE_INST_FUN(showbPrec)
 
+-- | A 'ShowFuns' value either stores nothing (for 'TextShow') or it stores
+-- the two function arguments that show occurrences of the type parameter (for
+-- 'TextShow1').
+data ShowFuns arity a where
+    NoShowFuns :: ShowFuns Zero a
+    Show1Funs  :: (Int -> a -> Builder) -> ([a] -> Builder) -> ShowFuns One a
+  deriving Typeable
+
+instance Contravariant (ShowFuns arity) where
+    contramap _ NoShowFuns        = NoShowFuns
+    contramap f (Show1Funs sp sl) = Show1Funs (\p -> sp p . f) (sl . map f)
+
 -- | A type-level indicator that 'TextShow' is being derived generically.
 --
 -- / Since: 3.2/
@@ -292,30 +306,28 @@ data One
 class GTextShow arity f where
     -- | This is used as the default generic implementation of 'showbPrec' (if the
     -- @arity@ is 'Zero') or 'liftShowbPrec' (if the @arity@ is 'One').
-    gShowbPrec :: Proxy arity
-               -> (Int -> a -> Builder) -> ([a] -> Builder)
-               -> Int -> f a -> Builder
+    gShowbPrec :: ShowFuns arity a -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShow
 #endif
 
 instance GTextShow arity f => GTextShow arity (D1 d f) where
-    gShowbPrec pa sp sl p (M1 x) = gShowbPrec pa sp sl p x
+    gShowbPrec sfs p (M1 x) = gShowbPrec sfs p x
 
 instance GTextShow Zero V1 where
-    gShowbPrec _ _ _ _ !_ = error "Void showbPrec"
+    gShowbPrec _ _ !_ = error "Void showbPrec"
 
 instance GTextShow One V1 where
-    gShowbPrec _ _ _ _ !_ = error "Void liftShowbPrec"
+    gShowbPrec _ _ !_ = error "Void liftShowbPrec"
 
 instance (GTextShow arity f, GTextShow arity g) => GTextShow arity (f :+: g) where
-    gShowbPrec pa sp sl p (L1 x) = gShowbPrec pa sp sl p x
-    gShowbPrec pa sp sl p (R1 x) = gShowbPrec pa sp sl p x
+    gShowbPrec sfs p (L1 x) = gShowbPrec sfs p x
+    gShowbPrec sfs p (R1 x) = gShowbPrec sfs p x
 
 instance (Constructor c, GTextShowCon arity f, IsNullary f)
       => GTextShow arity (C1 c f) where
-    gShowbPrec pa sp sl p c@(M1 x) = case fixity of
+    gShowbPrec sfs p c@(M1 x) = case fixity of
         Prefix -> showbParen ( p > appPrec
                                && not (isNullary x || conIsTuple c)
                              ) $
@@ -326,8 +338,8 @@ instance (Constructor c, GTextShowCon arity f, IsNullary f)
             <> (if isNullary x || conIsTuple c
                    then mempty
                    else singleton ' ')
-            <> showbBraces t (gShowbPrecCon pa t sp sl appPrec1 x)
-        Infix _ m -> showbParen (p > m) $ gShowbPrecCon pa t sp sl (m+1) x
+            <> showbBraces t (gShowbPrecCon t sfs appPrec1 x)
+        Infix _ m -> showbParen (p > m) $ gShowbPrecCon t sfs (m+1) x
       where
         fixity :: Fixity
         fixity = conFixity c
@@ -357,79 +369,76 @@ instance (Constructor c, GTextShowCon arity f, IsNullary f)
 class GTextShowCon arity f where
     -- | Convert value of a specific 'ConType' to a 'Builder' with the given
     -- precedence.
-    gShowbPrecCon :: Proxy arity -> ConType
-                  -> (Int -> a -> Builder) -> ([a] -> Builder)
-                  -> Int -> f a -> Builder
+    gShowbPrecCon :: ConType -> ShowFuns arity a -> Int -> f a -> Builder
 
 #if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable GTextShowCon
 #endif
 
 instance GTextShowCon arity U1 where
-    gShowbPrecCon _ _ _ _ _ U1 = mempty
+    gShowbPrecCon _ _ _ U1 = mempty
 
 instance GTextShowCon One Par1 where
-    gShowbPrecCon _ _ sp _ p (Par1 x) = sp p x
+    gShowbPrecCon _ (Show1Funs sp _) p (Par1 x) = sp p x
 
 instance TextShow c => GTextShowCon arity (K1 i c) where
-    gShowbPrecCon _ _ _ _ p (K1 x) = showbPrec p x
+    gShowbPrecCon _ _ p (K1 x) = showbPrec p x
 
 instance TextShow1 f => GTextShowCon One (Rec1 f) where
-    gShowbPrecCon _ _ sp sl p (Rec1 x) = liftShowbPrec sp sl p x
+    gShowbPrecCon _ (Show1Funs sp sl) p (Rec1 x) = liftShowbPrec sp sl p x
 
 instance (Selector s, GTextShowCon arity f) => GTextShowCon arity (S1 s f) where
-    gShowbPrecCon pa t sp sl p sel@(M1 x)
-      | selName sel == "" = gShowbPrecCon pa t sp sl p x
+    gShowbPrecCon t sfs p sel@(M1 x)
+      | selName sel == "" = gShowbPrecCon t sfs p x
       | otherwise         = fromString (selName sel)
                             <> " = "
-                            <> gShowbPrecCon pa t sp sl 0 x
+                            <> gShowbPrecCon t sfs 0 x
 
 instance (GTextShowCon arity f, GTextShowCon arity g)
       => GTextShowCon arity (f :*: g) where
-    gShowbPrecCon pa t@Rec sp sl _ (a :*: b) =
-           gShowbPrecCon pa t sp sl 0 a
+    gShowbPrecCon t@Rec sfs _ (a :*: b) =
+           gShowbPrecCon t sfs 0 a
         <> ", "
-        <> gShowbPrecCon pa t sp sl 0 b
-    gShowbPrecCon pa t@(Inf o) sp sl p (a :*: b) =
-           gShowbPrecCon pa t sp sl p a
+        <> gShowbPrecCon t sfs 0 b
+    gShowbPrecCon t@(Inf o) sfs p (a :*: b) =
+           gShowbPrecCon t sfs p a
         <> showbSpace
         <> infixOp
         <> showbSpace
-        <> gShowbPrecCon pa t sp sl p b
+        <> gShowbPrecCon t sfs p b
       where
         infixOp :: Builder
         infixOp = if isInfixTypeCon o
                      then fromString o
                      else singleton '`' <> fromString o <> singleton '`'
-    gShowbPrecCon pa t@Tup sp sl _ (a :*: b) =
-           gShowbPrecCon pa t sp sl 0 a
+    gShowbPrecCon t@Tup sfs _ (a :*: b) =
+           gShowbPrecCon t sfs 0 a
         <> singleton ','
-        <> gShowbPrecCon pa t sp sl 0 b
-    gShowbPrecCon pa t@Pref sp sl p (a :*: b) =
-           gShowbPrecCon pa t sp sl p a
+        <> gShowbPrecCon t sfs 0 b
+    gShowbPrecCon t@Pref sfs p (a :*: b) =
+           gShowbPrecCon t sfs p a
         <> showbSpace
-        <> gShowbPrecCon pa t sp sl p b
+        <> gShowbPrecCon t sfs p b
 
 instance (TextShow1 f, GTextShowCon One g) => GTextShowCon One (f :.: g) where
-    gShowbPrecCon pa t sp sl p (Comp1 x) =
-      liftShowbPrec (gShowbPrecCon pa t sp sl)
-                    (showbListWith (gShowbPrecCon pa t sp sl 0))
-                    p x
+    gShowbPrecCon t sfs p (Comp1 x) =
+      let gspc = gShowbPrecCon t sfs
+      in liftShowbPrec gspc (showbListWith (gspc 0)) p x
 
 instance GTextShowCon arity UChar where
-    gShowbPrecCon _ _ _ _ p (UChar c)   = showbPrec (hashPrec p) (C# c) <> oneHash
+    gShowbPrecCon _ _ p (UChar c)   = showbPrec (hashPrec p) (C# c) <> oneHash
 
 instance GTextShowCon arity UDouble where
-    gShowbPrecCon _ _ _ _ p (UDouble d) = showbPrec (hashPrec p) (D# d) <> twoHash
+    gShowbPrecCon _ _ p (UDouble d) = showbPrec (hashPrec p) (D# d) <> twoHash
 
 instance GTextShowCon arity UFloat where
-    gShowbPrecCon _ _ _ _ p (UFloat f)  = showbPrec (hashPrec p) (F# f) <> oneHash
+    gShowbPrecCon _ _ p (UFloat f)  = showbPrec (hashPrec p) (F# f) <> oneHash
 
 instance GTextShowCon arity UInt where
-    gShowbPrecCon _ _ _ _ p (UInt i)    = showbPrec (hashPrec p) (I# i) <> oneHash
+    gShowbPrecCon _ _ p (UInt i)    = showbPrec (hashPrec p) (I# i) <> oneHash
 
 instance GTextShowCon arity UWord where
-    gShowbPrecCon _ _ _ _ p (UWord w)   = showbPrec (hashPrec p) (W# w) <> twoHash
+    gShowbPrecCon _ _ p (UWord w)   = showbPrec (hashPrec p) (W# w) <> twoHash
 
 oneHash, twoHash :: Builder
 hashPrec :: Int -> Int

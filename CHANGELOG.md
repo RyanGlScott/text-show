@@ -1,4 +1,5 @@
 # next
+* Refactored the internals of `TextShow.Generic` to avoid the use of proxies.
 * Made benchmark suite more comprehensive, including benchmarks for showing an enumeration type
 
 ### 3.2.2
