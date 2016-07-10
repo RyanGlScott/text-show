@@ -1,12 +1,11 @@
 {-# LANGUAGE CPP                        #-}
+
+#if !(MIN_VERSION_QuickCheck(2,9,0))
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-
-#if MIN_VERSION_base(4,8,0)
-{-# LANGUAGE FlexibleContexts           #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.Data.Monoid
@@ -20,6 +19,7 @@ Portability: GHC
 -}
 module Instances.Data.Monoid () where
 
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 import Data.Monoid
 import Test.QuickCheck (Arbitrary)
 
@@ -30,6 +30,7 @@ deriving instance Arbitrary a => Arbitrary (First a)
 deriving instance Arbitrary a => Arbitrary (Last a)
 deriving instance Arbitrary a => Arbitrary (Product a)
 deriving instance Arbitrary a => Arbitrary (Sum a)
-#if MIN_VERSION_base(4,8,0)
+# if MIN_VERSION_base(4,8,0)
 deriving instance Arbitrary (f a) => Arbitrary (Alt f a)
+# endif
 #endif

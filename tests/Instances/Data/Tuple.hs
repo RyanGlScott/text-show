@@ -18,6 +18,7 @@ import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 instance ( Arbitrary a
          , Arbitrary b
          , Arbitrary c
@@ -82,6 +83,7 @@ instance ( Arbitrary a
     arbitrary = (,,,,,,,,,)
         <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
         <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+#endif
 
 instance ( Arbitrary a
          , Arbitrary b

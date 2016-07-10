@@ -1,6 +1,10 @@
+{-# LANGUAGE CPP                        #-}
+
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.Control.Applicative
@@ -14,8 +18,10 @@ Portability: GHC
 -}
 module Instances.Control.Applicative () where
 
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 import Control.Applicative (Const(..), ZipList(..))
 import Test.QuickCheck (Arbitrary)
 
 deriving instance Arbitrary a => Arbitrary (Const a b)
 deriving instance Arbitrary a => Arbitrary (ZipList a)
+#endif

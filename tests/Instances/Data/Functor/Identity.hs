@@ -1,6 +1,10 @@
+{-# LANGUAGE CPP                        #-}
+
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.Data.Functor.Identity
@@ -14,7 +18,9 @@ Portability: GHC
 -}
 module Instances.Data.Functor.Identity () where
 
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 import Data.Functor.Identity (Identity(..))
 import Test.QuickCheck (Arbitrary)
 
 deriving instance Arbitrary a => Arbitrary (Identity a)
+#endif

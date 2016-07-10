@@ -1,4 +1,8 @@
+{-# LANGUAGE CPP #-}
+
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.Data.Version
@@ -12,6 +16,7 @@ Portability: GHC
 -}
 module Instances.Data.Version () where
 
+#if !(MIN_VERSION_QuickCheck(2,9,0))
 import Data.Version (Version(..))
 
 import Prelude ()
@@ -21,3 +26,4 @@ import Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary Version where
     arbitrary = Version <$> arbitrary <*> arbitrary
+#endif
