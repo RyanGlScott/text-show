@@ -33,7 +33,7 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
-import           Text.Show.Deriving (deriveShow1Options, legacyOptions)
+import           Text.Show.Deriving (deriveShow1Options, legacyShowOptions)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 #if defined(NEW_FUNCTOR_CLASSES)
@@ -107,9 +107,9 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily# a b) where
 
 -------------------------------------------------------------------------------
 
-$(deriveShow1Options legacyOptions ''TyCon#)
+$(deriveShow1Options legacyShowOptions ''TyCon#)
 #if defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow2Options legacyOptions ''TyCon#)
+$(deriveShow2Options legacyShowOptions ''TyCon#)
 #endif
 
 $(deriveTextShow  ''TyCon#)
@@ -117,10 +117,10 @@ $(deriveTextShow1 ''TyCon#)
 $(deriveTextShow2 ''TyCon#)
 
 #if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1Options legacyOptions 'TyFamily#)
+$(deriveShow1Options legacyShowOptions 'TyFamily#)
 #elif MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow1Options legacyOptions 'TyFamily#)
-$(deriveShow2Options legacyOptions 'TyFamily#)
+$(deriveShow1Options legacyShowOptions 'TyFamily#)
+$(deriveShow2Options legacyShowOptions 'TyFamily#)
 #else
 instance Show a => Show1 (TyFamily# a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
