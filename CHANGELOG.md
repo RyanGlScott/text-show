@@ -1,6 +1,7 @@
-# next
+## 3.3
 * Refactored the internals of `TextShow.Generic` to avoid the use of proxies.
 * Made benchmark suite more comprehensive, including benchmarks for showing an enumeration type
+* Microoptimization in derived `TextShow1/2` instances involving `TextShow.TH`
 * Allow building with `QuickCheck-2.9`
 * Fix GHC HEAD build
 

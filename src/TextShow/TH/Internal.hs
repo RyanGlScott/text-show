@@ -691,10 +691,12 @@ makeTextShowForType tsClass conName tvMap sl ty = do
     if any (`mentionsName` tyVarNames) lhsArgs
           || itf && any (`mentionsName` tyVarNames) tyArgs
        then outOfPlaceTyVarError tsClass conName
-       else appsE $ [ varE . showbPrecOrListName sl $ toEnum numLastArgs]
-                    ++ zipWith (makeTextShowForType tsClass conName tvMap)
-                               (cycle [False,True])
-                               (interleave rhsArgs rhsArgs)
+       else if any (`mentionsName` tyVarNames) rhsArgs
+               then appsE $ [ varE . showbPrecOrListName sl $ toEnum numLastArgs]
+                            ++ zipWith (makeTextShowForType tsClass conName tvMap)
+                                       (cycle [False,True])
+                                       (interleave rhsArgs rhsArgs)
+               else if sl then [| showbList |] else [| showbPrec |]
 
 -------------------------------------------------------------------------------
 -- Template Haskell reifying and AST manipulation
