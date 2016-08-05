@@ -75,6 +75,7 @@ module TextShow.Generic (
     , One
     ) where
 
+import           Data.Data (Data, Typeable)
 import           Data.Functor.Contravariant (Contravariant(..))
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Text    as TS (Text)
@@ -83,7 +84,6 @@ import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
 import qualified Data.Text.Lazy    as TL (Text)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
-import           Data.Typeable (Typeable)
 
 import           Generics.Deriving.Base
 #if __GLASGOW_HASKELL__ < 702
@@ -103,6 +103,7 @@ import           System.IO (Handle)
 import           TextShow.Classes (TextShow(..), TextShow1(..),
                                    showbListWith, showbParen, showbSpace)
 import           TextShow.Instances ()
+import           TextShow.TH.Internal (deriveTextShow)
 import           TextShow.Utils (isInfixTypeCon, isTupleString)
 
 #include "inline.h"
@@ -258,7 +259,8 @@ genericShowbPrec1 = genericLiftShowbPrec genericShowbPrec genericShowbList
 --
 -- /Since: 2/
 data ConType = Rec | Tup | Pref | Inf String
-  deriving ( Eq
+  deriving ( Data
+           , Eq
            , Ord
            , Read
            , Show
@@ -270,10 +272,6 @@ data ConType = Rec | Tup | Pref | Inf String
            , Lift
 #endif
            )
-
-instance TextShow ConType where
-    showbPrec = genericShowbPrec
-    INLINE_INST_FUN(showbPrec)
 
 -- | A 'ShowFuns' value either stores nothing (for 'TextShow') or it stores
 -- the two function arguments that show occurrences of the type parameter (for
@@ -497,6 +495,8 @@ instance IsNullary UWord where
     isNullary _ = False
 
 -------------------------------------------------------------------------------
+
+$(deriveTextShow ''ConType)
 
 #if __GLASGOW_HASKELL__ < 702
 $(Generics.deriveAll ''ConType)

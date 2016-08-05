@@ -1,3 +1,7 @@
+# next
+* TODO: TH Options
+* Added `Data` instance for `ConType` in `TextShow.Generic`
+
 ## 3.3
 * Refactored the internals of `TextShow.Generic` to avoid the use of proxies.
 * Made benchmark suite more comprehensive, including benchmarks for showing an enumeration type

@@ -21,12 +21,15 @@ module TextShow.TH.Internal (
       -- * 'deriveTextShow'
       -- $deriveTextShow
       deriveTextShow
+    , deriveTextShowOptions
       -- * 'deriveTextShow1'
       -- $deriveTextShow1
     , deriveTextShow1
+    , deriveTextShow1Options
       -- * 'deriveTextShow2'
       -- $deriveTextShow2
     , deriveTextShow2
+    , deriveTextShow2Options
       -- * @make-@ functions
       -- $make
     , makeShowt
@@ -46,6 +49,10 @@ module TextShow.TH.Internal (
     , makeShowbPrec1
     , makeLiftShowbPrec2
     , makeShowbPrec2
+    -- * 'Options'
+    , Options(..)
+    , defaultOptions
+    , GenTextMethods(..)
     ) where
 
 import           Control.Monad (liftM, unless, when)
@@ -85,6 +92,7 @@ import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showbListWith, showbParen, showbSpace)
+import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
 import           TextShow.Utils (isInfixTypeCon, isTupleString)
 
 -------------------------------------------------------------------------------
@@ -165,7 +173,11 @@ Note that at the moment, there are some limitations:
 --
 -- /Since: 2/
 deriveTextShow :: Name -> Q [Dec]
-deriveTextShow = deriveTextShowClass TextShow
+deriveTextShow = deriveTextShowOptions defaultOptions
+
+-- | Like 'deriveTextShow', but takes an 'Options' argument.
+deriveTextShowOptions :: Options -> Name -> Q [Dec]
+deriveTextShowOptions _ = deriveTextShowClass TextShow
 
 {- $deriveTextShow1
 
@@ -222,7 +234,11 @@ with some caveats:
 --
 -- /Since: 2/
 deriveTextShow1 :: Name -> Q [Dec]
-deriveTextShow1 = deriveTextShowClass TextShow1
+deriveTextShow1 = deriveTextShow1Options defaultOptions
+
+-- | Like 'deriveTextShow1', but takes an 'Options' argument.
+deriveTextShow1Options :: Options -> Name -> Q [Dec]
+deriveTextShow1Options _ = deriveTextShowClass TextShow1
 
 {- $deriveTextShow2
 
@@ -280,7 +296,11 @@ to 'deriveTextShow2', with some caveats:
 --
 -- /Since: 2/
 deriveTextShow2 :: Name -> Q [Dec]
-deriveTextShow2 = deriveTextShowClass TextShow2
+deriveTextShow2 = deriveTextShow2Options defaultOptions
+
+-- | Like 'deriveTextShow2', but takes an 'Options' argument.
+deriveTextShow2Options :: Options -> Name -> Q [Dec]
+deriveTextShow2Options _ = deriveTextShowClass TextShow2
 
 {- $make
 

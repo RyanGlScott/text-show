@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-|
 Module:      TextShow.TH
 Copyright:   (C) 2014-2016 Ryan Scott
@@ -16,3 +19,8 @@ module TextShow.TH (module TextShow.TH.Internal) where
 
 import TextShow.Instances ()
 import TextShow.TH.Internal
+
+-------------------------------------------------------------------------------
+
+$(deriveTextShow ''Options)
+$(deriveTextShow ''GenTextMethods)

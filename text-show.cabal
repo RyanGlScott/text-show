@@ -157,6 +157,7 @@ library
                        TextShow.Data.Typeable.Utils
                        TextShow.FromStringTextShow
                        TextShow.Instances
+                       TextShow.Options
                        TextShow.TH.Internal
                        TextShow.TH.Names
                        TextShow.Utils
@@ -244,6 +245,7 @@ test-suite spec
                        Instances.Generic
                        Instances.GHC.Generics
                        Instances.Numeric.Natural
+                       Instances.Options
                        Instances.System.Exit
                        Instances.System.IO
                        Instances.System.Posix.Types
@@ -324,6 +326,7 @@ test-suite spec
                        Spec.GenericSpec
                        Spec.GHC.GenericsSpec
                        Spec.Numeric.NaturalSpec
+                       Spec.OptionsSpec
                        Spec.System.ExitSpec
                        Spec.System.IOSpec
                        Spec.System.Posix.TypesSpec

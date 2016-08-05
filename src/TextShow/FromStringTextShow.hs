@@ -21,7 +21,6 @@
 
 #if __GLASGOW_HASKELL__ >= 708
 {-# LANGUAGE AutoDeriveTypeable         #-}
-{-# LANGUAGE PolyKinds                  #-}
 #endif
 
 #if __GLASGOW_HASKELL__ >= 800
