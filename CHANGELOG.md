@@ -1,5 +1,7 @@
 # next
+* The default definitions of `showt` and `showtl` were changed to `showtPrec 0` and `showtlPrec 0`, respectively
 * TODO: TH Options
+* Added `showtParen`, `showtSpace`, `showtlParen`, and `showtlSpace` to `TextShow`
 * Added `Data` instance for `ConType` in `TextShow.Generic`
 
 ## 3.3

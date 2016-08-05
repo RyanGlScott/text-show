@@ -21,9 +21,9 @@ module TextShow.Classes where
 import           Data.Data (Typeable)
 #endif
 import           Data.Monoid.Compat ((<>))
-import           Data.Text         as TS (Text)
+import qualified Data.Text         as TS (Text, singleton)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
-import qualified Data.Text.Lazy    as TL (Text)
+import qualified Data.Text.Lazy    as TL (Text, singleton)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
@@ -108,13 +108,16 @@ class TextShow a where
     -- efficiency, but it should satisfy:
     --
     -- @
+    -- 'showt' = 'showtPrec' 0
     -- 'showt' = 'toStrict' . 'showtl'
     -- @
+    --
+    -- The first equation is the default definition of 'showt'.
     --
     -- /Since: 3/
     showt :: a -- ^ The value to be converted to a strict 'TS.Text'.
           -> TS.Text
-    showt = toStrict . showtl
+    showt = showtPrec 0
 
     -- | Converts a list of values to a strict 'TS.Text'. This can be overridden for
     -- efficiency, but it should satisfy:
@@ -146,13 +149,16 @@ class TextShow a where
     -- efficiency, but it should satisfy:
     --
     -- @
+    -- 'showtl' = 'showtlPrec' 0
     -- 'showtl' = 'toLazyText' . 'showb'
     -- @
+    --
+    -- The first equation is the default definition of 'showtl'.
     --
     -- /Since: 3/
     showtl :: a -- ^ The value to be converted to a lazy 'TL.Text'.
            -> TL.Text
-    showtl = toLazyText . showb
+    showtl = showtlPrec 0
 
     -- | Converts a list of values to a lazy 'TL.Text'. This can be overridden for
     -- efficiency, but it should satisfy:
@@ -178,7 +184,6 @@ deriving instance Typeable TextShow
 showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
                      | otherwise = builder
-{-# INLINE showbParen #-}
 
 -- | Construct a 'Builder' containing a single space character.
 --
@@ -186,10 +191,37 @@ showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
 showbSpace :: Builder
 showbSpace = singleton ' '
 
+-- | Surrounds strict 'TS.Text' output with parentheses if the 'Bool' parameter is 'True'.
+--
+-- /Since: next/
+showtParen :: Bool -> TS.Text -> TS.Text
+showtParen p t | p         = TS.singleton '(' <> t <> TS.singleton ')'
+               | otherwise = t
+
+-- | Construct a strict 'TS.Text' containing a single space character.
+--
+-- /Since: next/
+showtSpace :: TS.Text
+showtSpace = TS.singleton ' '
+
+-- | Surrounds lazy 'TL.Text' output with parentheses if the 'Bool' parameter is 'True'.
+--
+-- /Since: next/
+showtlParen :: Bool -> TL.Text -> TL.Text
+showtlParen p t | p         = TL.singleton '(' <> t <> TL.singleton ')'
+                | otherwise = t
+{-# INLINE showtlParen #-}
+
+-- | Construct a lazy 'TL.Text' containing a single space character.
+--
+-- /Since: next/
+showtlSpace :: TL.Text
+showtlSpace = TL.singleton ' '
+
 -- | Converts a list of values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. The function argument
 -- controls how each element is shown.
-
+--
 -- @'showbListWith' 'showb'@ is the default implementation of 'showbList' save for
 -- a few special cases (e.g., 'String').
 --
@@ -200,7 +232,6 @@ showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
   where
     go (y:ys) = singleton ',' <> showbx y <> go ys               -- ..,..
     go []     = singleton ']'                                    -- ..]"
-{-# INLINE showbListWith #-}
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.

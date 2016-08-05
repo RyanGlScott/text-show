@@ -66,7 +66,7 @@ newtype Options = Options
 data GenTextMethods
   = AlwaysTextMethods    -- ^ Always generate them.
   | SometimesTextMethods -- ^ Only generate when @text-show@ feels it's appropriate.
-  | NoTextMethods        -- ^ Never generate them under any circumstances.
+  | NeverTextMethods     -- ^ Never generate them under any circumstances.
   deriving ( Bounded
            , Data
            , Enum

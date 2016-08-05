@@ -15,7 +15,11 @@ module TextShow (
       -- ** 'TextShow'
       TextShow(..)
     , showbParen
+    , showtParen
+    , showtlParen
     , showbSpace
+    , showtSpace
+    , showtlSpace
       -- ** 'TextShow1'
     , TextShow1(..)
     , showbPrec1

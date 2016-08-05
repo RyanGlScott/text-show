@@ -21,15 +21,12 @@ module TextShow.TH.Internal (
       -- * 'deriveTextShow'
       -- $deriveTextShow
       deriveTextShow
-    , deriveTextShowOptions
       -- * 'deriveTextShow1'
       -- $deriveTextShow1
     , deriveTextShow1
-    , deriveTextShow1Options
       -- * 'deriveTextShow2'
       -- $deriveTextShow2
     , deriveTextShow2
-    , deriveTextShow2Options
       -- * @make-@ functions
       -- $make
     , makeShowt
@@ -53,6 +50,22 @@ module TextShow.TH.Internal (
     , Options(..)
     , defaultOptions
     , GenTextMethods(..)
+    , deriveTextShowOptions
+    , deriveTextShow1Options
+    , deriveTextShow2Options
+--     , makeShowtOptions
+--     , makeShowtlOptions
+--     , makeShowtPrecOptions
+--     , makeShowtlPrecOptions
+--     , makeShowtListOptions
+--     , makeShowtlListOptions
+--     , makeShowbOptions
+--     , makeShowbPrecOptions
+--     , makeShowbListOptions
+--     , makePrintTOptions
+--     , makePrintTLOptions
+--     , makeHPrintTOptions
+--     , makeHPrintTLOptions
     ) where
 
 import           Control.Monad (liftM, unless, when)
@@ -69,11 +82,12 @@ import           Data.Maybe
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Set as Set
 import           Data.Set (Set)
-import qualified Data.Text    as TS ()
+import qualified Data.Text    as TS
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
-import qualified Data.Text.Lazy    as TL ()
+import qualified Data.Text.Lazy.Builder as TB
+import           Data.Text.Lazy.Builder (Builder, toLazyText)
+import qualified Data.Text.Lazy    as TL
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
 import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
@@ -91,7 +105,8 @@ import           Prelude ()
 import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
-                                   showbListWith, showbParen, showbSpace)
+                                   showbListWith, showbParen, showbSpace,
+                                   showtParen, showtSpace, showtlParen, showtlSpace)
 import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
 import           TextShow.Utils (isInfixTypeCon, isTupleString)
 
@@ -176,8 +191,10 @@ deriveTextShow :: Name -> Q [Dec]
 deriveTextShow = deriveTextShowOptions defaultOptions
 
 -- | Like 'deriveTextShow', but takes an 'Options' argument.
+--
+-- /Since: next/
 deriveTextShowOptions :: Options -> Name -> Q [Dec]
-deriveTextShowOptions _ = deriveTextShowClass TextShow
+deriveTextShowOptions = deriveTextShowClass TextShow
 
 {- $deriveTextShow1
 
@@ -237,8 +254,10 @@ deriveTextShow1 :: Name -> Q [Dec]
 deriveTextShow1 = deriveTextShow1Options defaultOptions
 
 -- | Like 'deriveTextShow1', but takes an 'Options' argument.
+--
+-- /Since: next/
 deriveTextShow1Options :: Options -> Name -> Q [Dec]
-deriveTextShow1Options _ = deriveTextShowClass TextShow1
+deriveTextShow1Options = deriveTextShowClass TextShow1
 
 {- $deriveTextShow2
 
@@ -299,8 +318,10 @@ deriveTextShow2 :: Name -> Q [Dec]
 deriveTextShow2 = deriveTextShow2Options defaultOptions
 
 -- | Like 'deriveTextShow2', but takes an 'Options' argument.
+--
+-- /Since: next/
 deriveTextShow2Options :: Options -> Name -> Q [Dec]
-deriveTextShow2Options _ = deriveTextShowClass TextShow2
+deriveTextShow2Options = deriveTextShowClass TextShow2
 
 {- $make
 
@@ -384,14 +405,14 @@ makeShowb name = makeShowbPrec name `appE` [| zero |]
 --
 -- /Since: 2/
 makeShowbPrec :: Name -> Q Exp
-makeShowbPrec = makeShowbPrecClass TextShow
+makeShowbPrec = makeShowbPrecClass TextShow ShowbPrec
 
 -- | Generates a lambda expression which behaves like 'liftShowbPrec' (without
 -- requiring a 'TextShow1' instance).
 --
 -- /Since: 3/
 makeLiftShowbPrec :: Name -> Q Exp
-makeLiftShowbPrec = makeShowbPrecClass TextShow1
+makeLiftShowbPrec = makeShowbPrecClass TextShow1 ShowbPrec
 
 -- | Generates a lambda expression which behaves like 'showbPrec1' (without
 -- requiring a 'TextShow1' instance).
@@ -405,7 +426,7 @@ makeShowbPrec1 name = [| $(makeLiftShowbPrec name) showbPrec showbList |]
 --
 -- /Since: 3/
 makeLiftShowbPrec2 :: Name -> Q Exp
-makeLiftShowbPrec2 = makeShowbPrecClass TextShow2
+makeLiftShowbPrec2 = makeShowbPrecClass TextShow2 ShowbPrec
 
 -- | Generates a lambda expression which behaves like 'showbPrec2' (without
 -- requiring a 'TextShow2' instance).
@@ -449,14 +470,223 @@ makeHPrintT name = [| \h -> TS.hPutStrLn h . $(makeShowt name) |]
 makeHPrintTL :: Name -> Q Exp
 makeHPrintTL name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
 
+-- -- | Generates a lambda expression which behaves like 'showt' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowt :: Name -> Q Exp
+-- makeShowt = makeShowtOptions defaultOptions
+--
+-- -- | Like 'makeShowt', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtOptions :: Options -> Name -> Q Exp
+-- makeShowtOptions opts name =
+--     if genTextMethods opts == NeverTextMethods
+--        then [| toStrict . $(makeShowtl name) |]
+--        else makeShowtPrec name `appE` integerE 0
+--
+-- -- | Generates a lambda expression which behaves like 'showtl' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowtl :: Name -> Q Exp
+-- makeShowtl = makeShowtlOptions defaultOptions
+--
+-- -- | Like 'makeShowtl', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtlOptions :: Options -> Name -> Q Exp
+-- makeShowtlOptions opts name =
+--     if genTextMethods opts == NeverTextMethods
+--        then [| toLazyText . $(makeShowb name) |]
+--        else makeShowtlPrec name `appE` integerE 0
+--
+-- -- | Generates a lambda expression which behaves like 'showtPrec' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowtPrec :: Name -> Q Exp
+-- makeShowtPrec = makeShowtPrecOptions defaultOptions
+--
+-- -- | Like 'makeShowtPrec', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtPrecOptions :: Options -> Name -> Q Exp
+-- makeShowtPrecOptions opts name =
+--     if genTextMethods opts == NeverTextMethods
+--        then [| \p -> toStrict . $(makeShowtlPrec name) p |]
+--        else makeShowbPrecClass TextShow ShowtPrec
+--
+-- -- | Generates a lambda expression which behaves like 'showtlPrec' (without
+-- -- requiring a 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowtlPrec :: Name -> Q Exp
+-- makeShowtlPrec = makeShowtlPrecOptions defaultOptions
+--
+-- -- | Like 'makeShowtlPrec', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtlPrecOptions :: Options -> Name -> Q Exp
+-- makeShowtlPrecOptions opts name =
+--     if genTextMethods opts == NeverTextMethods
+--        then [| \p -> toLazyText . $(makeShowbPrec name) p |]
+--        else makeShowbPrecClass TextShow ShowtlPrec
+--
+-- -- | Generates a lambda expression which behaves like 'showtList' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowtList :: Name -> Q Exp
+-- makeShowtList = makeShowtListOptions defaultOptions
+--
+-- -- | Like 'makeShowtList', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtListOptions :: Options -> Name -> Q Exp
+-- makeShowtListOptions _ name = [| toStrict . $(makeShowtlList name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'showtlList' (without
+-- -- requiring a 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowtlList :: Name -> Q Exp
+-- makeShowtlList = makeShowtlListOptions defaultOptions
+--
+-- -- | Like 'makeShowtlList', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowtlListOptions :: Options -> Name -> Q Exp
+-- makeShowtlListOptions _ name = [| toLazyText . $(makeShowbList name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'showb' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowb :: Name -> Q Exp
+-- makeShowb = makeShowbOptions defaultOptions
+--
+-- -- | Like 'makeShowb', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowbOptions :: Options -> Name -> Q Exp
+-- makeShowbOptions _ name = makeShowbPrec name `appE` integerE 0
+--
+-- -- | Generates a lambda expression which behaves like 'showbPrec' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowbPrec :: Name -> Q Exp
+-- makeShowbPrec = makeShowbPrecOptions defaultOptions
+--
+-- -- | Like 'makeShowbPrec', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowbPrecOptions :: Options -> Name -> Q Exp
+-- makeShowbPrecOptions _ name = makeShowbPrecClass TextShow ShowbPrec
+--
+-- -- | Generates a lambda expression which behaves like 'liftShowbPrec' (without
+-- -- requiring a 'TextShow1' instance).
+-- --
+-- -- /Since: 3/
+-- makeLiftShowbPrec :: Name -> Q Exp
+-- makeLiftShowbPrec = makeShowbPrecClass TextShow1 ShowbPrec
+--
+-- -- | Generates a lambda expression which behaves like 'showbPrec1' (without
+-- -- requiring a 'TextShow1' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowbPrec1 :: Name -> Q Exp
+-- makeShowbPrec1 name = [| $(makeLiftShowbPrec name) showbPrec showbList |]
+--
+-- -- | Generates a lambda expression which behaves like 'liftShowbPrec2' (without
+-- -- requiring a 'TextShow2' instance).
+-- --
+-- -- /Since: 3/
+-- makeLiftShowbPrec2 :: Name -> Q Exp
+-- makeLiftShowbPrec2 = makeShowbPrecClass TextShow2 ShowbPrec
+--
+-- -- | Generates a lambda expression which behaves like 'showbPrec2' (without
+-- -- requiring a 'TextShow2' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowbPrec2 :: Name -> Q Exp
+-- makeShowbPrec2 name = [| $(makeLiftShowbPrec2 name) showbPrec showbList showbPrec showbList |]
+--
+-- -- | Generates a lambda expression which behaves like 'showbList' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeShowbList :: Name -> Q Exp
+-- makeShowbList = makeShowbListOptions defaultOptions
+--
+-- -- | Like 'makeShowbList', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeShowbListOptions :: Options -> Name -> Q Exp
+-- makeShowbListOptions _ name = [| showbListWith $(makeShowb name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'printT' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makePrintT :: Name -> Q Exp
+-- makePrintT = makePrintTOptions defaultOptions
+--
+-- -- | Like 'makePrintT', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makePrintTOptions :: Options -> Name -> Q Exp
+-- makePrintTOptions _ name = [| TS.putStrLn . $(makeShowt name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'printTL' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makePrintTL :: Name -> Q Exp
+-- makePrintTL = makePrintTLOptions defaultOptions
+--
+-- -- | Like 'makePrintTL', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makePrintTLOptions :: Options -> Name -> Q Exp
+-- makePrintTLOptions _ name = [| TL.putStrLn . $(makeShowtl name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'hPrintT' (without requiring a
+-- -- 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeHPrintT :: Name -> Q Exp
+-- makeHPrintT = makeHPrintTOptions defaultOptions
+--
+-- -- | Like 'makeHPrintT', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeHPrintTOptions :: Options -> Name -> Q Exp
+-- makeHPrintTOptions _ name = [| \h -> TS.hPutStrLn h . $(makeShowt name) |]
+--
+-- -- | Generates a lambda expression which behaves like 'hPrintTL' (without
+-- -- requiring a 'TextShow' instance).
+-- --
+-- -- /Since: 2/
+-- makeHPrintTL :: Name -> Q Exp
+-- makeHPrintTL = makeHPrintTLOptions defaultOptions
+--
+-- -- | Like 'makeHPrintTL', but takes an 'Options' argument.
+-- --
+-- -- /Since: next/
+-- makeHPrintTLOptions :: Options -> Name -> Q Exp
+-- makeHPrintTLOptions _ name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
+
 -------------------------------------------------------------------------------
 -- Code generation
 -------------------------------------------------------------------------------
 
 -- | Derive a TextShow(1)(2) instance declaration (depending on the TextShowClass
 -- argument's value).
-deriveTextShowClass :: TextShowClass -> Name -> Q [Dec]
-deriveTextShowClass tsClass name = withType name fromCons
+deriveTextShowClass :: TextShowClass -> Options -> Name -> Q [Dec]
+deriveTextShowClass tsClass opts name = withType name fromCons
   where
     fromCons :: Name -> Cxt -> [TyVarBndr] -> [Con] -> Maybe [Type] -> Q [Dec]
     fromCons name' ctxt tvbs cons mbTys = (:[]) <$> do
@@ -464,24 +694,37 @@ deriveTextShowClass tsClass name = withType name fromCons
             <- buildTypeInstance tsClass name' ctxt tvbs mbTys
         instanceD (return instanceCxt)
                   (return instanceType)
-                  (showbPrecDecs tsClass cons)
+                  (showbPrecDecs tsClass opts cons)
 
 -- | Generates a declaration defining the primary function corresponding to a
 -- particular class (showbPrec for TextShow, liftShowbPrec for TextShow1, and
 -- liftShowbPrec2 for TextShow2).
-showbPrecDecs :: TextShowClass -> [Con] -> [Q Dec]
-showbPrecDecs tsClass cons =
-    [ funD (showbPrecName tsClass)
-           [ clause []
-                    (normalB $ makeTextShowForCons tsClass cons)
-                    []
-           ]
-    ]
+showbPrecDecs :: TextShowClass -> Options -> [Con] -> [Q Dec]
+showbPrecDecs tsClass opts cons =
+    [genMethod ShowbPrec (showbPrecName tsClass)]
+    ++ if tsClass == TextShow && shouldGenTextMethods
+          then [genMethod ShowtPrec 'showtPrec, genMethod ShowtlPrec 'showtlPrec]
+          else []
+  where
+    shouldGenTextMethods :: Bool
+    shouldGenTextMethods = case genTextMethods opts of
+      AlwaysTextMethods    -> True
+      SometimesTextMethods -> all isNullaryCon cons
+      NeverTextMethods     -> False
+
+    genMethod :: TextShowFun -> Name -> Q Dec
+    genMethod method methodName
+      = funD methodName
+             [ clause []
+                      (normalB $ makeTextShowForCons tsClass method cons)
+                      []
+             ]
+
 
 -- | Generates a lambda expression which behaves like showbPrec (for TextShow),
 -- liftShowbPrec (for TextShow1), or liftShowbPrec2 (for TextShow2).
-makeShowbPrecClass :: TextShowClass -> Name -> Q Exp
-makeShowbPrecClass tsClass name = withType name fromCons
+makeShowbPrecClass :: TextShowClass -> TextShowFun -> Name -> Q Exp
+makeShowbPrecClass tsClass tsFun name = withType name fromCons
   where
     fromCons :: Name -> Cxt -> [TyVarBndr] -> [Con] -> Maybe [Type] -> Q Exp
     fromCons name' ctxt tvbs cons mbTys =
@@ -489,103 +732,125 @@ makeShowbPrecClass tsClass name = withType name fromCons
         -- or not the provided datatype can actually have showbPrec/liftShowbPrec/etc.
         -- implemented for it, and produces errors if it can't.
         buildTypeInstance tsClass name' ctxt tvbs mbTys
-          `seq` makeTextShowForCons tsClass cons
+          `seq` makeTextShowForCons tsClass tsFun cons
 
 -- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for the
 -- given constructors. All constructors must be from the same type.
-makeTextShowForCons :: TextShowClass -> [Con] -> Q Exp
-makeTextShowForCons _ [] = error "Must have at least one data constructor"
-makeTextShowForCons tsClass cons = do
+makeTextShowForCons :: TextShowClass -> TextShowFun -> [Con] -> Q Exp
+makeTextShowForCons _ _ [] = error "Must have at least one data constructor"
+makeTextShowForCons tsClass tsFun cons = do
     p       <- newName "p"
     value   <- newName "value"
     sps     <- newNameList "sp" $ fromEnum tsClass
     sls     <- newNameList "sl" $ fromEnum tsClass
     let spls      = zip sps sls
         spsAndSls = interleave sps sls
-    matches <- concatMapM (makeTextShowForCon p tsClass spls) cons
+    matches <- concatMapM (makeTextShowForCon p tsClass tsFun spls) cons
     lamE (map varP $ spsAndSls ++ [p, value])
         . appsE
-        $ [ varE $ showbPrecConstName tsClass
+        $ [ varE $ showPrecConstName tsClass tsFun
           , caseE (varE value) (map return matches)
           ] ++ map varE spsAndSls
             ++ [varE p, varE value]
 
 -- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for a
 -- single constructor.
-makeTextShowForCon :: Name -> TextShowClass -> [(Name, Name)] -> Con -> Q [Match]
-makeTextShowForCon _ _ _ (NormalC conName []) = do
+makeTextShowForCon :: Name
+                   -> TextShowClass
+                   -> TextShowFun
+                   -> [(Name, Name)]
+                   -> Con
+                   -> Q [Match]
+makeTextShowForCon _ _ tsFun _ (NormalC conName []) = do
     m <- match
            (conP conName [])
-           (normalB [| fromString $(stringE (parenInfixConName conName "")) |])
+           (normalB  $ varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName ""))
            []
     return [m]
-makeTextShowForCon p tsClass spls (NormalC conName [_]) = do
+makeTextShowForCon p tsClass tsFun spls (NormalC conName [_]) = do
     ([argTy], tvMap) <- reifyConTys tsClass spls conName
     arg <- newName "arg"
 
-    let showArg  = makeTextShowForArg appPrec1 tsClass conName tvMap argTy arg
-        namedArg = [| fromString $(stringE (parenInfixConName conName " ")) <> $(showArg) |]
+    let showArg  = makeTextShowForArg appPrec1 tsClass tsFun conName tvMap argTy arg
+        namedArg = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+                            [| (<>) |]
+                            showArg
 
     m <- match
            (conP conName [varP arg])
-           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArg) |])
+           (normalB $ varE (showParenName tsFun)
+                       `appE` infixApp (varE p) [| (>) |] (integerE appPrec)
+                       `appE` namedArg)
            []
     return [m]
-makeTextShowForCon p tsClass spls (NormalC conName _) = do
+makeTextShowForCon p tsClass tsFun spls (NormalC conName _) = do
     (argTys, tvMap) <- reifyConTys tsClass spls conName
     args <- newNameList "arg" $ length argTys
 
     m <- if isNonUnitTuple conName
          then do
-           let showArgs       = zipWith (makeTextShowForArg 0 tsClass conName tvMap) argTys args
-               parenCommaArgs = [| singleton '(' |] : intersperse [| singleton ',' |] showArgs
-               mappendArgs    = foldr (`infixApp` [| (<>) |])
-                                      [| singleton ')' |]
-                                      parenCommaArgs
+           let showArgs       = zipWith (makeTextShowForArg 0 tsClass tsFun conName tvMap) argTys args
+               parenCommaArgs = (varE (singletonName tsFun) `appE` charE '(')
+                                : intersperse (varE (singletonName tsFun) `appE` charE ',') showArgs
+               mappendArgs    = foldr' (`infixApp` [| (<>) |])
+                                       (varE (singletonName tsFun) `appE` charE ')')
+                                       parenCommaArgs
 
            match (conP conName $ map varP args)
                  (normalB mappendArgs)
                  []
          else do
-           let showArgs    = zipWith (makeTextShowForArg appPrec1 tsClass conName tvMap) argTys args
-               mappendArgs = foldr1 (\v q -> [| $(v) <> showbSpace <> $(q) |]) showArgs
-               namedArgs   = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
+           let showArgs    = zipWith (makeTextShowForArg appPrec1 tsClass tsFun conName tvMap) argTys args
+               mappendArgs = foldr1 (\v q -> infixApp v
+                                                      [| (<>) |]
+                                                      (infixApp (varE $ showSpaceName tsFun)
+                                                                [| (<>) |]
+                                                                q)) showArgs
+               namedArgs   = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+                                      [| (<>) |]
+                                      mappendArgs
 
            match (conP conName $ map varP args)
-                 (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
+                 (normalB $ varE (showParenName tsFun)
+                              `appE` infixApp (varE p) [| (>) |] (integerE appPrec)
+                              `appE` namedArgs)
                  []
     return [m]
-makeTextShowForCon p tsClass spls (RecC conName []) =
-    makeTextShowForCon p tsClass spls $ NormalC conName []
-makeTextShowForCon p tsClass spls (RecC conName ts) = do
+makeTextShowForCon p tsClass tsFun spls (RecC conName []) =
+    makeTextShowForCon p tsClass tsFun spls $ NormalC conName []
+makeTextShowForCon p tsClass tsFun spls (RecC conName ts) = do
     (argTys, tvMap) <- reifyConTys tsClass spls conName
     args <- newNameList "arg" $ length argTys
 
     let showArgs       = concatMap (\((argName, _, _), argTy, arg)
-                                      -> [ [| fromString $(stringE (nameBase argName ++ " = ")) |]
-                                         , makeTextShowForArg 0 tsClass conName tvMap argTy arg
-                                         , [| fromString ", " |]
+                                      -> [ varE (fromStringName tsFun) `appE` stringE (nameBase argName ++ " = ")
+                                         , makeTextShowForArg 0 tsClass tsFun conName tvMap argTy arg
+                                         , varE (fromStringName tsFun) `appE` stringE ", "
                                          ]
                                    )
                                    (zip3 ts argTys args)
-        braceCommaArgs = [| singleton '{' |] : take (length showArgs - 1) showArgs
-        mappendArgs    = foldr (`infixApp` [| (<>) |])
-                           [| singleton '}' |]
-                           braceCommaArgs
-        namedArgs      = [| fromString $(stringE (parenInfixConName conName " ")) <> $(mappendArgs) |]
+        braceCommaArgs = (varE (singletonName tsFun) `appE` charE '{') : take (length showArgs - 1) showArgs
+        mappendArgs    = foldr' (`infixApp` [| (<>) |])
+                                (varE (singletonName tsFun) `appE` charE '}')
+                                braceCommaArgs
+        namedArgs      = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+                                  [| (<>) |]
+                                  mappendArgs
 
     m <- match
            (conP conName $ map varP args)
-           (normalB [| showbParen ($(varE p) > $(lift appPrec)) $(namedArgs) |])
+           (normalB $ varE (showParenName tsFun)
+                        `appE` infixApp (varE p) [| (>) |] (integerE appPrec)
+                        `appE` namedArgs)
            []
     return [m]
-makeTextShowForCon p tsClass spls (InfixC _ conName _) = do
+makeTextShowForCon p tsClass tsFun spls (InfixC _ conName _) = do
     ([alTy, arTy], tvMap) <- reifyConTys tsClass spls conName
     al   <- newName "argL"
     ar   <- newName "argR"
     info <- reify conName
 
-#if __GLASGOW_HASKELL__ >= 711
+#if MIN_VERSION_template_haskell(2,11,0)
     conPrec <- case info of
                         DataConI{} -> do
                             fi <- fromMaybe defaultFixity <$> reifyFixity conName
@@ -598,24 +863,26 @@ makeTextShowForCon p tsClass spls (InfixC _ conName _) = do
                         _ -> error $ "TextShow.TH.makeTextShowForCon: Unsupported type: " ++ show info
 
     let opName   = nameBase conName
-        infixOpE = if isInfixTypeCon opName
-                      then [| fromString $(stringE $ " "  ++ opName ++ " " ) |]
-                      else [| fromString $(stringE $ " `" ++ opName ++ "` ") |]
+        infixOpE = appE (varE $ fromStringName tsFun) . stringE $
+                     if isInfixTypeCon opName
+                        then " "  ++ opName ++ " "
+                        else " `" ++ opName ++ "` "
 
     m <- match
            (infixP (varP al) conName (varP ar))
-           (normalB $ appE [| showbParen ($(varE p) > conPrec) |]
-                           [| $(makeTextShowForArg (conPrec + 1) tsClass conName tvMap alTy al)
-                           <> $(infixOpE)
-                           <> $(makeTextShowForArg (conPrec + 1) tsClass conName tvMap arTy ar)
-                           |]
+           (normalB $ (varE (showParenName tsFun) `appE` infixApp (varE p) [| (>) |] (integerE conPrec))
+                        `appE` (infixApp (makeTextShowForArg (conPrec + 1) tsClass tsFun conName tvMap alTy al)
+                                         [| (<>) |]
+                                         (infixApp infixOpE
+                                                   [| (<>) |]
+                                                   (makeTextShowForArg (conPrec + 1) tsClass tsFun conName tvMap arTy ar)))
            )
            []
     return [m]
-makeTextShowForCon p tsClass spls (ForallC _ _ con) =
-    makeTextShowForCon p tsClass spls con
+makeTextShowForCon p tsClass tsFun spls (ForallC _ _ con) =
+    makeTextShowForCon p tsClass tsFun spls con
 #if MIN_VERSION_template_haskell(2,11,0)
-makeTextShowForCon p tsClass spls (GadtC conNames ts _) =
+makeTextShowForCon p tsClass tsFun spls (GadtC conNames ts _) =
     let con :: Name -> Q Con
         con conName = do
             mbFi <- reifyFixity conName
@@ -625,53 +892,54 @@ makeTextShowForCon p tsClass spls (GadtC conNames ts _) =
                       then let [t1, t2] = ts in InfixC t1 conName t2
                       else NormalC conName ts
 
-    in concatMapM (makeTextShowForCon p tsClass spls <=< con) conNames
-makeTextShowForCon p tsClass spls (RecGadtC conNames ts _) =
-    concatMapM (makeTextShowForCon p tsClass spls . flip RecC ts) conNames
+    in concatMapM (makeTextShowForCon p tsClass tsFun spls <=< con) conNames
+makeTextShowForCon p tsClass tsFun spls (RecGadtC conNames ts _) =
+    concatMapM (makeTextShowForCon p tsClass tsFun spls . flip RecC ts) conNames
 #endif
 
 -- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for an
 -- argument of a constructor.
 makeTextShowForArg :: Int
                    -> TextShowClass
+                   -> TextShowFun
                    -> Name
                    -> TyVarMap
                    -> Type
                    -> Name
                    -> Q Exp
-makeTextShowForArg p _ _ _ (ConT tyName) tyExpName =
-#if __GLASGOW_HASKELL__ >= 711
--- Starting with GHC 7.10, data types containing unlifted types with derived @Show@
--- instances show hashed literals with actual hash signs, and negative hashed
--- literals are not surrounded with parentheses.
+makeTextShowForArg p _ tsFun _ _ (ConT tyName) tyExpName =
     showE
   where
-    tyVarE :: Q Exp
-    tyVarE = varE tyExpName
+    tyVarE, showPrecE :: Q Exp
+    tyVarE    = varE tyExpName
+    showPrecE = varE (showPrecName TextShow tsFun)
 
     showE :: Q Exp
-    showE | tyName == ''Char#   = [| showbPrec 0 (C# $(tyVarE)) <> singleton '#'   |]
-          | tyName == ''Double# = [| showbPrec 0 (D# $(tyVarE)) <> fromString "##" |]
-          | tyName == ''Float#  = [| showbPrec 0 (F# $(tyVarE)) <> singleton '#'   |]
-          | tyName == ''Int#    = [| showbPrec 0 (I# $(tyVarE)) <> singleton '#'   |]
-          | tyName == ''Word#   = [| showbPrec 0 (W# $(tyVarE)) <> fromString "##" |]
-          | otherwise = [| showbPrec p $(tyVarE) |]
-#else
-    [| showbPrec p $(expr) |]
-  where
-    tyVarE :: Q Exp
-    tyVarE = varE tyExpName
+    showE | tyName == ''Char#   = showPrimE 'C# oneHashE
+          | tyName == ''Double# = showPrimE 'D# twoHashE
+          | tyName == ''Float#  = showPrimE 'F# oneHashE
+          | tyName == ''Int#    = showPrimE 'I# oneHashE
+          | tyName == ''Word#   = showPrimE 'W# twoHashE
+          | otherwise = showPrecE `appE` integerE p `appE` tyVarE
 
-    expr :: Q Exp
-    expr | tyName == ''Char#   = [| C# $(tyVarE) |]
-         | tyName == ''Double# = [| D# $(tyVarE) |]
-         | tyName == ''Float#  = [| F# $(tyVarE) |]
-         | tyName == ''Int#    = [| I# $(tyVarE) |]
-         | tyName == ''Word#   = [| W# $(tyVarE) |]
-         | otherwise = tyVarE
+    -- Starting with GHC 7.10, data types containing unlifted types with derived Show
+    -- instances show hashed literals with actual hash signs, and negative hashed
+    -- literals are not surrounded with parentheses.
+    showPrimE :: Name -> Q Exp -> Q Exp
+    showPrimE con _hashE
+#if __GLASGOW_HASKELL__ >= 711
+      = infixApp (showPrecE `appE` integerE 0 `appE` (conE con `appE` tyVarE))
+                 [| (<>) |]
+                 _hashE
+#else
+      = showPrecE `appE` integerE p `appE` (conE con `appE` tyVarE)
 #endif
-makeTextShowForArg p tsClass conName tvMap ty tyExpName =
-    [| $(makeTextShowForType tsClass conName tvMap False ty) p $(varE tyExpName) |]
+
+    oneHashE, twoHashE :: Q Exp
+    oneHashE = varE (singletonName  tsFun) `appE` charE   '#'
+    twoHashE = varE (fromStringName tsFun) `appE` stringE "##"
+makeTextShowForArg p tsClass tsFun conName tvMap ty tyExpName =
+    [| $(makeTextShowForType tsClass tsFun conName tvMap False ty) p $(varE tyExpName) |]
 
 -- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for a
 -- specific type. The generated expression depends on the number of type variables.
@@ -681,19 +949,23 @@ makeTextShowForArg p tsClass conName tvMap ty tyExpName =
 -- 3. If the type is of kind * -> * -> * (T a b), apply
 --    liftShowbPrec2 $(makeTextShowForType a) $(makeTextShowForType b)
 makeTextShowForType :: TextShowClass
+                    -> TextShowFun
                     -> Name
                     -> TyVarMap
                     -> Bool -- ^ True if we are using the function of type ([a] -> Builder),
                             --   False if we are using the function of type (Int -> a -> Builder).
                     -> Type
                     -> Q Exp
-makeTextShowForType _ _ tvMap sl (VarT tyName) =
-    case Map.lookup tyName tvMap of
-         Just (spExp, slExp) -> varE (if sl then slExp else spExp)
-         Nothing             -> if sl then [| showbList |] else [| showbPrec |]
-makeTextShowForType tsClass conName tvMap sl (SigT ty _)      = makeTextShowForType tsClass conName tvMap sl ty
-makeTextShowForType tsClass conName tvMap sl (ForallT _ _ ty) = makeTextShowForType tsClass conName tvMap sl ty
-makeTextShowForType tsClass conName tvMap sl ty = do
+makeTextShowForType _ tsFun _ tvMap sl (VarT tyName) =
+    varE $ case Map.lookup tyName tvMap of
+         Just (spExp, slExp) -> if sl then slExp else spExp
+         Nothing             -> if sl then showListName TextShow tsFun
+                                      else showPrecName TextShow tsFun
+makeTextShowForType tsClass tsFun conName tvMap sl (SigT ty _) =
+    makeTextShowForType tsClass tsFun conName tvMap sl ty
+makeTextShowForType tsClass tsFun conName tvMap sl (ForallT _ _ ty) =
+    makeTextShowForType tsClass tsFun conName tvMap sl ty
+makeTextShowForType tsClass tsFun conName tvMap sl ty = do
     let tyCon :: Type
         tyArgs :: [Type]
         tyCon :| tyArgs = unapplyTy ty
@@ -712,11 +984,12 @@ makeTextShowForType tsClass conName tvMap sl ty = do
           || itf && any (`mentionsName` tyVarNames) tyArgs
        then outOfPlaceTyVarError tsClass conName
        else if any (`mentionsName` tyVarNames) rhsArgs
-               then appsE $ [ varE . showbPrecOrListName sl $ toEnum numLastArgs]
-                            ++ zipWith (makeTextShowForType tsClass conName tvMap)
+               then appsE $ [ varE $ showPrecOrListName sl (toEnum numLastArgs) tsFun]
+                            ++ zipWith (makeTextShowForType tsClass tsFun conName tvMap)
                                        (cycle [False,True])
                                        (interleave rhsArgs rhsArgs)
-               else if sl then [| showbList |] else [| showbPrec |]
+               else varE $ if sl then showListName TextShow tsFun
+                                 else showPrecName TextShow tsFun
 
 -------------------------------------------------------------------------------
 -- Template Haskell reifying and AST manipulation
@@ -1313,6 +1586,36 @@ substNamesWithKindStar ns t = foldr' (flip substNameWithKind starK) t ns
 data TextShowClass = TextShow | TextShow1 | TextShow2
   deriving (Enum, Eq, Ord)
 
+-- | A representation of which TextShow method is being used to
+-- implement something.
+data TextShowFun = ShowbPrec | ShowtPrec | ShowtlPrec
+
+fromStringName :: TextShowFun -> Name
+fromStringName ShowbPrec  = 'TB.fromString
+fromStringName ShowtPrec  = 'TS.pack
+fromStringName ShowtlPrec = 'TL.pack
+
+singletonName :: TextShowFun -> Name
+singletonName ShowbPrec  = 'TB.singleton
+singletonName ShowtPrec  = 'TS.singleton
+singletonName ShowtlPrec = 'TL.singleton
+
+showParenName :: TextShowFun -> Name
+showParenName ShowbPrec  = 'showbParen
+showParenName ShowtPrec  = 'showtParen
+showParenName ShowtlPrec = 'showtlParen
+
+showSpaceName :: TextShowFun -> Name
+showSpaceName ShowbPrec  = 'showbSpace
+showSpaceName ShowtPrec  = 'showtSpace
+showSpaceName ShowtlPrec = 'showtlSpace
+
+showPrecConstName :: TextShowClass -> TextShowFun -> Name
+showPrecConstName tsClass  ShowbPrec  = showbPrecConstName tsClass
+showPrecConstName TextShow ShowtPrec  = 'showtPrecConst
+showPrecConstName TextShow ShowtlPrec = 'showtlPrecConst
+showPrecConstName _        _          = error "showPrecConstName"
+
 showbPrecConstName :: TextShowClass -> Name
 showbPrecConstName TextShow  = 'showbPrecConst
 showbPrecConstName TextShow1 = 'liftShowbPrecConst
@@ -1323,21 +1626,34 @@ textShowClassName TextShow  = ''TextShow
 textShowClassName TextShow1 = ''TextShow1
 textShowClassName TextShow2 = ''TextShow2
 
+showPrecName :: TextShowClass -> TextShowFun -> Name
+showPrecName tsClass  ShowbPrec  = showbPrecName tsClass
+showPrecName TextShow ShowtPrec  = 'showtPrec
+showPrecName TextShow ShowtlPrec = 'showtlPrec
+showPrecName _        _          = error "showPrecName"
+
 showbPrecName :: TextShowClass -> Name
 showbPrecName TextShow  = 'showbPrec
 showbPrecName TextShow1 = 'liftShowbPrec
 showbPrecName TextShow2 = 'liftShowbPrec2
+
+showListName :: TextShowClass -> TextShowFun -> Name
+showListName tsClass  ShowbPrec  = showbListName tsClass
+showListName TextShow ShowtPrec  = 'showtPrec
+showListName TextShow ShowtlPrec = 'showtlPrec
+showListName _        _          = error "showListName"
 
 showbListName :: TextShowClass -> Name
 showbListName TextShow  = 'showbList
 showbListName TextShow1 = 'liftShowbList
 showbListName TextShow2 = 'liftShowbList2
 
-showbPrecOrListName :: Bool -- ^ showbListName if True, showbPrecName if False
-                    -> TextShowClass
-                    -> Name
-showbPrecOrListName False  = showbPrecName
-showbPrecOrListName True = showbListName
+showPrecOrListName :: Bool -- ^ showbListName if True, showbPrecName if False
+                   -> TextShowClass
+                   -> TextShowFun
+                   -> Name
+showPrecOrListName False = showPrecName
+showPrecOrListName True  = showListName
 
 -- | A type-restricted version of 'const'. This is useful when generating the lambda
 -- expression in 'makeShowbPrec' for a data type with only nullary constructors (since
@@ -1348,6 +1664,14 @@ showbPrecOrListName True = showbListName
 showbPrecConst :: Builder
                -> Int -> a -> Builder
 showbPrecConst b _ _ = b
+
+showtPrecConst :: TS.Text
+               -> Int -> a -> TS.Text
+showtPrecConst t _ _ = t
+
+showtlPrecConst :: TL.Text
+                -> Int -> a -> TL.Text
+showtlPrecConst tl _ _ = tl
 
 liftShowbPrecConst :: Builder
                    -> (Int -> a -> Builder) -> ([a] -> Builder)
@@ -1394,6 +1718,12 @@ catKindVarNames = mapMaybe starKindStatusToName
 -------------------------------------------------------------------------------
 -- Assorted utilities
 -------------------------------------------------------------------------------
+
+integerE :: Int -> Q Exp
+integerE = litE . integerL . fromIntegral
+
+charE :: Char -> Q Exp
+charE = litE . charL
 
 -- | Returns True if a Type has kind *.
 hasKindStar :: Type -> Bool
@@ -1667,6 +1997,17 @@ constructorName (GadtC    names _ _)    = head names
 constructorName (RecGadtC names _ _)    = head names
 # endif
 #endif
+
+isNullaryCon :: Con -> Bool
+isNullaryCon (NormalC _ [])    = True
+isNullaryCon (RecC    _ [])    = True
+isNullaryCon InfixC{}          = False
+isNullaryCon (ForallC _ _ con) = isNullaryCon con
+#if MIN_VERSION_template_haskell(2,11,0)
+isNullaryCon (GadtC    _ [] _) = True
+isNullaryCon (RecGadtC _ [] _) = True
+#endif
+isNullaryCon _                 = False
 
 interleave :: [a] -> [a] -> [a]
 interleave (a1:a1s) (a2:a2s) = a1:a2:interleave a1s a2s
