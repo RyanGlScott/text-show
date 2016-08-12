@@ -159,7 +159,7 @@ formatRealFloatAltB :: RealFloat a
                     -> Bool      -- ^ Should a decimal point always be shown?
                     -> a
                     -> Builder
-{-# SPECIALIZE formatRealFloatAltB :: FPFormat -> Maybe Int -> Bool -> Float -> Builder #-}
+{-# SPECIALIZE formatRealFloatAltB :: FPFormat -> Maybe Int -> Bool -> Float  -> Builder #-}
 {-# SPECIALIZE formatRealFloatAltB :: FPFormat -> Maybe Int -> Bool -> Double -> Builder #-}
 formatRealFloatAltB fmt decs alt x
    | isNaN x                   = "NaN"

@@ -124,6 +124,17 @@ showbIntegralPrec p = showbIntegerPrec p . toInteger
 --
 -- /Since: 2/
 showbIntAtBase :: (Integral a, TextShow a) => a -> (Int -> Char) -> a -> Builder
+{-# SPECIALIZE showbIntAtBase :: Int     -> (Int -> Char) -> Int     -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Int8    -> (Int -> Char) -> Int8    -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Int16   -> (Int -> Char) -> Int16   -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Int32   -> (Int -> Char) -> Int32   -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Int64   -> (Int -> Char) -> Int64   -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Integer -> (Int -> Char) -> Integer -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Word    -> (Int -> Char) -> Word    -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Word8   -> (Int -> Char) -> Word8   -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Word16  -> (Int -> Char) -> Word16  -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Word32  -> (Int -> Char) -> Word32  -> Builder #-}
+{-# SPECIALIZE showbIntAtBase :: Word64  -> (Int -> Char) -> Word64  -> Builder #-}
 showbIntAtBase base toChr n0
     | base <= 1 = error . toString $ "TextShow.Int.showbIntAtBase: applied to unsupported base" <> showb base
     | n0 < 0    = error . toString $ "TextShow.Int.showbIntAtBase: applied to negative number " <> showb n0
