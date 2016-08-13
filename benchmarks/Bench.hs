@@ -103,8 +103,6 @@ data BinTree3 a = BTEmpty3
 
 instance TextShow a => TextShow (BinTree3 a) where
     showbPrec  = genericShowbPrec
-    showtPrec  = genericShowtPrec
-    showtlPrec = genericShowtlPrec
 
 -------------------------------------------------------------------------------
 -- Simple enumeration types
