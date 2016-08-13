@@ -352,28 +352,28 @@ instance TextShow (f a) => TextShow (HigherKinded f a) where
 --
 -- /Since: 2/
 makeShowt :: Name -> Q Exp
-makeShowt name = [| toStrict . $(makeShowtl name) |]
+makeShowt name = makeShowtPrec name `appE` integerE 0
 
 -- | Generates a lambda expression which behaves like 'showtl' (without requiring a
 -- 'TextShow' instance).
 --
 -- /Since: 2/
 makeShowtl :: Name -> Q Exp
-makeShowtl name = [| toLazyText . $(makeShowb name) |]
+makeShowtl name = makeShowtlPrec name `appE` integerE 0
 
 -- | Generates a lambda expression which behaves like 'showtPrec' (without requiring a
 -- 'TextShow' instance).
 --
 -- /Since: 2/
 makeShowtPrec :: Name -> Q Exp
-makeShowtPrec name = [| \p -> toStrict . $(makeShowtlPrec name) p |]
+makeShowtPrec = makeShowbPrecClass TextShow ShowtPrec
 
 -- | Generates a lambda expression which behaves like 'showtlPrec' (without
 -- requiring a 'TextShow' instance).
 --
 -- /Since: 2/
 makeShowtlPrec :: Name -> Q Exp
-makeShowtlPrec name = [| \p -> toLazyText . $(makeShowbPrec name) p |]
+makeShowtlPrec = makeShowbPrecClass TextShow ShowtlPrec
 
 -- | Generates a lambda expression which behaves like 'showtList' (without requiring a
 -- 'TextShow' instance).
@@ -394,11 +394,7 @@ makeShowtlList name = [| toLazyText . $(makeShowbList name) |]
 --
 -- /Since: 2/
 makeShowb :: Name -> Q Exp
-makeShowb name = makeShowbPrec name `appE` [| zero |]
-  where
-    -- To prevent the generated TH code from having a type ascription
-    zero :: Int
-    zero = 0
+makeShowb name = makeShowbPrec name `appE` integerE 0
 
 -- | Generates a lambda expression which behaves like 'showbPrec' (without requiring a
 -- 'TextShow' instance).
@@ -469,6 +465,11 @@ makeHPrintT name = [| \h -> TS.hPutStrLn h . $(makeShowt name) |]
 -- /Since: 2/
 makeHPrintTL :: Name -> Q Exp
 makeHPrintTL name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
+
+{-
+Does it even make sense to give options to these functions? Perhaps revisit
+at a later date.
+-}
 
 -- -- | Generates a lambda expression which behaves like 'showt' (without requiring a
 -- -- 'TextShow' instance).

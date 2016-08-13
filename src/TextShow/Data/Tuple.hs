@@ -42,7 +42,6 @@ import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 --
 -- /Since: 2/
 showbUnit :: () -> Builder
--- showbUnit () = "()"
 showbUnit = showb
 
 -- | Converts a 2-tuple into a 'Builder' with the given show functions.

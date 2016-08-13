@@ -24,10 +24,14 @@ module TextShow (
     , TextShow1(..)
     , showbPrec1
     , showbUnaryWith
+    , liftShowtPrec
+    , liftShowtlPrec
       -- ** 'TextShow2'
     , TextShow2(..)
     , showbPrec2
     , showbBinaryWith
+    , liftShowtPrec2
+    , liftShowtlPrec2
       -- * 'Builder's
       -- ** The 'Builder' type
     , Builder
@@ -51,7 +55,8 @@ module TextShow (
     , printTL
     , hPrintT
     , hPrintTL
-      -- * Conversion between 'TextShow' and string @Show@
+      -- * Conversions
+      -- ** Conversion between 'TextShow' and string 'Show'
     , FromStringShow(..)
     , FromTextShow(..)
     , FromStringShow1(..)
@@ -62,13 +67,24 @@ module TextShow (
     , showsToShowb
     , showbPrecToShowsPrec
     , showbToShows
+      -- ** Conversions between 'Builder', strict 'TS.Text', and lazy 'TL.Text'
+    , showtPrecToShowbPrec
+    , showtlPrecToShowbPrec
+    , showtToShowb
+    , showtlToShowb
+    , showbPrecToShowtPrec
+    , showbPrecToShowtlPrec
+    , showbToShowt
+    , showbToShowtl
     ) where
 
-import Data.Text.Lazy.Builder
+import qualified Data.Text as TS ()
+import qualified Data.Text.Lazy as TL ()
+import           Data.Text.Lazy.Builder
 
-import Prelude ()
+import           Prelude ()
 
-import TextShow.Classes
-import TextShow.FromStringTextShow
-import TextShow.Instances ()
-import TextShow.Utils (toString, toText, lengthB, unlinesB, unwordsB)
+import           TextShow.Classes
+import           TextShow.FromStringTextShow
+import           TextShow.Instances ()
+import           TextShow.Utils (toString, toText, lengthB, unlinesB, unwordsB)

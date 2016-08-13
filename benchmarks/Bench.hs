@@ -24,7 +24,7 @@ import qualified Data.Text as T
 import           GHC.Generics (Generic)
 
 import           TextShow (TextShow(..))
-import           TextShow.Generic (genericShowbPrec)
+import           TextShow.Generic (genericShowbPrec, genericShowtPrec, genericShowtlPrec)
 import           TextShow.TH (deriveTextShow)
 
 main :: IO ()
@@ -102,7 +102,9 @@ data BinTree3 a = BTEmpty3
   deriving Generic
 
 instance TextShow a => TextShow (BinTree3 a) where
-    showbPrec = genericShowbPrec
+    showbPrec  = genericShowbPrec
+    showtPrec  = genericShowtPrec
+    showtlPrec = genericShowtlPrec
 
 -------------------------------------------------------------------------------
 -- Simple enumeration types
@@ -114,7 +116,9 @@ data Color = Red | Green | Blue | Orange | Violet
 newtype Color2 = Color2 Color
 
 instance TextShow Color2 where
-    showbPrec p (Color2 c) = genericShowbPrec p c
+    showbPrec  p (Color2 c) = genericShowbPrec  p c
+    showtPrec  p (Color2 c) = genericShowtPrec  p c
+    showtlPrec p (Color2 c) = genericShowtlPrec p c
 
 colorShowt :: Color -> T.Text
 colorShowt c = case c of

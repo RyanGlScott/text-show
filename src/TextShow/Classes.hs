@@ -26,13 +26,14 @@ import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, singleton)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromLazyText, fromString,
+                                         fromText, singleton, toLazyText)
 
 import           GHC.Show (appPrec, appPrec1)
 
 import           System.IO (Handle)
 
-import           TextShow.Utils (toString)
+import           TextShow.Utils (toString, toText)
 
 -------------------------------------------------------------------------------
 
@@ -191,6 +192,21 @@ showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
 showbSpace :: Builder
 showbSpace = singleton ' '
 
+-- | Converts a list of values into a 'Builder' in which the values are surrounded
+-- by square brackets and each value is separated by a comma. The function argument
+-- controls how each element is shown.
+--
+-- @'showbListWith' 'showb'@ is the default implementation of 'showbList' save for
+-- a few special cases (e.g., 'String').
+--
+-- /Since: 2/
+showbListWith :: (a -> Builder) -> [a] -> Builder
+showbListWith _      []     = "[]"
+showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
+  where
+    go (y:ys) = singleton ',' <> showbx y <> go ys               -- ..,..
+    go []     = singleton ']'                                    -- ..]"
+
 -- | Surrounds strict 'TS.Text' output with parentheses if the 'Bool' parameter is 'True'.
 --
 -- /Since: next/
@@ -203,6 +219,18 @@ showtParen p t | p         = TS.singleton '(' <> t <> TS.singleton ')'
 -- /Since: next/
 showtSpace :: TS.Text
 showtSpace = TS.singleton ' '
+
+-- | Converts a list of values into a strict 'TS.Text' in which the values are surrounded
+-- by square brackets and each value is separated by a comma. The function argument
+-- controls how each element is shown.
+--
+-- /Since: next/
+showtListWith :: (a -> TS.Text) -> [a] -> TS.Text
+showtListWith _      []     = "[]"
+showtListWith showtx (x:xs) = TS.singleton '[' <> showtx x <> go xs -- "[..
+  where
+    go (y:ys) = TS.singleton ',' <> showtx y <> go ys               -- ..,..
+    go []     = TS.singleton ']'                                    -- ..]"
 
 -- | Surrounds lazy 'TL.Text' output with parentheses if the 'Bool' parameter is 'True'.
 --
@@ -218,20 +246,17 @@ showtlParen p t | p         = TL.singleton '(' <> t <> TL.singleton ')'
 showtlSpace :: TL.Text
 showtlSpace = TL.singleton ' '
 
--- | Converts a list of values into a 'Builder' in which the values are surrounded
+-- | Converts a list of values into a lazy 'TL.Text' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. The function argument
 -- controls how each element is shown.
 --
--- @'showbListWith' 'showb'@ is the default implementation of 'showbList' save for
--- a few special cases (e.g., 'String').
---
--- /Since: 2/
-showbListWith :: (a -> Builder) -> [a] -> Builder
-showbListWith _      []     = "[]"
-showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
+-- /Since: next/
+showtlListWith :: (a -> TL.Text) -> [a] -> TL.Text
+showtlListWith _       []     = "[]"
+showtlListWith showtlx (x:xs) = TL.singleton '[' <> showtlx x <> go xs -- "[..
   where
-    go (y:ys) = singleton ',' <> showbx y <> go ys               -- ..,..
-    go []     = singleton ']'                                    -- ..]"
+    go (y:ys) = TL.singleton ',' <> showtlx y <> go ys                 -- ..,..
+    go []     = TL.singleton ']'                                       -- ..]"
 
 -- | Writes a value's strict 'TS.Text' representation to the standard output, followed
 --   by a newline.
@@ -265,33 +290,89 @@ hPrintTL :: TextShow a => Handle -> a -> IO ()
 hPrintTL h = TL.hPutStrLn h . showtl
 {-# INLINE hPrintTL #-}
 
--- | Convert a precedence-aware @ShowS@-based show function to a @Builder@-based one.
+-- | Convert a precedence-aware 'ShowS'-based show function to a 'Builder'-based one.
 --
 -- /Since: 3/
 showsPrecToShowbPrec :: (Int -> a -> ShowS) -> Int -> a -> Builder
 showsPrecToShowbPrec sp p x = fromString $ sp p x ""
 {-# INLINE showsPrecToShowbPrec #-}
 
--- | Convert a @ShowS@-based show function to a @Builder@-based one.
+-- | Convert a precedence-aware, strict 'TS.Text'-based show function to a 'Builder'-based one.
+--
+-- /Since: next/
+showtPrecToShowbPrec :: (Int -> a -> TS.Text) -> Int -> a -> Builder
+showtPrecToShowbPrec sp p = fromText . sp p
+{-# INLINE showtPrecToShowbPrec #-}
+
+-- | Convert a precedence-aware, lazy 'TL.Text'-based show function to a 'Builder'-based one.
+--
+-- /Since: next/
+showtlPrecToShowbPrec :: (Int -> a -> TL.Text) -> Int -> a -> Builder
+showtlPrecToShowbPrec sp p = fromLazyText . sp p
+{-# INLINE showtlPrecToShowbPrec #-}
+
+-- | Convert a 'ShowS'-based show function to a 'Builder'-based one.
 --
 -- /Since: 3/
 showsToShowb :: (a -> ShowS) -> a -> Builder
 showsToShowb sf x = fromString $ sf x ""
 {-# INLINE showsToShowb #-}
 
--- | Convert a precedence-aware @Builder@-based show function to a @ShowS@-based one.
+-- | Convert a strict 'TS.Text'-based show function to a 'Builder'-based one.
+--
+-- /Since: next/
+showtToShowb :: (a -> TS.Text) -> a -> Builder
+showtToShowb sf = fromText . sf
+{-# INLINE showtToShowb #-}
+
+-- | Convert a lazy 'TL.Text'-based show function to a 'Builder'-based one.
+--
+-- /Since: next/
+showtlToShowb :: (a -> TL.Text) -> a -> Builder
+showtlToShowb sf = fromLazyText . sf
+{-# INLINE showtlToShowb #-}
+
+-- | Convert a precedence-aware 'Builder'-based show function to a 'ShowS'-based one.
 --
 -- /Since: 3/
 showbPrecToShowsPrec :: (Int -> a -> Builder) -> Int -> a -> ShowS
 showbPrecToShowsPrec sp p = showString . toString . sp p
 {-# INLINE showbPrecToShowsPrec #-}
 
--- | Convert a @Builder@-based show function to a @ShowS@-based one.
+-- | Convert a precedence-aware 'Builder'-based show function to a strict 'TS.Text'-based one.
+--
+-- /Since: next/
+showbPrecToShowtPrec :: (Int -> a -> Builder) -> Int -> a -> TS.Text
+showbPrecToShowtPrec sp p = toText . sp p
+{-# INLINE showbPrecToShowtPrec #-}
+
+-- | Convert a precedence-aware 'Builder'-based show function to a lazy 'TL.Text'-based one.
+--
+-- /Since: next/
+showbPrecToShowtlPrec :: (Int -> a -> Builder) -> Int -> a -> TL.Text
+showbPrecToShowtlPrec sp p = toLazyText . sp p
+{-# INLINE showbPrecToShowtlPrec #-}
+
+-- | Convert a 'Builder'-based show function to a 'ShowS'-based one.
 --
 -- /Since: 3/
 showbToShows :: (a -> Builder) -> a -> ShowS
-showbToShows sl = showString . toString . sl
+showbToShows sf = showString . toString . sf
 {-# INLINE showbToShows #-}
+
+-- | Convert a 'Builder'-based show function to a strict 'TS.Text'-based one.
+--
+-- /Since: 3/
+showbToShowt :: (a -> Builder) -> a -> TS.Text
+showbToShowt sf = toText . sf
+{-# INLINE showbToShowt #-}
+
+-- | Convert a 'Builder'-based show function to a lazy 'TL.Text'-based one.
+--
+-- /Since: 3/
+showbToShowtl :: (a -> Builder) -> a -> TL.Text
+showbToShowtl sf = toLazyText . sf
+{-# INLINE showbToShowtl #-}
 
 -------------------------------------------------------------------------------
 
@@ -339,6 +420,26 @@ showbUnaryWith :: (Int -> a -> Builder) -> Builder -> Int -> a -> Builder
 showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
     nameB <> showbSpace <> sp appPrec1 x
 {-# INLINE showbUnaryWith #-}
+
+-- | 'showtPrec' function for an application of the type constructor
+-- based on 'showtPrec' and 'showtList' functions for the argument type.
+--
+-- The current implementation is based on `liftShowbPrec` internally.
+--
+-- /Since: next/
+liftShowtPrec :: TextShow1 f => (Int -> a -> TS.Text) -> ([a] -> TS.Text)
+              -> Int -> f a -> TS.Text
+liftShowtPrec sp sl = showbPrecToShowtPrec $ liftShowbPrec (showtPrecToShowbPrec sp) (showtToShowb sl)
+
+-- | 'showtlPrec' function for an application of the type constructor
+-- based on 'showtlPrec' and 'showtlList' functions for the argument type.
+--
+-- The current implementation is based on `liftShowbPrec` internally.
+--
+-- /Since: next/
+liftShowtlPrec :: TextShow1 f => (Int -> a -> TL.Text) -> ([a] -> TL.Text)
+               -> Int -> f a -> TL.Text
+liftShowtlPrec sp sl = showbPrecToShowtlPrec $ liftShowbPrec (showtlPrecToShowbPrec sp) (showtlToShowb sl)
 
 -------------------------------------------------------------------------------
 
@@ -390,3 +491,31 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
     <> showbSpace <> sp1 appPrec1 x
     <> showbSpace <> sp2 appPrec1 y
 {-# INLINE showbBinaryWith #-}
+
+-- | 'showtPrec' function for an application of the type constructor
+-- based on 'showtPrec' and 'showtList' functions for the argument type.
+--
+-- The current implementation is based on `liftShowbPrec2` internally.
+--
+-- /Since: next/
+liftShowtPrec2 :: TextShow2 f
+               => (Int -> a -> TS.Text) -> ([a] -> TS.Text)
+               -> (Int -> b -> TS.Text) -> ([b] -> TS.Text)
+               -> Int -> f a b -> TS.Text
+liftShowtPrec2 sp1 sl1 sp2 sl2 = showbPrecToShowtPrec $
+    liftShowbPrec2 (showtPrecToShowbPrec sp1) (showtToShowb sl1)
+                   (showtPrecToShowbPrec sp2) (showtToShowb sl2)
+
+-- | 'showtlPrec' function for an application of the type constructor
+-- based on 'showtlPrec' and 'showtlList' functions for the argument type.
+--
+-- The current implementation is based on `liftShowbPrec2` internally.
+--
+-- /Since: next/
+liftShowtlPrec2 :: TextShow2 f
+                => (Int -> a -> TL.Text) -> ([a] -> TL.Text)
+                -> (Int -> b -> TL.Text) -> ([b] -> TL.Text)
+                -> Int -> f a b -> TL.Text
+liftShowtlPrec2 sp1 sl1 sp2 sl2 = showbPrecToShowtlPrec $
+    liftShowbPrec2 (showtlPrecToShowbPrec sp1) (showtlToShowb sl1)
+                   (showtlPrecToShowbPrec sp2) (showtlToShowb sl2)

@@ -26,7 +26,8 @@ import Data.Proxy (Proxy(..))
 import Data.Text.Lazy.Builder (Builder)
 
 import TextShow.Classes (TextShow(..))
-import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec)
+import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,
+                             makeShowtPrec, makeShowtlPrec)
 
 #include "inline.h"
 
@@ -38,7 +39,11 @@ showbProxy = showb
 {-# INLINE showbProxy #-}
 
 instance TextShow (Proxy s) where
-    showbPrec = $(makeShowbPrec ''Proxy)
+    showbPrec  = $(makeShowbPrec  ''Proxy)
+    showtPrec  = $(makeShowtPrec  ''Proxy)
+    showtlPrec = $(makeShowtlPrec ''Proxy)
     INLINE_INST_FUN(showbPrec)
+    INLINE_INST_FUN(showtPrec)
+    INLINE_INST_FUN(showtlPrec)
 
 $(deriveTextShow1 ''Proxy)

@@ -8,11 +8,11 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Exports 'showbListWith'.
+Exports 'showbListWith', 'showtListWith', and 'showtlListWith'.
 -}
-module TextShow.Data.List (showbListWith) where
+module TextShow.Data.List (showbListWith, showtListWith, showtlListWith) where
 
-import TextShow.Classes (TextShow(..), TextShow1(..), showbListWith)
+import TextShow.Classes (TextShow(..), TextShow1(..), showbListWith, showtListWith, showtlListWith)
 import TextShow.Data.Char ()
 import TextShow.Data.Integral ()
 

@@ -25,22 +25,22 @@ import Prelude ()
 import Prelude.Compat
 
 import TextShow.Debug.Trace
-import TextShow.Generic (GTextShow, Zero, genericShowt)
+import TextShow.Generic (GTextShowT, Zero, genericShowt)
 
 -- | A 'Generic' implementation of 'traceTextShow'.
 --
 -- /Since: 2/
-genericTraceTextShow :: (Generic a, GTextShow Zero (Rep a)) => a -> b -> b
+genericTraceTextShow :: (Generic a, GTextShowT Zero (Rep a)) => a -> b -> b
 genericTraceTextShow = tracet . genericShowt
 
 -- | A 'Generic' implementation of 'traceTextShowId'.
 --
 -- /Since: 2/
-genericTraceTextShowId :: (Generic a, GTextShow Zero (Rep a)) => a -> a
+genericTraceTextShowId :: (Generic a, GTextShowT Zero (Rep a)) => a -> a
 genericTraceTextShowId a = tracet (genericShowt a) a
 
 -- | A 'Generic' implementation of 'traceShowM'.
 --
 -- /Since: 2/
-genericTraceTextShowM :: (Generic a, GTextShow Zero (Rep a), Applicative f) => a -> f ()
+genericTraceTextShowM :: (Generic a, GTextShowT Zero (Rep a), Applicative f) => a -> f ()
 genericTraceTextShowM = tracetM . genericShowt

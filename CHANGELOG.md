@@ -1,7 +1,10 @@
 # next
 * The default definitions of `showt` and `showtl` were changed to `showtPrec 0` and `showtlPrec 0`, respectively
-* TODO: TH Options
-* Added `showtParen`, `showtSpace`, `showtlParen`, and `showtlSpace` to `TextShow`
+* TODO: TH refactoring (and Options)
+* TODO: Generics refactoring
+* Added `showtParen`, `showtSpace`, `showtlParen`, `showtlSpace`, `liftShowtPrec`, `liftShowtPrec2`, `liftShowtlPrec`, and `liftShowtlPrec2` to `TextShow`
+* Added `showtPrecToShowbPrec`, `showtlPrecToShowbPrec`, `showtToShowb`, `showtlToShowb`, `showbPrecToShowtPrec`, `showbPrecToShowtlPrec`, `showbToShowt`, and `showbToShowtl` to `TextShow`
+* Added `showtListWith` and `showtlListWith` to `TextShow.Data.List`
 * Added `Data` instance for `ConType` in `TextShow.Generic`
 
 ## 3.3
