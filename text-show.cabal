@@ -419,7 +419,11 @@ test-suite spec
 benchmark bench
   -- This SHOULD build with 7.4, but criterion goofed:
   -- https://github.com/bos/criterion/pull/99
-  if impl(ghc < 7.6)
+  --
+  -- It should ALSO run with 7.6, but doing so triggers a bug that occurs
+  -- due to GHC 7.6 shipping with an old version of binary:
+  -- https://github.com/bos/criterion/pull/112
+  if impl(ghc < 7.8)
     buildable:         False
 
   type:                exitcode-stdio-1.0
