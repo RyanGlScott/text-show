@@ -63,14 +63,9 @@ import           Test.QuickCheck (Arbitrary(..), oneof)
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Text.Show.Deriving (deriveShow1)
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-#endif
 
-#if defined(NEW_FUNCTOR_CLASSES)
-# if MIN_VERSION_template_haskell(2,7,0)
+# if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2)
-# else
-import           Data.Functor.Classes (Show1(..), Show2(..),
-                                       showsUnaryWith, showsBinaryWith)
 # endif
 #endif
 
@@ -95,22 +90,14 @@ instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b 
                       , NASShow2 <$> arbitrary
                       ]
 
-#if !defined(NEW_FUNCTOR_CLASSES)
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'NASShow1)
-#elif MIN_VERSION_template_haskell(2,7,0)
+# else
 $(deriveShow1 'NASShow1)
 $(deriveShow2 'NASShow2)
-#else
-instance (Show b, Show c) => Show1 (NotAllShow Int b c) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show b => Show2 (NotAllShow Int b) where
-    liftShowsPrec2 sp1 _ _ _ p (NASShow1 c b) =
-        showsBinaryWith sp1 showsPrec "NASShow1" p c b
-    liftShowsPrec2 _ _ sp2 _ p (NASShow2 d) =
-        showsUnaryWith sp2 "NASShow2" p d
-#endif
+# endif
 
-#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'NASShow1)
 $(deriveTextShow1 'NASShow2)
 $(deriveTextShow2 'NASShow1)
@@ -154,29 +141,17 @@ instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: Bool) b c) where
     arbitrary = KindDistinguishedBool <$> arbitrary <*> arbitrary
 
-#if !defined(NEW_FUNCTOR_CLASSES)
+# if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'KindDistinguishedUnit)
 
 $(deriveShow1 'KindDistinguishedBool)
-#elif MIN_VERSION_template_haskell(2,7,0)
+# else
 $(deriveShow1 'KindDistinguishedUnit)
 $(deriveShow2 'KindDistinguishedUnit)
 
 $(deriveShow1 'KindDistinguishedBool)
 $(deriveShow2 'KindDistinguishedBool)
-#else
-instance Show b => Show1 (KindDistinguished (a :: ())   b) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show b => Show1 (KindDistinguished (a :: Bool) b) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance Show2 (KindDistinguished (a :: ())) where
-    liftShowsPrec2 sp1 _ sp2 _ p (KindDistinguishedUnit b c) =
-        showsBinaryWith sp1 sp2 "KindDistinguishedUnit" p b c
-instance Show2 (KindDistinguished (a :: Bool)) where
-    liftShowsPrec2 sp1 _ sp2 _ p (KindDistinguishedBool b c) =
-        showsBinaryWith sp1 sp2 "KindDistinguishedBool" p b c
-#endif
+# endif
 
 $(deriveTextShow  'KindDistinguishedUnit)
 $(deriveTextShow1 'KindDistinguishedUnit)
@@ -203,8 +178,4 @@ instance NullaryClass where
       deriving (Arbitrary, Show, Generic)
 
 $(deriveTextShow 'NullaryCon)
-
-# if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveAll 'NullaryCon)
-# endif
 #endif

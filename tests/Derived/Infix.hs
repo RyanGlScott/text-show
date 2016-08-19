@@ -44,15 +44,11 @@ import           Prelude.Compat
 import           Test.QuickCheck (Arbitrary(..), oneof)
 
 import           Text.Show.Deriving (deriveShow1)
-import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
 #if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import           Data.Functor.Classes (Show1(..), Show2(..), showsBinaryWith)
-import           GHC.Show (appPrec, appPrec1, showSpace)
-# endif
 #endif
+
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 -------------------------------------------------------------------------------
 
@@ -169,67 +165,6 @@ $(deriveTextShow  ''TyConGADT)
 $(deriveTextShow1 ''TyConGADT)
 $(deriveTextShow2 ''TyConGADT)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 '(:#:))
-
-$(deriveShow1 '(:*))
-#elif MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow1 '(:#:))
-$(deriveShow2 '(:$:))
-
-$(deriveShow1 '(:*))
-$(deriveShow2 '(:***))
-#else
-instance Show a => Show1 (TyFamilyPlain a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-instance Show a => Show1 (TyFamilyGADT a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance Show2 TyFamilyPlain where
-    liftShowsPrec2 sp1 _ sp2 _ p (a :#: b) =
-        showsBinaryWith sp1 sp2 "(:#:)" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :$: b) =
-        showsInfix sp1 sp2 ":$:" p 4 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyPlain a b) =
-        showsInfix sp1 sp2 "`TyFamilyPlain`" p 5 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyFakeInfix a b) =
-        showsBinaryWith sp1 sp2 "TyFamilyFakeInfix" p a b
-instance Show2 TyFamilyGADT where
-    liftShowsPrec2 sp1 _ sp2 _ p (a :* b) =
-        showsInfix sp1 sp2 ":*" p 1 a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :** b) =
-        showsBinaryWith sp1 sp2 "(:**)" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p ((:***) a b i) =
-        showsTernaryWith sp1 sp2 "(:***)" p a b i
-    liftShowsPrec2 sp1 _ sp2 _ p (a :**** b) =
-        showsBinaryWith sp1 sp2 "(:****)" p a b
-
-showsInfix :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
-           -> String -> Int -> Int -> a -> b -> ShowS
-showsInfix sp1 sp2 name p infixPrec a b = showParen (p > infixPrec) $
-      sp1 (infixPrec + 1) a . showSpace
-    . showString name       . showSpace
-    . sp2 (infixPrec + 1) b
-
-showsTernaryWith :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
-                 -> String -> Int -> a -> b -> Int -> ShowS
-showsTernaryWith sp1 sp2 name p a b i = showParen (p > appPrec) $
-      showString name . showSpace
-    . sp1 appPrec1 a  . showSpace
-    . sp2 appPrec1 b  . showSpace
-    . showsPrec appPrec1 i
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-$(deriveTextShow  '(:#:))
-$(deriveTextShow1 '(:$:))
-$(deriveTextShow2 'TyFamilyPlain)
-
-$(deriveTextShow  '(:*))
-$(deriveTextShow1 '(:***))
-$(deriveTextShow2 '(:****))
-#endif
-
 #if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveMeta           ''TyConPlain)
 $(Generics.deriveRepresentable1 ''TyConPlain)
@@ -241,6 +176,26 @@ $(Generics.deriveRepresentable0 ''TyConPlain)
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 '(:#:))
+
+$(deriveShow1 '(:*))
+# else
+$(deriveShow1 '(:#:))
+$(deriveShow2 '(:$:))
+
+$(deriveShow1 '(:*))
+$(deriveShow2 '(:***))
+# endif
+
+$(deriveTextShow  '(:#:))
+$(deriveTextShow1 '(:$:))
+$(deriveTextShow2 'TyFamilyPlain)
+
+$(deriveTextShow  '(:*))
+$(deriveTextShow1 '(:***))
+$(deriveTextShow2 '(:****))
+
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           '(:#:))
 $(Generics.deriveRepresentable1 '(:$:))

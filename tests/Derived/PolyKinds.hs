@@ -57,10 +57,6 @@ import           TextShow.TH (deriveTextShow2, makeShowbPrec,
 #if defined(NEW_FUNCTOR_CLASSES)
 import           Data.Functor.Classes (Show2(..))
 import           Text.Show.Deriving (deriveShow2, makeLiftShowsPrec, makeLiftShowsPrec2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import           Data.Functor.Classes (showsUnaryWith)
-import           GHC.Show (appPrec, appPrec1, showSpace)
-# endif
 #else
 import           Text.Show.Deriving (makeShowsPrec1)
 #endif
@@ -267,113 +263,6 @@ instance TextShow1 (f a b c d) => TextShow1 (TyConReallyHighKinds f a b c d) whe
 instance TextShow2 (f a b c) => TextShow2 (TyConReallyHighKinds f a b c) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyConReallyHighKinds)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-instance (Functor (f (g (j a) (k a))), Functor (h (j a)),
-          Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
-  Show1 (TyFamilyCompose f g h j k a) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyCompose)
-instance Show1 (TyFamilyProxy (a :: *)) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyProxy)
-instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyReallyHighKinds)
-#elif MIN_VERSION_template_haskell(2,7,0)
-instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
-  Show1 (TyFamilyCompose f g h j k a) where
-    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyCompose)
-instance Show1 (TyFamilyProxy (a :: *)) where
-    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyProxy)
-instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
-    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyReallyHighKinds)
-
-instance (Show2 f, Show2 g, Show2 h, Show1 j, Show1 k) =>
-  Show2 (TyFamilyCompose f g h j k) where
-    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyCompose)
-instance Show2 TyFamilyProxy where
-    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyProxy)
-instance Show2 (f a b c) => Show2 (TyFamilyReallyHighKinds f a b c) where
-    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyReallyHighKinds)
-#else
-instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
-  Show1 (TyFamilyCompose f g h j k a) where
-    liftShowsPrec sp sl p (TyFamilyCompose x) =
-        showsPrecCompose sp sl "TyFamilyCompose" p x
-instance Show1 (TyFamilyProxy (a :: *)) where
-    liftShowsPrec = liftShowsPrec2 undefined undefined
-instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
-    liftShowsPrec sp sl p (TyFamilyReallyHighKinds x) =
-        showsUnaryWith (liftShowsPrec sp sl) "TyFamilyReallyHighKinds" p x
-
-instance (Show2 f, Show2 g, Show2 h, Show1 j, Show1 k) =>
-  Show2 (TyFamilyCompose f g h j k) where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamilyCompose x) =
-        showsPrecCompose2 sp1 sl1 sp2 sl2 "TyFamilyCompose" p x
-instance Show2 TyFamilyProxy where
-    liftShowsPrec2 _ _ _ _ p (TyFamilyProxy x) = showParen (p > appPrec) $
-          showString "TyFamilyProxy "
-        . showsPrec appPrec1 x
-instance Show2 (f a b c) => Show2 (TyFamilyReallyHighKinds f a b c) where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamilyReallyHighKinds x) =
-        showsUnaryWith (liftShowsPrec2 sp1 sl1 sp2 sl2) "TyFamilyReallyHighKinds" p x
-
-showsPrecCompose :: (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k)
-                 => (Int -> b -> ShowS) -> ([b] -> ShowS)
-                 -> String -> Int -> f (g (j a) (k a)) (h (j a) (k b)) -> ShowS
-showsPrecCompose sp sl name p x = showParen (p > appPrec) $
-      showString name . showSpace
-    . liftShowsPrec (liftShowsPrec (liftShowsPrec sp sl)
-                                   (liftShowList  sp sl))
-                    (liftShowList  (liftShowsPrec sp sl)
-                                   (liftShowList  sp sl))
-                    appPrec1 x
-
-showsPrecCompose2 :: (Show2 f, Show2 g, Show2 h, Show1 j, Show1 k)
-                  => (Int -> a -> ShowS) -> ([a] -> ShowS)
-                  -> (Int -> b -> ShowS) -> ([b] -> ShowS)
-                  -> String -> Int -> f (g (j a) (k a)) (h (j a) (k b)) -> ShowS
-showsPrecCompose2 sp1 sl1 sp2 sl2 name p x = showParen (p > appPrec) $
-      showString name . showSpace
-    . liftShowsPrec2 (liftShowsPrec2 (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1)
-                                     (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1))
-                     (liftShowList2  (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1)
-                                     (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1))
-                     (liftShowsPrec2 (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1)
-                                     (liftShowsPrec sp2 sl2)
-                                     (liftShowList  sp2 sl2))
-                     (liftShowList2  (liftShowsPrec sp1 sl1)
-                                     (liftShowList  sp1 sl1)
-                                     (liftShowsPrec sp2 sl2)
-                                     (liftShowList  sp2 sl2))
-                     appPrec1 x
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-instance TextShow (f (g (j a) (k a)) (h (j a) (k b))) =>
-  TextShow (TyFamilyCompose f g h j k a b) where
-    showbPrec = $(makeShowbPrec 'TyFamilyCompose)
-instance (TextShow1 (f (g (j a) (k a))), TextShow1 (h (j a)), TextShow1 k) =>
-  TextShow1 (TyFamilyCompose f g h j k a) where
-    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyCompose)
-$(deriveTextShow2 'TyFamilyCompose)
-
-instance TextShow (TyFamilyProxy a b) where
-    showbPrec = $(makeShowbPrec 'TyFamilyProxy)
-instance TextShow1 (TyFamilyProxy a) where
-    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyProxy)
-$(deriveTextShow2 'TyFamilyProxy)
-
-instance TextShow (f a b c d e) => TextShow (TyFamilyReallyHighKinds f a b c d e) where
-    showbPrec = $(makeShowbPrec 'TyFamilyReallyHighKinds)
-instance TextShow1 (f a b c d) => TextShow1 (TyFamilyReallyHighKinds f a b c d) where
-    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyReallyHighKinds)
-instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) where
-    liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamilyReallyHighKinds)
-#endif
-
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           ''TyConCompose)
 $(Generics.deriveRep1           ''TyConCompose)
@@ -398,6 +287,54 @@ $(Generics.deriveRepresentable0 ''TyConReallyHighKinds)
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
+instance (Functor (f (g (j a) (k a))), Functor (h (j a)),
+          Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
+  Show1 (TyFamilyCompose f g h j k a) where
+    showsPrec1 = $(makeShowsPrec1 'TyFamilyCompose)
+instance Show1 (TyFamilyProxy (a :: *)) where
+    showsPrec1 = $(makeShowsPrec1 'TyFamilyProxy)
+instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
+    showsPrec1 = $(makeShowsPrec1 'TyFamilyReallyHighKinds)
+# else
+instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
+  Show1 (TyFamilyCompose f g h j k a) where
+    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyCompose)
+instance Show1 (TyFamilyProxy (a :: *)) where
+    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyProxy)
+instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
+    liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyReallyHighKinds)
+
+instance (Show2 f, Show2 g, Show2 h, Show1 j, Show1 k) =>
+  Show2 (TyFamilyCompose f g h j k) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyCompose)
+instance Show2 TyFamilyProxy where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyProxy)
+instance Show2 (f a b c) => Show2 (TyFamilyReallyHighKinds f a b c) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyReallyHighKinds)
+# endif
+
+instance TextShow (f (g (j a) (k a)) (h (j a) (k b))) =>
+  TextShow (TyFamilyCompose f g h j k a b) where
+    showbPrec = $(makeShowbPrec 'TyFamilyCompose)
+instance (TextShow1 (f (g (j a) (k a))), TextShow1 (h (j a)), TextShow1 k) =>
+  TextShow1 (TyFamilyCompose f g h j k a) where
+    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyCompose)
+$(deriveTextShow2 'TyFamilyCompose)
+
+instance TextShow (TyFamilyProxy a b) where
+    showbPrec = $(makeShowbPrec 'TyFamilyProxy)
+instance TextShow1 (TyFamilyProxy a) where
+    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyProxy)
+$(deriveTextShow2 'TyFamilyProxy)
+
+instance TextShow (f a b c d e) => TextShow (TyFamilyReallyHighKinds f a b c d e) where
+    showbPrec = $(makeShowbPrec 'TyFamilyReallyHighKinds)
+instance TextShow1 (f a b c d) => TextShow1 (TyFamilyReallyHighKinds f a b c d) where
+    liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyReallyHighKinds)
+instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) where
+    liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamilyReallyHighKinds)
+
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamilyCompose)
 $(Generics.deriveRep1           'TyFamilyCompose)

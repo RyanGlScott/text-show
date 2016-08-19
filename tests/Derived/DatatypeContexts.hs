@@ -30,11 +30,6 @@ import TextShow.TH (makeShowbPrec, makeLiftShowbPrec, makeLiftShowbPrec2)
 #if defined(NEW_FUNCTOR_CLASSES)
 import Data.Functor.Classes (Show2(..))
 import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
-# if MIN_VERSION_template_haskell(2,7,0)
-import Text.Show.Deriving (deriveShow2)
-# else
-import GHC.Show (appPrec, appPrec1, showSpace)
-# endif
 #else
 import Text.Show.Deriving (makeShowsPrec1)
 #endif
@@ -74,33 +69,6 @@ instance (Ord a, Show a) => Show2 (TyCon a) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 ''TyCon)
 #endif
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamily)
-#elif MIN_VERSION_template_haskell(2,7,0)
-instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
-    liftShowsPrec = $(makeLiftShowsPrec 'TyFamily)
-
-instance (Ord a, Show a) => Show2 (TyFamily a) where
-    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamily)
-#else
-instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance (Ord a, Show a) => Show2 (TyFamily a) where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamily a b c) =
-        showsThree sp1 sp2 "TyFamily" p a b c
-
-showsThree :: Show a
-           => (Int -> b -> ShowS) -> (Int -> c -> ShowS)
-           -> String -> Int -> a -> b -> c -> ShowS
-showsThree sp1 sp2 name p a b c = showParen (p > appPrec) $
-      showString name      . showSpace
-    . showsPrec appPrec1 a . showSpace
-    . sp1 appPrec1 b       . showSpace
-    . sp2 appPrec1 c
-#endif
-
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyCon a b c) where
     showbPrec = $(makeShowbPrec ''TyCon)
 instance (Ord a, TextShow a, TextShow b) => TextShow1 (TyCon a b) where
@@ -109,6 +77,17 @@ instance (Ord a, TextShow a) => TextShow2 (TyCon a) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyCon)
 
 #if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
+instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
+    showsPrec1 = $(makeShowsPrec1 'TyFamily)
+# else
+instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
+    liftShowsPrec = $(makeLiftShowsPrec 'TyFamily)
+
+instance (Ord a, Show a) => Show2 (TyFamily a) where
+    liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamily)
+# endif
+
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyFamily a b c) where
     showbPrec = $(makeShowbPrec 'TyFamily)
 instance (Ord a, TextShow a, TextShow b) => TextShow1 (TyFamily a b) where

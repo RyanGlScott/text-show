@@ -35,9 +35,6 @@ import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2,
 #if defined(NEW_FUNCTOR_CLASSES)
 import Data.Functor.Classes (Show2(..))
 import Text.Show.Deriving (deriveShow2, makeLiftShowsPrec, makeLiftShowsPrec2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import Data.Functor.Classes (showsBinaryWith)
-# endif
 #else
 import Text.Show.Deriving (makeShowsPrec1)
 #endif
@@ -103,32 +100,14 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamily)
-#elif MIN_VERSION_template_haskell(2,7,0)
+# else
 $(deriveShow1 'TyFamily)
 $(deriveShow2 'TyFamily)
-#else
-instance Show a => Show1 (TyFamily a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
+# endif
 
-instance Show2 TyFamily where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily b a) =
-        showsForall sp1 sl1 sp2 sl2 "TyFamily" p b a
-
-showsForall :: (Int -> a -> ShowS) -> ([a] -> ShowS)
-            -> (Int -> b -> ShowS) -> ([b] -> ShowS)
-            -> String -> Int
-            -> (forall a. Tagged2 a Int b)
-            -> (forall b. Tagged2 b a a)
-            -> ShowS
-showsForall sp1 sl1 sp2 sl2 name p b a =
-        showsBinaryWith (liftShowsPrec2 showsPrec showList sp2 sl2)
-                        (liftShowsPrec2 sp1       sl1      sp1 sl1)
-                        name p b a
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)

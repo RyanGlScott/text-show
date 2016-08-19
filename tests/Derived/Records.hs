@@ -37,16 +37,11 @@ import           Prelude.Compat
 import           Test.QuickCheck (Arbitrary(..), oneof)
 
 import           Text.Show.Deriving (deriveShow1)
-import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
 #if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import           Data.Functor.Classes (Show1(..), Show2(..))
-import           GHC.Show (showSpace)
-import           GHC.Show (appPrec)
-# endif
 #endif
+
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 -------------------------------------------------------------------------------
 
@@ -110,33 +105,14 @@ $(Generics.deriveRepresentable1 ''TyCon)
 $(Generics.deriveRepresentable0 ''TyCon)
 #endif
 
-#if !defined(NEW_FUNCTOR_CLASSES)
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamilyPrefix)
-#elif MIN_VERSION_template_haskell(2,7,0)
+# else
 $(deriveShow1 'TyFamilyPrefix)
 $(deriveShow2 '(:!:))
-#else
-instance Show a => Show1 (TyFamily a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
+# endif
 
-instance Show2 TyFamily where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyPrefix a b) =
-        showsRecord sp1 sp2 "TyFamilyPrefix" "tf1" "tf2" p a b
-    liftShowsPrec2 sp1 _ sp2 _ p (a :!: b) =
-        showsRecord sp2 sp1 "(:!:)" "tf3" "tf4" p a b
-
-showsRecord :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
-            -> String -> String -> String -> Int -> a -> b -> ShowS
-showsRecord sp1 sp2 con rec1 rec2 p a b =
-    showParen (p > appPrec) $
-          showString con . showSpace
-        . showChar '{'
-        . showString rec1 . showString " = " . sp1 0 a . showString ", "
-        . showString rec2 . showString " = " . sp2 0 b
-        . showChar '}'
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamilyPrefix)
 $(deriveTextShow1 '(:!:))
 $(deriveTextShow2 'TyFamilyPrefix)

@@ -34,17 +34,11 @@ import           Prelude.Compat
 import           Test.QuickCheck (Arbitrary(..))
 
 import           Text.Show.Deriving (deriveShow1Options, legacyShowOptions)
-import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
 #if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2Options)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import           Data.Functor.Classes (Show1(..), Show2(..))
-import           GHC.Show (showSpace)
-import           GHC.Show (appPrec)
-# endif
 #endif
 
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 -------------------------------------------------------------------------------
 
 data TyCon# a b = TyCon# {
@@ -116,60 +110,23 @@ $(deriveTextShow  ''TyCon#)
 $(deriveTextShow1 ''TyCon#)
 $(deriveTextShow2 ''TyCon#)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1Options legacyShowOptions 'TyFamily#)
-#elif MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow1Options legacyShowOptions 'TyFamily#)
-$(deriveShow2Options legacyShowOptions 'TyFamily#)
-#else
-instance Show a => Show1 (TyFamily# a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance Show2 TyFamily# where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamily# a b i f d c w) =
-        showsHash sp1 sp2 "TyFamily#" "tfA" "tfB" "tfInt#" "tfFloat#"
-                  "tfDouble#" "tfChar#" "tfWord#" p a b i f d c w
-
-showsHash :: (Int -> a -> ShowS) -> (Int -> b -> ShowS)
-          -> String -> String -> String -> String -> String -> String -> String -> String
-          -> Int -> a -> b -> Int# -> Float# -> Double# -> Char# -> Word#
-          -> ShowS
-showsHash sp1 sp2 con rec1 rec2 rec3 rec4 rec5 rec6 rec7 p a b i f d c w =
-    showParen (p > appPrec) $
-          showString con . showSpace
-        . showChar '{'
-        . showString rec1 . equals . sp1 0 a                . comma
-        . showString rec2 . equals . sp2 0 b                . comma
-        . showString rec3 . equals . shows (I# i) . oneHash . comma
-        . showString rec4 . equals . shows (F# f) . oneHash . comma
-        . showString rec5 . equals . shows (D# d) . twoHash . comma
-        . showString rec6 . equals . shows (C# c) . oneHash . comma
-        . showString rec7 . equals . shows (W# w) . twoHash
-        . showChar '}'
-  where
-    comma, equals :: ShowS
-    comma  = showString ", "
-    equals = showString " = "
-
-    oneHash, twoHash :: ShowS
-# if __GLASGOW_HASKELL__ >= 711
-    oneHash  = showChar '#'
-    twoHash  = showString "##"
-# else
-    oneHash  = id
-    twoHash  = id
-# endif
+#if __GLASGOW_HASKELL__ < 711
+$(Generics.deriveAll0And1 ''TyCon#)
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1Options legacyShowOptions 'TyFamily#)
+# else
+$(deriveShow1Options legacyShowOptions 'TyFamily#)
+$(deriveShow2Options legacyShowOptions 'TyFamily#)
+# endif
+
 $(deriveTextShow  'TyFamily#)
 $(deriveTextShow1 'TyFamily#)
 $(deriveTextShow2 'TyFamily#)
-#endif
 
-#if __GLASGOW_HASKELL__ < 711
-$(Generics.deriveAll0And1 ''TyCon#)
-# if MIN_VERSION_template_haskell(2,7,0)
+# if __GLASGOW_HASKELL__ < 711
 $(Generics.deriveAll0And1 'TyFamily#)
 # endif
 #endif

@@ -39,14 +39,11 @@ import           Prelude
 import           Test.QuickCheck (Arbitrary)
 
 import           Text.Show.Deriving (deriveShow1)
-import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
 #if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import           Data.Functor.Classes (Show1(..), Show2(..), showsUnaryWith)
-# endif
 #endif
+
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 -------------------------------------------------------------------------------
 
@@ -113,42 +110,6 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 'TyFamily)
-#elif MIN_VERSION_template_haskell(2,7,0)
-$(deriveShow1 'TyFamily)
-$(deriveShow2 'TyFamily)
-#else
-instance Show a => Show1 (TyFamily a) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
-
-instance Show2 TyFamily where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p (TyFamily x) =
-        showsTypeSynonym sp1 sl1 sp2 sl2 "TyFamily" p x
-
-showsTypeSynonym :: (Int -> a -> ShowS) -> ([a] -> ShowS)
-                 -> (Int -> b -> ShowS) -> ([b] -> ShowS)
-                 -> String -> Int
-                 -> ( Id (FakeOut (Id a))
-                    , Id (FakeOut (Id b))
-                    , Id (Flip Either (Id a) (Id Int))
-                    , Id (Flip Either (Id b) (Id a))
-                    )
-                -> ShowS
-showsTypeSynonym sp1 sl1 sp2 sl2 name p x =
-    showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 showsPrec showList sp1 sl1)
-                                   (liftShowList2  showsPrec showList sp1 sl1)
-                                   (liftShowsPrec2 sp1       sl1      sp2 sl2)
-                                   (liftShowList2  sp1       sl1      sp2 sl2)
-                   ) name p x
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-$(deriveTextShow  'TyFamily)
-$(deriveTextShow1 'TyFamily)
-$(deriveTextShow2 'TyFamily)
-#endif
-
 #if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveMeta           ''TyCon)
 $(Generics.deriveRepresentable1 ''TyCon)
@@ -159,6 +120,17 @@ $(Generics.deriveRepresentable0 ''TyCon)
 #endif
 
 #if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
+$(deriveShow1 'TyFamily)
+# else
+$(deriveShow1 'TyFamily)
+$(deriveShow2 'TyFamily)
+# endif
+
+$(deriveTextShow  'TyFamily)
+$(deriveTextShow1 'TyFamily)
+$(deriveTextShow2 'TyFamily)
+
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamily)
 $(Generics.deriveRepresentable1 'TyFamily)

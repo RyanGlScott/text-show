@@ -23,16 +23,12 @@ import Prelude.Compat
 import Test.QuickCheck (Arbitrary(..), Gen, oneof)
 
 import Text.Show.Deriving (deriveShow1)
-import TextShow (TextShow)
-import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
 #if defined(NEW_FUNCTOR_CLASSES)
 import Text.Show.Deriving (deriveShow2)
-# if !(MIN_VERSION_template_haskell(2,7,0))
-import Data.Functor.Classes (Show1(..), Show2(..), showsBinaryWith)
-import GHC.Show (appPrec, appPrec1, showSpace)
-# endif
 #endif
+
+import TextShow (TextShow)
+import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 -------------------------------------------------------------------------------
 
@@ -113,39 +109,14 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
+#if MIN_VERSION_template_haskell(2,7,0)
+# if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamilyClassConstraints)
-#elif MIN_VERSION_template_haskell(2,7,0)
+# else
 $(deriveShow1 'TyFamilyTypeRefinement1)
 $(deriveShow2 'TyFamilyTypeRefinement1)
-#else
-instance (Show a, Show b, Show c) => Show1 (TyFamily a b c) where
-    liftShowsPrec = liftShowsPrec2 showsPrec showList
+# endif
 
-instance (Show a, Show b) => Show2 (TyFamily a b) where
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyClassConstraints a b c d) =
-        showsFour sp1 sp2 "TyFamilyClassConstraints" p a b c d
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyEqualityConstraints a b c d) =
-        showsFour sp1 sp2 "TyFamilyEqualityConstraints" p a b c d
-    liftShowsPrec2 _ _ sp2 _ p (TyFamilyTypeRefinement1 i d) =
-        showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement1" p i d
-    liftShowsPrec2 _ _ sp2 _ p (TyFamilyTypeRefinement2 i d) =
-        showsBinaryWith showsPrec sp2 "TyFamilyTypeRefinement2" p i d
-    liftShowsPrec2 sp1 _ sp2 _ p (TyFamilyForalls p' q d c) =
-        showsFour sp2 sp1 "TyFamilyForalls" p p' q d c
-
-showsFour :: (Show a, Show b)
-          => (Int -> c -> ShowS) -> (Int -> d -> ShowS)
-          -> String -> Int -> a -> b -> c -> d -> ShowS
-showsFour sp1 sp2 name p a b c d = showParen (p > appPrec) $
-      showString name      . showSpace
-    . showsPrec appPrec1 a . showSpace
-    . showsPrec appPrec1 b . showSpace
-    . sp1 appPrec1 c       . showSpace
-    . sp2 appPrec1 d
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
 $(deriveTextShow  'TyFamilyClassConstraints)
 $(deriveTextShow1 'TyFamilyTypeRefinement1)
 $(deriveTextShow2 'TyFamilyTypeRefinement2)
