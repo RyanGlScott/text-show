@@ -6,6 +6,10 @@
 {-# LANGUAGE DeriveGeneric   #-}
 #endif
 
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds       #-}
+#endif
+
 {-|
 Module:      Derived.Records
 Copyright:   (C) 2014-2016 Ryan Scott

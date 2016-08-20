@@ -28,4 +28,7 @@ instance Arbitrary GCStats where
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
                         <*> arbitrary <*> arbitrary <*> arbitrary
+# if __GLASGOW_HASKELL__ >= 801
+                        <*> arbitrary
+# endif
 #endif

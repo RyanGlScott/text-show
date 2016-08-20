@@ -16,6 +16,7 @@
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE PolyKinds                  #-}
 #endif
 

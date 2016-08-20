@@ -8,6 +8,7 @@
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds          #-}
 {-# LANGUAGE PolyKinds          #-}
 #endif
 
@@ -28,6 +29,8 @@ Stability:   Provisional
 Portability: GHC
 
 'Options' and related datatypes.
+
+/Since: 3.4/
 -}
 module TextShow.Options (Options(..), GenTextMethods(..), defaultOptions) where
 
@@ -43,6 +46,8 @@ import qualified Generics.Deriving.TH as Generics
 import           Language.Haskell.TH.Lift
 
 -- | Options that specify how to derive 'TextShow' instances using Template Haskell.
+--
+-- /Since: 3.4/
 newtype Options = Options
   { genTextMethods :: GenTextMethods
     -- ^ When Template Haskell should generate definitions for methods which
@@ -63,6 +68,8 @@ newtype Options = Options
 
 -- | When should Template Haskell generate implementations for the methods of
 -- 'TextShow' which return @Text@?
+--
+-- /Since: 3.4/
 data GenTextMethods
   = AlwaysTextMethods    -- ^ Always generate them.
   | SometimesTextMethods -- ^ Only generate when @text-show@ feels it's appropriate.
@@ -85,6 +92,8 @@ data GenTextMethods
            )
 
 -- | Sensible default 'Options'.
+--
+-- /Since: 3.4/
 defaultOptions :: Options
 defaultOptions = Options { genTextMethods = SometimesTextMethods }
 

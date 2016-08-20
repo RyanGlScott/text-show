@@ -53,19 +53,6 @@ module TextShow.TH.Internal (
     , deriveTextShowOptions
     , deriveTextShow1Options
     , deriveTextShow2Options
---     , makeShowtOptions
---     , makeShowtlOptions
---     , makeShowtPrecOptions
---     , makeShowtlPrecOptions
---     , makeShowtListOptions
---     , makeShowtlListOptions
---     , makeShowbOptions
---     , makeShowbPrecOptions
---     , makeShowbListOptions
---     , makePrintTOptions
---     , makePrintTLOptions
---     , makeHPrintTOptions
---     , makeHPrintTLOptions
     ) where
 
 import           Control.Monad (liftM, unless, when)
@@ -192,7 +179,7 @@ deriveTextShow = deriveTextShowOptions defaultOptions
 
 -- | Like 'deriveTextShow', but takes an 'Options' argument.
 --
--- /Since: next/
+-- /Since: 3.4/
 deriveTextShowOptions :: Options -> Name -> Q [Dec]
 deriveTextShowOptions = deriveTextShowClass TextShow
 
@@ -255,7 +242,7 @@ deriveTextShow1 = deriveTextShow1Options defaultOptions
 
 -- | Like 'deriveTextShow1', but takes an 'Options' argument.
 --
--- /Since: next/
+-- /Since: 3.4/
 deriveTextShow1Options :: Options -> Name -> Q [Dec]
 deriveTextShow1Options = deriveTextShowClass TextShow1
 
@@ -319,7 +306,7 @@ deriveTextShow2 = deriveTextShow2Options defaultOptions
 
 -- | Like 'deriveTextShow2', but takes an 'Options' argument.
 --
--- /Since: next/
+-- /Since: 3.4/
 deriveTextShow2Options :: Options -> Name -> Q [Dec]
 deriveTextShow2Options = deriveTextShowClass TextShow2
 
@@ -465,220 +452,6 @@ makeHPrintT name = [| \h -> TS.hPutStrLn h . $(makeShowt name) |]
 -- /Since: 2/
 makeHPrintTL :: Name -> Q Exp
 makeHPrintTL name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
-
-{-
-Does it even make sense to give options to these functions? Perhaps revisit
-at a later date.
--}
-
--- -- | Generates a lambda expression which behaves like 'showt' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowt :: Name -> Q Exp
--- makeShowt = makeShowtOptions defaultOptions
---
--- -- | Like 'makeShowt', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtOptions :: Options -> Name -> Q Exp
--- makeShowtOptions opts name =
---     if genTextMethods opts == NeverTextMethods
---        then [| toStrict . $(makeShowtl name) |]
---        else makeShowtPrec name `appE` integerE 0
---
--- -- | Generates a lambda expression which behaves like 'showtl' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowtl :: Name -> Q Exp
--- makeShowtl = makeShowtlOptions defaultOptions
---
--- -- | Like 'makeShowtl', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtlOptions :: Options -> Name -> Q Exp
--- makeShowtlOptions opts name =
---     if genTextMethods opts == NeverTextMethods
---        then [| toLazyText . $(makeShowb name) |]
---        else makeShowtlPrec name `appE` integerE 0
---
--- -- | Generates a lambda expression which behaves like 'showtPrec' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowtPrec :: Name -> Q Exp
--- makeShowtPrec = makeShowtPrecOptions defaultOptions
---
--- -- | Like 'makeShowtPrec', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtPrecOptions :: Options -> Name -> Q Exp
--- makeShowtPrecOptions opts name =
---     if genTextMethods opts == NeverTextMethods
---        then [| \p -> toStrict . $(makeShowtlPrec name) p |]
---        else makeShowbPrecClass TextShow ShowtPrec
---
--- -- | Generates a lambda expression which behaves like 'showtlPrec' (without
--- -- requiring a 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowtlPrec :: Name -> Q Exp
--- makeShowtlPrec = makeShowtlPrecOptions defaultOptions
---
--- -- | Like 'makeShowtlPrec', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtlPrecOptions :: Options -> Name -> Q Exp
--- makeShowtlPrecOptions opts name =
---     if genTextMethods opts == NeverTextMethods
---        then [| \p -> toLazyText . $(makeShowbPrec name) p |]
---        else makeShowbPrecClass TextShow ShowtlPrec
---
--- -- | Generates a lambda expression which behaves like 'showtList' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowtList :: Name -> Q Exp
--- makeShowtList = makeShowtListOptions defaultOptions
---
--- -- | Like 'makeShowtList', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtListOptions :: Options -> Name -> Q Exp
--- makeShowtListOptions _ name = [| toStrict . $(makeShowtlList name) |]
---
--- -- | Generates a lambda expression which behaves like 'showtlList' (without
--- -- requiring a 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowtlList :: Name -> Q Exp
--- makeShowtlList = makeShowtlListOptions defaultOptions
---
--- -- | Like 'makeShowtlList', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowtlListOptions :: Options -> Name -> Q Exp
--- makeShowtlListOptions _ name = [| toLazyText . $(makeShowbList name) |]
---
--- -- | Generates a lambda expression which behaves like 'showb' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowb :: Name -> Q Exp
--- makeShowb = makeShowbOptions defaultOptions
---
--- -- | Like 'makeShowb', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowbOptions :: Options -> Name -> Q Exp
--- makeShowbOptions _ name = makeShowbPrec name `appE` integerE 0
---
--- -- | Generates a lambda expression which behaves like 'showbPrec' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowbPrec :: Name -> Q Exp
--- makeShowbPrec = makeShowbPrecOptions defaultOptions
---
--- -- | Like 'makeShowbPrec', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowbPrecOptions :: Options -> Name -> Q Exp
--- makeShowbPrecOptions _ name = makeShowbPrecClass TextShow ShowbPrec
---
--- -- | Generates a lambda expression which behaves like 'liftShowbPrec' (without
--- -- requiring a 'TextShow1' instance).
--- --
--- -- /Since: 3/
--- makeLiftShowbPrec :: Name -> Q Exp
--- makeLiftShowbPrec = makeShowbPrecClass TextShow1 ShowbPrec
---
--- -- | Generates a lambda expression which behaves like 'showbPrec1' (without
--- -- requiring a 'TextShow1' instance).
--- --
--- -- /Since: 2/
--- makeShowbPrec1 :: Name -> Q Exp
--- makeShowbPrec1 name = [| $(makeLiftShowbPrec name) showbPrec showbList |]
---
--- -- | Generates a lambda expression which behaves like 'liftShowbPrec2' (without
--- -- requiring a 'TextShow2' instance).
--- --
--- -- /Since: 3/
--- makeLiftShowbPrec2 :: Name -> Q Exp
--- makeLiftShowbPrec2 = makeShowbPrecClass TextShow2 ShowbPrec
---
--- -- | Generates a lambda expression which behaves like 'showbPrec2' (without
--- -- requiring a 'TextShow2' instance).
--- --
--- -- /Since: 2/
--- makeShowbPrec2 :: Name -> Q Exp
--- makeShowbPrec2 name = [| $(makeLiftShowbPrec2 name) showbPrec showbList showbPrec showbList |]
---
--- -- | Generates a lambda expression which behaves like 'showbList' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeShowbList :: Name -> Q Exp
--- makeShowbList = makeShowbListOptions defaultOptions
---
--- -- | Like 'makeShowbList', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeShowbListOptions :: Options -> Name -> Q Exp
--- makeShowbListOptions _ name = [| showbListWith $(makeShowb name) |]
---
--- -- | Generates a lambda expression which behaves like 'printT' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makePrintT :: Name -> Q Exp
--- makePrintT = makePrintTOptions defaultOptions
---
--- -- | Like 'makePrintT', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makePrintTOptions :: Options -> Name -> Q Exp
--- makePrintTOptions _ name = [| TS.putStrLn . $(makeShowt name) |]
---
--- -- | Generates a lambda expression which behaves like 'printTL' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makePrintTL :: Name -> Q Exp
--- makePrintTL = makePrintTLOptions defaultOptions
---
--- -- | Like 'makePrintTL', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makePrintTLOptions :: Options -> Name -> Q Exp
--- makePrintTLOptions _ name = [| TL.putStrLn . $(makeShowtl name) |]
---
--- -- | Generates a lambda expression which behaves like 'hPrintT' (without requiring a
--- -- 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeHPrintT :: Name -> Q Exp
--- makeHPrintT = makeHPrintTOptions defaultOptions
---
--- -- | Like 'makeHPrintT', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeHPrintTOptions :: Options -> Name -> Q Exp
--- makeHPrintTOptions _ name = [| \h -> TS.hPutStrLn h . $(makeShowt name) |]
---
--- -- | Generates a lambda expression which behaves like 'hPrintTL' (without
--- -- requiring a 'TextShow' instance).
--- --
--- -- /Since: 2/
--- makeHPrintTL :: Name -> Q Exp
--- makeHPrintTL = makeHPrintTLOptions defaultOptions
---
--- -- | Like 'makeHPrintTL', but takes an 'Options' argument.
--- --
--- -- /Since: next/
--- makeHPrintTLOptions :: Options -> Name -> Q Exp
--- makeHPrintTLOptions _ name = [| \h -> TL.hPutStrLn h . $(makeShowtl name) |]
 
 -------------------------------------------------------------------------------
 -- Code generation

@@ -45,6 +45,7 @@ import           Data.Functor.Classes (Show1(..))
 import           Generics.Deriving.Base
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
+import           Generics.Deriving.TH (Options(..), defaultOptions)
 #endif
 
 import           Test.QuickCheck (Arbitrary)
@@ -63,8 +64,9 @@ import           Text.Show.Deriving (makeShowsPrec1)
 
 -------------------------------------------------------------------------------
 
-newtype TyConCompose f g h j k a b =
-    TyConCompose (f (g (j a) (k a)) (h (j a) (k b)))
+-- NB: Don't use k as a type variable here! It'll trigger GHC Trac #12503.
+newtype TyConCompose f g h j p a b =
+    TyConCompose (f (g (j a) (p a)) (h (j a) (p b)))
 #if __GLASGOW_HASKELL__ >= 702
   deriving Generic
 #endif
@@ -264,8 +266,8 @@ instance TextShow2 (f a b c) => TextShow2 (TyConReallyHighKinds f a b c) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyConReallyHighKinds)
 
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           ''TyConCompose)
-$(Generics.deriveRep1           ''TyConCompose)
+$(Generics.deriveMeta              ''TyConCompose)
+$(Generics.deriveRep1Options False ''TyConCompose)
 
 instance ( Functor (f (g (j a) (k a)))
          , Functor (h (j a))
@@ -336,8 +338,8 @@ instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) wher
     liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamilyReallyHighKinds)
 
 # if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           'TyFamilyCompose)
-$(Generics.deriveRep1           'TyFamilyCompose)
+$(Generics.deriveMeta              'TyFamilyCompose)
+$(Generics.deriveRep1Options False 'TyFamilyCompose)
 
 instance ( Functor (f (g (j a) (k a)))
          , Functor (h (j a))

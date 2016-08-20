@@ -20,6 +20,7 @@
 #endif
 
 #if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE PolyKinds            #-}
 #endif
 
@@ -339,7 +340,7 @@ hash_prec = id
 the two function arguments that show occurrences of the type parameter (for             \
 'TextShow1').                                                                           \
                                                                                         \
-/Since: next/                                                                           \
+/Since: 3.4/                                                                           \
 -};                                                                                     \
 data show_funs arity a where {                                                          \
     no_show_funs :: show_funs Zero a                                                    \
@@ -356,7 +357,7 @@ a 'text_type'. The @arity@ type variable indicates which type class is          
 used. @'gtext_show' 'Zero'@ indicates 'TextShow' behavior, and                          \
 @'gtext_show' 'One'@ indicates 'TextShow1' behavior.                                    \
                                                                                         \
-/Since: next/                                                                           \
+/Since: 3.4/                                                                           \
 -};                                                                                     \
 class gtext_show arity f where {                                                        \
     {- | This is used as the default generic implementation of 'show_prec' (if the      \

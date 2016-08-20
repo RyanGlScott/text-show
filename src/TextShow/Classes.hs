@@ -209,14 +209,14 @@ showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
 
 -- | Surrounds strict 'TS.Text' output with parentheses if the 'Bool' parameter is 'True'.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtParen :: Bool -> TS.Text -> TS.Text
 showtParen p t | p         = TS.singleton '(' <> t <> TS.singleton ')'
                | otherwise = t
 
 -- | Construct a strict 'TS.Text' containing a single space character.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtSpace :: TS.Text
 showtSpace = TS.singleton ' '
 
@@ -224,7 +224,7 @@ showtSpace = TS.singleton ' '
 -- by square brackets and each value is separated by a comma. The function argument
 -- controls how each element is shown.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtListWith :: (a -> TS.Text) -> [a] -> TS.Text
 showtListWith _      []     = "[]"
 showtListWith showtx (x:xs) = TS.singleton '[' <> showtx x <> go xs -- "[..
@@ -234,7 +234,7 @@ showtListWith showtx (x:xs) = TS.singleton '[' <> showtx x <> go xs -- "[..
 
 -- | Surrounds lazy 'TL.Text' output with parentheses if the 'Bool' parameter is 'True'.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtlParen :: Bool -> TL.Text -> TL.Text
 showtlParen p t | p         = TL.singleton '(' <> t <> TL.singleton ')'
                 | otherwise = t
@@ -242,7 +242,7 @@ showtlParen p t | p         = TL.singleton '(' <> t <> TL.singleton ')'
 
 -- | Construct a lazy 'TL.Text' containing a single space character.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtlSpace :: TL.Text
 showtlSpace = TL.singleton ' '
 
@@ -250,7 +250,7 @@ showtlSpace = TL.singleton ' '
 -- by square brackets and each value is separated by a comma. The function argument
 -- controls how each element is shown.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtlListWith :: (a -> TL.Text) -> [a] -> TL.Text
 showtlListWith _       []     = "[]"
 showtlListWith showtlx (x:xs) = TL.singleton '[' <> showtlx x <> go xs -- "[..
@@ -299,14 +299,14 @@ showsPrecToShowbPrec sp p x = fromString $ sp p x ""
 
 -- | Convert a precedence-aware, strict 'TS.Text'-based show function to a 'Builder'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtPrecToShowbPrec :: (Int -> a -> TS.Text) -> Int -> a -> Builder
 showtPrecToShowbPrec sp p = fromText . sp p
 {-# INLINE showtPrecToShowbPrec #-}
 
 -- | Convert a precedence-aware, lazy 'TL.Text'-based show function to a 'Builder'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtlPrecToShowbPrec :: (Int -> a -> TL.Text) -> Int -> a -> Builder
 showtlPrecToShowbPrec sp p = fromLazyText . sp p
 {-# INLINE showtlPrecToShowbPrec #-}
@@ -320,14 +320,14 @@ showsToShowb sf x = fromString $ sf x ""
 
 -- | Convert a strict 'TS.Text'-based show function to a 'Builder'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtToShowb :: (a -> TS.Text) -> a -> Builder
 showtToShowb sf = fromText . sf
 {-# INLINE showtToShowb #-}
 
 -- | Convert a lazy 'TL.Text'-based show function to a 'Builder'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showtlToShowb :: (a -> TL.Text) -> a -> Builder
 showtlToShowb sf = fromLazyText . sf
 {-# INLINE showtlToShowb #-}
@@ -341,14 +341,14 @@ showbPrecToShowsPrec sp p = showString . toString . sp p
 
 -- | Convert a precedence-aware 'Builder'-based show function to a strict 'TS.Text'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showbPrecToShowtPrec :: (Int -> a -> Builder) -> Int -> a -> TS.Text
 showbPrecToShowtPrec sp p = toText . sp p
 {-# INLINE showbPrecToShowtPrec #-}
 
 -- | Convert a precedence-aware 'Builder'-based show function to a lazy 'TL.Text'-based one.
 --
--- /Since: next/
+-- /Since: 3.4/
 showbPrecToShowtlPrec :: (Int -> a -> Builder) -> Int -> a -> TL.Text
 showbPrecToShowtlPrec sp p = toLazyText . sp p
 {-# INLINE showbPrecToShowtlPrec #-}
@@ -426,7 +426,7 @@ showbUnaryWith sp nameB p x = showbParen (p > appPrec) $
 --
 -- The current implementation is based on `liftShowbPrec` internally.
 --
--- /Since: next/
+-- /Since: 3.4/
 liftShowtPrec :: TextShow1 f => (Int -> a -> TS.Text) -> ([a] -> TS.Text)
               -> Int -> f a -> TS.Text
 liftShowtPrec sp sl = showbPrecToShowtPrec $ liftShowbPrec (showtPrecToShowbPrec sp) (showtToShowb sl)
@@ -436,7 +436,7 @@ liftShowtPrec sp sl = showbPrecToShowtPrec $ liftShowbPrec (showtPrecToShowbPrec
 --
 -- The current implementation is based on `liftShowbPrec` internally.
 --
--- /Since: next/
+-- /Since: 3.4/
 liftShowtlPrec :: TextShow1 f => (Int -> a -> TL.Text) -> ([a] -> TL.Text)
                -> Int -> f a -> TL.Text
 liftShowtlPrec sp sl = showbPrecToShowtlPrec $ liftShowbPrec (showtlPrecToShowbPrec sp) (showtlToShowb sl)
@@ -497,7 +497,7 @@ showbBinaryWith sp1 sp2 nameB p x y = showbParen (p > appPrec) $ nameB
 --
 -- The current implementation is based on `liftShowbPrec2` internally.
 --
--- /Since: next/
+-- /Since: 3.4/
 liftShowtPrec2 :: TextShow2 f
                => (Int -> a -> TS.Text) -> ([a] -> TS.Text)
                -> (Int -> b -> TS.Text) -> ([b] -> TS.Text)
@@ -511,7 +511,7 @@ liftShowtPrec2 sp1 sl1 sp2 sl2 = showbPrecToShowtPrec $
 --
 -- The current implementation is based on `liftShowbPrec2` internally.
 --
--- /Since: next/
+-- /Since: 3.4/
 liftShowtlPrec2 :: TextShow2 f
                 => (Int -> a -> TL.Text) -> ([a] -> TL.Text)
                 -> (Int -> b -> TL.Text) -> ([b] -> TL.Text)

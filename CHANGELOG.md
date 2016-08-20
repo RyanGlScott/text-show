@@ -1,11 +1,15 @@
-# next
+## 3.4
 * The default definitions of `showt` and `showtl` were changed to `showtPrec 0` and `showtlPrec 0`, respectively
-* TODO: TH refactoring (and Options)
-* TODO: Generics refactoring
+* `deriveTextShowOptions`, `deriveTextShow1Options`, and `deriveTextShow2Options` added to `TextShow.TH`, which allow further configuration of how `TextShow(1)(2)` instances should be derived using the new `Options` data type. `Options` itself contains `GenTextMethods`, which configures whether manual implementations of `TextShow` should implement the methods that return strict and lazy `Text`.
+  * The `defaultOptions` uses `SometimesTextMethods`, which only implements the `Text`-returning methods if the datatype contains only nullary constructors (i.e., it is an enumeration type). For example, `deriveTextShow = deriveTextShowOptions defaultOptions`. One can also choose `AlwaysTextMethods` or `NeverTextMethods` instead.
+* The internals of `TextShow.Generic` were refactored so that is possible to generically derive `showbPrec`, `showtPrec`, and `showtlPrec` (which use `Builder`, strict `Text`, and lazy `Text`, respectively). Before, only generic derivation of `showbPrec` was possible, and all other generic functions were defined in terms of `showbPrec`.
+  * The internal class `GTextShow` was split up into `GShowB`, `GShowT`, and `GShowTL`, depending on what type it returns.
+  * As a result, functions like `genericShowtPrec` might be faster than before if they are showing something like an enumeration type, since they no longer construct an intermediate `Builder`. On the other hand, they might be slower if they are showing a constructor with many fields, since they will now be appending lots of `Text`s. If so, make sure to switch to `genericShowbPrec` and convert the final `Builder` to `Text` instead.
 * Added `showtParen`, `showtSpace`, `showtlParen`, `showtlSpace`, `liftShowtPrec`, `liftShowtPrec2`, `liftShowtlPrec`, and `liftShowtlPrec2` to `TextShow`
 * Added `showtPrecToShowbPrec`, `showtlPrecToShowbPrec`, `showtToShowb`, `showtlToShowb`, `showbPrecToShowtPrec`, `showbPrecToShowtlPrec`, `showbToShowt`, and `showbToShowtl` to `TextShow`
 * Added `showtListWith` and `showtlListWith` to `TextShow.Data.List`
 * Added `Data` instance for `ConType` in `TextShow.Generic`
+* Require `generic-deriving-1.11` or later
 
 ## 3.3
 * Refactored the internals of `TextShow.Generic` to avoid the use of proxies.
