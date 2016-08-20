@@ -45,7 +45,6 @@ import           Data.Functor.Classes (Show1(..))
 import           Generics.Deriving.Base
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
-import           Generics.Deriving.TH (Options(..), defaultOptions)
 #endif
 
 import           Test.QuickCheck (Arbitrary)
