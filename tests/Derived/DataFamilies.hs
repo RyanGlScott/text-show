@@ -58,7 +58,7 @@ import           GHC.Generics (Generic1)
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Text.Show.Deriving (deriveShow1)
@@ -86,9 +86,7 @@ data instance NotAllShow Int b   c  d = NASShow1 c b
            )
 
 instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b c d) where
-    arbitrary = oneof [ NASShow1 <$> arbitrary <*> arbitrary
-                      , NASShow2 <$> arbitrary
-                      ]
+    arbitrary = genericArbitrary
 
 #if MIN_VERSION_template_haskell(2,7,0)
 # if !defined(NEW_FUNCTOR_CLASSES)
@@ -135,11 +133,11 @@ data instance KindDistinguished (a :: Bool) b c = KindDistinguishedBool b c
 
 instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: ()) b c) where
-    arbitrary = KindDistinguishedUnit <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: Bool) b c) where
-    arbitrary = KindDistinguishedBool <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 # if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'KindDistinguishedUnit)

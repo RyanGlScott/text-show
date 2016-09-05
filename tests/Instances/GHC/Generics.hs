@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MagicHash                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
@@ -21,18 +20,11 @@ Portability: GHC
 module Instances.GHC.Generics () where
 
 import Data.Orphans ()
-
 import Generics.Deriving.Base
-
-import GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
 
 instance Arbitrary (U1 p) where
-    arbitrary = pure U1
+    arbitrary = genericArbitrary
 
 deriving instance Arbitrary p         => Arbitrary (Par1 p)
 deriving instance Arbitrary (f p)     => Arbitrary (Rec1 f p)
@@ -41,13 +33,13 @@ deriving instance Arbitrary (f p)     => Arbitrary (M1 i c f p)
 deriving instance Arbitrary (f (g p)) => Arbitrary ((f :.: g) p)
 
 instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :+: g) p) where
-    arbitrary = oneof [L1 <$> arbitrary, R1 <$> arbitrary]
+    arbitrary = genericArbitrary
 
 instance (Arbitrary (f p), Arbitrary (g p)) => Arbitrary ((f :*: g) p) where
-    arbitrary = (:*:) <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary Fixity where
-    arbitrary = oneof [pure Prefix, Infix <$> arbitrary <*> arbitrary]
+    arbitrary = genericArbitrary
 
 instance Arbitrary Associativity where
     arbitrary = arbitraryBoundedEnum
@@ -63,30 +55,20 @@ instance Arbitrary DecidedStrictness where
     arbitrary = arbitraryBoundedEnum
 #else
 instance Arbitrary Arity where
-    arbitrary = oneof [pure NoArity, Arity <$> arbitrary]
+    arbitrary = genericArbitrary
 #endif
 
 instance Arbitrary (UChar p) where
-    arbitrary = do
-        C# c <- arbitrary
-        pure $ UChar c
+    arbitrary = genericArbitrary
 
 instance Arbitrary (UDouble p) where
-    arbitrary = do
-        D# d <- arbitrary
-        pure $ UDouble d
+    arbitrary = genericArbitrary
 
 instance Arbitrary (UFloat p) where
-    arbitrary = do
-        F# f <- arbitrary
-        pure $ UFloat f
+    arbitrary = genericArbitrary
 
 instance Arbitrary (UInt p) where
-    arbitrary = do
-        I# i <- arbitrary
-        pure $ UInt i
+    arbitrary = genericArbitrary
 
 instance Arbitrary (UWord p) where
-    arbitrary = do
-        W# w <- arbitrary
-        pure $ UWord w
+    arbitrary = genericArbitrary

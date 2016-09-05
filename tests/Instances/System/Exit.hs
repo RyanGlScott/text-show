@@ -12,12 +12,10 @@ Portability: GHC
 -}
 module Instances.System.Exit () where
 
-import Prelude ()
-import Prelude.Compat
-
+import Data.Orphans ()
+import Generics.Deriving.Base ()
 import System.Exit (ExitCode(..))
-
-import Test.QuickCheck (Arbitrary(..), oneof)
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 instance Arbitrary ExitCode where
-    arbitrary = oneof [pure ExitSuccess, ExitFailure <$> arbitrary]
+    arbitrary = genericArbitrary

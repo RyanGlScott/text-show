@@ -1,5 +1,10 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                #-}
+
+#if MIN_VERSION_base(4,8,0)
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.GHC.StaticPtr
@@ -14,14 +19,12 @@ Portability: GHC
 module Instances.GHC.StaticPtr () where
 
 #if MIN_VERSION_base(4,8,0)
+import GHC.Generics (Generic)
 import GHC.StaticPtr (StaticPtrInfo(..))
-import Test.QuickCheck (Arbitrary(..))
 
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+
+deriving instance Generic StaticPtrInfo
 instance Arbitrary StaticPtrInfo where
-    arbitrary = StaticPtrInfo <$> arbitrary
-                              <*> arbitrary
-                              <*> arbitrary
-# if __GLASGOW_HASKELL__ < 801
-                              <*> arbitrary
-# endif
+    arbitrary = genericArbitrary
 #endif

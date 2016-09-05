@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.GHC.RTS.FlagsSpec (main, spec) where
 
-import Instances.GHC.RTS.Flags ()
+import Instances.GHC.RTS.Flags
 
 import Prelude ()
 import Prelude.Compat
@@ -26,7 +26,6 @@ import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck (Property, ioProperty)
 #endif
 
 main :: IO ()
@@ -36,9 +35,9 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
     describe "RTSFlags" $
-        prop "TextShow instance" prop_showRTSFlags
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> RTSFlags -> Bool)
     describe "GCFlags" $
-        prop "TextShow instance" prop_showGCFlags
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> GCFlags -> Bool)
     describe "ConcFlags" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> ConcFlags -> Bool)
     describe "MiscFlags" $
@@ -46,49 +45,25 @@ spec = parallel $ do
     describe "DebugFlags" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> DebugFlags -> Bool)
     describe "CCFlags" $
-        prop "TextShow instance" prop_showCCFlags
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> CCFlags -> Bool)
     describe "ProfFlags" $
-        prop "TextShow instance" prop_showProfFlags
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> ProfFlags -> Bool)
     describe "TraceFlags" $
-        prop "TextShow instance" prop_showTraceFlags
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> TraceFlags -> Bool)
     describe "TickyFlags" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> TickyFlags -> Bool)
+    describe "GiveGCStats" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> GiveGCStats' -> Bool)
+    describe "DoCostCentres" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoCostCentres' -> Bool)
+    describe "DoHeapProfile" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoHeapProfile' -> Bool)
+    describe "DoTrace" $
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoTrace' -> Bool)
 # if __GLASGOW_HASKELL__ >= 801
     describe "ParFlags" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> ParFlags -> Bool)
 # endif
 #else
     pure ()
-#endif
-
-#if MIN_VERSION_base(4,8,0)
--- | Verifies that the 'Show' instance for 'RTSFlags' is accurate.
-prop_showRTSFlags :: Int -> Property
-prop_showRTSFlags p = ioProperty $ do
-    rtsflags <- getRTSFlags
-    pure $ prop_matchesTextShow p rtsflags
-
--- | Verifies that the 'Show' instance for 'GCFlags' is accurate.
-prop_showGCFlags :: Int -> Property
-prop_showGCFlags p = ioProperty $ do
-    gcflags <- getGCFlags
-    pure $ prop_matchesTextShow p gcflags
-
--- | Verifies that the 'Show' instance for 'CCFlags' is accurate.
-prop_showCCFlags :: Int -> Property
-prop_showCCFlags p = ioProperty $ do
-    ccflags <- getCCFlags
-    pure $ prop_matchesTextShow p ccflags
-
--- | Verifies that the 'Show' instance for 'ProfFlags' is accurate.
-prop_showProfFlags :: Int -> Property
-prop_showProfFlags p = ioProperty $ do
-    profflags <- getProfFlags
-    pure $ prop_matchesTextShow p profflags
-
--- | Verifies that the 'Show' instance for 'TraceFlags' is accurate.
-prop_showTraceFlags :: Int -> Property
-prop_showTraceFlags p = ioProperty $ do
-    traceflags <- getTraceFlags
-    pure $ prop_matchesTextShow p traceflags
 #endif

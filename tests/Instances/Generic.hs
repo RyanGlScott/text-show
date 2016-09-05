@@ -13,13 +13,8 @@ Portability: GHC
 module Instances.Generic () where
 
 import Instances.Data.Text ()
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..), oneof)
-
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 import TextShow.Generic (ConType(..))
 
 instance Arbitrary ConType where
-    arbitrary = oneof [pure Rec, pure Tup, pure Pref, Inf <$> arbitrary]
+    arbitrary = genericArbitrary

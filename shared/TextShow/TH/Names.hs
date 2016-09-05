@@ -38,7 +38,7 @@ import Language.Haskell.TH.Syntax
 import Text.Read.Lex (Number)
 #endif
 
-#if __GLASGOW_HASKELL__ >= 711
+#if MIN_VERSION_base(4,8,2)
 import GHC.RTS.Flags (GiveGCStats, DoCostCentres, DoHeapProfile, DoTrace)
 #endif
 
@@ -83,7 +83,7 @@ numberTypeName = mkNameG_tc "base" "Text.Read.Lex" "Number"
 #if MIN_VERSION_base(4,8,0)
 -- | The 'Name' of 'GiveGCStats'.
 giveGCStatsTypeName :: Name
-# if __GLASGOW_HASKELL__ >= 711
+# if MIN_VERSION_base(4,8,2)
 giveGCStatsTypeName = ''GiveGCStats
 # else
 giveGCStatsTypeName = mkFlagsName_tc "GiveGCStats"
@@ -91,7 +91,7 @@ giveGCStatsTypeName = mkFlagsName_tc "GiveGCStats"
 
 -- | The 'Name' of 'DoCostCentres'.
 doCostCentresTypeName :: Name
-# if __GLASGOW_HASKELL__ >= 711
+# if MIN_VERSION_base(4,8,2)
 doCostCentresTypeName = ''DoCostCentres
 # else
 doCostCentresTypeName = mkFlagsName_tc "DoCostCentres"
@@ -99,7 +99,7 @@ doCostCentresTypeName = mkFlagsName_tc "DoCostCentres"
 
 -- | The 'Name' of 'DoHeapProfile'.
 doHeapProfileTypeName :: Name
-# if __GLASGOW_HASKELL__ >= 711
+# if MIN_VERSION_base(4,8,2)
 doHeapProfileTypeName = ''DoHeapProfile
 # else
 doHeapProfileTypeName = mkFlagsName_tc "DoHeapProfile"
@@ -107,14 +107,14 @@ doHeapProfileTypeName = mkFlagsName_tc "DoHeapProfile"
 
 -- | The 'Name' of 'DoTrace'.
 doTraceTypeName :: Name
-# if __GLASGOW_HASKELL__ >= 711
+# if MIN_VERSION_base(4,8,2)
 doTraceTypeName = ''DoTrace
 # else
 doTraceTypeName = mkFlagsName_tc "DoTrace"
 # endif
 
 -- | Creates a 'Name' for a type from the "GHC.RTS.Flags" module.
-# if __GLASGOW_HASKELL__ < 711
+# if !(MIN_VERSION_base(4,8,2))
 mkFlagsName_tc :: String -> Name
 mkFlagsName_tc = mkNameG_tc "base" "GHC.RTS.Flags"
 # endif

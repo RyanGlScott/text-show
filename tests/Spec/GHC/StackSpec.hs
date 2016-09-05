@@ -19,7 +19,7 @@ import Prelude.Compat
 
 import Test.Hspec (Spec, hspec, parallel)
 
-#if MIN_VERSION_base(4,9,0)
+#if MIN_VERSION_base(4,8,1)
 import GHC.Stack (CallStack, SrcLoc)
 
 import Spec.Utils (prop_matchesTextShow)
@@ -33,7 +33,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if MIN_VERSION_base(4,9,0)
+#if MIN_VERSION_base(4,8,1)
     describe "CallStack" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> CallStack -> Bool)
     describe "SrcLoc" $

@@ -16,11 +16,7 @@ module Instances.Data.Semigroup () where
 
 import Data.Semigroup (Min(..), Max(..), First(..), Last(..),
                        WrappedMonoid(..), Option(..), Arg(..))
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 deriving instance Arbitrary a => Arbitrary (Min a)
 deriving instance Arbitrary a => Arbitrary (Max a)
@@ -30,4 +26,4 @@ deriving instance Arbitrary a => Arbitrary (WrappedMonoid a)
 deriving instance Arbitrary a => Arbitrary (Option a)
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Arg a b) where
-    arbitrary = Arg <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary

@@ -13,6 +13,9 @@ Portability: GHC
 module Spec.Text.ReadSpec (main, spec) where
 
 import Instances.Text.Read ()
+#if MIN_VERSION_base(4,6,0)
+import Instances.Text.Read (Number')
+#endif
 
 import Spec.Utils (prop_matchesTextShow)
 
@@ -20,9 +23,6 @@ import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import Text.Read (Lexeme)
-#if MIN_VERSION_base(4,7,0)
-import Text.Read.Lex (Number)
-#endif
 
 main :: IO ()
 main = hspec spec
@@ -31,7 +31,7 @@ spec :: Spec
 spec = parallel $ do
     describe "Lexeme" $
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Lexeme -> Bool)
-#if MIN_VERSION_base(4,7,0)
+#if MIN_VERSION_base(4,6,0)
     describe "Number" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Number -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> Number' -> Bool)
 #endif

@@ -1,5 +1,5 @@
 {-|
-Module:      Properties.Instances
+Module:      Instances.Utils
 Copyright:   (C) 2014-2016 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott

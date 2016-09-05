@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP       #-}
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds #-}
@@ -19,11 +19,7 @@ Portability: GHC
 module Instances.Data.Proxy () where
 
 import Data.Proxy (Proxy(..))
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance Arbitrary (Proxy s) where
-    arbitrary = pure Proxy
+    arbitrary = arbitraryBoundedEnum

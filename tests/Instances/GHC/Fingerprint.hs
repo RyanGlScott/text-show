@@ -1,5 +1,10 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                #-}
+
+#if MIN_VERSION_base(4,4,0)
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.GHC.Fingerprint
@@ -15,12 +20,11 @@ module Instances.GHC.Fingerprint () where
 
 #if MIN_VERSION_base(4,4,0)
 import GHC.Fingerprint.Type (Fingerprint(..))
+import GHC.Generics (Generic)
 
-import Prelude ()
-import Prelude.Compat
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
-import Test.QuickCheck (Arbitrary(..))
-
+deriving instance Generic Fingerprint
 instance Arbitrary Fingerprint where
-    arbitrary = Fingerprint <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 #endif

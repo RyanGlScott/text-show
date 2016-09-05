@@ -1,5 +1,6 @@
 # next [YYYY.MM.DD]
 * Require `QuickCheck-2.9` or later
+* Refactor the test suite to use features introduced in `QuickCheck-???`
 
 ## 3.4
 * The default definitions of `showt` and `showtl` were changed to `showtPrec 0` and `showtlPrec 0`, respectively
