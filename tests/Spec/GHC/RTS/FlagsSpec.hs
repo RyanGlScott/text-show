@@ -22,11 +22,11 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,8,0)
 import GHC.RTS.Flags
 
-import Spec.Utils (ioProperty, prop_matchesTextShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (describe)
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck (Property)
+import Test.QuickCheck (Property, ioProperty)
 #endif
 
 main :: IO ()

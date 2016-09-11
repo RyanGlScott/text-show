@@ -10,8 +10,6 @@ Portability: GHC
 -}
 module Spec.Numeric.NaturalSpec (main, spec) where
 
-import Instances.Numeric.Natural ()
-
 import Numeric.Natural (Natural)
 
 import Spec.Utils (prop_matchesTextShow)

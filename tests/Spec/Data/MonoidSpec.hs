@@ -16,8 +16,6 @@ import Data.Monoid
 
 import Generics.Deriving.Instances ()
 
-import Instances.Data.Monoid ()
-
 import Spec.Utils (prop_matchesTextShow, prop_genericTextShow, prop_genericTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)

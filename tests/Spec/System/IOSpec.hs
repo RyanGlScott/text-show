@@ -22,14 +22,14 @@ import Instances.System.IO ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (ioProperty, prop_matchesTextShow)
+import Spec.Utils (prop_matchesTextShow)
 
 import System.IO (BufferMode, IOMode, HandlePosn, Newline,
                   NewlineMode, SeekMode, Handle, mkTextEncoding)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck (Property, generate, oneof)
+import Test.QuickCheck (Property, generate, ioProperty, oneof)
 
 main :: IO ()
 main = hspec spec

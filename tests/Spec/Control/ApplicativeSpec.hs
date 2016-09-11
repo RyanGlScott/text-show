@@ -17,8 +17,6 @@ import Data.Orphans ()
 
 import Generics.Deriving.Instances ()
 
-import Instances.Control.Applicative ()
-
 import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow1,
                    prop_genericTextShow, prop_genericTextShow1)
 

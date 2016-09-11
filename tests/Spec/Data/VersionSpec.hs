@@ -2,8 +2,6 @@ module Spec.Data.VersionSpec (main, spec) where
 
 import Data.Version (Version, showVersion)
 
-import Instances.Data.Version ()
-
 import Spec.Utils (prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)

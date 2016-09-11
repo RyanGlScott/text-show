@@ -14,8 +14,6 @@ import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Identity (Identity)
 
-import Instances.Data.Functor.Identity ()
-
 import Spec.Utils (prop_matchesTextShow1)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
