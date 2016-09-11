@@ -1,3 +1,6 @@
+# next [YYYY.MM.DD]
+* Require `QuickCheck-2.9` or later
+
 ## 3.4
 * The default definitions of `showt` and `showtl` were changed to `showtPrec 0` and `showtlPrec 0`, respectively
 * `deriveTextShowOptions`, `deriveTextShow1Options`, and `deriveTextShow2Options` added to `TextShow.TH`, which allow further configuration of how `TextShow(1)(2)` instances should be derived using the new `Options` data type. `Options` itself contains `GenTextMethods`, which configures whether manual implementations of `TextShow` should implement the methods that return strict and lazy `Text`.
