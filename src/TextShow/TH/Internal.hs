@@ -78,9 +78,6 @@ import qualified Data.Text.Lazy    as TL
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
 import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
-#if __GLASGOW_HASKELL__ >= 800
-import           GHC.Lexeme (startsConSym)
-#endif
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
@@ -95,7 +92,7 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showbListWith, showbParen, showbSpace,
                                    showtParen, showtSpace, showtlParen, showtlSpace)
 import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
-import           TextShow.Utils (isInfixTypeCon, isTupleString)
+import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
 -------------------------------------------------------------------------------
 -- User-facing API
@@ -597,10 +594,13 @@ makeTextShowForCon p tsClass tsFun spls (RecC conName ts) = do
     args <- newNameList "arg" $ length argTys
 
     let showArgs       = concatMap (\((argName, _, _), argTy, arg)
-                                      -> [ varE (fromStringName tsFun) `appE` stringE (nameBase argName ++ " = ")
-                                         , makeTextShowForArg 0 tsClass tsFun conName tvMap argTy arg
-                                         , varE (fromStringName tsFun) `appE` stringE ", "
-                                         ]
+                                      -> let argNameBase = nameBase argName
+                                             infixRec    = showParen (isSymVar argNameBase)
+                                                                     (showString argNameBase) ""
+                                         in [ varE (fromStringName tsFun) `appE` stringE (infixRec ++ " = ")
+                                            , makeTextShowForArg 0 tsClass tsFun conName tvMap argTy arg
+                                            , varE (fromStringName tsFun) `appE` stringE ", "
+                                            ]
                                    )
                                    (zip3 ts argTys args)
         braceCommaArgs = (varE (singletonName tsFun) `appE` charE '{') : take (length showArgs - 1) showArgs
@@ -638,7 +638,7 @@ makeTextShowForCon p tsClass tsFun spls (InfixC _ conName _) = do
 
     let opName   = nameBase conName
         infixOpE = appE (varE $ fromStringName tsFun) . stringE $
-                     if isInfixTypeCon opName
+                     if isInfixDataCon opName
                         then " "  ++ opName ++ " "
                         else " `" ++ opName ++ "` "
 
@@ -660,7 +660,7 @@ makeTextShowForCon p tsClass tsFun spls (GadtC conNames ts _) =
     let con :: Name -> Q Con
         con conName = do
             mbFi <- reifyFixity conName
-            return $ if startsConSym (head $ nameBase conName)
+            return $ if isInfixDataCon (nameBase conName)
                         && length ts == 2
                         && isJust mbFi
                       then let [t1, t2] = ts in InfixC t1 conName t2
@@ -1583,7 +1583,7 @@ isNonUnitTuple = isTupleString . nameBase
 parenInfixConName :: Name -> ShowS
 parenInfixConName conName =
     let conNameBase = nameBase conName
-     in showParen (isInfixTypeCon conNameBase) $ showString conNameBase
+     in showParen (isInfixDataCon conNameBase) $ showString conNameBase
 
 -- | Extracts the kind from a TyVarBndr.
 tvbKind :: TyVarBndr -> Kind
