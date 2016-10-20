@@ -1,4 +1,4 @@
-# next [YYYY.MM.DD]
+### 3.4.1 [2016.10.20]
 * Require `QuickCheck-2.9` or later
 * Fix bug in which infix record selectors weren't shown with parentheses
 
