@@ -50,8 +50,8 @@ import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 -------------------------------------------------------------------------------
 
 infixl 4 :@:
-data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
-               | (:@:)       { tc3 :: b, tc4 :: a }
+data TyCon a b = TyConPrefix { tc1 :: a, tc2  :: b }
+               | (:@:)       { tc3 :: b, (##) :: a }
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 702
            , Generic
@@ -66,8 +66,8 @@ data TyCon a b = TyConPrefix { tc1 :: a, tc2 :: b }
 data family TyFamily y z :: *
 
 infixl 4 :!:
-data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2 :: b }
-                           | (:!:)          { tf3 :: b, tf4 :: a }
+data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2   :: b }
+                           | (:!:)          { tf3 :: b, (###) :: a }
   deriving ( Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic

@@ -14,7 +14,8 @@ Miscellaneous utility functions.
 module TextShow.Utils (
       coerce
     , i2d
-    , isInfixTypeCon
+    , isInfixDataCon
+    , isSymVar
     , isTupleString
     , lengthB
     , toString
@@ -41,6 +42,12 @@ import qualified Data.Coerce as C (Coercible, coerce)
 import           Unsafe.Coerce (unsafeCoerce)
 #endif
 
+#if defined(MIN_VERSION_ghc_boot_th)
+import           GHC.Lexeme (startsVarSym)
+#else
+import           Data.Char (isSymbol, ord)
+#endif
+
 -- | On GHC 7.8 and later, this is 'C.coerce' from "Data.Coerce". Otherwise, it's
 -- 'unsafeCoerce'.
 #if __GLASGOW_HASKELL__ >= 708
@@ -56,12 +63,25 @@ i2d :: Int -> Char
 i2d (I# i#) = C# (chr# (ord# '0'# +# i#))
 {-# INLINE i2d #-}
 
--- | Checks if a 'String' names a valid Haskell infix type constructor (i.e., does
+-- | Checks if a 'String' names a valid Haskell infix data constructor (i.e., does
 -- it begin with a colon?).
-isInfixTypeCon :: String -> Bool
-isInfixTypeCon (':':_) = True
-isInfixTypeCon _       = False
-{-# INLINE isInfixTypeCon #-}
+isInfixDataCon :: String -> Bool
+isInfixDataCon (':':_) = True
+isInfixDataCon _       = False
+{-# INLINE isInfixDataCon #-}
+
+-- | Checks if a 'String' names a valid Haskell infix, non-constructor function.
+isSymVar :: String -> Bool
+isSymVar ""      = False
+isSymVar (c : _) = startsVarSym c
+
+#if !defined(MIN_VERSION_ghc_boot)
+startsVarSym :: Char -> Bool
+startsVarSym c = startsVarSymASCII c || (ord c > 0x7f && isSymbol c) -- Infix Ids
+
+startsVarSymASCII :: Char -> Bool
+startsVarSymASCII c = c `elem` "!#$%&*+./<=>?@\\^|~-"
+#endif
 
 -- | Checks if a 'String' represents a tuple (other than '()')
 isTupleString :: String -> Bool

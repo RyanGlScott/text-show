@@ -118,7 +118,7 @@ import           TextShow.Classes (TextShow(..), TextShow1(..),
                                    liftShowtPrec, liftShowtlPrec)
 import           TextShow.Instances ()
 import           TextShow.TH.Internal (deriveTextShow)
-import           TextShow.Utils (isInfixTypeCon, isTupleString)
+import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
 #include "inline.h"
 
@@ -394,7 +394,7 @@ instance (Constructor c, gtext_show_con arity f, IsNullary f)                   
                (if conIsTuple c                                                         \
                    then mempty                                                          \
                    else let cn = conName c                                              \
-                        in show_paren (isInfixTypeCon cn) $ from_string cn)             \
+                        in show_paren (isInfixDataCon cn) $ from_string cn)             \
             <> (if isNullary x || conIsTuple c                                          \
                    then mempty                                                          \
                    else from_char ' ')                                                  \
@@ -460,9 +460,19 @@ instance TextShow1 f => gtext_show_con One (Rec1 f) where {                     
 instance (Selector s, gtext_show_con arity f) => gtext_show_con arity (S1 s f) where {  \
     gshow_prec_con t sfs p sel@(M1 x)                                                   \
       | selName sel == "" = gshow_prec_con t sfs p x                                    \
-      | otherwise         = from_string (selName sel)                                   \
+      | otherwise         = infixRec                                                    \
                             <> " = "                                                    \
                             <> gshow_prec_con t sfs 0 x                                 \
+      where {                                                                           \
+        infixRec :: text_type                                                           \
+      ; infixRec | isSymVar selectorName                                                \
+                 = from_char '(' <> from_string selectorName <> from_char ')'           \
+                 | otherwise                                                            \
+                 = from_string selectorName                                             \
+                                                                                        \
+      ; selectorName :: String                                                          \
+      ; selectorName = selName sel                                                      \
+      }                                                                                 \
  };                                                                                     \
                                                                                         \
 instance (gtext_show_con arity f, gtext_show_con arity g)                               \
@@ -479,7 +489,7 @@ instance (gtext_show_con arity f, gtext_show_con arity g)                       
         <> gshow_prec_con t sfs p b                                                     \
       where {                                                                           \
         infixOp :: text_type                                                            \
-      ; infixOp = if isInfixTypeCon o                                                   \
+      ; infixOp = if isInfixDataCon o                                                   \
                      then from_string o                                                 \
                      else from_char '`' <> from_string o <> from_char '`'               \
       }                                                                                 \

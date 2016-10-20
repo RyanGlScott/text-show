@@ -365,7 +365,7 @@ test-suite spec
                      , bytestring-builder
                      , containers           >= 0.1    && < 0.6
                      , contravariant        >= 0.5    && < 2
-                     , deriving-compat      >= 0.3    && < 1
+                     , deriving-compat      >= 0.3.4  && < 1
                      , generic-deriving     >= 1.11   && < 2
                      , ghc-prim
                      , hspec                >= 2      && < 3
