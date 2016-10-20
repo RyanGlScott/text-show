@@ -75,7 +75,7 @@ isSymVar :: String -> Bool
 isSymVar ""      = False
 isSymVar (c : _) = startsVarSym c
 
-#if !defined(MIN_VERSION_ghc_boot)
+#if !defined(MIN_VERSION_ghc_boot_th)
 startsVarSym :: Char -> Bool
 startsVarSym c = startsVarSymASCII c || (ord c > 0x7f && isSymbol c) -- Infix Ids
 
