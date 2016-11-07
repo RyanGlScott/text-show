@@ -1,3 +1,6 @@
+# next [????.??.??]
+* Require `criterion-1.1.4` or later. This allows the benchmarks to be run on older versions of GHC.
+
 ### 3.4.1 [2016.10.20]
 * Require `QuickCheck-2.9` or later
 * Fix bug in which infix record selectors weren't shown with parentheses

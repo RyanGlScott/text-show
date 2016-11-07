@@ -412,13 +412,7 @@ test-suite spec
                      , utils.h
 
 benchmark bench
-  -- This SHOULD build with 7.4, but criterion goofed:
-  -- https://github.com/bos/criterion/pull/99
-  --
-  -- It should ALSO run with 7.6, but doing so triggers a bug that occurs
-  -- due to GHC 7.6 shipping with an old version of binary:
-  -- https://github.com/bos/criterion/pull/112
-  if impl(ghc < 7.8)
+  if impl(ghc < 7.4)
     buildable:         False
 
   type:                exitcode-stdio-1.0
@@ -430,7 +424,7 @@ benchmark bench
                      , bytestring-builder
                      , containers          >= 0.1    && < 0.6
                      , contravariant       >= 0.5    && < 2
-                     , criterion           >= 1      && < 2
+                     , criterion           >= 1.1.4  && < 2
                      , deepseq             >= 1.3    && < 2
                      , generic-deriving    >= 1.11   && < 2
                      , ghc-prim
