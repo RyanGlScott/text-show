@@ -1,5 +1,12 @@
-{-# LANGUAGE CPP                #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric              #-}
+#endif
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -15,24 +22,30 @@ Portability: GHC
 -}
 module Instances.Control.Exception () where
 
-import Control.Exception
+import           Control.Exception
 
-import GHC.IO.Exception (IOException(..), IOErrorType(..))
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+#endif
 
-import Instances.Foreign.C.Types ()
-import Instances.System.IO ()
+import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 
-import Prelude ()
-import Prelude.Compat
+import           Instances.Foreign.C.Types ()
+import           Instances.System.IO ()
 
-import Test.QuickCheck (Arbitrary(..), Gen, arbitraryBoundedEnum, oneof)
+import           Prelude ()
+import           Prelude.Compat
+
+import           Test.QuickCheck (Arbitrary(..), Gen,
+                                  arbitraryBoundedEnum, genericArbitrary)
 
 instance Arbitrary SomeException where
     arbitrary = SomeException <$> (arbitrary :: Gen AssertionFailed)
 
 instance Arbitrary IOException where
-    arbitrary = IOError <$> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 deriving instance Bounded IOErrorType
 deriving instance Enum IOErrorType
@@ -45,12 +58,10 @@ instance Arbitrary ArithException where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary ArrayException where
-    arbitrary = oneof [ IndexOutOfBounds <$> arbitrary
-                      , UndefinedElement <$> arbitrary
-                      ]
+    arbitrary = genericArbitrary
 
 instance Arbitrary AssertionFailed where
-    arbitrary = AssertionFailed <$> arbitrary
+    arbitrary = genericArbitrary
 
 #if MIN_VERSION_base(4,7,0)
 instance Arbitrary SomeAsyncException where
@@ -62,54 +73,85 @@ deriving instance Enum AsyncException
 instance Arbitrary AsyncException where
     arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded NonTermination
+deriving instance Enum NonTermination
 instance Arbitrary NonTermination where
-    arbitrary = pure NonTermination
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded NestedAtomically
+deriving instance Enum NestedAtomically
 instance Arbitrary NestedAtomically where
-    arbitrary = pure NestedAtomically
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded BlockedIndefinitelyOnMVar
+deriving instance Enum BlockedIndefinitelyOnMVar
 instance Arbitrary BlockedIndefinitelyOnMVar where
-    arbitrary = pure BlockedIndefinitelyOnMVar
+    arbitrary = arbitraryBoundedEnum
 
+deriving instance Bounded BlockedIndefinitelyOnSTM
+deriving instance Enum BlockedIndefinitelyOnSTM
 instance Arbitrary BlockedIndefinitelyOnSTM where
-    arbitrary = pure BlockedIndefinitelyOnSTM
+    arbitrary = arbitraryBoundedEnum
 
 #if MIN_VERSION_base(4,8,0)
+deriving instance Bounded AllocationLimitExceeded
+deriving instance Enum AllocationLimitExceeded
 instance Arbitrary AllocationLimitExceeded where
-    arbitrary = pure AllocationLimitExceeded
+    arbitrary = arbitraryBoundedEnum
 #endif
 
 #if MIN_VERSION_base(4,9,0)
-instance Arbitrary TypeError where
-    arbitrary = TypeError <$> arbitrary
+deriving instance Arbitrary TypeError
 #endif
 
+deriving instance Bounded Deadlock
+deriving instance Enum Deadlock
 instance Arbitrary Deadlock where
-    arbitrary = pure Deadlock
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary NoMethodError where
-    arbitrary = NoMethodError <$> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary PatternMatchFail where
-    arbitrary = PatternMatchFail <$> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary RecConError where
-    arbitrary = RecConError <$> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary RecSelError where
-    arbitrary = RecSelError <$> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary RecUpdError where
-    arbitrary = RecUpdError <$> arbitrary
+    arbitrary = genericArbitrary
 
 instance Arbitrary ErrorCall where
-#if MIN_VERSION_base(4,9,0)
-    arbitrary = ErrorCallWithLocation <$> arbitrary <*> arbitrary
-#else
-    arbitrary = ErrorCall <$> arbitrary
-#endif
+    arbitrary = genericArbitrary
 
 deriving instance Bounded MaskingState
 deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
     arbitrary = arbitraryBoundedEnum
+
+#if __GLASGOW_HASKELL__ >= 702
+deriving instance Generic ArrayException
+deriving instance Generic AssertionFailed
+deriving instance Generic IOException
+deriving instance Generic Deadlock
+deriving instance Generic NoMethodError
+deriving instance Generic PatternMatchFail
+deriving instance Generic RecConError
+deriving instance Generic RecSelError
+deriving instance Generic RecUpdError
+deriving instance Generic ErrorCall
+#else
+$(Generics.deriveAll0 ''ArrayException)
+$(Generics.deriveAll0 ''AssertionFailed)
+$(Generics.deriveAll0 ''IOException)
+$(Generics.deriveAll0 ''Deadlock)
+$(Generics.deriveAll0 ''NoMethodError)
+$(Generics.deriveAll0 ''PatternMatchFail)
+$(Generics.deriveAll0 ''RecConError)
+$(Generics.deriveAll0 ''RecSelError)
+$(Generics.deriveAll0 ''RecUpdError)
+$(Generics.deriveAll0 ''ErrorCall)
+#endif

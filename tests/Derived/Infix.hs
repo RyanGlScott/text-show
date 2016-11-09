@@ -45,7 +45,7 @@ import           GHC.Generics (Generic1)
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 import           Text.Show.Deriving (deriveShow1)
 #if defined(NEW_FUNCTOR_CLASSES)
@@ -131,26 +131,16 @@ data instance TyFamilyGADT a b where
 -------------------------------------------------------------------------------
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConPlain a b) where
-    arbitrary = oneof (map pure [(:!:), (:@:), TyConPlain]) <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConGADT a b) where
-    arbitrary = oneof [ pure (:.)
-                      , pure (:..)
-                      , flip (flip . (:...)) <$> arbitrary
-                      , pure (:....)
-                      ]
-                <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyPlain a b) where
-    arbitrary = oneof (map pure [(:#:), (:$:), TyFamilyPlain]) <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
-    arbitrary = oneof [ pure (:*)
-                      , pure (:**)
-                      , flip (flip . (:***)) <$> arbitrary
-                      , pure (:****)
-                      ]
-                <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 -------------------------------------------------------------------------------
 

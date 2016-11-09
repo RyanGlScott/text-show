@@ -197,7 +197,7 @@ library
   else
     build-depends:     transformers        == 0.4.*
 
-  hs-source-dirs:      src
+  hs-source-dirs:      src, shared
   default-language:    Haskell2010
   ghc-options:         -Wall
   include-dirs:        include
@@ -403,7 +403,7 @@ test-suite spec
   else
     build-depends:     text-show == 3.4.1.1
 
-  hs-source-dirs:      tests
+  hs-source-dirs:      tests, shared
   default-language:    Haskell2010
   ghc-options:         -Wall -threaded -rtsopts
   include-dirs:        include

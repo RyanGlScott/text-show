@@ -1,4 +1,7 @@
-# 3.4.1.1 [2016.11.07]
+# next [YYYY.MM.DD]
+* TODO
+
+#### 3.4.1.1 [2016.11.07]
 * Require `criterion-1.1.4` or later. This allows the benchmarks to be run on older versions of GHC.
 
 ### 3.4.1 [2016.10.20]

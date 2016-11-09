@@ -21,16 +21,16 @@ module Spec.Utils (
     , prop_genericTextShow1
     ) where
 
-import           Data.Functor.Classes (Show1, showsPrec1)
+import Data.Functor.Classes (Show1, showsPrec1)
 
-import           Generics.Deriving.Base
+import Generics.Deriving.Base
 
-import           TextShow (TextShow(..), TextShow1(..), showbPrec1, fromString)
-import           TextShow.Generic
+import TextShow (TextShow(..), TextShow1(..), showbPrec1, fromString)
+import TextShow.Generic
 
 #if defined(NEW_FUNCTOR_CLASSES)
-import           Data.Functor.Classes (Show2, showsPrec2)
-import           TextShow (TextShow2(..), showbPrec2)
+import Data.Functor.Classes (Show2, showsPrec2)
+import TextShow (TextShow2(..), showbPrec2)
 #endif
 
 -- | Verifies that a type's 'Show' instances coincide for both 'String's and 'Text',

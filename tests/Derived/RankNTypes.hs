@@ -62,19 +62,13 @@ newtype Tagged2 s t c = Tagged2 c
 
 -------------------------------------------------------------------------------
 
--- There's so much rank-n voodoo going on that we can't have a more generalized
--- Arbitrary instances. Oh well, this is close enough.
-instance Arbitrary (TyCon Int Int) where
-    arbitrary = do
-        i1 <- arbitrary
-        i2 <- arbitrary
-        pure $ TyCon (Tagged2 i1) (Tagged2 i2)
+instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon a b) where
+    arbitrary = (\i1 i2 -> TyCon (Tagged2 i1) (Tagged2 i2))
+                    <$> arbitrary <*> arbitrary
 
-instance Arbitrary (TyFamily Int Int) where
-    arbitrary = do
-        i1 <- arbitrary
-        i2 <- arbitrary
-        pure $ TyFamily (Tagged2 i1) (Tagged2 i2)
+instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
+    arbitrary = (\i1 i2 -> TyFamily (Tagged2 i1) (Tagged2 i2))
+                    <$> arbitrary <*> arbitrary
 
 -------------------------------------------------------------------------------
 

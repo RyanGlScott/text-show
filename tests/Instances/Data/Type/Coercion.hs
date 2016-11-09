@@ -22,11 +22,8 @@ module Instances.Data.Type.Coercion () where
 import Data.Coerce (Coercible)
 import Data.Type.Coercion (Coercion(..))
 
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance Coercible a b => Arbitrary (Coercion a b) where
-    arbitrary = pure Coercion
+    arbitrary = arbitraryBoundedEnum
 #endif

@@ -1,4 +1,12 @@
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -13,31 +21,28 @@ Portability: GHC
 -}
 module Instances.Data.Data () where
 
-import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
-                  Fixity(..), mkConstr, mkDataType)
+import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
+                            Fixity(..), mkConstr, mkDataType)
 
-import Prelude ()
-import Prelude.Compat
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+#endif
 
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import           Prelude ()
+import           Prelude.Compat
+
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
 
 instance Arbitrary Constr where
     arbitrary = mkConstr <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 instance Arbitrary ConstrRep where
-    arbitrary = oneof [ AlgConstr   <$> arbitrary
-                      , IntConstr   <$> arbitrary
-                      , FloatConstr <$> arbitrary
-                      , CharConstr  <$> arbitrary
-                      ]
+    arbitrary = genericArbitrary
 
 instance Arbitrary DataRep where
-    arbitrary = oneof [ AlgRep <$> arbitrary
-                      , pure IntRep
-                      , pure FloatRep
-                      , pure CharRep
-                      , pure NoRep
-                      ]
+    arbitrary = genericArbitrary
 
 instance Arbitrary DataType where
     arbitrary = mkDataType <$> arbitrary <*> arbitrary
@@ -46,3 +51,11 @@ deriving instance Bounded Fixity
 deriving instance Enum Fixity
 instance Arbitrary Fixity where
     arbitrary = arbitraryBoundedEnum
+
+#if __GLASGOW_HASKELL__ >= 702
+deriving instance Generic ConstrRep
+deriving instance Generic DataRep
+#else
+$(Generics.deriveAll0 ''ConstrRep)
+$(Generics.deriveAll0 ''DataRep)
+#endif

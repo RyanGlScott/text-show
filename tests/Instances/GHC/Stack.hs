@@ -1,5 +1,11 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP             #-}
+
+#if MIN_VERSION_base(4,8,1)
+{-# LANGUAGE DataKinds       #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies    #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.GHC.Stack
@@ -13,24 +19,35 @@ Portability: GHC
 -}
 module Instances.GHC.Stack () where
 
--- Ideally, we'd also define these instances for base-4.8.1 and up, but the
--- constructors for CallStack and SrcLoc aren't exposed prior to base-4.9, and
--- the API doesn't provide any way to construct values of those types, so we're
--- pretty much out of luck.
-#if MIN_VERSION_base(4,9,0)
-import GHC.Stack.Types (CallStack(..), SrcLoc(..))
+#if MIN_VERSION_base(4,8,1)
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+# if MIN_VERSION_base(4,9,0)
+import           GHC.Stack.Types (CallStack(..), SrcLoc(..))
+import           Test.QuickCheck (oneof)
+# else
+import           GHC.SrcLoc (SrcLoc)
+import           GHC.Stack (CallStack)
+# endif
 
-import Instances.Utils ((<@>))
+import           Instances.Utils ((<@>))
 
-import Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 instance Arbitrary CallStack where
+# if MIN_VERSION_base(4,9,0)
     arbitrary = oneof [ pure EmptyCallStack
                       , PushCallStack <$> arbitrary <*> arbitrary <@> EmptyCallStack
                       , pure $ FreezeCallStack EmptyCallStack
                       ]
+# else
+    arbitrary = genericArbitrary
+# endif
 
 instance Arbitrary SrcLoc where
-    arbitrary = SrcLoc <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
-                       <*> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
+
+# if MIN_VERSION_base(4,9,0)
+$(Generics.deriveAll0 ''CallStack)
+# endif
+$(Generics.deriveAll0 ''SrcLoc)
 #endif

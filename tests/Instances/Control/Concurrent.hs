@@ -1,4 +1,12 @@
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -13,12 +21,14 @@ Portability: GHC
 -}
 module Instances.Control.Concurrent () where
 
-import GHC.Conc (BlockReason(..), ThreadStatus(..))
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+#endif
 
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import           GHC.Conc (BlockReason(..), ThreadStatus(..))
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
 
 deriving instance Bounded BlockReason
 deriving instance Enum BlockReason
@@ -26,8 +36,10 @@ instance Arbitrary BlockReason where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary ThreadStatus where
-    arbitrary = oneof [ pure ThreadRunning
-                      , pure ThreadFinished
-                      , ThreadBlocked <$> arbitrary
-                      , pure ThreadDied
-                      ]
+    arbitrary = genericArbitrary
+
+#if __GLASGOW_HASKELL__ >= 702
+deriving instance Generic ThreadStatus
+#else
+$(Generics.deriveAll0 ''ThreadStatus)
+#endif

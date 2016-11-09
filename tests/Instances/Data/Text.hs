@@ -1,5 +1,12 @@
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -14,25 +21,31 @@ Portability: GHC
 -}
 module Instances.Data.Text () where
 
-import Data.Text.Encoding.Error (UnicodeException(..))
-import Data.Text.Foreign (I16)
-import Data.Text.Lazy.Builder (Builder, fromString)
+import           Data.Text.Encoding.Error (UnicodeException(..))
+import           Data.Text.Foreign (I16)
+import           Data.Text.Lazy.Builder (Builder, fromString)
 
 #if MIN_VERSION_text(1,0,0)
-import Data.Text.Encoding (Decoding(..))
-import Instances.Utils ((<@>))
+import           Data.Text.Encoding (Decoding(..))
+import           Instances.Utils ((<@>))
 #endif
 
 #if MIN_VERSION_text(1,1,0)
-import Data.Text.Internal.Fusion.Size (Size, exactSize)
-import Test.QuickCheck (getNonNegative)
+import           Data.Text.Internal.Fusion.Size (Size, exactSize)
+import           Test.QuickCheck (getNonNegative)
 #endif
 
-import Prelude ()
-import Prelude.Compat
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+#endif
 
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
-import Test.QuickCheck.Instances ()
+import           Prelude ()
+import           Prelude.Compat
+
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
+import           Test.QuickCheck.Instances ()
 
 instance Arbitrary Builder where
     arbitrary = fromString <$> arbitrary
@@ -41,7 +54,7 @@ instance Arbitrary I16 where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary UnicodeException where
-    arbitrary = DecodeError <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 #if MIN_VERSION_text(1,0,0)
 instance Arbitrary Decoding where
@@ -51,4 +64,10 @@ instance Arbitrary Decoding where
 #if MIN_VERSION_text(1,1,0)
 instance Arbitrary Size where
     arbitrary = exactSize . getNonNegative <$> arbitrary
+#endif
+
+#if __GLASGOW_HASKELL__ >= 702
+deriving instance Generic UnicodeException
+#else
+$(Generics.deriveAll0 ''UnicodeException)
 #endif

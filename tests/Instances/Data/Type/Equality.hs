@@ -22,12 +22,8 @@ module Instances.Data.Type.Equality () where
 
 #if MIN_VERSION_base(4,7,0)
 import Data.Type.Equality ((:~:)(..))
-
-import Prelude ()
-import Prelude.Compat
-
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance a ~ b => Arbitrary (a :~: b) where
-    arbitrary = pure Refl
+    arbitrary = arbitraryBoundedEnum
 #endif

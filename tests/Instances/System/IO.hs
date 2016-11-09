@@ -1,5 +1,12 @@
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+
+#if __GLASGOW_HASKELL__ >= 702
+{-# LANGUAGE DeriveGeneric      #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -14,36 +21,40 @@ Portability: GHC
 -}
 module Instances.System.IO () where
 
-#if MIN_VERSION_base(4,4,0)
-import GHC.IO.Encoding.Failure (CodingFailureMode(..))
-import GHC.IO.Encoding.Types (CodingProgress(..))
+#if __GLASGOW_HASKELL__ >= 702
+import           GHC.Generics (Generic)
+#else
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
 #endif
 
-import GHC.IO.Handle (HandlePosn(..))
+#if MIN_VERSION_base(4,4,0)
+import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
+import           GHC.IO.Encoding.Types (CodingProgress(..))
+#endif
 
-import Prelude ()
-import Prelude.Compat
+import           GHC.IO.Handle (HandlePosn(..))
 
-import System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
-                  SeekMode(..), Handle, stdin, stdout, stderr)
+import           Prelude ()
+import           Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
+                            SeekMode(..), Handle, stdin, stdout, stderr)
+
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum,
+                                  genericArbitrary, oneof)
 
 instance Arbitrary Handle where
     arbitrary = oneof $ map pure [stdin, stdout, stderr]
 
 instance Arbitrary HandlePosn where
-    arbitrary = HandlePosn <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 
 deriving instance Bounded IOMode
 instance Arbitrary IOMode where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary BufferMode where
-    arbitrary = oneof [ pure NoBuffering
-                      , pure LineBuffering
-                      , BlockBuffering <$> arbitrary
-                      ]
+    arbitrary = genericArbitrary
 
 deriving instance Bounded SeekMode
 instance Arbitrary SeekMode where
@@ -67,4 +78,14 @@ instance Arbitrary Newline where
     arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary NewlineMode where
-    arbitrary = NewlineMode <$> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
+
+#if __GLASGOW_HASKELL__ >= 702
+deriving instance Generic HandlePosn
+deriving instance Generic BufferMode
+deriving instance Generic NewlineMode
+#else
+$(Generics.deriveAll0 ''HandlePosn)
+$(Generics.deriveAll0 ''BufferMode)
+$(Generics.deriveAll0 ''NewlineMode)
+#endif

@@ -1,5 +1,10 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                #-}
+
+#if MIN_VERSION_base(4,5,0)
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 {-|
 Module:      Instances.GHC.Stats
@@ -14,21 +19,12 @@ Portability: GHC
 module Instances.GHC.Stats () where
 
 #if MIN_VERSION_base(4,5,0)
+import GHC.Generics (Generic)
 import GHC.Stats (GCStats(..))
 
-import Prelude ()
-import Prelude.Compat
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
-import Test.QuickCheck (Arbitrary(..))
-
+deriving instance Generic GCStats
 instance Arbitrary GCStats where
-    arbitrary = GCStats <$> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
-                        <*> arbitrary <*> arbitrary <*> arbitrary
-# if __GLASGOW_HASKELL__ >= 801
-                        <*> arbitrary
-# endif
+    arbitrary = genericArbitrary
 #endif

@@ -1,6 +1,8 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                #-}
 
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans               #-}
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif
@@ -20,18 +22,21 @@ module Instances.Data.OldTypeable () where
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable.Internal (TyCon(..), TypeRep(..))
 
+import GHC.Generics (Generic)
+
 import Instances.GHC.Fingerprint ()
 import Instances.Utils ((<@>))
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 instance Arbitrary TypeRep where
     arbitrary = TypeRep <$> arbitrary <*> arbitrary <@> []
 --     arbitrary = TypeRep <$> arbitrary <*> arbitrary <*> arbitrary
 
+deriving instance Generic TyCon
 instance Arbitrary TyCon where
-    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    arbitrary = genericArbitrary
 #endif

@@ -38,7 +38,7 @@ import           GHC.Generics (Generic1)
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), oneof)
+import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
 
 import           Text.Show.Deriving (deriveShow1)
 #if defined(NEW_FUNCTOR_CLASSES)
@@ -80,14 +80,12 @@ data instance TyFamily a b = TyFamilyPrefix { tf1 :: a, tf2   :: b }
 -------------------------------------------------------------------------------
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon a b) where
-    arbitrary = oneof [ TyConPrefix <$> arbitrary <*> arbitrary
-                      , (:@:)       <$> arbitrary <*> arbitrary
-                      ]
+    arbitrary = genericArbitrary
 
+#if MIN_VERSION_template_haskell(2,7,0)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
-    arbitrary = oneof [ TyFamilyPrefix <$> arbitrary <*> arbitrary
-                      , (:!:)          <$> arbitrary <*> arbitrary
-                      ]
+    arbitrary = genericArbitrary
+#endif
 
 -------------------------------------------------------------------------------
 
