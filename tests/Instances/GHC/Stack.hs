@@ -30,8 +30,9 @@ import           GHC.Stack (CallStack)
 # endif
 
 import           Instances.Utils ((<@>))
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary CallStack where
 # if MIN_VERSION_base(4,9,0)

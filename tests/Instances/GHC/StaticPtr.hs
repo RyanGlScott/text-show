@@ -22,7 +22,9 @@ module Instances.GHC.StaticPtr () where
 import GHC.Generics (Generic)
 import GHC.StaticPtr (StaticPtrInfo(..))
 
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+
+import Test.QuickCheck (Arbitrary(..))
 
 deriving instance Generic StaticPtrInfo
 instance Arbitrary StaticPtrInfo where

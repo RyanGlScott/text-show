@@ -35,10 +35,12 @@ import           GHC.Generics (Generic1)
 # endif
 #endif
 
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 
 import           Text.Show.Deriving (deriveShow1)
 #if defined(NEW_FUNCTOR_CLASSES)

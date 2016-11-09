@@ -16,7 +16,8 @@ module Instances.Data.Semigroup () where
 
 import Data.Semigroup (Min(..), Max(..), First(..), Last(..),
                        WrappedMonoid(..), Option(..), Arg(..))
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+import Test.QuickCheck (Arbitrary(..))
 
 deriving instance Arbitrary a => Arbitrary (Min a)
 deriving instance Arbitrary a => Arbitrary (Max a)

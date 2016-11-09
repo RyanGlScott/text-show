@@ -31,8 +31,9 @@ module Instances.GHC.RTS.Flags (
 
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           GHC.RTS.Flags
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
 import           Language.Haskell.TH.Lib (conT)
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 import           TextShow.TH.Names
 
 instance Arbitrary RTSFlags where

@@ -14,8 +14,9 @@ module Instances.System.Exit () where
 
 import Data.Orphans ()
 import Generics.Deriving.Base ()
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 import System.Exit (ExitCode(..))
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary ExitCode where
     arbitrary = genericArbitrary

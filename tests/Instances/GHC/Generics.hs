@@ -21,7 +21,8 @@ module Instances.GHC.Generics () where
 
 import Data.Orphans ()
 import Generics.Deriving.Base
-import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance Arbitrary (U1 p) where
     arbitrary = genericArbitrary

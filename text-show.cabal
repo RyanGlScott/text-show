@@ -246,6 +246,7 @@ test-suite spec
                        Instances.System.Posix.Types
                        Instances.Text.Read
                        Instances.Utils
+                       Instances.Utils.GenericArbitrary
 
                        -- Only exports instances if using Windows
                        Instances.GHC.Conc.Windows

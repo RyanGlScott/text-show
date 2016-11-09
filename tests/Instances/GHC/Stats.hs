@@ -22,7 +22,9 @@ module Instances.GHC.Stats () where
 import GHC.Generics (Generic)
 import GHC.Stats (GCStats(..))
 
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+
+import Test.QuickCheck (Arbitrary(..))
 
 deriving instance Generic GCStats
 instance Arbitrary GCStats where

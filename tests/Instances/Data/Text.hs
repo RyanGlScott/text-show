@@ -41,10 +41,12 @@ import           GHC.Generics (Generic)
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 #endif
 
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 import           Test.QuickCheck.Instances ()
 
 instance Arbitrary Builder where

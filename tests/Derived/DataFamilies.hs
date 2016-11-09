@@ -55,10 +55,12 @@ import           GHC.Generics (Generic1)
 # endif
 #endif
 
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 
 #if MIN_VERSION_template_haskell(2,7,0)
 import           Text.Show.Deriving (deriveShow1)

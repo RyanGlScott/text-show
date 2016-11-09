@@ -34,12 +34,12 @@ import           GHC.IO.Exception (IOException(..), IOErrorType(..))
 
 import           Instances.Foreign.C.Types ()
 import           Instances.System.IO ()
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import           Prelude ()
 import           Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), Gen,
-                                  arbitraryBoundedEnum, genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..), Gen, arbitraryBoundedEnum)
 
 instance Arbitrary SomeException where
     arbitrary = SomeException <$> (arbitrary :: Gen AssertionFailed)

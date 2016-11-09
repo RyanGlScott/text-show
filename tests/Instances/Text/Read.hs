@@ -27,10 +27,11 @@ module Instances.Text.Read (
     ) where
 
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
 #if MIN_VERSION_base(4,6,0)
 import           Language.Haskell.TH.Lib (conT)
 #endif
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 import           Text.Read (Lexeme(..))
 import           TextShow.TH.Names (numberTypeName)
 

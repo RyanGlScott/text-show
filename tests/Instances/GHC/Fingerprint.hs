@@ -22,7 +22,9 @@ module Instances.GHC.Fingerprint () where
 import GHC.Fingerprint.Type (Fingerprint(..))
 import GHC.Generics (Generic)
 
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+
+import Test.QuickCheck (Arbitrary(..))
 
 deriving instance Generic Fingerprint
 instance Arbitrary Fingerprint where

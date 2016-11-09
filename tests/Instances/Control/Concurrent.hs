@@ -28,7 +28,8 @@ import qualified Generics.Deriving.TH as Generics (deriveAll0)
 #endif
 
 import           GHC.Conc (BlockReason(..), ThreadStatus(..))
-import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, genericArbitrary)
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 deriving instance Bounded BlockReason
 deriving instance Enum BlockReason

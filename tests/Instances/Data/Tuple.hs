@@ -27,7 +27,8 @@ import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 #endif
-import           Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+import           Test.QuickCheck (Arbitrary(..))
 
 instance ( Arbitrary a
          , Arbitrary b

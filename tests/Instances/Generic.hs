@@ -13,7 +13,10 @@ Portability: GHC
 module Instances.Generic () where
 
 import Instances.Data.Text ()
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+
+import Test.QuickCheck (Arbitrary(..))
+
 import TextShow.Generic (ConType(..))
 
 instance Arbitrary ConType where

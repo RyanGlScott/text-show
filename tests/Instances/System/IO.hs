@@ -34,14 +34,15 @@ import           GHC.IO.Encoding.Types (CodingProgress(..))
 
 import           GHC.IO.Handle (HandlePosn(..))
 
+import           Instances.Utils.GenericArbitrary (genericArbitrary)
+
 import           Prelude ()
 import           Prelude.Compat
 
 import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
                             SeekMode(..), Handle, stdin, stdout, stderr)
 
-import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum,
-                                  genericArbitrary, oneof)
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
 
 instance Arbitrary Handle where
     arbitrary = oneof $ map pure [stdin, stdout, stderr]
