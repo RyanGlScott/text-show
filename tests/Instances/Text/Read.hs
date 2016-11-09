@@ -28,12 +28,13 @@ module Instances.Text.Read (
 
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
-#if MIN_VERSION_base(4,6,0)
-import           Language.Haskell.TH.Lib (conT)
-#endif
 import           Test.QuickCheck (Arbitrary(..))
 import           Text.Read (Lexeme(..))
+
+#if MIN_VERSION_base(4,6,0)
+import           Language.Haskell.TH.Lib (conT)
 import           TextShow.TH.Names (numberTypeName)
+#endif
 
 instance Arbitrary Lexeme where
     arbitrary = genericArbitrary
@@ -46,4 +47,6 @@ instance Arbitrary Number' where
 #endif
 
 $(Generics.deriveAll0 ''Lexeme)
+#if MIN_VERSION_base(4,6,0)
 $(Generics.deriveAll0 numberTypeName)
+#endif

@@ -24,7 +24,7 @@ module Instances.Data.Data () where
 import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
                             Fixity(..), mkConstr, mkDataType)
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
@@ -54,7 +54,7 @@ deriving instance Enum Fixity
 instance Arbitrary Fixity where
     arbitrary = arbitraryBoundedEnum
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic ConstrRep
 deriving instance Generic DataRep
 #else

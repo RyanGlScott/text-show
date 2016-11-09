@@ -21,7 +21,7 @@ Portability: GHC
 -}
 module Instances.System.IO () where
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
@@ -81,7 +81,7 @@ instance Arbitrary Newline where
 instance Arbitrary NewlineMode where
     arbitrary = genericArbitrary
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic HandlePosn
 deriving instance Generic BufferMode
 deriving instance Generic NewlineMode

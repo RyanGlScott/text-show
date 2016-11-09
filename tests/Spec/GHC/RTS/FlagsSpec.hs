@@ -12,8 +12,6 @@ Portability: GHC
 -}
 module Spec.GHC.RTS.FlagsSpec (main, spec) where
 
-import Instances.GHC.RTS.Flags
-
 import Prelude ()
 import Prelude.Compat
 
@@ -21,6 +19,8 @@ import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,8,0)
 import GHC.RTS.Flags
+
+import Instances.GHC.RTS.Flags
 
 import Spec.Utils (prop_matchesTextShow)
 

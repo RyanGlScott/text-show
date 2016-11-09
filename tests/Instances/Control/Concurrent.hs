@@ -21,7 +21,7 @@ Portability: GHC
 -}
 module Instances.Control.Concurrent () where
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
@@ -39,7 +39,7 @@ instance Arbitrary BlockReason where
 instance Arbitrary ThreadStatus where
     arbitrary = genericArbitrary
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic ThreadStatus
 #else
 $(Generics.deriveAll0 ''ThreadStatus)

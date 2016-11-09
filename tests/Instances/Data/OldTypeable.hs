@@ -26,11 +26,12 @@ import GHC.Generics (Generic)
 
 import Instances.GHC.Fingerprint ()
 import Instances.Utils ((<@>))
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..), genericArbitrary)
+import Test.QuickCheck (Arbitrary(..))
 
 instance Arbitrary TypeRep where
     arbitrary = TypeRep <$> arbitrary <*> arbitrary <@> []

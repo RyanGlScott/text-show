@@ -22,9 +22,9 @@ Portability: GHC
 -}
 module Instances.Control.Exception () where
 
-import           Control.Exception
+import           Control.Exception hiding (IOException)
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
@@ -132,7 +132,7 @@ deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
     arbitrary = arbitraryBoundedEnum
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic ArrayException
 deriving instance Generic AssertionFailed
 deriving instance Generic IOException

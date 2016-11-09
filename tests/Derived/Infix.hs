@@ -138,11 +138,13 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConPlain a b) where
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConGADT a b) where
     arbitrary = genericArbitrary
 
+#if MIN_VERSION_template_haskell(2,7,0)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyPlain a b) where
     arbitrary = genericArbitrary
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
     arbitrary = genericArbitrary
+#endif
 
 -------------------------------------------------------------------------------
 

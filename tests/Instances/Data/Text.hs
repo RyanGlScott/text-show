@@ -7,7 +7,8 @@
 {-# LANGUAGE DeriveGeneric      #-}
 #endif
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
+{-# OPTIONS_GHC -fno-warn-orphans      #-}
 
 {-|
 Module:      Instances.Data.Text
@@ -35,7 +36,7 @@ import           Data.Text.Internal.Fusion.Size (Size, exactSize)
 import           Test.QuickCheck (getNonNegative)
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 import           GHC.Generics (Generic)
 #else
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
@@ -68,7 +69,7 @@ instance Arbitrary Size where
     arbitrary = exactSize . getNonNegative <$> arbitrary
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
+#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic UnicodeException
 #else
 $(Generics.deriveAll0 ''UnicodeException)
