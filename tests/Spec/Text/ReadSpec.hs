@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 {-|
 Module:      Spec.Text.ReadSpec
@@ -13,9 +14,6 @@ Portability: GHC
 module Spec.Text.ReadSpec (main, spec) where
 
 import Instances.Text.Read ()
-#if MIN_VERSION_base(4,6,0)
-import Instances.Text.Read (Number')
-#endif
 
 import Spec.Utils (prop_matchesTextShow)
 
@@ -23,6 +21,11 @@ import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import Text.Read (Lexeme)
+
+#if MIN_VERSION_base(4,6,0)
+import Language.Haskell.TH.Lib (conT)
+import TextShow.TH.Names (numberTypeName)
+#endif
 
 main :: IO ()
 main = hspec spec
@@ -33,5 +36,5 @@ spec = parallel $ do
         prop "TextShow instance" (prop_matchesTextShow :: Int -> Lexeme -> Bool)
 #if MIN_VERSION_base(4,6,0)
     describe "Number" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Number' -> Bool)
+        prop "TextShow instance" (prop_matchesTextShow :: Int -> $(conT numberTypeName) -> Bool)
 #endif

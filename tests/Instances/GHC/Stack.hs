@@ -23,13 +23,13 @@ module Instances.GHC.Stack () where
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 # if MIN_VERSION_base(4,9,0)
 import           GHC.Stack.Types (CallStack(..), SrcLoc(..))
+import           Instances.Utils ((<@>))
 import           Test.QuickCheck (oneof)
 # else
 import           GHC.SrcLoc (SrcLoc)
 import           GHC.Stack (CallStack)
 # endif
 
-import           Instances.Utils ((<@>))
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import           Test.QuickCheck (Arbitrary(..))

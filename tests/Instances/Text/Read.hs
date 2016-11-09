@@ -20,11 +20,7 @@ Portability: GHC
 
 'Arbitrary' instances for data types in the "Text.Read" module.
 -}
-module Instances.Text.Read (
-#if MIN_VERSION_base(4,6,0)
-    Number'
-#endif
-    ) where
+module Instances.Text.Read () where
 
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
@@ -40,9 +36,14 @@ instance Arbitrary Lexeme where
     arbitrary = genericArbitrary
 
 #if MIN_VERSION_base(4,6,0)
-type Number' = $(conT numberTypeName)
+-- NB: Don't attempt to define
+--
+-- type Number' = $(conT numberTypeName)
+--
+-- here. Sadly, due to a bizarre GHC 7.6 bug, it'll think it's a recursive
+-- type synonym and reject it.
 
-instance Arbitrary Number' where
+instance Arbitrary $(conT numberTypeName) where
     arbitrary = genericArbitrary
 #endif
 
