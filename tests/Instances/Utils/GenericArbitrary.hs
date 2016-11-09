@@ -23,7 +23,12 @@ merged yet. Until then, we'll have to define it ourselves.
 module Instances.Utils.GenericArbitrary (genericArbitrary) where
 
 import Generics.Deriving.Base
+
 import GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
+
+import Prelude ()
+import Prelude.Compat
+
 import Test.QuickCheck (Arbitrary(..), Gen, choose)
 
 -- | `Gen` for generic instances in which each constructor has equal probability

@@ -47,7 +47,7 @@ instance Arbitrary CallStack where
 instance Arbitrary SrcLoc where
     arbitrary = genericArbitrary
 
-# if MIN_VERSION_base(4,9,0)
+# if !(MIN_VERSION_base(4,9,0))
 $(Generics.deriveAll0 ''CallStack)
 # endif
 $(Generics.deriveAll0 ''SrcLoc)
