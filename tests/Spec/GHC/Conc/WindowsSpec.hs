@@ -20,12 +20,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+import Data.Proxy (Proxy(..))
 import GHC.Conc.Windows (ConsoleEvent)
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -35,7 +33,7 @@ spec :: Spec
 spec = parallel $
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
     describe "ConsoleEvent" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConsoleEvent -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ConsoleEvent)
 #else
     pure ()
 #endif
