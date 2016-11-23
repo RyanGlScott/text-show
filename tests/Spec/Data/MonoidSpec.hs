@@ -13,13 +13,13 @@ Portability: GHC
 module Spec.Data.MonoidSpec (main, spec) where
 
 import Data.Monoid
+import Data.Proxy (Proxy(..))
 
 import Generics.Deriving.Instances ()
 
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow, prop_genericTextShow1)
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec, genericTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -27,34 +27,50 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "All" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> All -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> All -> Bool)
+        let p :: Proxy All
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
     describe "Any" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Any -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Any -> Bool)
+        let p :: Proxy Any
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
     describe "Dual Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Dual Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Dual Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> Dual Int -> Bool)
+        let p :: Proxy (Dual Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "First Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> First Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> First Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> First Int -> Bool)
+        let p :: Proxy (First Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "Last Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Last Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Last Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> Last Int -> Bool)
+        let p :: Proxy (Last Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "Product Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Product Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Product Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> Product Int -> Bool)
+        let p :: Proxy (Product Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "Sum Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Sum Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Sum Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> Sum Int -> Bool)
+        let p :: Proxy (Sum Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #if MIN_VERSION_base(4,8,0)
     describe "Alt Maybe Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Alt Maybe Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Alt Maybe Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> Alt Maybe Int -> Bool)
+        let p :: Proxy (Alt Maybe Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #endif

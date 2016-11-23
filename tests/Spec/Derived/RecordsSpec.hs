@@ -12,12 +12,10 @@ Portability: GHC
 -}
 module Spec.Derived.RecordsSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Derived.Records
-
-import Spec.Utils (prop_matchesTextShow1, prop_genericTextShow, prop_genericTextShow1)
-
+import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -25,12 +23,16 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TyCon Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> TyCon Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> TyCon Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyCon Int Int -> Bool)
+        let p :: Proxy (TyCon Int Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> TyFamily Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> TyFamily Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> TyFamily Int Int -> Bool)
+        let p :: Proxy (TyFamily Int Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #endif

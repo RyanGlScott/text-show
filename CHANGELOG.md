@@ -1,5 +1,5 @@
 ### next [YYYY.MM.DD]
-* Refactor test suite to make use of a generic default implementation for `arbitrary`
+* Refactor test suite
 
 #### 3.4.1.1 [2016.11.07]
 * Require `criterion-1.1.4` or later. This allows the benchmarks to be run on older versions of GHC.

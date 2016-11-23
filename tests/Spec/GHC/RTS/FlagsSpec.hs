@@ -18,14 +18,11 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,8,0)
+import Data.Proxy (Proxy(..))
 import GHC.RTS.Flags
-
 import Instances.GHC.RTS.Flags
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -35,34 +32,34 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
     describe "RTSFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> RTSFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy RTSFlags)
     describe "GCFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> GCFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy GCFlags)
     describe "ConcFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConcFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ConcFlags)
     describe "MiscFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> MiscFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy MiscFlags)
     describe "DebugFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DebugFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DebugFlags)
     describe "CCFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CCFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CCFlags)
     describe "ProfFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ProfFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ProfFlags)
     describe "TraceFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TraceFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TraceFlags)
     describe "TickyFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TickyFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TickyFlags)
     describe "GiveGCStats" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> GiveGCStats' -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy GiveGCStats')
     describe "DoCostCentres" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoCostCentres' -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DoCostCentres')
     describe "DoHeapProfile" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoHeapProfile' -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DoHeapProfile')
     describe "DoTrace" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DoTrace' -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DoTrace')
 # if __GLASGOW_HASKELL__ >= 801
     describe "ParFlags" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ParFlags -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ParFlags)
 # endif
 #else
     pure ()

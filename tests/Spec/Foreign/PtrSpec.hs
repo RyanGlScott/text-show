@@ -10,6 +10,8 @@ Portability: GHC
 -}
 module Spec.Foreign.PtrSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
 import Foreign.ForeignPtr (newForeignPtr_)
 import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)
 
@@ -18,7 +20,7 @@ import Instances.Foreign.Ptr ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec, prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -30,13 +32,13 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Ptr Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Ptr Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Ptr Int))
     describe "FunPtr Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> FunPtr Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (FunPtr Int))
     describe "IntPtr" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IntPtr -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IntPtr)
     describe "WordPtr" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> WordPtr -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy WordPtr)
     describe "ForeignPtr" $
         prop "TextShow instance" prop_showForeignPtr
 

@@ -12,6 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.TypeableSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.Typeable (TyCon, TypeRep)
 
 #if MIN_VERSION_base(4,9,0)
@@ -20,10 +21,9 @@ import GHC.Types (TrName, Module)
 
 import Instances.Data.Typeable ()
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -31,12 +31,12 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TypeRep" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TypeRep -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TypeRep)
     describe "TyCon" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TyCon -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TyCon)
 #if MIN_VERSION_base(4,9,0)
     describe "TrName" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TrName -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TrName)
     describe "Module" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Module -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Module)
 #endif

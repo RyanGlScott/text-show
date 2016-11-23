@@ -22,12 +22,13 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_template_haskell(2,7,0)
+import Data.Proxy (Proxy(..))
+
 import Derived.DataFamilies (NotAllShow)
 
-import Spec.Utils (prop_matchesTextShow1, prop_genericTextShow, prop_genericTextShow1)
+import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 
 # if __GLASGOW_HASKELL__ >= 706
 import Derived.DataFamilies (KindDistinguished)
@@ -35,7 +36,7 @@ import Derived.DataFamilies (KindDistinguished)
 
 # if __GLASGOW_HASKELL__ >= 708
 import Derived.DataFamilies (NullaryData)
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 # endif
 #endif
 
@@ -46,23 +47,31 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "NotAllShow Int Int Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> NotAllShow Int Int Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> NotAllShow Int Int Int Int -> Bool)
+        let p :: Proxy (NotAllShow Int Int Int Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 # if __GLASGOW_HASKELL__ >= 706
     describe "KindDistinguished '() Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished '() Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished '() Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished '() Int Int -> Bool)
+        let p :: Proxy (KindDistinguished '() Int Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "KindDistinguished 'True Int Int" $ do
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> KindDistinguished 'True Int Int -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> KindDistinguished 'True Int Int -> Bool)
-        prop "generic TextShow1"  (prop_genericTextShow1 :: Int -> KindDistinguished 'True Int Int -> Bool)
+        let p :: Proxy (KindDistinguished 'True Int Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 # endif
 # if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> NullaryData -> Bool)
-        prop "generic TextShow"   (prop_genericTextShow  :: Int -> NullaryData -> Bool)
+        let p :: Proxy NullaryData
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
 # endif
 #else
     pure ()

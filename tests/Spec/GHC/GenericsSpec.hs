@@ -18,6 +18,7 @@ Portability: GHC
 module Spec.GHC.GenericsSpec (main, spec) where
 
 import Data.Orphans ()
+import Data.Proxy (Proxy(..))
 
 import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
                               , UChar, UDouble, UFloat, UInt, UWord
@@ -32,10 +33,9 @@ import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
 
 import Instances.GHC.Generics ()
 
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -55,62 +55,100 @@ m1Description = "M1 () () Maybe Int"
 spec :: Spec
 spec = parallel $ do
     describe "Fixity" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Fixity -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Fixity -> Bool)
+        let p :: Proxy Fixity
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "Associativity" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Associativity -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Associativity -> Bool)
+        let p :: Proxy Associativity
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
 #if MIN_VERSION_base(4,9,0)
     describe "SourceUnpackedness" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> SourceUnpackedness -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> SourceUnpackedness -> Bool)
+        let p :: Proxy SourceUnpackedness
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "SourceStrictness" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> SourceStrictness -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> SourceStrictness -> Bool)
+        let p :: Proxy SourceStrictness
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "DecidedStrictness" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> DecidedStrictness -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> DecidedStrictness -> Bool)
+        let p :: Proxy DecidedStrictness
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
 #else
     describe "Arity" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Arity -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Arity -> Bool)
+        let p :: Proxy Arity
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
 #endif
     describe "U1 Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> U1 Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> U1 Int -> Bool)
+        let p :: Proxy (U1 Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "Par1 Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Par1 Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Par1 Int -> Bool)
+        let p :: Proxy (Par1 Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "Rec1 Maybe Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Rec1 Maybe Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> Rec1 Maybe Int -> Bool)
+        let p :: Proxy (Rec1 Maybe Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "K1 () Int ()" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> K1 () Int () -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> K1 () Int () -> Bool)
+        let p :: Proxy (K1 () Int ())
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe m1Description $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> M1 () MD Maybe Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> M1 () MD Maybe Int -> Bool)
+        let p :: Proxy (M1 () MD Maybe Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "(Maybe :+: Maybe) Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :+: Maybe) Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :+: Maybe) Int -> Bool)
+        let p :: Proxy ((Maybe :+: Maybe) Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "(Maybe :*: Maybe) Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :*: Maybe) Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :*: Maybe) Int -> Bool)
+        let p :: Proxy ((Maybe :*: Maybe) Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "(Maybe :.: Maybe) Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> (Maybe :.: Maybe) Int -> Bool)
+        let p :: Proxy ((Maybe :.: Maybe) Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "UChar Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UChar Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UChar Int -> Bool)
+        let p :: Proxy (UChar Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "UDouble Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UDouble Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UDouble Int -> Bool)
+        let p :: Proxy (UDouble Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "UFloat Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UFloat Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UFloat Int -> Bool)
+        let p :: Proxy (UFloat Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "UInt Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UInt Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UInt Int -> Bool)
+        let p :: Proxy (UInt Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "UWord Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> UWord Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> UWord Int -> Bool)
+        let p :: Proxy (UWord Int)
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p

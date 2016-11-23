@@ -24,12 +24,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,6,0)
+import Data.Proxy (Proxy(..))
 import GHC.TypeLits
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -39,24 +37,24 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,7,0)
     describe "SomeNat" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeNat -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SomeNat)
     describe "SomeSymbol" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeSymbol -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SomeSymbol)
 #elif MIN_VERSION_base(4,6,0)
     describe "IsEven 0" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IsEven 0 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IsEven 0)
     describe "IsEven 1" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IsEven 1 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IsEven 1)
     describe "IsEven 2" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IsEven 2 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IsEven 2)
     describe "IsZero 0" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IsZero 0 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IsZero 0)
     describe "IsZero 1" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IsZero 1 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IsZero 1)
     describe "Sing 0" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Sing 0 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Sing 0)
     describe "Sing \"a\"" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Sing "a" -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Sing "a")
 #else
     pure ()
 #endif

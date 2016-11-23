@@ -10,13 +10,10 @@ Portability: GHC
 -}
 module Spec.GenericSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.Generic ()
-
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
-
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
-
 import TextShow.Generic (ConType)
 
 main :: IO ()
@@ -24,5 +21,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "ConType" $ do
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> ConType -> Bool)
-    prop "generic TextShow"  (prop_genericTextShow :: Int -> ConType -> Bool)
+    let p :: Proxy ConType
+        p = Proxy
+    matchesTextShowSpec p
+    genericTextShowSpec p

@@ -13,13 +13,10 @@ Portability: GHC
 module Spec.Control.ExceptionSpec (main, spec) where
 
 import Control.Exception
-
+import Data.Proxy (Proxy(..))
 import Instances.Control.Exception ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -27,50 +24,50 @@ main = hspec spec
 spec :: Spec
 spec = parallel . describe "TextShow.Control.Exception" $ do
     describe "SomeException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SomeException)
     describe "IOException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IOException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IOException)
     describe "ArithException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ArithException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ArithException)
     describe "ArrayException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ArrayException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ArrayException)
     describe "AssertionFailed" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> AssertionFailed -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy AssertionFailed)
 #if MIN_VERSION_base(4,7,0)
     describe "SomeAsyncException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SomeAsyncException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SomeAsyncException)
 #endif
     describe "AsyncException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> AsyncException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy AsyncException)
     describe "NonTermination" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> NonTermination -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy NonTermination)
     describe "NestedAtomically" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> NestedAtomically -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy NestedAtomically)
     describe "BlockedIndefinitelyOnMVar" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BlockedIndefinitelyOnMVar -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BlockedIndefinitelyOnMVar)
     describe "BlockedIndefinitelyOnSTM" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BlockedIndefinitelyOnSTM -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BlockedIndefinitelyOnSTM)
 #if MIN_VERSION_base(4,8,0)
     describe "AllocationLimitExceeded" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> AllocationLimitExceeded -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy AllocationLimitExceeded)
 #endif
 #if MIN_VERSION_base(4,9,0)
     describe "TypeError" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TypeError -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TypeError)
 #endif
     describe "Deadlock" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Deadlock -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Deadlock)
     describe "NoMethodError" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> NoMethodError -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy NoMethodError)
     describe "PatternMatchFail" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> PatternMatchFail -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy PatternMatchFail)
     describe "RecConError" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecConError -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy RecConError)
     describe "RecSelError" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecSelError -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy RecSelError)
     describe "RecUpdError" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> RecUpdError -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy RecUpdError)
     describe "ErrorCall" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ErrorCall -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ErrorCall)
     describe "MaskingState" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> MaskingState -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy MaskingState)

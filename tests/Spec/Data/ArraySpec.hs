@@ -21,11 +21,11 @@ import Test.QuickCheck.Instances ()
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 import Data.Array (Array)
 import Data.Array.Unboxed (UArray)
+import Data.Proxy (Proxy(..))
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -36,9 +36,9 @@ spec = parallel $ do
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why these tests diverge on Windows
     describe "Array Int Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Array Int Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Array Int Int))
     describe "UArray Int Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> UArray Int Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (UArray Int Int))
 #else
     pure ()
 #endif

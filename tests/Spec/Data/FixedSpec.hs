@@ -11,8 +11,9 @@ Portability: GHC
 module Spec.Data.FixedSpec (main, spec) where
 
 import Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
+import Data.Proxy (Proxy(..))
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -26,21 +27,21 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Fixed E0" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E0 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E0))
     describe "Fixed E1" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E1 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E1))
     describe "Fixed E2" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E2 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E2))
     describe "Fixed E3" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E3 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E3))
     describe "Fixed E6" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E6 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E6))
     describe "Fixed E9" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E9 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E9))
     describe "Fixed E12" $
-        prop "TextShow instance"                    (prop_matchesTextShow :: Int -> Fixed E12 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Fixed E12))
     describe "showbFixed" $
-        prop "has the same output as showFixed"     prop_showFixed
+        prop "has the same output as showFixed" prop_showFixed
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
 prop_showFixed :: Bool -> Fixed E12 -> Bool

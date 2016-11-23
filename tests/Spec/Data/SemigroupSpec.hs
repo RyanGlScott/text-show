@@ -10,14 +10,14 @@ Portability: GHC
 -}
 module Spec.Data.SemigroupSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.Semigroup (Min, Max, First, Last, WrappedMonoid, Option, Arg)
 
 import Instances.Data.Semigroup ()
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -25,16 +25,16 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Min Int" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Min Int -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (Min Int))
     describe "Max Int" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Max Int -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (Max Int))
     describe "First Int" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> First Int -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (First Int))
     describe "Last Int" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Last Int -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (Last Int))
     describe "WrappedMonoid ()" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> WrappedMonoid () -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (WrappedMonoid ()))
     describe "Option Int" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Option Int -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (Option Int))
     describe "Arg Int Char" $
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> Arg Int Char -> Bool)
+        matchesTextShowSpec  (Proxy :: Proxy (Arg Int Char))

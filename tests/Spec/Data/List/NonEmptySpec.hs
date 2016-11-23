@@ -10,18 +10,15 @@ Portability: GHC
 -}
 module Spec.Data.List.NonEmptySpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.List.NonEmpty (NonEmpty)
-
 import Instances.Data.List.NonEmpty ()
-
-import Spec.Utils (prop_matchesTextShow1)
-
+import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "NonEmpty Int" $
-    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> NonEmpty Int -> Bool)
+    matchesTextShow1Spec (Proxy :: Proxy (NonEmpty Int))

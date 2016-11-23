@@ -12,12 +12,13 @@ Portability: GHC
 -}
 module Spec.Data.TextSpec (main, spec) where
 
+import           Data.Proxy (Proxy(..))
+
 import           Instances.Data.Text ()
 
-import           Spec.Utils (prop_matchesTextShow)
+import           Spec.Utils (matchesTextShowSpec)
 
 import           Test.Hspec (Spec, describe, hspec, parallel)
-import           Test.Hspec.QuickCheck (prop)
 
 import qualified Data.Text as TS
 import qualified Data.Text as TL
@@ -37,20 +38,20 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Builder" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Builder -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Builder)
     describe "strict Text" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TS.Text -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TS.Text)
     describe "lazy Text" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> TL.Text -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy TL.Text)
     describe "I16" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> I16 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy I16)
     describe "UnicodeException" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> UnicodeException -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy UnicodeException)
 #if MIN_VERSION_text(1,0,0)
     describe "Decoding" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Decoding -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Decoding)
 #endif
 #if MIN_VERSION_text(1,1,0)
     describe "Size" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Size -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Size)
 #endif

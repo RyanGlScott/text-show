@@ -10,15 +10,12 @@ Portability: GHC
 -}
 module Spec.Data.TupleSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Generics.Deriving.Instances ()
-
 import Instances.Data.Tuple ()
-
-import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow1,
-                   prop_genericTextShow, prop_genericTextShow1)
-
+import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec,
+                   genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -26,73 +23,59 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "()" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> () -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow :: Int -> () -> Bool)
+        let p :: Proxy ()
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
     describe "(Int, Int)" $ do
-        prop "TextShow1 instance"
-            (prop_matchesTextShow1 :: Int -> (Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int) -> Bool)
+        let p :: Proxy (Int, Int)
+            p = Proxy
+        matchesTextShow1Spec p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow  :: Int -> (Int, Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int, Int) -> Bool)
+        let p :: Proxy (Int, Int, Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int) -> Bool)
+        let p :: Proxy (Int, Int, Int, Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int) -> Bool)
+        let p :: Proxy (Int, Int, Int, Int, Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int, Int) -> Bool)
+        let p :: Proxy (Int, Int, Int, Int, Int, Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow"
-            (prop_genericTextShow  :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
-        prop "generic TextShow1"
-            (prop_genericTextShow1 :: Int -> (Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        let p :: Proxy (Int, Int, Int, Int, Int, Int, Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "(Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
-        prop "TextShow instance"
-            (prop_matchesTextShow :: Int -> (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))

@@ -13,13 +13,13 @@ module Spec.Data.ByteStringSpec (main, spec) where
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString)
 import           Data.ByteString.Short (ShortByteString)
+import           Data.Proxy (Proxy(..))
 
 import           Instances.Data.ByteString ()
 
-import           Spec.Utils (prop_matchesTextShow)
+import           Spec.Utils (matchesTextShowSpec)
 
 import           Test.Hspec (Spec, describe, hspec, parallel)
-import           Test.Hspec.QuickCheck (prop)
 import           Test.QuickCheck.Instances ()
 
 main :: IO ()
@@ -28,8 +28,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "strict ByteString" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BS.ByteString -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BS.ByteString)
     describe "lazy ByteString" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BL.ByteString -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BL.ByteString)
     describe "ShortByteString" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ShortByteString -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ShortByteString)

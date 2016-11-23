@@ -12,6 +12,8 @@ Portability: GHC
 -}
 module Spec.GHC.StackSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
 import Instances.GHC.Stack ()
 
 import Prelude ()
@@ -27,10 +29,9 @@ import GHC.Stack (SrcLoc)
 import GHC.SrcLoc (SrcLoc)
 # endif
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -40,9 +41,9 @@ spec :: Spec
 spec = parallel $ do
 #if MIN_VERSION_base(4,8,1)
     describe "CallStack" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CallStack -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CallStack)
     describe "SrcLoc" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SrcLoc -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SrcLoc)
 #else
     pure ()
 #endif

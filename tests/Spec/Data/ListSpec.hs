@@ -10,7 +10,9 @@ Portability: GHC
 -}
 module Spec.Data.ListSpec (main, spec) where
 
-import Spec.Utils (prop_matchesTextShow)
+import Data.Proxy (Proxy(..))
+
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -25,13 +27,13 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "String" $
-        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> String -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy String)
     describe "[String]" $
-        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> [String] -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy [String])
     describe "[Int]" $
-        prop "TextShow instance"                       (prop_matchesTextShow :: Int -> [Int] -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy [Int])
     describe "showbListWith" $
-        prop "has the same output as showListWith"     prop_showListWith
+        prop "has the same output as showListWith" prop_showListWith
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
 prop_showListWith :: String -> Bool

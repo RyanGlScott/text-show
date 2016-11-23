@@ -10,11 +10,9 @@ Portability: GHC
 -}
 module Spec.FunctionsSpec (main, spec) where
 
-import Spec.Utils (prop_matchesTextShow)
-
+import Data.Proxy (Proxy(..))
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
-
 import Text.Show.Functions ()
 import TextShow.Functions ()
 
@@ -23,4 +21,4 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Int -> Int" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> (Int -> Int) -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy (Int -> Int))

@@ -12,14 +12,11 @@ Portability: GHC
 -}
 module Spec.Foreign.C.TypesSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Foreign.C.Types
-
 import Instances.Foreign.C.Types ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -27,54 +24,54 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "CChar" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CChar -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CChar)
     describe "CSChar" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSChar -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSChar)
     describe "CUChar" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUChar -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUChar)
     describe "CShort" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CShort -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CShort)
     describe "CUShort" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUShort -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUShort)
     describe "CInt" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CInt -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CInt)
     describe "CUInt" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUInt -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUInt)
     describe "CLong" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CLong -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CLong)
     describe "CULong" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CULong -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CULong)
     describe "CPtrdiff" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CPtrdiff -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CPtrdiff)
     describe "CSize" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSize -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSize)
     describe "CWchar" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CWchar -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CWchar)
     describe "CSigAtomic" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSigAtomic -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSigAtomic)
     describe "CLLong" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CLLong -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CLLong)
     describe "CULLong" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CULLong -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CULLong)
     describe "CIntPtr" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CIntPtr -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CIntPtr)
     describe "CUIntPtr" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUIntPtr -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUIntPtr)
     describe "CIntMax" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CIntMax -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CIntMax)
     describe "CUIntMax" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUIntMax -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUIntMax)
     describe "CClock" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CClock -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CClock)
     describe "CTime" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CTime -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CTime)
 #if MIN_VERSION_base(4,4,0)
     describe "CUSeconds" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUSeconds -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUSeconds)
     describe "CSUSeconds" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSUSeconds -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSUSeconds)
 #endif
     describe "CFloat" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CFloat -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CFloat)
     describe "CDouble" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CDouble -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CDouble)

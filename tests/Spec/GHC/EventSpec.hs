@@ -12,6 +12,8 @@ Portability: GHC
 -}
 module Spec.GHC.EventSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
 import Instances.GHC.Event ()
 
 import Prelude ()
@@ -25,10 +27,9 @@ import GHC.Event (Event)
 import GHC.Event (Lifetime)
 #endif
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 
@@ -39,12 +40,12 @@ spec :: Spec
 spec = parallel $ do
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
     describe "Event" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Event -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Event)
 --     describe "FdKey" $
---         prop "TextShow instance" (prop_matchesTextShow :: Int -> FdKey -> Bool)
+--         matchesTextShowSpec (Proxy :: Proxy FdKey)
 # if MIN_VERSION_base(4,8,1)
     describe "Lifetime" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Lifetime -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Lifetime)
 # endif
 #else
     pure ()

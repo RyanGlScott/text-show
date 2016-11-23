@@ -10,18 +10,15 @@ Portability: GHC
 -}
 module Spec.System.ExitSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.System.Exit ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import System.Exit (ExitCode)
-
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "ExitCode" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> ExitCode -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy ExitCode)

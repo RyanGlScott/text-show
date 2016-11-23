@@ -12,14 +12,11 @@ Portability: GHC
 -}
 module Spec.System.Posix.TypesSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.System.Posix.Types ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import System.Posix.Types
-
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 #include "HsBaseConfig.h"
 
@@ -29,56 +26,56 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Fd" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fd -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Fd)
 #if defined(HTYPE_DEV_T)
     describe "CDev" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CDev -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CDev)
 #endif
 #if defined(HTYPE_INO_T)
     describe "CIno" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CIno -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CIno)
 #endif
 #if defined(HTYPE_MODE_T)
     describe "CMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CMode)
 #endif
 #if defined(HTYPE_OFF_T)
     describe "COff" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> COff -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy COff)
 #endif
 #if defined(HTYPE_PID_T)
     describe "CPid" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CPid -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CPid)
 #endif
 #if defined(HTYPE_SSIZE_T)
     describe "CSsize" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSsize -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSsize)
 #endif
 #if defined(HTYPE_GID_T)
     describe "CGid" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CGid -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CGid)
 #endif
 #if defined(HTYPE_NLINK_T)
     describe "CNlink" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CNlink -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CNlink)
 #endif
 #if defined(HTYPE_UID_T)
     describe "CUid" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CUid -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CUid)
 #endif
 #if defined(HTYPE_CC_T)
     describe "CCc" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CCc -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CCc)
 #endif
 #if defined(HTYPE_SPEED_T)
     describe "CSpeed" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CSpeed -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CSpeed)
 #endif
 #if defined(HTYPE_TCFLAG_T)
     describe "CTcflag" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CTcflag -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CTcflag)
 #endif
 #if defined(HTYPE_RLIM_T)
     describe "CRLim" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CRLim -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CRLim)
 #endif

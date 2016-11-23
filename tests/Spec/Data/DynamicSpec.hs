@@ -11,17 +11,17 @@ Portability: GHC
 module Spec.Data.DynamicSpec (main, spec) where
 
 import Data.Dynamic (Dynamic)
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Dynamic ()
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Dynamic" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Dynamic -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy Dynamic)

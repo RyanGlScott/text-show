@@ -22,12 +22,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,4,0)
+import Data.Proxy (Proxy(..))
 import GHC.Fingerprint.Type (Fingerprint)
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -37,7 +35,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,4,0)
     describe "Fingerprint" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fingerprint -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Fingerprint)
 #else
     pure ()
 #endif

@@ -10,21 +10,18 @@ Portability: GHC
 -}
 module Spec.Data.ProxySpec (main, spec) where
 
-import Data.Proxy (Proxy)
-
+import Data.Proxy (Proxy(..))
 import Generics.Deriving.Base ()
-
 import Instances.Data.Proxy ()
-
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
-
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Proxy Int" $ do
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Proxy Int -> Bool)
-    prop "generic TextShow"  (prop_genericTextShow :: Int -> Proxy Int -> Bool)
+    let p :: Proxy (Proxy Int)
+        p = Proxy
+    matchesTextShowSpec p
+    genericTextShowSpec p

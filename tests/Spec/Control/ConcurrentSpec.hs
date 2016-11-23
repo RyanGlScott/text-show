@@ -12,6 +12,8 @@ module Spec.Control.ConcurrentSpec (main, spec) where
 
 import Control.Concurrent (myThreadId)
 
+import Data.Proxy (Proxy(..))
+
 import GHC.Conc (BlockReason, ThreadStatus)
 
 import Instances.Control.Concurrent ()
@@ -19,7 +21,7 @@ import Instances.Control.Concurrent ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec, prop_matchesTextShow)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -31,11 +33,11 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "BlockReason" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BlockReason -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BlockReason)
     describe "ThreadId" $
         prop "TextShow instance" prop_showThreadId
     describe "ThreadStatus" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ThreadStatus -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ThreadStatus)
 
 -- | Verifies the 'Show' instance for 'ThreadId' is accurate.
 prop_showThreadId :: Int -> Property

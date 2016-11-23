@@ -12,15 +12,15 @@ module Spec.Data.CharSpec (main, spec) where
 
 import Data.Array (elems)
 import Data.Char (GeneralCategory)
+import Data.Proxy (Proxy(..))
 
 import GHC.Show (asciiTab)
 
 import Instances.Data.Char ()
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, it, parallel, shouldBe)
-import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
 import TextShow.Data.Char (asciiTabB)
@@ -31,8 +31,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Char" $
-        prop "TextShow instance"   (prop_matchesTextShow :: Int -> Char -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Char)
     describe "GeneralCategory" $
-        prop "TextShow instance"   (prop_matchesTextShow :: Int -> GeneralCategory -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy GeneralCategory)
     describe "asciiTabB" $
-        it "equals asciiTab" $     map fromString asciiTab `shouldBe` elems asciiTabB
+        it "equals asciiTab" $ map fromString asciiTab `shouldBe` elems asciiTabB

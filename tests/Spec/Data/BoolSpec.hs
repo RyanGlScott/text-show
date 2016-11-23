@@ -12,15 +12,16 @@ Portability: GHC
 -}
 module Spec.Data.BoolSpec (main, spec) where
 
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
-
+import Data.Proxy (Proxy(..))
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Bool" $ do
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Bool -> Bool)
-    prop "generic TextShow"  (prop_genericTextShow :: Int -> Bool -> Bool)
+    let p :: Proxy Bool
+        p = Proxy
+    matchesTextShowSpec p
+    genericTextShowSpec p

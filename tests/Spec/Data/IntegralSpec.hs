@@ -13,12 +13,13 @@ Portability: GHC
 module Spec.Data.IntegralSpec (main, spec) where
 
 import Data.Int (Int8, Int16, Int32, Int64)
+import Data.Proxy (Proxy(..))
 import Data.Word (Word8, Word16, Word32, Word64)
 
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -39,27 +40,27 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Int" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Int)
     describe "Int8" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int8 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Int8)
     describe "Int16" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int16 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Int16)
     describe "Int32" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int32 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Int32)
     describe "Int64" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Int64 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Int64)
     describe "Integer" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Integer -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Integer)
     describe "Word" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Word)
     describe "Word8" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word8 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Word8)
     describe "Word16" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word16 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Word16)
     describe "Word32" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word32 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Word32)
     describe "Word64" $
-        prop "TextShow instance"                        (prop_matchesTextShow :: Int -> Word64 -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Word64)
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 -- TODO: Figure out why this diverges on Windows
     describe "showbIntAtBase" $

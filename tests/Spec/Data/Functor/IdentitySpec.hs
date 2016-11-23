@@ -13,15 +13,15 @@ module Spec.Data.Functor.IdentitySpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Identity (Identity)
+import Data.Proxy (Proxy(..))
 
-import Spec.Utils (prop_matchesTextShow1)
+import Spec.Utils (matchesTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Identity Int" $
-    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Identity Int -> Bool)
+    matchesTextShow1Spec (Proxy :: Proxy (Identity Int))

@@ -12,6 +12,8 @@ Portability: GHC
 -}
 module Spec.System.IOSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
 #if MIN_VERSION_base(4,4,0)
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress)
@@ -22,7 +24,7 @@ import Instances.System.IO ()
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec, prop_matchesTextShow)
 
 import System.IO (BufferMode, IOMode, HandlePosn, Newline,
                   NewlineMode, SeekMode, Handle, mkTextEncoding)
@@ -37,27 +39,27 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Handle" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Handle -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Handle)
     describe "IOMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> IOMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy IOMode)
     describe "BufferMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> BufferMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy BufferMode)
     describe "HandlePosn" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> HandlePosn -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy HandlePosn)
     describe "SeekMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> SeekMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy SeekMode)
     describe "TextEncoding" $
         prop "TextShow instance" prop_showTextEncoding
 #if MIN_VERSION_base(4,4,0)
     describe "CodingProgress" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CodingProgress -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CodingProgress)
     describe "CodingFailureMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> CodingFailureMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy CodingFailureMode)
 #endif
     describe "Newline" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Newline -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Newline)
     describe "NewlineMode" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> NewlineMode -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy NewlineMode)
 
 -- | Verifies the 'TextShow' instance for 'TextEncoding' is accurate.
 prop_showTextEncoding :: Int -> Property

@@ -10,16 +10,14 @@ Portability: GHC
 -}
 module Spec.Numeric.NaturalSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Numeric.Natural (Natural)
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Natural" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Natural -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy Natural)

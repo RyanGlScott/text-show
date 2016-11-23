@@ -11,13 +11,13 @@ Portability: GHC
 module Spec.Data.DataSpec (main, spec) where
 
 import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity)
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Data ()
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -25,12 +25,12 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Constr" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Constr -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Constr)
     describe "ConstrRep" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> ConstrRep -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy ConstrRep)
     describe "DataRep" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DataRep -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DataRep)
     describe "DataType" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> DataType -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy DataType)
     describe "Fixity" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Fixity -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Fixity)

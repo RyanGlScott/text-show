@@ -12,12 +12,10 @@ Portability: GHC
 -}
 module Spec.Derived.InfixSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Derived.Infix
-
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow, prop_genericTextShow1)
-
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -25,20 +23,28 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "TyConPlain Int Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyConPlain Int Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyConPlain Int Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyConPlain Int Int -> Bool)
+        let p :: Proxy (TyConPlain Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "TyConGADT Int Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyConGADT Int Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyConGADT Int Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyConGADT Int Int -> Bool)
+        let p :: Proxy (TyConGADT Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyPlain Int Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyFamilyPlain Int Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyFamilyPlain Int Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyFamilyPlain Int Int -> Bool)
+        let p :: Proxy (TyFamilyPlain Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
     describe "TyFamilyGADT Int Int" $ do
-        prop "TextShow instance" (prop_matchesTextShow  :: Int -> TyFamilyGADT Int Int -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow  :: Int -> TyFamilyGADT Int Int -> Bool)
-        prop "generic TextShow1" (prop_genericTextShow1 :: Int -> TyFamilyGADT Int Int -> Bool)
+        let p :: Proxy (TyFamilyGADT Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
 #endif

@@ -1,8 +1,9 @@
 module Spec.Data.VersionSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.Version (Version, showVersion)
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -16,9 +17,9 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Version" $
-        prop "TextShow instance"                      (prop_matchesTextShow :: Int -> Version -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Version)
     describe "showbVersionConcrete" $
-        prop "has the same output as showVersion"     prop_showVersion
+        prop "has the same output as showVersion" prop_showVersion
 
 -- | Verifies 'showVersion' and 'showbVersion' generate the same output.
 prop_showVersion :: Version -> Bool

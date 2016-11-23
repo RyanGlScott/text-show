@@ -12,17 +12,14 @@ Portability: GHC
 -}
 module Spec.FromStringTextShowSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.FromStringTextShow ()
-
-import Spec.Utils (prop_matchesTextShow, prop_matchesTextShow1)
-
+import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
-
 import TextShow (FromStringShow(..), FromTextShow(..))
 
 #if defined(NEW_FUNCTOR_CLASSES)
-import Spec.Utils (prop_matchesTextShow2)
+import Spec.Utils (matchesTextShow2Spec)
 import TextShow (FromStringShow1(..), FromStringShow2(..),
                  FromTextShow1(..), FromTextShow2(..))
 #endif
@@ -33,30 +30,46 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "FromStringShow Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromStringShow Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromStringShow Int -> Bool)
+        let p :: Proxy (FromStringShow Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
     describe "FromStringShow String" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromStringShow String -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromStringShow String -> Bool)
+        let p :: Proxy (FromStringShow String)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
     describe "FromTextShow Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromTextShow Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromTextShow Int -> Bool)
+        let p :: Proxy (FromTextShow Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
     describe "FromTextShow String" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromTextShow String -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromTextShow String -> Bool)
+        let p :: Proxy (FromTextShow String)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
 #if defined(NEW_FUNCTOR_CLASSES)
     describe "FromStringShow1 Maybe Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromStringShow1 Maybe Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromStringShow1 Maybe Int -> Bool)
+        let p :: Proxy (FromStringShow1 Maybe Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
     describe "FromTextShow1 Maybe Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromTextShow1 Maybe Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromTextShow1 Maybe Int -> Bool)
+        let p :: Proxy (FromTextShow1 Maybe Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
     describe "FromStringShow2 Either Char Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromStringShow2 Either Char Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromStringShow2 Either Char Int -> Bool)
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> FromStringShow2 Either Char Int -> Bool)
+        let p :: Proxy (FromStringShow2 Either Char Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
+        matchesTextShow2Spec p
     describe "FromTextShow2 Either Char Int" $ do
-        prop "TextShow instance"  (prop_matchesTextShow  :: Int -> FromTextShow2 Either Char Int -> Bool)
-        prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> FromTextShow2 Either Char Int -> Bool)
-        prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> FromTextShow2 Either Char Int -> Bool)
+        let p :: Proxy (FromTextShow2 Either Char Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
+        matchesTextShow2Spec p
 #endif

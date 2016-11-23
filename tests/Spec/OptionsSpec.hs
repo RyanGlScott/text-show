@@ -10,13 +10,10 @@ Portability: GHC
 -}
 module Spec.OptionsSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.Options ()
-
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
-
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
-
 import TextShow.TH (Options, GenTextMethods)
 
 main :: IO ()
@@ -25,8 +22,12 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Options" $ do
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Options -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow :: Int -> Options -> Bool)
+        let p :: Proxy Options
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "GenTextMethods" $ do
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> GenTextMethods -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow :: Int -> GenTextMethods -> Bool)
+        let p :: Proxy GenTextMethods
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p

@@ -11,15 +11,15 @@ Portability: GHC
 module Spec.Data.ComplexSpec (main, spec) where
 
 import Data.Complex (Complex)
+import Data.Proxy (Proxy(..))
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Complex Double" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Complex Double -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy (Complex Double))

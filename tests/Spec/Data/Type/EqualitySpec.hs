@@ -21,12 +21,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,7,0)
+import Data.Proxy (Proxy(..))
 import Data.Type.Equality ((:~:))
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -36,7 +34,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,7,0)
     describe "Int :~: Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Int :~: Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Int :~: Int))
 #else
     pure ()
 #endif

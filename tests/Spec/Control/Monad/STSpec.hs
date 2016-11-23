@@ -1,17 +1,14 @@
 module Spec.Control.Monad.STSpec (main, spec) where
 
 import Control.Monad.ST
-
+import Data.Proxy (Proxy(..))
 import Instances.Control.Monad.ST ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "ST Int Int" $
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> ST Int Int -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy (ST Int Int))

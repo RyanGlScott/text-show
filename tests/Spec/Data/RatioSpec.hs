@@ -10,16 +10,16 @@ Portability: GHC
 -}
 module Spec.Data.RatioSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.Ratio (Ratio)
 
-import Spec.Utils (prop_matchesTextShow)
+import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Ratio Int" $ do
-    prop "TextShow instance" (prop_matchesTextShow :: Int -> Ratio Int -> Bool)
+    matchesTextShowSpec (Proxy :: Proxy (Ratio Int))

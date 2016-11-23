@@ -11,6 +11,7 @@ Portability: GHC
 module Spec.Data.OrdSpec (main, spec) where
 
 import Data.Orphans ()
+import Data.Proxy (Proxy(..))
 
 import Generics.Deriving.Instances ()
 
@@ -18,10 +19,9 @@ import GHC.Exts (Down)
 
 import Instances.Data.Ord ()
 
-import Spec.Utils (prop_matchesTextShow, prop_genericTextShow)
+import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
@@ -29,7 +29,9 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Ordering" $ do
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Ordering -> Bool)
-        prop "generic TextShow"  (prop_genericTextShow :: Int -> Ordering -> Bool)
+        let p :: Proxy Ordering
+            p = Proxy
+        matchesTextShowSpec p
+        genericTextShowSpec p
     describe "Down Int" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Down Int -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy (Down Int))

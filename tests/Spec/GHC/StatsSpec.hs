@@ -20,12 +20,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,5,0)
+import Data.Proxy (Proxy(..))
 import GHC.Stats (GCStats)
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
-import Test.Hspec.QuickCheck (prop)
 #endif
 
 main :: IO ()
@@ -35,7 +33,7 @@ spec :: Spec
 spec = parallel $
 #if MIN_VERSION_base(4,5,0)
     describe "GCStats" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> GCStats -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy GCStats)
 #else
     pure ()
 #endif

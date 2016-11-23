@@ -13,13 +13,10 @@ Portability: GHC
 -}
 module Spec.Text.ReadSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Instances.Text.Read ()
-
-import Spec.Utils (prop_matchesTextShow)
-
+import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
-
 import Text.Read (Lexeme)
 
 #if MIN_VERSION_base(4,6,0)
@@ -33,8 +30,8 @@ main = hspec spec
 spec :: Spec
 spec = parallel $ do
     describe "Lexeme" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> Lexeme -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy Lexeme)
 #if MIN_VERSION_base(4,6,0)
     describe "Number" $
-        prop "TextShow instance" (prop_matchesTextShow :: Int -> $(conT numberTypeName) -> Bool)
+        matchesTextShowSpec (Proxy :: Proxy $(conT numberTypeName))
 #endif

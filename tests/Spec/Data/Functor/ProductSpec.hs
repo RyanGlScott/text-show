@@ -13,17 +13,17 @@ module Spec.Data.Functor.ProductSpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Product (Product)
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Functor.Product ()
 
-import Spec.Utils (prop_matchesTextShow1)
+import Spec.Utils (matchesTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Product Maybe Maybe Int" $
-    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Product Maybe Maybe Int -> Bool)
+    matchesTextShow1Spec (Proxy :: Proxy (Product Maybe Maybe Int))

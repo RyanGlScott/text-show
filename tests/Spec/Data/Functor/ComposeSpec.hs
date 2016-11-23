@@ -13,18 +13,17 @@ module Spec.Data.Functor.ComposeSpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Compose (Compose)
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Functor.Compose ()
 
-import Spec.Utils (prop_matchesTextShow1)
+import Spec.Utils (matchesTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel . describe "Compose Maybe Maybe Int" $
-    prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> Compose Maybe Maybe Int -> Bool)
-
+    matchesTextShow1Spec (Proxy :: Proxy (Compose Maybe Maybe Int))
