@@ -12,8 +12,6 @@ Portability: GHC
 -}
 module Spec.GHC.EventSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
-
 import Instances.GHC.Event ()
 
 import Prelude ()
@@ -22,6 +20,8 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+import Data.Proxy (Proxy(..))
+
 import GHC.Event (Event)
 # if MIN_VERSION_base(4,8,1)
 import GHC.Event (Lifetime)
