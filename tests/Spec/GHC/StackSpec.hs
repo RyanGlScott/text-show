@@ -12,8 +12,6 @@ Portability: GHC
 -}
 module Spec.GHC.StackSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
-
 import Instances.GHC.Stack ()
 
 import Prelude ()
@@ -22,6 +20,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,8,1)
+import Data.Proxy (Proxy(..))
 import GHC.Stack (CallStack)
 # if MIN_VERSION_base(4,9,0)
 import GHC.Stack (SrcLoc)

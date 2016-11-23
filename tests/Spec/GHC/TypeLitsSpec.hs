@@ -42,19 +42,19 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy SomeSymbol)
 #elif MIN_VERSION_base(4,6,0)
     describe "IsEven 0" $
-        matchesTextShowSpec (Proxy :: Proxy IsEven 0)
+        matchesTextShowSpec (Proxy :: Proxy (IsEven 0))
     describe "IsEven 1" $
-        matchesTextShowSpec (Proxy :: Proxy IsEven 1)
+        matchesTextShowSpec (Proxy :: Proxy (IsEven 1))
     describe "IsEven 2" $
-        matchesTextShowSpec (Proxy :: Proxy IsEven 2)
+        matchesTextShowSpec (Proxy :: Proxy (IsEven 2))
     describe "IsZero 0" $
-        matchesTextShowSpec (Proxy :: Proxy IsZero 0)
+        matchesTextShowSpec (Proxy :: Proxy (IsZero 0))
     describe "IsZero 1" $
-        matchesTextShowSpec (Proxy :: Proxy IsZero 1)
+        matchesTextShowSpec (Proxy :: Proxy (IsZero 1))
     describe "Sing 0" $
-        matchesTextShowSpec (Proxy :: Proxy Sing 0)
+        matchesTextShowSpec (Proxy :: Proxy (Sing 0))
     describe "Sing \"a\"" $
-        matchesTextShowSpec (Proxy :: Proxy Sing "a")
+        matchesTextShowSpec (Proxy :: Proxy (Sing "a"))
 #else
     pure ()
 #endif
