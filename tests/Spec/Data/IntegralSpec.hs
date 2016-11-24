@@ -22,13 +22,16 @@ import Prelude.Compat
 import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-import Test.Hspec.QuickCheck (prop)
 
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 import Control.Applicative (liftA2)
+
 import Data.Char (intToDigit)
+
 import Numeric (showIntAtBase)
+
 import Test.QuickCheck (Gen, arbitrary, getNonNegative, suchThat)
+import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
 import TextShow.Data.Integral (showbIntAtBase)
