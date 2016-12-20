@@ -63,7 +63,7 @@ instance Arbitrary TraceFlags where
 instance Arbitrary TickyFlags where
     arbitrary = genericArbitrary
 
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
 instance Arbitrary ParFlags where
     arbitrary = genericArbitrary
 # endif
@@ -96,7 +96,7 @@ $(Generics.deriveAll0 ''CCFlags)
 $(Generics.deriveAll0 ''ProfFlags)
 $(Generics.deriveAll0 ''TraceFlags)
 $(Generics.deriveAll0 ''TickyFlags)
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
 $(Generics.deriveAll0 ''ParFlags)
 # endif
 

@@ -57,7 +57,7 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy DoHeapProfile')
     describe "DoTrace" $
         matchesTextShowSpec (Proxy :: Proxy DoTrace')
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
     describe "ParFlags" $
         matchesTextShowSpec (Proxy :: Proxy ParFlags)
 # endif

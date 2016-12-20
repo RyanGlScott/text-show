@@ -30,7 +30,7 @@ module TextShow.GHC.RTS.Flags (
     , showbProfFlagsPrec
     , showbTraceFlagsPrec
     , showbTickyFlagsPrec
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
     , showbParFlagsPrec
 # endif
 # if MIN_VERSION_base(4,8,2)
@@ -127,7 +127,7 @@ showbTickyFlagsPrec :: Int -> TickyFlags -> Builder
 showbTickyFlagsPrec = showbPrec
 {-# INLINE showbTickyFlagsPrec #-}
 
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
 -- | Convert a 'ParFlags' value to a 'Builder' with the given precedence.
 -- This function is only available with GHC 8.1 or later.
 --
@@ -180,7 +180,7 @@ $(deriveTextShow ''CCFlags)
 $(deriveTextShow ''ProfFlags)
 $(deriveTextShow ''TraceFlags)
 $(deriveTextShow ''TickyFlags)
-# if __GLASGOW_HASKELL__ >= 801
+# if MIN_VERSION_base(4,10,0)
 $(deriveTextShow ''ParFlags)
 # endif
 

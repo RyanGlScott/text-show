@@ -2,7 +2,8 @@
 
 #if MIN_VERSION_base(4,5,0)
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
+{-# OPTIONS_GHC -fno-warn-orphans      #-}
 #endif
 {-|
 Module:      TextShow.GHC.Stats
