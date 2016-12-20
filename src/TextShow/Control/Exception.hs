@@ -34,6 +34,9 @@ module TextShow.Control.Exception (
 #if MIN_VERSION_base(4,9,0)
   , showbTypeError
 #endif
+#if MIN_VERSION_base(4,10,0)
+  , showbCompactionFailed
+#endif
   , showbDeadlock
   , showbNoMethodError
   , showbPatternMatchFail
@@ -177,6 +180,15 @@ showbTypeError (TypeError err) = fromString err
 {-# INLINE showbTypeError #-}
 #endif
 
+#if MIN_VERSION_base(4,10,0)
+-- | Convert a 'CompactionFailed' value to a 'Builder'.
+-- This function is only available with @base-4.10.0.0@ or later.
+--
+-- /Since: next/
+showbCompactionFailed :: CompactionFailed -> Builder
+showbCompactionFailed (CompactionFailed why) = fromString ("compaction failed: " <> why)
+#endif
+
 -- | Convert a 'Deadlock' exception to a 'Builder'.
 --
 -- /Since: 2/
@@ -293,6 +305,12 @@ instance TextShow AllocationLimitExceeded where
 #if MIN_VERSION_base(4,9,0)
 instance TextShow TypeError where
     showb = showbTypeError
+    {-# INLINE showb #-}
+#endif
+
+#if MIN_VERSION_base(4,10,0)
+instance TextShow CompactionFailed where
+    showb = showbCompactionFailed
     {-# INLINE showb #-}
 #endif
 

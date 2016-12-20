@@ -55,6 +55,10 @@ spec = parallel . describe "TextShow.Control.Exception" $ do
     describe "TypeError" $
         matchesTextShowSpec (Proxy :: Proxy TypeError)
 #endif
+#if MIN_VERSION_base(4,10,0)
+    describe "CompactionFailed" $
+        matchesTextShowSpec (Proxy :: Proxy CompactionFailed)
+#endif
     describe "Deadlock" $
         matchesTextShowSpec (Proxy :: Proxy Deadlock)
     describe "NoMethodError" $

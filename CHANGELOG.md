@@ -1,5 +1,7 @@
 ### next [YYYY.MM.DD]
-* Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types` on `base-4.10` or later
+* Introduce some instances for datatypes added in `base-4.10.0.0`:
+    * Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types`
+    * Add `TextShow` instance for `CompactionFailed` in `Control.Exception`
 * Refactor test suite
 
 #### 3.4.1.1 [2016.11.07]
