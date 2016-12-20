@@ -79,3 +79,34 @@ spec = parallel $ do
     describe "CRLim" $
         matchesTextShowSpec (Proxy :: Proxy CRLim)
 #endif
+
+#if MIN_VERSION_base(4,10,0)
+# if defined(HTYPE_BLKSIZE_T)
+    describe "CBlkSize" $
+        matchesTextShowSpec (Proxy :: Proxy CBlkSize)
+# endif
+# if defined(HTYPE_BLKCNT_T)
+    describe "CBlkCnt" $
+        matchesTextShowSpec (Proxy :: Proxy CBlkCnt)
+# endif
+# if defined(HTYPE_CLOCKID_T)
+    describe "CClockId" $
+        matchesTextShowSpec (Proxy :: Proxy CClockId)
+# endif
+# if defined(HTYPE_FSBLKCNT_T)
+    describe "CFsBlkCnt" $
+        matchesTextShowSpec (Proxy :: Proxy CFsBlkCnt)
+# endif
+# if defined(HTYPE_FSFILCNT_T)
+    describe "CFsFilCnt" $
+        matchesTextShowSpec (Proxy :: Proxy CFsFilCnt)
+# endif
+# if defined(HTYPE_ID_T)
+    describe "CId" $
+        matchesTextShowSpec (Proxy :: Proxy CId)
+# endif
+# if defined(HTYPE_KEY_T)
+    describe "CKey" $
+        matchesTextShowSpec (Proxy :: Proxy CKey)
+# endif
+#endif

@@ -123,4 +123,34 @@ instance Arbitrary CRLim where
 # endif
 #endif
 
+#if MIN_VERSION_base(4,10,0)
+# if defined(HTYPE_BLKSIZE_T)
+deriving instance Arbitrary CBlkSize
+# endif
+
+# if defined(HTYPE_BLKCNT_T)
+deriving instance Arbitrary CBlkCnt
+# endif
+
+# if defined(HTYPE_CLOCKID_T)
+deriving instance Arbitrary CClockId
+# endif
+
+# if defined(HTYPE_FSBLKCNT_T)
+deriving instance Arbitrary CFsBlkCnt
+# endif
+
+# if defined(HTYPE_FSFILCNT_T)
+deriving instance Arbitrary CFsFilCnt
+# endif
+
+# if defined(HTYPE_ID_T)
+deriving instance Arbitrary CId
+# endif
+
+# if defined(HTYPE_KEY_T)
+deriving instance Arbitrary CKey
+# endif
+#endif
+
 deriving instance Arbitrary Fd

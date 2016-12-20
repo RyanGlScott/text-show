@@ -61,6 +61,30 @@ module TextShow.System.Posix.Types (
 #if defined(HTYPE_RLIM_T)
     , showbCRLim
 #endif
+
+#if MIN_VERSION_base(4,10,0)
+# if defined(HTYPE_BLKSIZE_T)
+    , showbCBlkSizePrec
+# endif
+# if defined(HTYPE_BLKCNT_T)
+    , showbCBlkCntPrec
+# endif
+# if defined(HTYPE_CLOCKID_T)
+    , showbCClockIdPrec
+# endif
+# if defined(HTYPE_FSBLKCNT_T)
+    , showbCFsBlkCntPrec
+# endif
+# if defined(HTYPE_FSFILCNT_T)
+    , showbCFsFilCntPrec
+# endif
+# if defined(HTYPE_ID_T)
+    , showbCIdPrec
+# endif
+# if defined(HTYPE_KEY_T)
+    , showbCKeyPrec
+# endif
+#endif
     ) where
 
 import Data.Text.Lazy.Builder (Builder)
@@ -250,6 +274,71 @@ showbCRLim = unsafeCoerce (showb :: HTYPE_RLIM_T -> Builder)
 # endif
 #endif
 
+#if MIN_VERSION_base(4,10,0)
+# if defined(HTYPE_BLKSIZE_T)
+-- | Convert a 'CBlkSize' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCBlkSizePrec :: Int -> CBlkSize -> Builder
+showbCBlkSizePrec = showbPrec
+{-# INLINE showbCBlkSizePrec #-}
+# endif
+
+# if defined(HTYPE_BLKCNT_T)
+-- | Convert a 'CBlkCnt' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCBlkCntPrec :: Int -> CBlkCnt -> Builder
+showbCBlkCntPrec = showbPrec
+{-# INLINE showbCBlkCntPrec #-}
+# endif
+
+# if defined(HTYPE_CLOCKID_T)
+-- | Convert a 'CClockId' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCClockIdPrec :: Int -> CClockId -> Builder
+showbCClockIdPrec = showbPrec
+{-# INLINE showbCClockIdPrec #-}
+# endif
+
+# if defined(HTYPE_FSBLKCNT_T)
+-- | Convert a 'CFsBlkCnt' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCFsBlkCntPrec :: Int -> CFsBlkCnt -> Builder
+showbCFsBlkCntPrec = showbPrec
+{-# INLINE showbCFsBlkCntPrec #-}
+# endif
+
+# if defined(HTYPE_FSFILCNT_T)
+-- | Convert a 'CFsFilCnt' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCFsFilCntPrec :: Int -> CFsFilCnt -> Builder
+showbCFsFilCntPrec = showbPrec
+{-# INLINE showbCFsFilCntPrec #-}
+# endif
+
+# if defined(HTYPE_ID_T)
+-- | Convert a 'CId' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCIdPrec :: Int -> CId -> Builder
+showbCIdPrec = showbPrec
+{-# INLINE showbCIdPrec #-}
+# endif
+
+# if defined(HTYPE_KEY_T)
+-- | Convert a 'CKey' to a 'Builder' with the given precedence.
+--
+-- /Since: next/
+showbCKeyPrec :: Int -> CKey -> Builder
+showbCKeyPrec = showbPrec
+{-# INLINE showbCKeyPrec #-}
+# endif
+#endif
+
 -- | Convert an 'Fd' to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
@@ -386,6 +475,36 @@ instance TextShow CTcflag where
 instance TextShow CRLim where
     showb = showbCRLim
     INLINE_INST_FUN(showb)
+# endif
+#endif
+
+#if MIN_VERSION_base(4,10,0)
+# if defined(HTYPE_BLKSIZE_T)
+deriving instance TextShow CBlkSize
+# endif
+
+# if defined(HTYPE_BLKCNT_T)
+deriving instance TextShow CBlkCnt
+# endif
+
+# if defined(HTYPE_CLOCKID_T)
+deriving instance TextShow CClockId
+# endif
+
+# if defined(HTYPE_FSBLKCNT_T)
+deriving instance TextShow CFsBlkCnt
+# endif
+
+# if defined(HTYPE_FSFILCNT_T)
+deriving instance TextShow CFsFilCnt
+# endif
+
+# if defined(HTYPE_ID_T)
+deriving instance TextShow CId
+# endif
+
+# if defined(HTYPE_KEY_T)
+deriving instance TextShow CKey
 # endif
 #endif
 

@@ -1,4 +1,5 @@
 ### next [YYYY.MM.DD]
+* Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types` on `base-4.10` or later
 * Refactor test suite
 
 #### 3.4.1.1 [2016.11.07]
