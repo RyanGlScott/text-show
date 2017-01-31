@@ -402,7 +402,7 @@ test-suite spec
   if flag(developer)
     hs-source-dirs:    src
   else
-    build-depends:     text-show == 3.4.1.1
+    build-depends:     text-show
 
   hs-source-dirs:      tests, shared
   default-language:    Haskell2010
@@ -459,7 +459,7 @@ benchmark bench
   if flag(developer)
     hs-source-dirs:    src
   else
-    build-depends:     text-show == 3.4.1.1
+    build-depends:     text-show
 
   hs-source-dirs:      benchmarks
   default-language:    Haskell2010
