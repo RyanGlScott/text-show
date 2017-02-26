@@ -13,29 +13,21 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for data types in the @Event@ module.
-This module only exports functions if using @base-4.4.0.0@ on a platform other
+'TextShow' instances for data types in the @Event@ module.
+Only provided if using @base-4.4.0.0@ on a platform other
 than Windows or GHCJS.
 
 /Since: 2/
 -}
-module TextShow.GHC.Event (
-#if defined(__GHCJS__) || defined(mingw32_HOST_OS) || !(MIN_VERSION_base(4,4,0))
-    ) where
-#else
-      showbEvent
-    , showbFdKeyPrec
-# if MIN_VERSION_base(4,8,1)
-    , showbLifetime
-# endif
-    ) where
+module TextShow.GHC.Event () where
 
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
 import Data.List (intersperse)
 import Data.Maybe (catMaybes)
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, singleton)
 
-import GHC.Event (Event, FdKey, evtRead, evtWrite)
+import GHC.Event (Event, evtRead, evtWrite)
 
 import Language.Haskell.TH.Lib (conT, varE)
 
@@ -55,46 +47,19 @@ import GHC.Event (Lifetime)
 
 #include "inline.h"
 
--- | Convert an 'Event' to a 'Builder'.
--- This function is only available with @base-4.4.0.0@ or later and is not available
--- on Windows.
---
--- /Since: 2/
-showbEvent :: Event -> Builder
-showbEvent e = singleton '[' <> mconcat (intersperse "," $ catMaybes
-    [ evtRead                 `so` "evtRead"
-    , evtWrite                `so` "evtWrite"
-    , $(varE evtCloseValName) `so` "evtClose"
-    ]) <> singleton ']'
-  where
-    so :: Event -> Builder -> Maybe Builder
-    ev `so` disp | $(varE eventIsValName) e ev = Just disp
-                 | otherwise                   = Nothing
-
--- | Convert an 'FdKey' to a 'Builder' with the given precedence.
--- This function is only available with @base-4.4.0.0@ or later and is not available
--- on Windows.
---
--- /Since: 2/
-showbFdKeyPrec :: Int -> FdKey -> Builder
-showbFdKeyPrec = showbPrec
-{-# INLINE showbFdKeyPrec #-}
-
-# if MIN_VERSION_base(4,8,1)
--- | Convert a 'Lifetime' to a 'Builder'.
--- This function is only available with @base-4.8.1.0@ or later and is not available
--- on Windows.
---
--- /Since: 2/
-showbLifetime :: Lifetime -> Builder
-showbLifetime = showb
-{-# INLINE showbLifetime #-}
-# endif
-
+-- | /Since: 2/
 instance TextShow Event where
-    showb = showbEvent
-    {-# INLINE showb #-}
+    showb e = singleton '[' <> mconcat (intersperse "," $ catMaybes
+        [ evtRead                 `so` "evtRead"
+        , evtWrite                `so` "evtWrite"
+        , $(varE evtCloseValName) `so` "evtClose"
+        ]) <> singleton ']'
+      where
+        so :: Event -> Builder -> Maybe Builder
+        ev `so` disp | $(varE eventIsValName) e ev = Just disp
+                     | otherwise                   = Nothing
 
+-- | /Since: 2/
 $(deriveTextShow fdKeyTypeName)
 
 instance TextShow $(conT uniqueTypeName) where
@@ -102,6 +67,9 @@ instance TextShow $(conT uniqueTypeName) where
     INLINE_INST_FUN(showb)
 
 # if MIN_VERSION_base(4,8,1)
+-- | Only available with @base-4.8.1.0@ or later.
+--
+-- /Since: 2/
 $(deriveTextShow ''Lifetime)
 # endif
 #endif

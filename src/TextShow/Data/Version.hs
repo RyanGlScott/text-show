@@ -8,14 +8,11 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for 'Version'.
+Provides a 'TextShow' instance for 'Version' and the 'showbVersion' function.
 
 /Since: 2/
 -}
-module TextShow.Data.Version (
-      showbVersionPrec
-    , showbVersionConcrete
-    ) where
+module TextShow.Data.Version (showbVersion) where
 
 import Data.List (intersperse)
 import Data.Monoid.Compat ((<>))
@@ -25,28 +22,22 @@ import Data.Version (Version(..))
 import Prelude ()
 import Prelude.Compat
 
-import TextShow.Classes (showb, showbPrec)
+import TextShow.Classes (TextShow(..))
 import TextShow.Data.Char ()
 import TextShow.Data.Integral ()
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Convert a 'Version' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbVersionPrec :: Int -> Version -> Builder
-showbVersionPrec = showbPrec
-{-# INLINE showbVersionPrec #-}
-
 -- | Provides one possible concrete representation for 'Version'.  For
 -- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags'
 -- @= [\"tag1\",\"tag2\"]@, the output will be @1.2.3-tag1-tag2@.
 --
--- /Since: 2/
-showbVersionConcrete :: Version -> Builder
-showbVersionConcrete (Version branch tags)
+-- /Since: next/
+showbVersion :: Version -> Builder
+showbVersion (Version branch tags)
     = mconcat (intersperse (singleton '.') $ map showb branch) <>
         mconcat (map ((singleton '-' <>) . fromString) tags)
-{-# INLINE showbVersionConcrete #-}
+{-# INLINE showbVersion #-}
 
+-- | /Since: 2/
 $(deriveTextShow ''Version)

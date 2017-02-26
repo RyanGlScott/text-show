@@ -14,36 +14,26 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for representational equality.
-This module only exports functions if using @base-4.7.0.0@ or later.
+'TextShow' instance for representational equality.
+Only provided if using @base-4.7.0.0@ or later.
 
 /Since: 2/
 -}
-module TextShow.Data.Type.Coercion (
-#if !(MIN_VERSION_base(4,7,0))
-    ) where
-#else
-      showbCoercion
-    ) where
+module TextShow.Data.Type.Coercion () where
 
-import Data.Text.Lazy.Builder (Builder)
-import Data.Type.Coercion (Coercion(..))
+#if MIN_VERSION_base(4,7,0)
+import Data.Type.Coercion (Coercion)
 
-import TextShow.Classes (TextShow(..), TextShow1(..))
+import TextShow.Classes (TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeLiftShowbPrec)
 
--- | Convert a representational equality value to a 'Builder'.
--- This function is only available with @base-4.7.0.0@ or later.
---
--- /Since: 2/
-showbCoercion :: Coercion a b -> Builder
-showbCoercion = showb
-{-# INLINE showbCoercion #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''Coercion)
 
+-- | /Since: 2/
 instance TextShow1 (Coercion a) where
     liftShowbPrec = $(makeLiftShowbPrec ''Coercion)
 
+-- | /Since: 2/
 $(deriveTextShow2 ''Coercion)
 #endif

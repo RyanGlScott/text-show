@@ -9,30 +9,23 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Dynamic'.
+'TextShow' instance for 'Dynamic'.
 
 /Since: 2/
 -}
-module TextShow.Data.Dynamic (showbDynamic) where
+module TextShow.Data.Dynamic () where
 
 import Data.Dynamic (Dynamic, dynTypeRep)
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder)
 
 import Prelude ()
 
 import TextShow.Classes (TextShow(..))
-import TextShow.Data.Typeable (showbTypeRepPrec)
+import TextShow.Data.Typeable ()
 
 #include "inline.h"
 
--- | Convert a 'Dynamic' value to a 'Builder'.
---
--- /Since: 2/
-showbDynamic :: Dynamic -> Builder
-showbDynamic dyn = "<<" <> showbTypeRepPrec 0 (dynTypeRep dyn) <> ">>"
-{-# INLINE showbDynamic #-}
-
+-- | /Since: 2/
 instance TextShow Dynamic where
-    showb = showbDynamic
+    showb dyn = "<<" <> showb (dynTypeRep dyn) <> ">>"
     INLINE_INST_FUN(showb)

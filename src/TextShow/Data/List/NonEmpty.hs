@@ -9,26 +9,18 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'NonEmpty' lists.
+'TextShow' instance for 'NonEmpty' lists.
 
 /Since: 3/
 -}
-module TextShow.Data.List.NonEmpty (liftShowbNonEmptyPrec) where
+module TextShow.Data.List.NonEmpty () where
 
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Text.Lazy.Builder (Builder)
+import Data.List.NonEmpty (NonEmpty)
 
-import TextShow.Classes (TextShow1(..))
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
--- | Convert a 'NonEmpty' value to a 'Builder' with the given show functions
--- and precedence.
---
--- /Since: 3/
-liftShowbNonEmptyPrec :: (Int -> a -> Builder) -> ([a] -> Builder)
-                      -> Int -> NonEmpty a -> Builder
-liftShowbNonEmptyPrec = liftShowbPrec
-
+-- | /Since: 3/
 $(deriveTextShow  ''NonEmpty)
+-- | /Since: 3/
 $(deriveTextShow1 ''NonEmpty)

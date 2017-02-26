@@ -15,36 +15,26 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for propositional equality.
-This module only exports functions if using @base-4.7.0.0@ or later.
+'TextShow' instance for propositional equality.
+Only provided if using @base-4.7.0.0@ or later.
 
 /Since: 2/
 -}
-module TextShow.Data.Type.Equality (
-#if !(MIN_VERSION_base(4,7,0))
-    ) where
-#else
-      showbPropEquality
-    ) where
+module TextShow.Data.Type.Equality () where
 
-import Data.Text.Lazy.Builder (Builder)
-import Data.Type.Equality ((:~:)(..))
+#if MIN_VERSION_base(4,7,0)
+import Data.Type.Equality ((:~:))
 
-import TextShow.Classes (TextShow(..), TextShow1(..))
+import TextShow.Classes (TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeLiftShowbPrec)
 
--- | Convert a propositional equality value to a 'Builder'.
--- This function is only available with @base-4.7.0.0@ or later.
---
--- /Since: 2/
-showbPropEquality :: (a :~: b) -> Builder
-showbPropEquality = showb
-{-# INLINE showbPropEquality #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''(:~:))
 
+-- | /Since: 2/
 instance TextShow1 ((:~:) a) where
     liftShowbPrec = $(makeLiftShowbPrec ''(:~:))
 
+-- | /Since: 2/
 $(deriveTextShow2 ''(:~:))
 #endif

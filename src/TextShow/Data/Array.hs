@@ -10,15 +10,12 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Array' values.
+Provides 'TextShow' instances for 'Array' types, as well as the
+'showbIArrayPrec' function.
 
 /Since: 2/
 -}
-module TextShow.Data.Array (
-      showbArrayPrec
-    , showbUArrayPrec
-    , showbIArrayPrec
-    ) where
+module TextShow.Data.Array (showbIArrayPrec) where
 
 import qualified Data.Array as Array (assocs, bounds)
 import           Data.Array (Array)
@@ -40,24 +37,6 @@ import           TextShow.Data.Tuple ()
 
 #include "inline.h"
 
--- | Convert an 'Array' value to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbArrayPrec :: (TextShow i, TextShow e, Ix i) => Int -> Array i e -> Builder
-showbArrayPrec p a = showbParen (p > appPrec) $
-       "array "
-    <> showb (Array.bounds a)
-    <> showbSpace
-    <> showb (Array.assocs a)
-{-# INLINE showbArrayPrec #-}
-
--- | Convert a 'UArray' value to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbUArrayPrec :: (IArray UArray e, Ix i, TextShow i, TextShow e) => Int -> UArray i e -> Builder
-showbUArrayPrec = showbIArrayPrec
-{-# INLINE showbUArrayPrec #-}
-
 {-# SPECIALIZE
     showbIArrayPrec :: (IArray UArray e, Ix i, TextShow i, TextShow e) =>
                         Int -> UArray i e -> Builder
@@ -72,10 +51,16 @@ showbIArrayPrec p a = showbParen (p > 9) $
     <> showbSpace
     <> showb (IArray.assocs a)
 
+-- | /Since: 2/
 instance (TextShow i, TextShow e, Ix i) => TextShow (Array i e) where
-    showbPrec = showbArrayPrec
+    showbPrec p a = showbParen (p > appPrec) $
+           "array "
+        <> showb (Array.bounds a)
+        <> showbSpace
+        <> showb (Array.assocs a)
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance (IArray UArray e, Ix i, TextShow i, TextShow e) => TextShow (UArray i e) where
-    showbPrec = showbUArrayPrec
+    showbPrec = showbIArrayPrec
     INLINE_INST_FUN(showbPrec)

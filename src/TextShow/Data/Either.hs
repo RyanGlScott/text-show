@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -9,28 +8,17 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Either' values.
+'TextShow' instance for 'Either'.
 
 /Since: 2/
 -}
-module TextShow.Data.Either (liftShowbEitherPrec2) where
+module TextShow.Data.Either () where
 
-import Data.Text.Lazy.Builder (Builder)
-
-import TextShow.Classes (liftShowbPrec2)
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
-#include "inline.h"
-
--- | Convert a 'Either' value to a 'Builder' with the given show functions
--- and precedence.
---
--- /Since: 3/
-liftShowbEitherPrec2 :: (Int -> a -> Builder) -> (Int -> b -> Builder)
-                     -> Int -> Either a b -> Builder
-liftShowbEitherPrec2 sp1 sp2 = liftShowbPrec2 sp1 undefined sp2 undefined
-{-# INLINE liftShowbEitherPrec2 #-}
-
+-- | /Since: 2/
 $(deriveTextShow  ''Either)
+-- | /Since: 2/
 $(deriveTextShow1 ''Either)
+-- | /Since: 2/
 $(deriveTextShow2 ''Either)

@@ -8,7 +8,8 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Exports 'showbListWith', 'showtListWith', and 'showtlListWith'.
+Exports 'showbListWith', 'showtListWith', and 'showtlListWith',
+and 'TextShow' instances for lists.
 -}
 module TextShow.Data.List (showbListWith, showtListWith, showtlListWith) where
 
@@ -18,6 +19,7 @@ import TextShow.Data.Integral ()
 
 #include "inline.h"
 
+-- | /Since: 2/
 instance TextShow a => TextShow [a] where
     {-# SPECIALIZE instance TextShow [String] #-}
     {-# SPECIALIZE instance TextShow String   #-}
@@ -25,6 +27,7 @@ instance TextShow a => TextShow [a] where
     showb = showbList
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow1 [] where
     liftShowbPrec _ sl _ = sl
     INLINE_INST_FUN(liftShowbPrec)

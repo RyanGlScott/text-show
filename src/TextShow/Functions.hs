@@ -9,32 +9,27 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Optional 'TextShow', 'TextShow1', and 'TextShow2' instances for functions.
+Optional orphan 'TextShow', 'TextShow1', and 'TextShow2' instances for functions.
 
 /Since: 2/
 -}
-module TextShow.Functions (showbFunction) where
+module TextShow.Functions () where
 
-import Data.Text.Lazy.Builder (Builder)
 import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 
 #include "inline.h"
 
--- | Convert a function to a 'Builder'.
---
--- /Since: 2/
-showbFunction :: (a -> b) -> Builder
-showbFunction = showb
-{-# INLINE showbFunction #-}
-
+-- | /Since: 2/
 instance TextShow (a -> b) where
     showbPrec = liftShowbPrec undefined undefined
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow1 ((->) a) where
     liftShowbPrec = liftShowbPrec2 undefined undefined
     INLINE_INST_FUN(liftShowbPrec)
 
+-- | /Since: 2/
 instance TextShow2 (->) where
     liftShowbPrec2 _ _ _ _ _ _ = "<function>"
     INLINE_INST_FUN(liftShowbPrec2)

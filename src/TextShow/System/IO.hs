@@ -10,24 +10,11 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'IO'-related data types.
+'TextShow' instances for 'IO'-related data types.
 
 /Since: 2/
 -}
-module TextShow.System.IO (
-      showbHandle
-    , showbIOMode
-    , showbBufferModePrec
-    , showbHandlePosn
-    , showbSeekMode
-    , showbTextEncoding
-#if MIN_VERSION_base(4,4,0)
-    , showbCodingProgress
-    , showbCodingFailureMode
-#endif
-    , showbNewline
-    , showbNewlineModePrec
-    ) where
+module TextShow.System.IO () where
 
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
@@ -43,114 +30,53 @@ import GHC.IO.Handle.Types (Handle(..))
 import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 
 import TextShow.Classes (TextShow(..))
-import TextShow.Data.Integral (showbIntegerPrec)
+import TextShow.Data.Integral ()
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
 
--- | Convert a 'Handle' to a 'Builder'.
---
--- /Since: 2/
-showbHandle :: Handle -> Builder
-showbHandle (FileHandle   file _)   = showbHandleFilePath file
-showbHandle (DuplexHandle file _ _) = showbHandleFilePath file
-{-# INLINE showbHandle #-}
+-- | /Since: 2/
+instance TextShow Handle where
+    showb (FileHandle   file _)   = showbHandleFilePath file
+    showb (DuplexHandle file _ _) = showbHandleFilePath file
+    INLINE_INST_FUN(showb)
 
 -- | Convert a 'Handle`'s 'FilePath' to a 'Builder'.
 showbHandleFilePath :: FilePath -> Builder
 showbHandleFilePath file = "{handle: " <> fromString file <> singleton '}'
 {-# INLINE showbHandleFilePath #-}
 
--- | Convert an 'IOMode' to a 'Builder'.
---
--- /Since: 2/
-showbIOMode :: IOMode -> Builder
-showbIOMode = showb
-{-# INLINE showbIOMode #-}
-
--- | Convert a 'BufferMode' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbBufferModePrec :: Int -> BufferMode -> Builder
-showbBufferModePrec = showbPrec
-{-# INLINE showbBufferModePrec #-}
-
--- | Convert a 'HandlePosn' to a 'Builder'.
---
--- /Since: 2/
-showbHandlePosn :: HandlePosn -> Builder
-showbHandlePosn (HandlePosn h pos)
-    = showbHandle h <> " at position " <> showbIntegerPrec 0 pos
-{-# INLINE showbHandlePosn #-}
-
--- | Convert a 'SeekMode' to a 'Builder'.
---
--- /Since: 2/
-showbSeekMode :: SeekMode -> Builder
-showbSeekMode = showb
-{-# INLINE showbSeekMode #-}
-
--- | Convert a 'TextEncoding' to a 'Builder'.
---
--- /Since: 2/
-showbTextEncoding :: TextEncoding -> Builder
-showbTextEncoding = fromString . textEncodingName
-{-# INLINE showbTextEncoding #-}
-
-#if MIN_VERSION_base(4,4,0)
--- | Convert a 'CodingProgress' to a 'Builder'.
--- This function is only available with @base-4.4.0.0@ or later.
---
--- /Since: 2/
-showbCodingProgress :: CodingProgress -> Builder
-showbCodingProgress = showb
-{-# INLINE showbCodingProgress #-}
-
--- | Convert a 'CodingFailureMode' value to a 'Builder'.
--- This function is only available with @base-4.4.0.0@ or later.
---
--- /Since: 2/
-showbCodingFailureMode :: CodingFailureMode -> Builder
-showbCodingFailureMode = showb
-{-# INLINE showbCodingFailureMode #-}
-#endif
-
--- | Convert a 'Newline' to a 'Builder'.
---
--- /Since: 2/
-showbNewline :: Newline -> Builder
-showbNewline = showb
-{-# INLINE showbNewline #-}
-
--- | Convert a 'NewlineMode' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbNewlineModePrec :: Int -> NewlineMode -> Builder
-showbNewlineModePrec = showbPrec
-{-# INLINE showbNewlineModePrec #-}
-
-instance TextShow Handle where
-    showb = showbHandle
-    INLINE_INST_FUN(showb)
-
+-- | /Since: 2/
 $(deriveTextShow ''IOMode)
+-- | /Since: 2/
 $(deriveTextShow ''BufferMode)
 
+-- | /Since: 2/
 instance TextShow HandlePosn where
-    showb = showbHandlePosn
+    showb (HandlePosn h pos) = showb h <> " at position " <> showbPrec 0 pos
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 $(deriveTextShow ''SeekMode)
 
+-- | /Since: 2/
 instance TextShow TextEncoding where
-    showb = showbTextEncoding
+    showb = fromString . textEncodingName
     INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,4,0)
+-- | Only available with @base-4.4.0.0@ or later.
+--
+-- /Since: 2/
 $(deriveTextShow ''CodingProgress)
+-- | Only available with @base-4.4.0.0@ or later.
+--
+-- /Since: 2/
 $(deriveTextShow ''CodingFailureMode)
 #endif
 
+-- | /Since: 2/
 $(deriveTextShow ''Newline)
+-- | /Since: 2/
 $(deriveTextShow ''NewlineMode)

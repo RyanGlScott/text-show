@@ -12,21 +12,14 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for 'CallStack' and 'SrcLoc' values.
-This module only exports functions if using @base-4.8.1.0@ or later.
+'TextShow' instances for 'CallStack' and 'SrcLoc' values.
+Only provided if using @base-4.8.1.0@ or later.
 
 /Since: 3.0.1/
 -}
-module TextShow.GHC.Stack (
-#if !(MIN_VERSION_base(4,8,1))
-    ) where
-#else
-      showbCallStackPrec
-    , showbSrcLocPrec
-    ) where
+module TextShow.GHC.Stack () where
 
-import Data.Text.Lazy.Builder (Builder)
-
+#if MIN_VERSION_base(4,8,1)
 import GHC.Stack (CallStack)
 # if MIN_VERSION_base(4,9,0)
 import GHC.Stack (SrcLoc, getCallStack)
@@ -41,34 +34,16 @@ import TextShow.Data.List     ()
 import TextShow.Data.Tuple    ()
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Convert a 'CallStack' to a 'Builder' with the given precedence.
--- This function is only available with @base-4.8.1.0@ or later.
--- With @base-4.9@ or later, this function ignores the precedence argument.
---
--- /Since: 3.0.1/
-showbCallStackPrec :: Int -> CallStack -> Builder
 # if MIN_VERSION_base(4,9,0)
-showbCallStackPrec _ = showb . getCallStack
-# else
-showbCallStackPrec = showbPrec
-# endif
-{-# INLINE showbCallStackPrec #-}
-
--- | Convert a 'SrcLoc' to a 'Builder' with the given precedence.
--- This function is only available with @base-4.8.1.0@ or later.
---
--- /Since: 3.0.1/
-showbSrcLocPrec :: Int -> SrcLoc -> Builder
-showbSrcLocPrec = showbPrec
-{-# INLINE showbSrcLocPrec #-}
-
-# if MIN_VERSION_base(4,9,0)
+-- | /Since: 3.0.1/
 instance TextShow CallStack where
-    showb = showbCallStackPrec 0
+    showb = showb . getCallStack
     {-# INLINE showb #-}
 # else
+-- | /Since: 3.0.1/
 $(deriveTextShow ''CallStack)
 # endif
 
+-- | /Since: 3.0.1/
 $(deriveTextShow ''SrcLoc)
 #endif

@@ -11,41 +11,31 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Natural's.
+'TextShow' instance for 'Natural'.
 
 /Since: 2/
 -}
-module TextShow.Numeric.Natural (showbNaturalPrec) where
-
-import Data.Text.Lazy.Builder (Builder)
+module TextShow.Numeric.Natural () where
 
 #if MIN_VERSION_base(4,8,0)
 import GHC.Integer.GMP.Internals (Integer(..))
 import GHC.Natural (Natural(..))
 import GHC.Types (Word(..))
-
-import TextShow.Data.Integral (showbWord)
 #else
 import Numeric.Natural (Natural)
 #endif
 
 import TextShow.Classes (TextShow(..))
-import TextShow.Data.Integral (showbIntegerPrec)
+import TextShow.Data.Integral ()
 
 #include "inline.h"
 
--- | Convert a 'Natural' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbNaturalPrec :: Int -> Natural -> Builder
-#if MIN_VERSION_base(4,8,0)
-showbNaturalPrec _ (NatS# w#)  = showbWord $ W# w#
-showbNaturalPrec p (NatJ# bn)  = showbIntegerPrec p $ Jp# bn
-#else
-showbNaturalPrec p             = showbIntegerPrec p . toInteger
-{-# INLINE showbNaturalPrec #-}
-#endif
-
+-- | /Since: 2/
 instance TextShow Natural where
-    showbPrec = showbNaturalPrec
+#if MIN_VERSION_base(4,8,0)
+    showbPrec _ (NatS# w#)  = showb $ W# w#
+    showbPrec p (NatJ# bn)  = showbPrec p $ Jp# bn
+#else
+    showbPrec p             = showbPrec p . toInteger
     INLINE_INST_FUN(showbPrec)
+#endif

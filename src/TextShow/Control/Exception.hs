@@ -10,47 +10,16 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for 'Exception's.
+'TextShow' instances for 'Exception' data types.
 
 /Since: 2/
 -}
-module TextShow.Control.Exception (
-    showbSomeExceptionPrec
-  , showbIOException
-  , showbArithException
-  , showbArrayException
-  , showbAssertionFailed
-#if MIN_VERSION_base(4,7,0)
-  , showbSomeAsyncException
-#endif
-  , showbAsyncException
-  , showbNonTermination
-  , showbNestedAtomically
-  , showbBlockedIndefinitelyOnMVar
-  , showbBlockedIndefinitelyOnSTM
-#if MIN_VERSION_base(4,8,0)
-  , showbAllocationLimitExceeded
-#endif
-#if MIN_VERSION_base(4,9,0)
-  , showbTypeError
-#endif
-#if MIN_VERSION_base(4,10,0)
-  , showbCompactionFailed
-#endif
-  , showbDeadlock
-  , showbNoMethodError
-  , showbPatternMatchFail
-  , showbRecConError
-  , showbRecSelError
-  , showbRecUpdError
-  , showbErrorCall
-  , showbMaskingState
-  ) where
+module TextShow.Control.Exception () where
 
 import Control.Exception.Base
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (fromString)
 #if MIN_VERSION_base(4,9,0)
 import Data.Text.Lazy.Builder (singleton)
 #endif
@@ -64,282 +33,146 @@ import TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
 
--- | Convert a 'SomeException' value to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbSomeExceptionPrec :: Int -> SomeException -> Builder
-showbSomeExceptionPrec p (SomeException e) = showbPrec p $ FromStringShow e
-{-# INLINE showbSomeExceptionPrec #-}
-
--- | Convert an 'IOException' to a 'Builder'.
---
--- /Since: 2/
-showbIOException :: IOException -> Builder
-showbIOException = showb . FromStringShow
-{-# INLINE showbIOException #-}
-
--- | Convert an 'ArithException' to a 'Builder'.
---
--- /Since: 2/
-showbArithException :: ArithException -> Builder
-showbArithException Overflow             = "arithmetic overflow"
-showbArithException Underflow            = "arithmetic underflow"
-showbArithException LossOfPrecision      = "loss of precision"
-showbArithException DivideByZero         = "divide by zero"
-showbArithException Denormal             = "denormal"
-#if MIN_VERSION_base(4,6,0)
-showbArithException RatioZeroDenominator = "Ratio has zero denominator"
-#endif
-
--- | Convert an 'ArrayException' to a 'Builder'.
---
--- /Since: 2/
-showbArrayException :: ArrayException -> Builder
-showbArrayException (IndexOutOfBounds s)
-    =  "array index out of range"
-    <> (if not $ null s then ": " <> fromString s
-                        else mempty)
-showbArrayException (UndefinedElement s)
-    =  "undefined array element"
-    <> (if not $ null s then ": " <> fromString s
-                        else mempty)
-{-# INLINE showbArrayException #-}
-
--- | Convert an 'AssertionFailed' exception to a 'Builder'.
---
--- /Since: 2/
-showbAssertionFailed :: AssertionFailed -> Builder
-showbAssertionFailed (AssertionFailed err) = fromString err
-{-# INLINE showbAssertionFailed #-}
-
-#if MIN_VERSION_base(4,7,0)
--- | Convert a 'SomeAsyncException' value to a 'Builder'.
--- This function is only available with @base-4.7.0.0@ or later.
---
--- /Since: 2/
-showbSomeAsyncException :: SomeAsyncException -> Builder
-showbSomeAsyncException (SomeAsyncException e) = showb $ FromStringShow e
-{-# INLINE showbSomeAsyncException #-}
-#endif
-
--- | Convert an 'AsyncException' to a 'Builder'.
---
--- /Since: 2/
-showbAsyncException :: AsyncException -> Builder
-showbAsyncException StackOverflow = "stack overflow"
-showbAsyncException HeapOverflow  = "heap overflow"
-showbAsyncException ThreadKilled  = "thread killed"
-showbAsyncException UserInterrupt = "user interrupt"
-{-# INLINE showbAsyncException #-}
-
--- | Convert a 'NonTermination' exception to a 'Builder'.
---
--- /Since: 2/
-showbNonTermination :: NonTermination -> Builder
-showbNonTermination NonTermination = "<<loop>>"
-{-# INLINE showbNonTermination #-}
-
--- | Convert a 'NestedAtomically' exception to a 'Builder'.
---
--- /Since: 2/
-showbNestedAtomically :: NestedAtomically -> Builder
-showbNestedAtomically NestedAtomically = "Control.Concurrent.STM.atomically was nested"
-{-# INLINE showbNestedAtomically #-}
-
--- | Convert a 'BlockedIndefinitelyOnMVar' exception to a 'Builder'.
---
--- /Since: 2/
-showbBlockedIndefinitelyOnMVar :: BlockedIndefinitelyOnMVar -> Builder
-showbBlockedIndefinitelyOnMVar BlockedIndefinitelyOnMVar = "thread blocked indefinitely in an MVar operation"
-{-# INLINE showbBlockedIndefinitelyOnMVar #-}
-
--- | Convert a 'BlockedIndefinitelyOnSTM' exception to a 'Builder'.
---
--- /Since: 2/
-showbBlockedIndefinitelyOnSTM :: BlockedIndefinitelyOnSTM -> Builder
-showbBlockedIndefinitelyOnSTM BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
-{-# INLINE showbBlockedIndefinitelyOnSTM #-}
-
-#if MIN_VERSION_base(4,8,0)
--- | Convert an 'AllocationLimitExceeded' exception to a 'Builder'.
--- This function is only available with @base-4.8.0.0@ or later.
---
--- /Since: 2/
-showbAllocationLimitExceeded :: AllocationLimitExceeded -> Builder
-showbAllocationLimitExceeded AllocationLimitExceeded = "allocation limit exceeded"
-{-# INLINE showbAllocationLimitExceeded #-}
-#endif
-
-#if MIN_VERSION_base(4,9,0)
--- | Convert a 'TypeError' to a 'Builder'.
--- This function is only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
-showbTypeError :: TypeError -> Builder
-showbTypeError (TypeError err) = fromString err
-{-# INLINE showbTypeError #-}
-#endif
-
-#if MIN_VERSION_base(4,10,0)
--- | Convert a 'CompactionFailed' value to a 'Builder'.
--- This function is only available with @base-4.10.0.0@ or later.
---
--- /Since: next/
-showbCompactionFailed :: CompactionFailed -> Builder
-showbCompactionFailed (CompactionFailed why) = fromString ("compaction failed: " <> why)
-#endif
-
--- | Convert a 'Deadlock' exception to a 'Builder'.
---
--- /Since: 2/
-showbDeadlock :: Deadlock -> Builder
-showbDeadlock Deadlock = "<<deadlock>>"
-{-# INLINE showbDeadlock #-}
-
--- | Convert a 'NoMethodError' to a 'Builder'.
---
--- /Since: 2/
-showbNoMethodError :: NoMethodError -> Builder
-showbNoMethodError (NoMethodError err) = fromString err
-{-# INLINE showbNoMethodError #-}
-
--- | Convert a 'PatternMatchFail' to a 'Builder'.
---
--- /Since: 2/
-showbPatternMatchFail :: PatternMatchFail -> Builder
-showbPatternMatchFail (PatternMatchFail err) = fromString err
-{-# INLINE showbPatternMatchFail #-}
-
--- | Convert a 'RecConError' to a 'Builder'.
---
--- /Since: 2/
-showbRecConError :: RecConError -> Builder
-showbRecConError (RecConError err) = fromString err
-{-# INLINE showbRecConError #-}
-
--- | Convert a 'RecSelError' to a 'Builder'.
---
--- /Since: 2/
-showbRecSelError :: RecSelError -> Builder
-showbRecSelError (RecSelError err) = fromString err
-{-# INLINE showbRecSelError #-}
-
--- | Convert a 'RecUpdError' to a 'Builder'.
---
--- /Since: 2/
-showbRecUpdError :: RecUpdError -> Builder
-showbRecUpdError (RecUpdError err) = fromString err
-{-# INLINE showbRecUpdError #-}
-
--- | Convert an 'ErrorCall' to a 'Builder'.
---
--- /Since: 2/
-showbErrorCall :: ErrorCall -> Builder
-#if MIN_VERSION_base(4,9,0)
-showbErrorCall (ErrorCallWithLocation err "")  = fromString err
-showbErrorCall (ErrorCallWithLocation err loc) =
-  fromString err <> singleton '\n' <> fromString loc
-#else
-showbErrorCall (ErrorCall err) = fromString err
-#endif
-
--- | Convert a 'MaskingState' to a 'Builder'.
---
--- /Since: 2/
-showbMaskingState :: MaskingState -> Builder
-showbMaskingState = showb
-{-# INLINE showbMaskingState #-}
-
+-- | /Since: 2/
 instance TextShow SomeException where
-    showbPrec = showbSomeExceptionPrec
+    showbPrec p (SomeException e) = showbPrec p $ FromStringShow e
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow IOException where
-    showb = showbIOException
+    showb = showb . FromStringShow
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow ArithException where
-    showb = showbArithException
-    INLINE_INST_FUN(showb)
+    showb Overflow             = "arithmetic overflow"
+    showb Underflow            = "arithmetic underflow"
+    showb LossOfPrecision      = "loss of precision"
+    showb DivideByZero         = "divide by zero"
+    showb Denormal             = "denormal"
+#if MIN_VERSION_base(4,6,0)
+    showb RatioZeroDenominator = "Ratio has zero denominator"
+#endif
 
+-- | /Since: 2/
 instance TextShow ArrayException where
-    showb = showbArrayException
+    showb (IndexOutOfBounds s)
+        =  "array index out of range"
+        <> (if not $ null s then ": " <> fromString s
+                            else mempty)
+    showb (UndefinedElement s)
+        =  "undefined array element"
+        <> (if not $ null s then ": " <> fromString s
+                            else mempty)
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow AssertionFailed where
-    showb = showbAssertionFailed
+    showb (AssertionFailed err) = fromString err
     INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,7,0)
+-- | Only available with @base-4.7.0.0@ or later.
+--
+-- /Since: 2/
 instance TextShow SomeAsyncException where
-    showb = showbSomeAsyncException
+    showb (SomeAsyncException e) = showb $ FromStringShow e
     {-# INLINE showb #-}
 #endif
 
+-- | /Since: 2/
 instance TextShow AsyncException where
-    showb = showbAsyncException
+    showb StackOverflow = "stack overflow"
+    showb HeapOverflow  = "heap overflow"
+    showb ThreadKilled  = "thread killed"
+    showb UserInterrupt = "user interrupt"
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow NonTermination where
-    showb = showbNonTermination
+    showb NonTermination = "<<loop>>"
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow NestedAtomically where
-    showb = showbNestedAtomically
+    showb NestedAtomically = "Control.Concurrent.STM.atomically was nested"
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnMVar where
-    showb = showbBlockedIndefinitelyOnMVar
+    showb BlockedIndefinitelyOnMVar = "thread blocked indefinitely in an MVar operation"
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnSTM where
-    showb = showbBlockedIndefinitelyOnSTM
+    showb BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
     INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,8,0)
+-- | Only available with @base-4.8.0.0@ or later.
+--
+-- /Since: 2/
 instance TextShow AllocationLimitExceeded where
-    showb = showbAllocationLimitExceeded
+    showb AllocationLimitExceeded = "allocation limit exceeded"
     {-# INLINE showb #-}
 #endif
 
 #if MIN_VERSION_base(4,9,0)
+-- | Only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
 instance TextShow TypeError where
-    showb = showbTypeError
+    showb (TypeError err) = fromString err
     {-# INLINE showb #-}
 #endif
 
 #if MIN_VERSION_base(4,10,0)
+-- | Only available with @base-4.10.0.0@ or later.
+--
+-- /Since: next/
 instance TextShow CompactionFailed where
-    showb = showbCompactionFailed
-    {-# INLINE showb #-}
+    showb (CompactionFailed why) = fromString ("compaction failed: " <> why)
 #endif
 
+-- | /Since: 2/
 instance TextShow Deadlock where
-    showb = showbDeadlock
+    showb Deadlock = "<<deadlock>>"
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow NoMethodError where
-    showb = showbNoMethodError
+    showb (NoMethodError err) = fromString err
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow PatternMatchFail where
-    showb = showbPatternMatchFail
+    showb (PatternMatchFail err) = fromString err
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow RecConError where
-    showb = showbRecConError
+    showb (RecConError err) = fromString err
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow RecSelError where
-    showb = showbRecSelError
+    showb (RecSelError err) = fromString err
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow RecUpdError where
-    showb = showbRecUpdError
+    showb (RecUpdError err) = fromString err
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow ErrorCall where
-    showb = showbErrorCall
-    INLINE_INST_FUN(showb)
+#if MIN_VERSION_base(4,9,0)
+    showb (ErrorCallWithLocation err "")  = fromString err
+    showb (ErrorCallWithLocation err loc) =
+      fromString err <> singleton '\n' <> fromString loc
+#else
+    showb (ErrorCall err) = fromString err
+#endif
 
+-- | /Since: 2/
 $(deriveTextShow ''MaskingState)

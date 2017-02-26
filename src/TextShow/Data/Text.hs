@@ -13,23 +13,11 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for 'Text' types.
+'TextShow' instances for 'Text' types.
 
 /Since: 2/
 -}
-module TextShow.Data.Text (
-      showbText
-    , showbTextLazy
-    , showbBuilder
-    , showbI16Prec
-    , showbUnicodeException
-#if MIN_VERSION_text(1,0,0)
-    , showbDecodingPrec
-#endif
-#if MIN_VERSION_text(1,1,0)
-    , showbSizePrec
-#endif
-    ) where
+module TextShow.Data.Text () where
 
 import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as TS
@@ -48,7 +36,7 @@ import           Data.Text.Encoding (Decoding(..))
 import           Data.Text.Lazy.Builder (singleton)
 import           GHC.Show (appPrec)
 import           TextShow.Classes (showbParen)
-import           TextShow.Data.ByteString (showbByteStringStrict)
+import           TextShow.Data.ByteString ()
 #endif
 
 #if MIN_VERSION_text(1,1,0)
@@ -57,99 +45,50 @@ import           Data.Text.Internal.Fusion.Size (Size)
 
 #include "inline.h"
 
--- | Convert a strict 'TS.Text' to a 'Builder'.
--- 'showbText' should not be confused with @fromText@, as 'showbText' escapes
--- certain characters (such as double quotes).
---
--- /Since: 2/
-showbText :: TS.Text -> Builder
-showbText = showbString . TS.unpack
-{-# INLINE showbText #-}
-
--- | Convert a lazy 'TL.Text' to a 'Builder'.
--- 'showbTextLazy' should not be confused with @fromTextLazy@, as 'showbTextLazy'
--- escapes certain characters (such as double quotes).
---
--- /Since: 2/
-showbTextLazy :: TL.Text -> Builder
-showbTextLazy = showbString . TL.unpack
-{-# INLINE showbTextLazy #-}
-
--- | Show a 'Builder' as if it were a 'String' (i.e., escape certain characters,
--- such as double quotes).
---
--- /Since: 2/
-showbBuilder :: Builder -> Builder
-showbBuilder = showbTextLazy . toLazyText
-{-# INLINE showbBuilder #-}
-
--- | Convert an 'I16' value to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbI16Prec :: Int -> I16 -> Builder
-showbI16Prec = showbPrec
-{-# INLINE showbI16Prec #-}
-
--- | Convert a 'UnicodeException' to a 'Builder'.
---
--- /Since: 2/
-showbUnicodeException :: UnicodeException -> Builder
-showbUnicodeException (DecodeError desc (Just w))
-    = "Cannot decode byte '\\x" <> showbHex w <> "': " <> fromString desc
-showbUnicodeException (DecodeError desc Nothing)
-    = "Cannot decode input: " <> fromString desc
-showbUnicodeException (EncodeError desc (Just c))
-    = "Cannot encode character '\\x" <> showbHex (fromEnum c) <> "': " <> fromString desc
-showbUnicodeException (EncodeError desc Nothing)
-    = "Cannot encode input: " <> fromString desc
-
-#if MIN_VERSION_text(1,0,0)
--- | Convert a 'Decoding' value to a 'Builder' with the given precedence.
--- This function is only available with @text-1.0.0.0@ or later.
---
--- /Since: 2/
-showbDecodingPrec :: Int -> Decoding -> Builder
-showbDecodingPrec p (Some t bs _) = showbParen (p > appPrec) $
-    fromString "Some " <> showbText t <>
-    singleton ' ' <> showbByteStringStrict bs <>
-    fromString " _"
-{-# INLINE showbDecodingPrec #-}
-#endif
-
-#if MIN_VERSION_text(1,1,0)
--- | Convert a 'Size' value to a 'Builder' with the given precedence.
--- This function is only available with @text-1.1.0.0@ or later.
---
--- /Since: 2/
-showbSizePrec :: Int -> Size -> Builder
-showbSizePrec = showbPrec
-{-# INLINE showbSizePrec #-}
-#endif
-
+-- | /Since: 2/
 instance TextShow TS.Text where
-    showb = showbText
+    showb = showbString . TS.unpack
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow TL.Text where
-    showb = showbTextLazy
+    showb = showbString . TL.unpack
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow Builder where
-    showb = showbBuilder
+    showb = showb . toLazyText
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 $(deriveTextShow ''I16)
 
+-- | /Since: 2/
 instance TextShow UnicodeException where
-    showb = showbUnicodeException
-    INLINE_INST_FUN(showb)
+    showb (DecodeError desc (Just w))
+        = "Cannot decode byte '\\x" <> showbHex w <> "': " <> fromString desc
+    showb (DecodeError desc Nothing)
+        = "Cannot decode input: " <> fromString desc
+    showb (EncodeError desc (Just c))
+        = "Cannot encode character '\\x" <> showbHex (fromEnum c) <> "': " <> fromString desc
+    showb (EncodeError desc Nothing)
+        = "Cannot encode input: " <> fromString desc
 
 #if MIN_VERSION_text(1,0,0)
+-- | Only available with @text-1.0.0.0@ or later.
+--
+-- /Since: 2/
 instance TextShow Decoding where
-    showbPrec = showbDecodingPrec
+    showbPrec p (Some t bs _) = showbParen (p > appPrec) $
+        fromString "Some " <> showb t <>
+        singleton ' ' <> showb bs <>
+        fromString " _"
     INLINE_INST_FUN(showbPrec)
 #endif
 
 #if MIN_VERSION_text(1,1,0)
+-- | Only available with @text-1.1.0.0@ or later.
+--
+-- /Since: 2/
 $(deriveTextShow ''Size)
 #endif

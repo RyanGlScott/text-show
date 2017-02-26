@@ -8,25 +8,16 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'ExitCode'.
+'TextShow' instance for 'ExitCode'.
 
 /Since: 2/
 -}
-module TextShow.System.Exit (showbExitCodePrec) where
-
-import Data.Text.Lazy.Builder (Builder)
+module TextShow.System.Exit () where
 
 import System.Exit (ExitCode)
 
-import TextShow.Classes (showbPrec)
 import TextShow.Data.Integral ()
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Convert an 'ExitCode' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbExitCodePrec :: Int -> ExitCode -> Builder
-showbExitCodePrec = showbPrec
-{-# INLINE showbExitCodePrec #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''ExitCode)

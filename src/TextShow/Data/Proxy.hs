@@ -16,14 +16,13 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Proxy' values.
+'TextShow' instance for 'Proxy'.
 
 /Since: 2/
 -}
-module TextShow.Data.Proxy (showbProxy) where
+module TextShow.Data.Proxy () where
 
-import Data.Proxy (Proxy(..))
-import Data.Text.Lazy.Builder (Builder)
+import Data.Proxy (Proxy)
 
 import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,
@@ -31,13 +30,7 @@ import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,
 
 #include "inline.h"
 
--- | Convert a 'Proxy' type to a 'Builder'.
---
--- /Since: 2/
-showbProxy :: Proxy s -> Builder
-showbProxy = showb
-{-# INLINE showbProxy #-}
-
+-- | /Since: 2/
 instance TextShow (Proxy s) where
     showbPrec  = $(makeShowbPrec  ''Proxy)
     showtPrec  = $(makeShowtPrec  ''Proxy)
@@ -46,4 +39,5 @@ instance TextShow (Proxy s) where
     INLINE_INST_FUN(showtPrec)
     INLINE_INST_FUN(showtlPrec)
 
+-- | /Since: 2/
 $(deriveTextShow1 ''Proxy)
