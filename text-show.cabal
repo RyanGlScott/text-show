@@ -461,7 +461,7 @@ benchmark bench
   else
     build-depends:     text-show
 
-  hs-source-dirs:      benchmarks
+  hs-source-dirs:      benchmarks, shared
   default-language:    Haskell2010
   ghc-options:         -Wall
   include-dirs:        include

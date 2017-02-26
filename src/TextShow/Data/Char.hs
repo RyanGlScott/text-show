@@ -10,7 +10,7 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for 'Char' and 'String'.
+'TextShow' instances and monomorphic functions for 'Char' and 'String'.
 
 /Since: 2/
 -}
@@ -32,7 +32,7 @@ import           Prelude ()
 import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..))
-import           TextShow.Data.Integral (showbIntPrec)
+import           TextShow.Data.Integral ()
 import           TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
@@ -59,7 +59,7 @@ showbChar c    = singleton '\'' <> showbLitChar c <> singleton '\''
 --
 -- /Since: 2/
 showbLitChar :: Char -> Builder
-showbLitChar c | c > '\DEL' = singleton '\\' <> showbIntPrec 0 (ord c)
+showbLitChar c | c > '\DEL' = singleton '\\' <> showb (ord c)
 showbLitChar '\DEL'         = "\\DEL"
 showbLitChar '\\'           = "\\\\"
 showbLitChar c | c >= ' '   = singleton c
@@ -88,8 +88,8 @@ showbLitString []             = mempty
 showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
 showbLitString ('"':cs)       = "\\\"" <> showbLitString cs
 showbLitString (c:d:cs)
-    | c > '\DEL' && isDigit d = singleton '\\' <> showbIntPrec 0 (ord c) <> "\\&"
-                             <> singleton d <> showbLitString cs
+    | c > '\DEL' && isDigit d = singleton '\\' <> showb (ord c) <> "\\&"
+                             <> singleton d    <> showbLitString cs
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
@@ -99,6 +99,7 @@ showbGeneralCategory :: GeneralCategory -> Builder
 showbGeneralCategory = showb
 {-# INLINE showbGeneralCategory #-}
 
+-- | /Since: 2/
 instance TextShow Char where
     showb = showbChar
     INLINE_INST_FUN(showb)
@@ -106,4 +107,5 @@ instance TextShow Char where
     showbList = showbString
     INLINE_INST_FUN(showbList)
 
+-- | /Since: 2/
 $(deriveTextShow ''GeneralCategory)

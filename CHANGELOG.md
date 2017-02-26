@@ -2,6 +2,8 @@
 * Introduce some instances for datatypes added in `base-4.10.0.0`:
     * Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types`
     * Add `TextShow` instance for `CompactionFailed` in `Control.Exception`
+* Remove most monomorphic `TextShow` functions, as their utility is questionable, and their maintenance burden is undeniable
+* Rename `showbVersionConcrete` to `showbVersion` in `TextShow.Data.Version`
 * Refactor test suite
 
 #### 3.4.1.1 [2016.11.07]

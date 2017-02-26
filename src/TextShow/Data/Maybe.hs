@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -9,25 +8,15 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Maybe' values.
+'TextShow' instance for 'Maybe'.
 
 /Since: 2/
 -}
-module TextShow.Data.Maybe (liftShowbMaybePrec) where
+module TextShow.Data.Maybe () where
 
-import Data.Text.Lazy.Builder (Builder)
-
-import TextShow.Classes (liftShowbPrec)
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)
 
-#include "inline.h"
-
--- | Convert a 'Maybe' value to a 'Builder' with the given show function and precedence.
---
--- /Since: 3/
-liftShowbMaybePrec :: (Int -> a -> Builder) -> Int -> Maybe a -> Builder
-liftShowbMaybePrec sp = liftShowbPrec sp undefined
-{-# INLINE liftShowbMaybePrec #-}
-
+-- | /Since: 2/
 $(deriveTextShow  ''Maybe)
+-- | /Since: 2/
 $(deriveTextShow1 ''Maybe)

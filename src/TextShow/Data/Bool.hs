@@ -8,22 +8,13 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Bool' values.
+'TextShow' instance for 'Bool'.
 
 /Since: 2/
 -}
-module TextShow.Data.Bool (showbBool) where
+module TextShow.Data.Bool () where
 
-import Data.Text.Lazy.Builder (Builder)
-
-import TextShow.Classes (showb)
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Convert a 'Bool' to a 'Builder'.
---
--- /Since: 2/
-showbBool :: Bool -> Builder
-showbBool = showb
-{-# INLINE showbBool #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''Bool)

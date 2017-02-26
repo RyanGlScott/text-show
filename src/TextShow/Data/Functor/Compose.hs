@@ -10,35 +10,25 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Compose'.
+'TextShow' instance for 'Compose'.
 
 /Since: 3/
 -}
-module TextShow.Data.Functor.Compose (liftShowbComposePrec) where
+module TextShow.Data.Functor.Compose () where
 
 import Data.Functor.Compose (Compose(..))
-import Data.Text.Lazy.Builder (Builder)
-
 import TextShow.Classes (TextShow(..), TextShow1(..), showbPrec1, showbUnaryWith)
 
 #include "inline.h"
 
--- | Convert a 'Compose' value to a 'Builder' with the given show functions
--- and precedence.
---
--- /Since: 3/
-liftShowbComposePrec :: (TextShow1 f, TextShow1 g)
-                     => (Int -> a -> Builder) -> ([a] -> Builder)
-                     -> Int -> Compose f g a -> Builder
-liftShowbComposePrec sp sl p (Compose x) =
-    showbUnaryWith (liftShowbPrec (liftShowbPrec sp sl)
-                                  (liftShowbList sp sl))
-                   "Compose" p x
-
+-- | /Since: 3/
 instance (TextShow1 f, TextShow1 g, TextShow a) => TextShow (Compose f g a) where
     showbPrec = showbPrec1
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 3/
 instance (TextShow1 f, TextShow1 g) => TextShow1 (Compose f g) where
-    liftShowbPrec = liftShowbComposePrec
-    INLINE_INST_FUN(liftShowbPrec)
+    liftShowbPrec sp sl p (Compose x) =
+        showbUnaryWith (liftShowbPrec (liftShowbPrec sp sl)
+                                      (liftShowbList sp sl))
+                       "Compose" p x

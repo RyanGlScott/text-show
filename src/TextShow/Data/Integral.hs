@@ -10,27 +10,16 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for integral types.
+'TextShow' instances and monomorphic functions for integral types.
 
 /Since: 2/
 -}
 module TextShow.Data.Integral (
-      showbIntPrec
-    , showbInt8Prec
-    , showbInt16Prec
-    , showbInt32Prec
-    , showbInt64Prec
-    , showbIntegerPrec
-    , showbIntegralPrec
+      showbIntegralPrec
     , showbIntAtBase
     , showbBin
     , showbHex
     , showbOct
-    , showbWord
-    , showbWord8
-    , showbWord16
-    , showbWord32
-    , showbWord64
     ) where
 
 import           Data.Char (intToDigit)
@@ -55,68 +44,11 @@ import           TextShow.Utils (toString)
 
 #include "inline.h"
 
--- | Convert an 'Int' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbIntPrec :: Int -> Int -> Builder
-showbIntPrec (I# p) n'@(I# n)
-    | isTrue (n <# 0#) && isTrue (p ># 6#) = singleton '(' <> decimal n' <> singleton ')'
-    | otherwise = decimal n'
-  where
-#if __GLASGOW_HASKELL__ >= 708
-    isTrue :: Int# -> Bool
-    isTrue b = isTrue# b
-#else
-    isTrue :: Bool -> Bool
-    isTrue = id
-#endif
-
--- | Convert an 'Int8' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbInt8Prec :: Int -> Int8 -> Builder
-showbInt8Prec p = showbIntPrec p . fromIntegral
-{-# INLINE showbInt8Prec #-}
-
--- | Convert an 'Int16' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbInt16Prec :: Int -> Int16 -> Builder
-showbInt16Prec p = showbIntPrec p . fromIntegral
-{-# INLINE showbInt16Prec #-}
-
--- | Convert an 'Int32' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbInt32Prec :: Int -> Int32 -> Builder
-showbInt32Prec p = showbIntPrec p . fromIntegral
-{-# INLINE showbInt32Prec #-}
-
--- | Convert an 'Int64' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbInt64Prec :: Int -> Int64 -> Builder
-#if WORD_SIZE_IN_BITS < 64
-showbInt64Prec p = showbIntegerPrec p . toInteger
-#else
-showbInt64Prec p = showbIntPrec p . fromIntegral
-#endif
-{-# INLINE showbInt64Prec #-}
-
--- | Convert an 'Integer' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbIntegerPrec :: Int -> Integer -> Builder
-showbIntegerPrec p n
-    | p > 6 && n < 0 = singleton '(' <> decimal n <> singleton ')'
-    | otherwise      = decimal n
-{-# INLINE showbIntegerPrec #-}
-
 -- | Convert an 'Integral' type to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
 showbIntegralPrec :: Integral a => Int -> a -> Builder
-showbIntegralPrec p = showbIntegerPrec p . toInteger
+showbIntegralPrec p = showbPrec p . toInteger
 {-# INLINE showbIntegralPrec #-}
 
 -- | Shows a /non-negative/ 'Integral' number using the base specified by the
@@ -172,81 +104,74 @@ showbOct :: (Integral a, TextShow a) => a -> Builder
 showbOct = showbIntAtBase 8 intToDigit
 {-# INLINE showbOct #-}
 
--- | Convert a 'Word' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbWord :: Word -> Builder
-showbWord = decimal
-{-# INLINE showbWord #-}
-
--- | Convert a 'Word8' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbWord8 :: Word8 -> Builder
-showbWord8 = decimal
-{-# INLINE showbWord8 #-}
-
--- | Convert a 'Word16' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbWord16 :: Word16 -> Builder
-showbWord16 = decimal
-{-# INLINE showbWord16 #-}
-
--- | Convert a 'Word32' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbWord32 :: Word32 -> Builder
-showbWord32 = decimal
-{-# INLINE showbWord32 #-}
-
--- | Convert a 'Word64' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbWord64 :: Word64 -> Builder
-showbWord64 = decimal
-{-# INLINE showbWord64 #-}
-
+-- | /Since: 2/
 instance TextShow Int where
-    showbPrec = showbIntPrec
-    INLINE_INST_FUN(showbPrec)
+    showbPrec (I# p) n'@(I# n)
+        | isTrue (n <# 0#) && isTrue (p ># 6#)
+        = singleton '(' <> decimal n' <> singleton ')'
+        | otherwise
+        = decimal n'
+      where
+#if __GLASGOW_HASKELL__ >= 708
+        isTrue :: Int# -> Bool
+        isTrue b = isTrue# b
+#else
+        isTrue :: Bool -> Bool
+        isTrue = id
+#endif
 
+-- | /Since: 2/
 instance TextShow Int8 where
-    showbPrec = showbInt8Prec
+    showbPrec p x = showbPrec p (fromIntegral x :: Int)
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Int16 where
-    showbPrec = showbInt16Prec
+    showbPrec p x = showbPrec p (fromIntegral x :: Int)
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Int32 where
-    showbPrec = showbInt32Prec
+    showbPrec p x = showbPrec p (fromIntegral x :: Int)
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Int64 where
-    showbPrec = showbInt64Prec
+#if WORD_SIZE_IN_BITS < 64
+    showbPrec p   = showbPrec p . toInteger
+#else
+    showbPrec p x = showbPrec p (fromIntegral x :: Int)
+#endif
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Integer where
-    showbPrec = showbIntegerPrec
+    showbPrec p n
+        | p > 6 && n < 0 = singleton '(' <> decimal n <> singleton ')'
+        | otherwise      = decimal n
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Word where
-    showb = showbWord
+    showb = decimal
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow Word8 where
-    showb = showbWord8
+    showb = decimal
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow Word16 where
-    showb = showbWord16
+    showb = decimal
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow Word32 where
-    showb = showbWord32
+    showb = decimal
     INLINE_INST_FUN(showb)
 
+-- | /Since: 2/
 instance TextShow Word64 where
-    showb = showbWord64
+    showb = decimal
     INLINE_INST_FUN(showb)

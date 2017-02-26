@@ -12,36 +12,22 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'StaticPtrInfo' values.
-This module only exports functions if using @base-4.8.0.0@ or later.
+'TextShow' instance for 'StaticPtrInfo'.
+Only provided if using @base-4.8.0.0@ or later.
 
 /Since: 2/
 -}
-module TextShow.GHC.StaticPtr (
-#if !(MIN_VERSION_base(4,8,0))
-    ) where
-#else
-      showbStaticPtrInfoPrec
-    ) where
+module TextShow.GHC.StaticPtr () where
 
-import Data.Text.Lazy.Builder (Builder)
-
+#if MIN_VERSION_base(4,8,0)
 import GHC.StaticPtr (StaticPtrInfo)
 
-import TextShow.Classes (showbPrec)
 import TextShow.Data.Char     ()
 import TextShow.Data.Integral ()
 import TextShow.Data.List     ()
 import TextShow.Data.Tuple    ()
 import TextShow.TH.Internal (deriveTextShow)
 
--- | Convert a 'StaticPtrInfo' value to a 'Builder' with the given precedence.
--- This function is only available with @base-4.8.0.0@ or later.
---
--- /Since: 2/
-showbStaticPtrInfoPrec :: Int -> StaticPtrInfo -> Builder
-showbStaticPtrInfoPrec = showbPrec
-{-# INLINE showbStaticPtrInfoPrec #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''StaticPtrInfo)
 #endif

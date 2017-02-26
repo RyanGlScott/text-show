@@ -17,21 +17,14 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for data types in the @Typeable@ module.
+'TextShow' instances for data types in the @Typeable@ module.
 
 /Since: 2/
 -}
-module TextShow.Data.Typeable (
-      showbTyCon
-    , showbTypeRepPrec
-#if MIN_VERSION_base(4,9,0)
-    , showbTrName
-    , showbModule
-#endif
-    ) where
+module TextShow.Data.Typeable () where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import Data.Text.Lazy.Builder (fromString, singleton)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (tyConName)
@@ -39,6 +32,7 @@ import Data.Typeable.Internal (tyConName)
 import Data.Typeable.Internal (typeRepKinds)
 # endif
 # if MIN_VERSION_base(4,9,0)
+import Data.Text.Lazy.Builder (Builder)
 import Data.Typeable.Internal (Proxy(..), Typeable, TypeRep(TypeRep), typeRep)
 import GHC.Exts (RuntimeRep(..), TYPE)
 # elif MIN_VERSION_base(4,4,0)
@@ -64,44 +58,6 @@ import TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import TextShow.Utils (isTupleString)
 
 #include "inline.h"
-
--- | Convert a 'TypeRep' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbTypeRepPrec :: Int -> TypeRep -> Builder
-showbTypeRepPrec p tyrep =
-    case tys of
-      [] -> showbTyCon tycon
-#if MIN_VERSION_base(4,9,0)
-      [x@(TypeRep _ argCon _ _)]
-#else
-      [x]
-#endif
-        | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
-#if MIN_VERSION_base(4,9,0)
-        | tycon == tcTYPE && argCon == tc'Lifted   -> singleton '*'
-        | tycon == tcTYPE && argCon == tc'Unlifted -> singleton '#'
-#endif
-      [a,r] | tycon == tcFun  -> showbParen (p > 8) $
-                                    showbPrec 9 a
-                                 <> " -> "
-                                 <> showbPrec 8 r
-      xs | isTupleTyCon tycon -> showbTuple xs
-         | otherwise          -> showbParen (p > 9) $
-                                    showbPrec p tycon
-                                 <> showbSpace
-                                 <> showbArgs showbSpace
-#if MIN_VERSION_base(4,8,0)
-                                                         (kinds ++ tys)
-#else
-                                                         tys
-#endif
-  where
-    tycon = typeRepTyCon tyrep
-    tys   = typeRepArgs tyrep
-#if MIN_VERSION_base(4,8,0)
-    kinds = typeRepKinds tyrep
-#endif
 
 #if MIN_VERSION_base(4,9,0)
 tyConOf :: Typeable a => Proxy a -> TyCon
@@ -144,33 +100,67 @@ isTupleTyCon :: TyCon -> Bool
 isTupleTyCon = isTupleString . tyConString
 {-# INLINE isTupleTyCon #-}
 
--- | Convert a 'TyCon' to a 'Builder'.
---
--- /Since: 2/
-showbTyCon :: TyCon -> Builder
-#if MIN_VERSION_base(4,9,0)
-showbTyCon (TyCon _ _ _ tc_name) = showb tc_name
-#else
-showbTyCon = fromString . tyConString
+#if MIN_VERSION_base(4,4,0)
+-- | Identical to 'tyConName'. Defined to avoid using excessive amounts of pragmas
+-- with base-4.3 and earlier, which use 'tyConString'.
+tyConString :: TyCon -> String
+tyConString = tyConName
+{-# INLINE tyConString #-}
 #endif
-{-# INLINE showbTyCon #-}
+
+-- | /Since: 2/
+instance TextShow TypeRep where
+    showbPrec p tyrep =
+        case tys of
+          [] -> showb tycon
+#if MIN_VERSION_base(4,9,0)
+          [x@(TypeRep _ argCon _ _)]
+#else
+          [x]
+#endif
+            | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
+#if MIN_VERSION_base(4,9,0)
+            | tycon == tcTYPE && argCon == tc'Lifted   -> singleton '*'
+            | tycon == tcTYPE && argCon == tc'Unlifted -> singleton '#'
+#endif
+          [a,r] | tycon == tcFun  -> showbParen (p > 8) $
+                                        showbPrec 9 a
+                                     <> " -> "
+                                     <> showbPrec 8 r
+          xs | isTupleTyCon tycon -> showbTuple xs
+             | otherwise          -> showbParen (p > 9) $
+                                        showbPrec p tycon
+                                     <> showbSpace
+                                     <> showbArgs showbSpace
+#if MIN_VERSION_base(4,8,0)
+                                                             (kinds ++ tys)
+#else
+                                                             tys
+#endif
+      where
+        tycon = typeRepTyCon tyrep
+        tys   = typeRepArgs tyrep
+#if MIN_VERSION_base(4,8,0)
+        kinds = typeRepKinds tyrep
+#endif
+
+-- | /Since: 2/
+instance TextShow TyCon where
+#if MIN_VERSION_base(4,9,0)
+    showb (TyCon _ _ _ tc_name) = showb tc_name
+#else
+    showb = fromString . tyConString
+#endif
+    INLINE_INST_FUN(showb)
 
 #if MIN_VERSION_base(4,9,0)
--- | Convert a 'TrName' to a 'Builder'.
--- This function is only available with @base-4.9.0.0@ or later.
+-- | Only available with @base-4.9.0.0@ or later.
 --
 -- /Since: 3/
-showbTrName :: TrName -> Builder
-showbTrName (TrNameS s) = unpackCStringToBuilder# s
-showbTrName (TrNameD s) = fromString s
-
--- | Convert a 'Module' to a 'Builder'.
--- This function is only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
-showbModule :: Module -> Builder
-showbModule (Module p m) = showb p <> singleton ':' <> showb m
-{-# INLINE showbModule #-}
+instance TextShow TrName where
+    showb (TrNameS s) = unpackCStringToBuilder# s
+    showb (TrNameD s) = fromString s
+    INLINE_INST_FUN(showb)
 
 unpackCStringToBuilder# :: Addr# -> Builder
     -- There's really no point in inlining this, ever, as the loop doesn't
@@ -185,30 +175,11 @@ unpackCStringToBuilder# addr
       where
         !ch = indexCharOffAddr# addr nh
 {-# NOINLINE unpackCStringToBuilder# #-}
-#endif
 
-#if MIN_VERSION_base(4,4,0)
--- | Identical to 'tyConName'. Defined to avoid using excessive amounts of pragmas
--- with base-4.3 and earlier, which use 'tyConString'.
-tyConString :: TyCon -> String
-tyConString = tyConName
-{-# INLINE tyConString #-}
-#endif
-
-instance TextShow TypeRep where
-    showbPrec = showbTypeRepPrec
-    INLINE_INST_FUN(showbPrec)
-
-instance TextShow TyCon where
-    showb = showbTyCon
-    INLINE_INST_FUN(showb)
-
-#if MIN_VERSION_base(4,9,0)
-instance TextShow TrName where
-    showb = showbTrName
-    INLINE_INST_FUN(showb)
-
+-- | Only available with @base-4.9.0.0@ or later.
+--
+-- /Since: 3/
 instance TextShow Module where
-    showb = showbModule
+    showb (Module p m) = showb p <> singleton ':' <> showb m
     INLINE_INST_FUN(showb)
 #endif

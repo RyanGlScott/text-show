@@ -9,14 +9,13 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' function for 'Ratio' values.
+'TextShow' instance for 'Ratio'.
 
 /Since: 2/
 -}
-module TextShow.Data.Ratio (showbRatioPrec) where
+module TextShow.Data.Ratio () where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder)
 
 import GHC.Real (Ratio(..), ratioPrec, ratioPrec1)
 
@@ -28,25 +27,10 @@ import TextShow.Data.Integral ()
 
 #include "inline.h"
 
--- | Convert a 'Ratio' to a 'Builder' with the given precedence.
---
--- Note that on @base-4.3.0.0@, this function must have a @('Show' a, 'Integral' a)@
--- constraint instead of just a @('Show' a)@ constraint.
+-- | Note that on @base-4.3.0.0@, this must have a @('TextShow' a, 'Integral' a)@
+-- constraint instead of just a @('TextShow' a)@ constraint.
 --
 -- /Since: 2/
-showbRatioPrec ::
-#if MIN_VERSION_base(4,4,0)
-                  TextShow a
-#else
-                  (TextShow a, Integral a)
-#endif
-               => Int -> Ratio a -> Builder
-showbRatioPrec p (numer :% denom) = showbParen (p > ratioPrec) $
-       showbPrec ratioPrec1 numer
-    <> " % "
-    <> showbPrec ratioPrec1 denom
-{-# INLINE showbRatioPrec #-}
-
 instance
 #if MIN_VERSION_base(4,4,0)
          TextShow a
@@ -55,10 +39,16 @@ instance
 #endif
       => TextShow (Ratio a) where
     {-# SPECIALIZE instance TextShow Rational #-}
-    showbPrec = showbRatioPrec
+    showbPrec p (numer :% denom) = showbParen (p > ratioPrec) $
+           showbPrec ratioPrec1 numer
+        <> " % "
+        <> showbPrec ratioPrec1 denom
     INLINE_INST_FUN(showbPrec)
 
 #if MIN_VERSION_base(4,4,0)
+-- | Only available with @base-4.4.0.0@ or later.
+--
+-- /Since: 2/
 instance TextShow1 Ratio where
     liftShowbPrec sp _ p (numer :% denom) = showbParen (p > ratioPrec) $
            sp ratioPrec1 numer

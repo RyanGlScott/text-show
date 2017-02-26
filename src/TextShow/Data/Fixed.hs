@@ -8,7 +8,7 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'Show' function for 'Fixed' values.
+Provides 'TextShow' instance for 'Fixed', as well as the 'showbFixed' function.
 
 /Since: 2/
 -}
@@ -88,6 +88,7 @@ withDotB b | b == mempty = mempty
 {-# INLINE withDotB #-}
 #endif
 
+-- | /Since: 2/
 instance HasResolution a => TextShow (Fixed a) where
     showb = showbFixed False
     INLINE_INST_FUN(showb)

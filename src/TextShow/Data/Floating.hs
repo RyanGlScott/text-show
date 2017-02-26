@@ -10,14 +10,12 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for floating-point types.
+'TextShow' instances and monomorphic functions for floating-point types.
 
 /Since: 2/
 -}
 module TextShow.Data.Floating (
       showbRealFloatPrec
-    , showbFloatPrec
-    , showbDoublePrec
     , showbEFloat
     , showbFFloat
     , showbGFloat
@@ -51,20 +49,6 @@ showbRealFloatPrec p x
     | x < 0 || isNegativeZero x = showbParen (p > 6) $ singleton '-' <> showbGFloat Nothing (-x)
     | otherwise                 = showbGFloat Nothing x
 {-# INLINE showbRealFloatPrec #-}
-
--- | Convert a 'Float' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbFloatPrec :: Int -> Float -> Builder
-showbFloatPrec = showbRealFloatPrec
-{-# INLINE showbFloatPrec #-}
-
--- | Convert a 'Double' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbDoublePrec :: Int -> Double -> Builder
-showbDoublePrec = showbRealFloatPrec
-{-# INLINE showbDoublePrec #-}
 
 -- | Show a signed 'RealFloat' value
 -- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
@@ -400,12 +384,15 @@ expts10 = array (minExpt,maxExpt10) [(n,10^n) | n <- [minExpt .. maxExpt10]]
 -- TextShow instances
 -------------------------------------------------------------------------------
 
+-- | /Since: 2/
 instance TextShow Float where
-    showbPrec = showbFloatPrec
+    showbPrec = showbRealFloatPrec
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 instance TextShow Double where
-    showbPrec = showbDoublePrec
+    showbPrec = showbRealFloatPrec
     INLINE_INST_FUN(showbPrec)
 
+-- | /Since: 2/
 $(deriveTextShow ''FPFormat)

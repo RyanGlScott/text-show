@@ -9,20 +9,14 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for data types in the @Data.Data@ module.
+'TextShow' instances for data types in the @Data.Data@ module.
 
 /Since: 2/
 -}
-module TextShow.Data.Data (
-      showbConstr
-    , showbConstrRepPrec
-    , showbDataRepPrec
-    , showbDataTypePrec
-    , showbFixity
-    ) where
+module TextShow.Data.Data () where
 
 import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity, showConstr)
-import Data.Text.Lazy.Builder (Builder, fromString)
+import Data.Text.Lazy.Builder (fromString)
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.List ()
@@ -31,46 +25,16 @@ import TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
 
--- | Convert a 'DataType' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbDataTypePrec :: Int -> DataType -> Builder
-showbDataTypePrec = showbPrec
-{-# INLINE showbDataTypePrec #-}
-
--- | Convert a 'DataRep' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbDataRepPrec :: Int -> DataRep -> Builder
-showbDataRepPrec = showbPrec
-{-# INLINE showbDataRepPrec #-}
-
--- | Convert a 'Constr' to a 'Builder'.
---
--- /Since: 2/
-showbConstr :: Constr -> Builder
-showbConstr = fromString . showConstr
-{-# INLINE showbConstr #-}
-
--- | Convert a 'Fixity' value to a 'Builder'.
---
--- /Since: 2/
-showbFixity :: Fixity -> Builder
-showbFixity = showb
-{-# INLINE showbFixity #-}
-
--- | Convert a 'ConstrRep' to a 'Builder' with the given precedence.
---
--- /Since: 2/
-showbConstrRepPrec :: Int -> ConstrRep -> Builder
-showbConstrRepPrec = showbPrec
-{-# INLINE showbConstrRepPrec #-}
-
+-- | /Since: 2/
 $(deriveTextShow ''DataType)
+-- | /Since: 2/
 $(deriveTextShow ''DataRep)
+-- | /Since: 2/
 $(deriveTextShow ''ConstrRep)
+-- | /Since: 2/
 $(deriveTextShow ''Fixity)
 
+-- | /Since: 2/
 instance TextShow Constr where
-    showb = showbConstr
+    showb = fromString . showConstr
     INLINE_INST_FUN(showb)

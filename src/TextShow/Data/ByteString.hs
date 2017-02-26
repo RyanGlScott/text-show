@@ -14,22 +14,16 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Monomorphic 'TextShow' functions for data types in the @bytestring@ library.
+'TextShow' instances for data types in the @bytestring@ library.
 
 /Since: 2/
 -}
-module TextShow.Data.ByteString (
-      showbByteStringStrict
-    , showbByteStringLazy
-    , showbByteStringLazyPrec
-    , showbShortByteString
-    ) where
+module TextShow.Data.ByteString () where
 
 import qualified Data.ByteString.Internal      as BS
 import qualified Data.ByteString.Lazy.Internal as BL
 import qualified Data.ByteString.Short         as SBS
 import           Data.ByteString.Short.Internal (ShortByteString(..))
-import           Data.Text.Lazy.Builder (Builder)
 
 import           GHC.Exts (ByteArray#, Char(C#), Int(I#), indexCharArray#)
 
@@ -49,15 +43,28 @@ import           TextShow.TH.Internal (deriveTextShow)
 
 #include "inline.h"
 
--- | Convert a strict 'BS.ByteString' to a 'Builder'.
---
--- /Since: 2/
-{-# INLINE showbByteStringStrict #-}
-showbByteStringStrict :: BS.ByteString -> Builder
+------------------------------------------------------------------------
+-- Primop wrappers
+
+data BA = BA# ByteArray#
+
+indexCharArray :: BA -> Int -> Char
+indexCharArray (BA# ba#) (I# i#) = C# (indexCharArray# ba# i#)
+
+------------------------------------------------------------------------
+-- Internal utils
+
+asBA :: ShortByteString -> BA
+asBA (SBS ba#) = BA# ba#
+------------------------------------------------------------------------
+
+-- | /Since: 2/
+instance TextShow BS.ByteString where
+    INLINE_INST_FUN(showb)
 #if MIN_VERSION_bytestring(0,10,0)
-showbByteStringStrict = showb . BS.unpackChars
+    showb = showb . BS.unpackChars
 #else
-showbByteStringStrict = showb . unpackWith BS.w2c
+    showb = showb . unpackWith BS.w2c
 
 -- | /O(n)/ Converts a 'ByteString' to a '[a]', using a conversion function.
 unpackWith :: (Word8 -> a) -> BS.ByteString -> [a]
@@ -70,36 +77,20 @@ unpackWith k (BS.PS ps s l) = BS.inlinePerformIO $ withForeignPtr ps $ \p ->
 {-# INLINE unpackWith #-}
 #endif
 
--- | Convert a lazy 'BL.ByteString' to a 'Builder'.
---
--- /Since: 2/
-showbByteStringLazy :: BL.ByteString -> Builder
-showbByteStringLazy = showbByteStringLazyPrec 0
-{-# INLINE showbByteStringLazy #-}
-
--- | Convert a lazy 'BL.ByteString' to a 'Builder' with the given precedence.
---
--- With @bytestring-0.10.0.0@ or later, this function ignores the precedence
--- argument, since lazy 'BL.ByteString's are printed out identically to 'String's.
--- On earlier versions of @bytestring@, however, lazy 'BL.ByteString's can be printed
--- with parentheses (e.g., @Chunk "example" Empty@ vs. @(Chunk "example" Empty)@)
--- depending on the precedence.
---
--- /Since: 2/
-showbByteStringLazyPrec :: Int -> BL.ByteString -> Builder
 #if MIN_VERSION_bytestring(0,10,0)
-showbByteStringLazyPrec _ = showb . BL.unpackChars
+-- | /Since: 2/
+instance TextShow BL.ByteString where
+    showb = showb . BL.unpackChars
+    INLINE_INST_FUN(showb)
 #else
-showbByteStringLazyPrec = showbPrec
+-- | /Since: 2/
+$(deriveTextShow ''BL.ByteString)
 #endif
-{-# INLINE showbByteStringLazyPrec #-}
 
--- | Convert a 'ShortByteString' to a 'Builder'.
---
--- /Since: 2/
-showbShortByteString :: ShortByteString -> Builder
-showbShortByteString = showb . unpackChars
-{-# INLINE showbShortByteString #-}
+-- | /Since: 2/
+instance TextShow ShortByteString where
+    showb = showb . unpackChars
+    INLINE_INST_FUN(showb)
 
 -- Unpacking bytestrings into lists effeciently is a tradeoff: on the one hand
 -- we would like to write a tight loop that just blats the list into memory, on
@@ -143,33 +134,3 @@ unpackAppendCharsStrict !sbs off len cs =
       | i == sentinal = acc
       | otherwise     = let !c = indexCharArray (asBA sbs) i
                         in go sentinal (i-1) (c:acc)
-
-------------------------------------------------------------------------
--- Primop wrappers
-
-data BA = BA# ByteArray#
-
-indexCharArray :: BA -> Int -> Char
-indexCharArray (BA# ba#) (I# i#) = C# (indexCharArray# ba# i#)
-
-------------------------------------------------------------------------
--- Internal utils
-
-asBA :: ShortByteString -> BA
-asBA (SBS ba#) = BA# ba#
-
-instance TextShow BS.ByteString where
-    showb = showbByteStringStrict
-    INLINE_INST_FUN(showb)
-
-#if MIN_VERSION_bytestring(0,10,0)
-instance TextShow BL.ByteString where
-    showbPrec = showbByteStringLazyPrec
-    INLINE_INST_FUN(showbPrec)
-#else
-$(deriveTextShow ''BL.ByteString)
-#endif
-
-instance TextShow ShortByteString where
-    showb = showbShortByteString
-    INLINE_INST_FUN(showb)
