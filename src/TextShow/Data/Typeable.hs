@@ -24,7 +24,7 @@ Portability: GHC
 module TextShow.Data.Typeable () where
 
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import Data.Text.Lazy.Builder (fromString, singleton)
 import Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 #if MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (tyConName)
@@ -32,6 +32,7 @@ import Data.Typeable.Internal (tyConName)
 import Data.Typeable.Internal (typeRepKinds)
 # endif
 # if MIN_VERSION_base(4,9,0)
+import Data.Text.Lazy.Builder (Builder)
 import Data.Typeable.Internal (Proxy(..), Typeable, TypeRep(TypeRep), typeRep)
 import GHC.Exts (RuntimeRep(..), TYPE)
 # elif MIN_VERSION_base(4,4,0)
