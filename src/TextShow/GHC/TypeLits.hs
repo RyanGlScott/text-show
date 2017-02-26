@@ -69,8 +69,8 @@ instance TextShow (IsEven n) where
 --
 -- /Since: 2/
 instance TextShow (IsZero n) where
-    showbIsZero IsZero     = singleton '0'
-    showbIsZero (IsSucc n) = singleton '(' <> showb n <> " + 1)"
+    showb IsZero     = singleton '0'
+    showb (IsSucc n) = singleton '(' <> showb n <> " + 1)"
     {-# INLINE showb #-}
 
 -- | Only available with @base-4.6@.
