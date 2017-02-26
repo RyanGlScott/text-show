@@ -23,11 +23,11 @@ module TextShow.GHC.Stack () where
 import GHC.Stack (CallStack)
 # if MIN_VERSION_base(4,9,0)
 import GHC.Stack (SrcLoc, getCallStack)
+import TextShow.Classes (TextShow(..))
 # else
 import GHC.SrcLoc (SrcLoc)
 # endif
 
-import TextShow.Classes (TextShow(..))
 import TextShow.Data.Char     ()
 import TextShow.Data.Integral ()
 import TextShow.Data.List     ()
