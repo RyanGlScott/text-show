@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE MagicHash                #-}
 {-# LANGUAGE TemplateHaskell          #-}
@@ -31,12 +30,10 @@ import TextShow.Classes (TextShow(..))
 import TextShow.Foreign.C.Types ()
 import TextShow.TH.Internal (deriveTextShow)
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow ThreadId where
     showbPrec p t = fromString "ThreadId " <> showbPrec p (getThreadId t)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- Temporary workaround until Trac #8281 is fixed
 foreign import ccall unsafe "rts_getThreadId" getThreadId# :: Addr# -> CInt

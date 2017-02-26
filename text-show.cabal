@@ -201,8 +201,6 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall
   include-dirs:        include
-  includes:            inline.h
-                     , utils.h
 
 test-suite spec
   type:                exitcode-stdio-1.0
@@ -410,7 +408,6 @@ test-suite spec
   include-dirs:        include
   includes:            generic.h
                      , overlap.h
-                     , utils.h
 
 benchmark bench
   if impl(ghc < 7.4)
@@ -465,5 +462,3 @@ benchmark bench
   default-language:    Haskell2010
   ghc-options:         -Wall
   include-dirs:        include
-  includes:            inline.h
-                     , utils.h

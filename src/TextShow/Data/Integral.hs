@@ -42,8 +42,6 @@ import           Prelude.Compat
 import           TextShow.Classes (TextShow(..))
 import           TextShow.Utils (toString)
 
-#include "inline.h"
-
 -- | Convert an 'Integral' type to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
@@ -123,17 +121,17 @@ instance TextShow Int where
 -- | /Since: 2/
 instance TextShow Int8 where
     showbPrec p x = showbPrec p (fromIntegral x :: Int)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Int16 where
     showbPrec p x = showbPrec p (fromIntegral x :: Int)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Int32 where
     showbPrec p x = showbPrec p (fromIntegral x :: Int)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Int64 where
@@ -142,36 +140,36 @@ instance TextShow Int64 where
 #else
     showbPrec p x = showbPrec p (fromIntegral x :: Int)
 #endif
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Integer where
     showbPrec p n
         | p > 6 && n < 0 = singleton '(' <> decimal n <> singleton ')'
         | otherwise      = decimal n
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Word where
     showb = decimal
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word8 where
     showb = decimal
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word16 where
     showb = decimal
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word32 where
     showb = decimal
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word64 where
     showb = decimal
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}

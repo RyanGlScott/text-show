@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -23,8 +22,6 @@ import TextShow.Data.List ()
 import TextShow.Data.Ratio ()
 import TextShow.TH.Internal (deriveTextShow)
 
-#include "inline.h"
-
 -- | /Since: 2/
 $(deriveTextShow ''DataType)
 -- | /Since: 2/
@@ -37,4 +34,4 @@ $(deriveTextShow ''Fixity)
 -- | /Since: 2/
 instance TextShow Constr where
     showb = fromString . showConstr
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}

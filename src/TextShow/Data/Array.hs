@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -35,8 +34,6 @@ import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Tuple ()
 
-#include "inline.h"
-
 {-# SPECIALIZE
     showbIArrayPrec :: (IArray UArray e, Ix i, TextShow i, TextShow e) =>
                         Int -> UArray i e -> Builder
@@ -58,9 +55,9 @@ instance (TextShow i, TextShow e, Ix i) => TextShow (Array i e) where
         <> showb (Array.bounds a)
         <> showbSpace
         <> showb (Array.assocs a)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance (IArray UArray e, Ix i, TextShow i, TextShow e) => TextShow (UArray i e) where
     showbPrec = showbIArrayPrec
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}

@@ -30,8 +30,6 @@ import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (makeShowbPrec)
 #endif
 
-#include "inline.h"
-
 -- | /Since: 2/
 $(deriveTextShow  ''All)
 -- | /Since: 2/

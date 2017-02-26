@@ -45,8 +45,6 @@ import TextShow.TH.Names (evtCloseValName, eventIsValName,
 import GHC.Event (Lifetime)
 # endif
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow Event where
     showb e = singleton '[' <> mconcat (intersperse "," $ catMaybes
@@ -64,7 +62,7 @@ $(deriveTextShow fdKeyTypeName)
 
 instance TextShow $(conT uniqueTypeName) where
     showb = showb . $(varE asInt64ValName)
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 # if MIN_VERSION_base(4,8,1)
 -- | Only available with @base-4.8.1.0@ or later.

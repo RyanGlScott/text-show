@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -19,12 +18,10 @@ module TextShow.Data.Functor.Compose () where
 import Data.Functor.Compose (Compose(..))
 import TextShow.Classes (TextShow(..), TextShow1(..), showbPrec1, showbUnaryWith)
 
-#include "inline.h"
-
 -- | /Since: 3/
 instance (TextShow1 f, TextShow1 g, TextShow a) => TextShow (Compose f g a) where
     showbPrec = showbPrec1
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 3/
 instance (TextShow1 f, TextShow1 g) => TextShow1 (Compose f g) where

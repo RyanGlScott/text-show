@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Data.List
@@ -17,17 +16,15 @@ import TextShow.Classes (TextShow(..), TextShow1(..), showbListWith, showtListWi
 import TextShow.Data.Char ()
 import TextShow.Data.Integral ()
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow a => TextShow [a] where
     {-# SPECIALIZE instance TextShow [String] #-}
     {-# SPECIALIZE instance TextShow String   #-}
     {-# SPECIALIZE instance TextShow [Int]    #-}
     showb = showbList
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow1 [] where
     liftShowbPrec _ sl _ = sl
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}

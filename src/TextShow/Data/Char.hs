@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -34,8 +33,6 @@ import           Prelude.Compat
 import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Integral ()
 import           TextShow.TH.Internal (deriveTextShow)
-
-#include "inline.h"
 
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
 --
@@ -102,10 +99,10 @@ showbGeneralCategory = showb
 -- | /Since: 2/
 instance TextShow Char where
     showb = showbChar
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
     showbList = showbString
-    INLINE_INST_FUN(showbList)
+    {-# INLINE showbList #-}
 
 -- | /Since: 2/
 $(deriveTextShow ''GeneralCategory)

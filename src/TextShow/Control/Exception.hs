@@ -31,17 +31,15 @@ import TextShow.Classes (TextShow(..))
 import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow SomeException where
     showbPrec p (SomeException e) = showbPrec p $ FromStringShow e
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow IOException where
     showb = showb . FromStringShow
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow ArithException where
@@ -64,12 +62,12 @@ instance TextShow ArrayException where
         =  "undefined array element"
         <> (if not $ null s then ": " <> fromString s
                             else mempty)
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow AssertionFailed where
     showb (AssertionFailed err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 #if MIN_VERSION_base(4,7,0)
 -- | Only available with @base-4.7.0.0@ or later.
@@ -86,27 +84,27 @@ instance TextShow AsyncException where
     showb HeapOverflow  = "heap overflow"
     showb ThreadKilled  = "thread killed"
     showb UserInterrupt = "user interrupt"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow NonTermination where
     showb NonTermination = "<<loop>>"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow NestedAtomically where
     showb NestedAtomically = "Control.Concurrent.STM.atomically was nested"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnMVar where
     showb BlockedIndefinitelyOnMVar = "thread blocked indefinitely in an MVar operation"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnSTM where
     showb BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 #if MIN_VERSION_base(4,8,0)
 -- | Only available with @base-4.8.0.0@ or later.
@@ -137,32 +135,32 @@ instance TextShow CompactionFailed where
 -- | /Since: 2/
 instance TextShow Deadlock where
     showb Deadlock = "<<deadlock>>"
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow NoMethodError where
     showb (NoMethodError err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow PatternMatchFail where
     showb (PatternMatchFail err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow RecConError where
     showb (RecConError err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow RecSelError where
     showb (RecSelError err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow RecUpdError where
     showb (RecUpdError err) = fromString err
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow ErrorCall where

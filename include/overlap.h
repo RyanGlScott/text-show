@@ -1,7 +1,8 @@
 #ifndef OVERLAP_H
 #define OVERLAP_H
 
-#include "utils.h"
+#define OPEN_PRAGMA {-#
+#define CLOSE_PRAGMA #-}
 
 #if __GLASGOW_HASKELL__ >= 710
 # define __LANGUAGE_OVERLAPPING_INSTANCES__

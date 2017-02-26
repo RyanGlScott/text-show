@@ -39,8 +39,6 @@ import           TextShow.Classes (TextShow(..), showbParen)
 import           TextShow.TH.Internal (deriveTextShow)
 import           TextShow.Utils (i2d)
 
-#include "inline.h"
-
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
@@ -387,12 +385,12 @@ expts10 = array (minExpt,maxExpt10) [(n,10^n) | n <- [minExpt .. maxExpt10]]
 -- | /Since: 2/
 instance TextShow Float where
     showbPrec = showbRealFloatPrec
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Double where
     showbPrec = showbRealFloatPrec
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 $(deriveTextShow ''FPFormat)

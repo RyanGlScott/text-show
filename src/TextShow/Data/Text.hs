@@ -43,22 +43,20 @@ import           TextShow.Data.ByteString ()
 import           Data.Text.Internal.Fusion.Size (Size)
 #endif
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow TS.Text where
     showb = showbString . TS.unpack
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow TL.Text where
     showb = showbString . TL.unpack
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Builder where
     showb = showb . toLazyText
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 $(deriveTextShow ''I16)
@@ -83,7 +81,7 @@ instance TextShow Decoding where
         fromString "Some " <> showb t <>
         singleton ' ' <> showb bs <>
         fromString " _"
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 #endif
 
 #if MIN_VERSION_text(1,1,0)

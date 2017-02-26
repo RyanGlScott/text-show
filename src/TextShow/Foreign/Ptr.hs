@@ -38,12 +38,11 @@ import TextShow.Utils (lengthB)
 import Unsafe.Coerce (unsafeCoerce)
 
 #include "MachDeps.h"
-#include "inline.h"
 
 -- | /Since: 2/
 instance TextShow (Ptr a) where
     showbPrec = liftShowbPrec undefined undefined
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow1 Ptr where
@@ -58,12 +57,12 @@ instance TextShow1 Ptr where
 -- | /Since: 2/
 instance TextShow (FunPtr a) where
     showbPrec = liftShowbPrec undefined undefined
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow1 FunPtr where
     liftShowbPrec _ _ _ = showb . castFunPtrToPtr
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}
 
 -- | /Since: 2/
 instance TextShow IntPtr where
@@ -76,9 +75,9 @@ instance TextShow WordPtr where
 -- | /Since: 2/
 instance TextShow (ForeignPtr a) where
     showbPrec = liftShowbPrec undefined undefined
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow1 ForeignPtr where
     liftShowbPrec _ _ _ = showb . unsafeForeignPtrToPtr
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}

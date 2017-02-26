@@ -41,8 +41,6 @@ import           Foreign.Storable (peek, peekByteOff)
 import           TextShow.TH.Internal (deriveTextShow)
 #endif
 
-#include "inline.h"
-
 ------------------------------------------------------------------------
 -- Primop wrappers
 
@@ -60,7 +58,7 @@ asBA (SBS ba#) = BA# ba#
 
 -- | /Since: 2/
 instance TextShow BS.ByteString where
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 #if MIN_VERSION_bytestring(0,10,0)
     showb = showb . BS.unpackChars
 #else
@@ -81,7 +79,7 @@ unpackWith k (BS.PS ps s l) = BS.inlinePerformIO $ withForeignPtr ps $ \p ->
 -- | /Since: 2/
 instance TextShow BL.ByteString where
     showb = showb . BL.unpackChars
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 #else
 -- | /Since: 2/
 $(deriveTextShow ''BL.ByteString)
@@ -90,7 +88,7 @@ $(deriveTextShow ''BL.ByteString)
 -- | /Since: 2/
 instance TextShow ShortByteString where
     showb = showb . unpackChars
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- Unpacking bytestrings into lists effeciently is a tradeoff: on the one hand
 -- we would like to write a tight loop that just blats the list into memory, on

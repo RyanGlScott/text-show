@@ -57,8 +57,6 @@ import TextShow.Data.List ()
 import TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import TextShow.Utils (isTupleString)
 
-#include "inline.h"
-
 #if MIN_VERSION_base(4,9,0)
 tyConOf :: Typeable a => Proxy a -> TyCon
 tyConOf = typeRepTyCon . typeRep
@@ -151,7 +149,7 @@ instance TextShow TyCon where
 #else
     showb = fromString . tyConString
 #endif
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 #if MIN_VERSION_base(4,9,0)
 -- | Only available with @base-4.9.0.0@ or later.
@@ -160,7 +158,7 @@ instance TextShow TyCon where
 instance TextShow TrName where
     showb (TrNameS s) = unpackCStringToBuilder# s
     showb (TrNameD s) = fromString s
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 unpackCStringToBuilder# :: Addr# -> Builder
     -- There's really no point in inlining this, ever, as the loop doesn't
@@ -181,5 +179,5 @@ unpackCStringToBuilder# addr
 -- /Since: 3/
 instance TextShow Module where
     showb (Module p m) = showb p <> singleton ':' <> showb m
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 #endif

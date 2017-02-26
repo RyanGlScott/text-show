@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -22,12 +21,10 @@ import Data.Functor.Product (Product(..))
 import TextShow.Classes (TextShow(..), TextShow1(..), showbPrec1)
 import TextShow.TH.Internal (deriveTextShow1)
 
-#include "inline.h"
-
 -- | /Since: 3/
 instance (TextShow1 f, TextShow1 g, TextShow a) => TextShow (Product f g a) where
     showbPrec = showbPrec1
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 3/
 $(deriveTextShow1 ''Product)

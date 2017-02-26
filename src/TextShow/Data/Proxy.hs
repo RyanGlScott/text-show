@@ -28,16 +28,14 @@ import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,
                              makeShowtPrec, makeShowtlPrec)
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow (Proxy s) where
     showbPrec  = $(makeShowbPrec  ''Proxy)
     showtPrec  = $(makeShowtPrec  ''Proxy)
     showtlPrec = $(makeShowtlPrec ''Proxy)
-    INLINE_INST_FUN(showbPrec)
-    INLINE_INST_FUN(showtPrec)
-    INLINE_INST_FUN(showtlPrec)
+    {-# INLINE showbPrec #-}
+    {-# INLINE showtPrec #-}
+    {-# INLINE showtlPrec #-}
 
 -- | /Since: 2/
 $(deriveTextShow1 ''Proxy)

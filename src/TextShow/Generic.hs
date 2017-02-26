@@ -120,8 +120,6 @@ import           TextShow.Instances ()
 import           TextShow.TH.Internal (deriveTextShow)
 import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
-#include "inline.h"
-
 {- $generics
 
 'TextShow' instances can be easily defined for data types that are 'Generic' instances.

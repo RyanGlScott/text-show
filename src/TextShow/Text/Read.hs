@@ -28,8 +28,6 @@ import TextShow.TH.Internal (deriveTextShow)
 import TextShow.TH.Names (numberTypeName)
 #endif
 
-#include "inline.h"
-
 -- | /Since: 2/
 $(deriveTextShow ''Lexeme)
 #if MIN_VERSION_base(4,6,0)

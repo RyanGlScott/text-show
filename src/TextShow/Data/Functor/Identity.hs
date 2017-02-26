@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -19,8 +18,6 @@ import Data.Functor.Identity (Identity(..))
 import TextShow.Classes (TextShow(..), TextShow1(..),
                          showbPrec1, showbUnaryWith)
 
-#include "inline.h"
-
 -- | /Since: 3/
 instance TextShow a => TextShow (Identity a) where
     showbPrec = showbPrec1
@@ -31,4 +28,4 @@ instance TextShow1 Identity where
     -- This would be equivalent to the derived instance of 'Identity' if the
     -- 'runIdentity' field were removed.
     liftShowbPrec sp _ p (Identity x) = showbUnaryWith sp "Identity" p x
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}

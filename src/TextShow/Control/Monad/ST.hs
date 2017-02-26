@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -18,19 +17,17 @@ module TextShow.Control.Monad.ST () where
 import Control.Monad.ST (ST)
 import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow (ST s a) where
     showb = liftShowbPrec undefined undefined 0
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow1 (ST s) where
     liftShowbPrec = liftShowbPrec2 undefined undefined
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}
 
 -- | /Since: 2/
 instance TextShow2 ST where
     liftShowbPrec2 _ _ _ _ _ _ = "<<ST action>>"
-    INLINE_INST_FUN(liftShowbPrec2)
+    {-# INLINE liftShowbPrec2 #-}

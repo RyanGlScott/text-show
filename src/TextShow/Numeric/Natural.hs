@@ -28,8 +28,6 @@ import Numeric.Natural (Natural)
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral ()
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow Natural where
 #if MIN_VERSION_base(4,8,0)
@@ -37,5 +35,5 @@ instance TextShow Natural where
     showbPrec p (NatJ# bn)  = showbPrec p $ Jp# bn
 #else
     showbPrec p             = showbPrec p . toInteger
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 #endif

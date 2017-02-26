@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
@@ -17,19 +16,17 @@ module TextShow.Functions () where
 
 import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow (a -> b) where
     showbPrec = liftShowbPrec undefined undefined
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow1 ((->) a) where
     liftShowbPrec = liftShowbPrec2 undefined undefined
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}
 
 -- | /Since: 2/
 instance TextShow2 (->) where
     liftShowbPrec2 _ _ _ _ _ _ = "<function>"
-    INLINE_INST_FUN(liftShowbPrec2)
+    {-# INLINE liftShowbPrec2 #-}

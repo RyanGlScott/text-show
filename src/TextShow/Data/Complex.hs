@@ -27,8 +27,6 @@ import TextShow.TH.Internal (makeShowbPrec)
 import TextShow.TH.Internal (deriveTextShow1)
 #endif
 
-#include "inline.h"
-
 -- | Note that on @base-4.3.0.0@, this must have a @('TextShow' a,
 -- 'RealFloat' a)@ constraint instead of just a @('TextShow' a)@ constraint.
 --
@@ -43,7 +41,7 @@ instance
     {-# SPECIALIZE instance TextShow (Complex Float)  #-}
     {-# SPECIALIZE instance TextShow (Complex Double) #-}
     showbPrec = $(makeShowbPrec ''Complex)
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 #if MIN_VERSION_base(4,4,0)
 -- | Only available with @base-4.4.0.0@ or later.

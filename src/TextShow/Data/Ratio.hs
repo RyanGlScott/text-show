@@ -25,8 +25,6 @@ import TextShow.Classes (TextShow1(..))
 #endif
 import TextShow.Data.Integral ()
 
-#include "inline.h"
-
 -- | Note that on @base-4.3.0.0@, this must have a @('TextShow' a, 'Integral' a)@
 -- constraint instead of just a @('TextShow' a)@ constraint.
 --
@@ -43,7 +41,7 @@ instance
            showbPrec ratioPrec1 numer
         <> " % "
         <> showbPrec ratioPrec1 denom
-    INLINE_INST_FUN(showbPrec)
+    {-# INLINE showbPrec #-}
 
 #if MIN_VERSION_base(4,4,0)
 -- | Only available with @base-4.4.0.0@ or later.
@@ -54,5 +52,5 @@ instance TextShow1 Ratio where
            sp ratioPrec1 numer
         <> " % "
         <> sp ratioPrec1 denom
-    INLINE_INST_FUN(liftShowbPrec)
+    {-# INLINE liftShowbPrec #-}
 #endif

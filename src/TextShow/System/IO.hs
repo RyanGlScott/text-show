@@ -34,13 +34,11 @@ import TextShow.Data.Integral ()
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow)
 
-#include "inline.h"
-
 -- | /Since: 2/
 instance TextShow Handle where
     showb (FileHandle   file _)   = showbHandleFilePath file
     showb (DuplexHandle file _ _) = showbHandleFilePath file
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | Convert a 'Handle`'s 'FilePath' to a 'Builder'.
 showbHandleFilePath :: FilePath -> Builder
@@ -55,7 +53,7 @@ $(deriveTextShow ''BufferMode)
 -- | /Since: 2/
 instance TextShow HandlePosn where
     showb (HandlePosn h pos) = showb h <> " at position " <> showbPrec 0 pos
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 -- | /Since: 2/
 $(deriveTextShow ''SeekMode)
@@ -63,7 +61,7 @@ $(deriveTextShow ''SeekMode)
 -- | /Since: 2/
 instance TextShow TextEncoding where
     showb = fromString . textEncodingName
-    INLINE_INST_FUN(showb)
+    {-# INLINE showb #-}
 
 #if MIN_VERSION_base(4,4,0)
 -- | Only available with @base-4.4.0.0@ or later.
