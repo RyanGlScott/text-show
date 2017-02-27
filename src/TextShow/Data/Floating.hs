@@ -68,7 +68,6 @@ showbRealFloatPrec p x
 -- /Since: 2/
 showbEFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbEFloat = formatRealFloatB Exponent
-{-# INLINE showbEFloat #-}
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
@@ -80,7 +79,6 @@ showbEFloat = formatRealFloatB Exponent
 -- /Since: 2/
 showbFFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbFFloat = formatRealFloatB Fixed
-{-# INLINE showbFFloat #-}
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation for arguments whose absolute value lies
@@ -93,7 +91,6 @@ showbFFloat = formatRealFloatB Fixed
 -- /Since: 2/
 showbGFloat :: RealFloat a => Maybe Int -> a -> Builder
 showbGFloat = formatRealFloatB Generic
-{-# INLINE showbGFloat #-}
 
 -- | Show a signed 'RealFloat' value
 -- using standard decimal notation (e.g. @245000@, @0.0015@).
