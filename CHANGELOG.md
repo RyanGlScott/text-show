@@ -5,6 +5,7 @@
 * Remove most monomorphic `TextShow` functions, as their utility is questionable, and their maintenance burden is undeniable
 * Rename `showbVersionConcrete` to `showbVersion` in `TextShow.Data.Version`
 * Add `SPECIALIZE` pragmas for `showbEFloat`, `showbFFloat`, and `showbGFloat` in `TextShow.Data.Floating`, mirroring the ones in `Numeric`
+* Generalize the kind of the last type parameter for the `TextShow (Const a b)` instance, which previously had been defaulted to `*`
 * Refactor test suite
 
 #### 3.4.1.1 [2016.11.07]
