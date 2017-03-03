@@ -3,6 +3,7 @@
     * Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types`
     * Add `TextShow` instance for `CompactionFailed` in `Control.Exception`
 * Remove most monomorphic `TextShow` functions, as their utility is questionable, and their maintenance burden is undeniable
+* Add `showbCommaSpace`, `showtCommaSpace`, and `showtlCommaSpace` to `TextShow`. This appears quite frequently in derived `TextShow` instances, so it is likely worthwhile to define it once.
 * Rename `showbVersionConcrete` to `showbVersion` in `TextShow.Data.Version`
 * Add `SPECIALIZE` pragmas for `showbEFloat`, `showbFFloat`, and `showbGFloat` in `TextShow.Data.Floating`, mirroring the ones in `Numeric`
 * Generalize the kind of the last type parameter for the `TextShow (Const a b)` instance, which previously had been defaulted to `*`

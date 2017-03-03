@@ -17,6 +17,9 @@ module TextShow (
     , showbParen
     , showtParen
     , showtlParen
+    , showbCommaSpace
+    , showtCommaSpace
+    , showtlCommaSpace
     , showbSpace
     , showtSpace
     , showtlSpace

@@ -78,9 +78,9 @@ instance TextShow UnicodeException where
 -- /Since: 2/
 instance TextShow Decoding where
     showbPrec p (Some t bs _) = showbParen (p > appPrec) $
-        fromString "Some " <> showb t <>
+        "Some " <> showb t <>
         singleton ' ' <> showb bs <>
-        fromString " _"
+        " _"
     {-# INLINE showbPrec #-}
 #endif
 
