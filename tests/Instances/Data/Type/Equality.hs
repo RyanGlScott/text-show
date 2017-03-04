@@ -21,9 +21,18 @@ Portability: GHC
 module Instances.Data.Type.Equality () where
 
 #if MIN_VERSION_base(4,7,0)
-import Data.Type.Equality ((:~:)(..))
+import Data.Type.Equality ((:~:))
+# if MIN_VERSION_base(4,10,0)
+import Data.Type.Equality ((:~~:), type (~~))
+# endif
+
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance a ~ b => Arbitrary (a :~: b) where
     arbitrary = arbitraryBoundedEnum
+
+# if MIN_VERSION_base(4,10,0)
+instance a ~~ b => Arbitrary (a :~~: b) where
+    arbitrary = arbitraryBoundedEnum
+# endif
 #endif

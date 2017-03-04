@@ -54,14 +54,16 @@ deriving instance Arbitrary CWchar
 deriving instance Arbitrary CSigAtomic
 deriving instance Arbitrary CClock
 deriving instance Arbitrary CTime
-# if MIN_VERSION_base(4,4,0)
 deriving instance Arbitrary CUSeconds
 deriving instance Arbitrary CSUSeconds
-# endif
 deriving instance Arbitrary CIntPtr
 deriving instance Arbitrary CUIntPtr
 deriving instance Arbitrary CIntMax
 deriving instance Arbitrary CUIntMax
+
+# if MIN_VERSION_base(4,10,0)
+deriving instance Arbitrary CBool
+# endif
 #else
 instance Arbitrary CChar where
     arbitrary = arbitrarySizedBoundedIntegral

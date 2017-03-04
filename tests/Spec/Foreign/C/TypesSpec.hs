@@ -75,3 +75,7 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy CFloat)
     describe "CDouble" $
         matchesTextShowSpec (Proxy :: Proxy CDouble)
+#if MIN_VERSION_base(4,10,0)
+    describe "CBool" $
+        matchesTextShowSpec (Proxy :: Proxy CBool)
+#endif

@@ -1,7 +1,10 @@
 ### next [YYYY.MM.DD]
-* Introduce some instances for datatypes added in `base-4.10.0.0`:
-    * Add `TextShow` instances for `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, and `CKey` in `System.Posix.Types`
-    * Add `TextShow` instance for `CompactionFailed` in `Control.Exception`
+* Introduce some 'TextShow' instances for datatypes added in `base-4.10.0.0`:
+  * `CBool` (from `Foreign.C.Types`)
+  * `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, `CKey`, and `CTimer` (from `System.Posix.Types`)
+  * `CompactionFailed` (from `Control.Exception`)
+  * `(:~~:)` (from `Data.Type.Equality`)
+  * `TypeRep` and `SomeTypeRep` (from `Type.Reflection`)
 * Remove most monomorphic `TextShow` functions, as their utility is questionable, and their maintenance burden is undeniable
 * Add `showbCommaSpace`, `showtCommaSpace`, and `showtlCommaSpace` to `TextShow`. This appears quite frequently in derived `TextShow` instances, so it is likely worthwhile to define it once.
 * Rename `showbVersionConcrete` to `showbVersion` in `TextShow.Data.Version`

@@ -109,4 +109,8 @@ spec = parallel $ do
     describe "CKey" $
         matchesTextShowSpec (Proxy :: Proxy CKey)
 # endif
+# if defined(HTYPE_TIMER_T)
+    describe "CTimer" $
+        matchesTextShowSpec (Proxy :: Proxy CTimer)
+# endif
 #endif

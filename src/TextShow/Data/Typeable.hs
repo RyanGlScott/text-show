@@ -46,49 +46,45 @@ import           TextShow.Utils (isTupleString)
 import           Type.Reflection (pattern App, pattern Con, pattern Con', pattern Fun,
                                   SomeTypeRep(..), TypeRep,
                                   eqTypeRep, tyConName, typeRep, typeRepTyCon)
-
-#else /* TODO */
-
+#else /* !(MIN_VERSION_base(4,10,0) */
 import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
-#if MIN_VERSION_base(4,4,0)
+# if MIN_VERSION_base(4,4,0)
 import           Data.Typeable.Internal (tyConName)
-# if MIN_VERSION_base(4,8,0)
+#  if MIN_VERSION_base(4,8,0)
 import           Data.Typeable.Internal (typeRepKinds)
-# endif
-# if MIN_VERSION_base(4,9,0)
+#  endif
+#  if MIN_VERSION_base(4,9,0)
 import           Data.Text.Lazy.Builder (Builder)
 import           Data.Typeable.Internal (Proxy(..), Typeable,
                                          TypeRep(TypeRep), typeRep)
 import           GHC.Exts (RuntimeRep(..), TYPE)
-# elif MIN_VERSION_base(4,4,0)
+#  elif MIN_VERSION_base(4,4,0)
 import           Data.Typeable.Internal (funTc, listTc)
 # endif
-#else
+# else
 import           Data.Typeable (mkTyCon, tyConString, typeOf)
-#endif
+# endif
 
-#if MIN_VERSION_base(4,9,0)
+# if MIN_VERSION_base(4,9,0)
 import           GHC.Exts (Char(..))
 import           GHC.Prim (Addr#, (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (TyCon(..), TrName(..), Module(..), isTrue#)
-#elif MIN_VERSION_base(4,4,0)
+# elif MIN_VERSION_base(4,4,0)
 import           Data.Typeable.Internal (TyCon)
-#else
+# else
 import           Data.Typeable (TyCon)
-#endif
+# endif
 
 import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import           TextShow.Utils (isTupleString)
-
 #endif
 
 #if !(MIN_VERSION_base(4,10,0))
-
-#if MIN_VERSION_base(4,9,0)
+# if MIN_VERSION_base(4,9,0)
 tyConOf :: Typeable a => Proxy a -> TyCon
 tyConOf = typeRepTyCon . typeRep
 
@@ -106,7 +102,7 @@ tc'Lifted = tyConOf (Proxy :: Proxy 'PtrRepLifted)
 
 tc'Unlifted :: TyCon
 tc'Unlifted = tyConOf (Proxy :: Proxy 'PtrRepUnlifted)
-#elif MIN_VERSION_base(4,4,0)
+# elif MIN_VERSION_base(4,4,0)
 -- | The list 'TyCon'.
 tcList :: TyCon
 tcList = listTc
@@ -114,7 +110,7 @@ tcList = listTc
 -- | The function (@->@) 'TyCon'.
 tcFun :: TyCon
 tcFun = funTc
-#else
+# else
 -- | The list 'TyCon'.
 tcList :: TyCon
 tcList = typeRepTyCon $ typeOf [()]
@@ -122,9 +118,8 @@ tcList = typeRepTyCon $ typeOf [()]
 -- | The function (@->@) 'TyCon'.
 tcFun :: TyCon
 tcFun = mkTyCon "->"
+# endif
 #endif
-
-#endif /* TODO */
 
 -- | Does the 'TyCon' represent a tuple type constructor?
 isTupleTyCon :: TyCon -> Bool

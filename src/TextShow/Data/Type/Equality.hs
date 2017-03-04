@@ -24,6 +24,9 @@ module TextShow.Data.Type.Equality () where
 
 #if MIN_VERSION_base(4,7,0)
 import Data.Type.Equality ((:~:))
+# if MIN_VERSION_base(4,10,0)
+import Data.Type.Equality ((:~~:))
+# endif
 
 import TextShow.Classes (TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeLiftShowbPrec)
@@ -37,4 +40,16 @@ instance TextShow1 ((:~:) a) where
 
 -- | /Since: 2/
 $(deriveTextShow2 ''(:~:))
+
+# if MIN_VERSION_base(4,10,0)
+-- | /Since: next/
+$(deriveTextShow ''(:~~:))
+
+-- | /Since: next/
+instance TextShow1 ((:~~:) a) where
+    liftShowbPrec = $(makeLiftShowbPrec ''(:~~:))
+
+-- | /Since: next/
+$(deriveTextShow2 ''(:~~:))
+# endif
 #endif
