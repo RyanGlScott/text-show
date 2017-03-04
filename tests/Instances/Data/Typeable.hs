@@ -25,8 +25,6 @@ module Instances.Data.Typeable () where
 
 #if MIN_VERSION_base(4,4,0)
 import Instances.Utils ((<@>))
-#else
-import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
 #endif
 
 #if MIN_VERSION_base(4,9,0)
@@ -46,8 +44,10 @@ import GHC.Exts (Int(..), Ptr(..))
 import GHC.Types (KindRep(..), RuntimeRep(..), TypeLitSort(..),
                   VecCount(..), VecElem(..))
 import Type.Reflection (SomeTypeRep(..), Typeable, TypeRep, typeRep)
-#else
+#elif MIN_VERSION_base(4,4,0)
 import Data.Typeable.Internal (TypeRep(..))
+#else
+import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
 #endif
 
 import Instances.Foreign.Ptr ()
