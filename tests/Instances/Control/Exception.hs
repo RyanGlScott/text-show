@@ -105,9 +105,7 @@ deriving instance Arbitrary TypeError
 #endif
 
 #if MIN_VERSION_base(4,10,0)
--- deriving instance Arbitrary CompactionFailed
-instance Arbitrary CompactionFailed where
-    arbitrary = genericArbitrary
+deriving instance Arbitrary CompactionFailed
 #endif
 
 deriving instance Bounded Deadlock
@@ -149,11 +147,6 @@ deriving instance Generic RecConError
 deriving instance Generic RecSelError
 deriving instance Generic RecUpdError
 deriving instance Generic ErrorCall
-
--- TODO: Get rid of this in /Since: next/ version
-# if MIN_VERSION_base(4,10,0)
-deriving instance Generic CompactionFailed
-# endif
 #else
 $(Generics.deriveAll0 ''ArrayException)
 $(Generics.deriveAll0 ''AssertionFailed)
