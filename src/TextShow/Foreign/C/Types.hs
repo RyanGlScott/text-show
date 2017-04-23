@@ -94,7 +94,7 @@ deriving instance TextShow CDouble
 # if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.4.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CBool
 # endif
 #else

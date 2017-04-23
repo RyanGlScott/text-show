@@ -188,56 +188,56 @@ instance TextShow CRLim where
 # if defined(HTYPE_BLKSIZE_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CBlkSize
 # endif
 
 # if defined(HTYPE_BLKCNT_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CBlkCnt
 # endif
 
 # if defined(HTYPE_CLOCKID_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CClockId
 # endif
 
 # if defined(HTYPE_FSBLKCNT_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CFsBlkCnt
 # endif
 
 # if defined(HTYPE_FSFILCNT_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CFsFilCnt
 # endif
 
 # if defined(HTYPE_ID_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CId
 # endif
 
 # if defined(HTYPE_KEY_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CKey
 # endif
 
 # if defined(HTYPE_TIMER_T)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 deriving instance TextShow CTimer
 # endif
 #endif

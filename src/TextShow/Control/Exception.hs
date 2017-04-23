@@ -127,7 +127,7 @@ instance TextShow TypeError where
 #if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 instance TextShow CompactionFailed where
     showb (CompactionFailed why) = fromString ("compaction failed: " <> why)
 #endif

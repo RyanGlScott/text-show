@@ -32,7 +32,7 @@ import TextShow.TH.Internal (deriveTextShow)
 -- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags'
 -- @= [\"tag1\",\"tag2\"]@, the output will be @1.2.3-tag1-tag2@.
 --
--- /Since: next/
+-- /Since: 3.6/
 showbVersion :: Version -> Builder
 showbVersion (Version branch tags)
     = mconcat (intersperse (singleton '.') $ map showb branch) <>

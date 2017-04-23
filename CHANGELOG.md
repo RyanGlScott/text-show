@@ -1,4 +1,4 @@
-### next [YYYY.MM.DD]
+### 3.6 [2017.04.22]
 * Introduce some 'TextShow' instances for datatypes added in `base-4.10.0.0`:
   * `CBool` (from `Foreign.C.Types`)
   * `CBlkSize`, `CBlkCnt`, `CClockId`, `CFsBlkCnt`, `CId`, `CKey`, and `CTimer` (from `System.Posix.Types`)

@@ -137,19 +137,19 @@ tyConString = tyConName
 #if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 instance TextShow SomeTypeRep where
     showbPrec p (SomeTypeRep ty) = showbPrec p ty
 
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 instance TextShow (TypeRep (a :: k)) where
     showbPrec = showbTypeable
 
 -- | Only available with @base-4.10.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.6/
 instance TextShow1 TypeRep where
     liftShowbPrec _ _ = showbTypeable
 

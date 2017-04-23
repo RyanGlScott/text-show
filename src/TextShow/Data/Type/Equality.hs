@@ -42,14 +42,14 @@ instance TextShow1 ((:~:) a) where
 $(deriveTextShow2 ''(:~:))
 
 # if MIN_VERSION_base(4,10,0)
--- | /Since: next/
+-- | /Since: 3.6/
 $(deriveTextShow ''(:~~:))
 
--- | /Since: next/
+-- | /Since: 3.6/
 instance TextShow1 ((:~~:) a) where
     liftShowbPrec = $(makeLiftShowbPrec ''(:~~:))
 
--- | /Since: next/
+-- | /Since: 3.6/
 $(deriveTextShow2 ''(:~~:))
 # endif
 #endif
