@@ -226,7 +226,6 @@ test-suite spec
                        Instances.Data.Functor.Compose
                        Instances.Data.Functor.Product
                        Instances.Data.Functor.Sum
-                       Instances.Data.List.NonEmpty
                        Instances.Data.Ord
                        Instances.Data.Proxy
                        Instances.Data.Semigroup
@@ -358,7 +357,7 @@ test-suite spec
                        Spec.GHC.StackSpec
   build-depends:       array                >= 0.3    && < 0.6
                      , base-compat          >= 0.8.2  && < 1
-                     , base-orphans         >= 0.5.2  && < 1
+                     , base-orphans         >= 0.6    && < 0.7
                      , bifunctors           >= 5.1    && < 6
                      , bytestring           >= 0.9    && < 0.11
                      , bytestring-builder
@@ -372,7 +371,7 @@ test-suite spec
                      , nats                 >= 0.1    && < 2
                      , QuickCheck           >= 2.9    && < 3
                      , quickcheck-instances >= 0.1    && < 0.4
-                     , semigroups           >= 0.17   && < 1
+                     , semigroups           >= 0.18.3 && < 1
                      , tagged               >= 0.8.3  && < 1
                      , text                 >= 0.11.1 && < 1.3
                      , th-lift              >= 0.7.6  && < 1

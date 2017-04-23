@@ -25,8 +25,9 @@ module TextShow.System.Posix.Types () where
 import System.Posix.Types
 
 import TextShow.Classes (TextShow(..))
-import TextShow.Data.Integral ()
+import TextShow.Data.Integral   ()
 import TextShow.Foreign.C.Types ()
+import TextShow.Foreign.Ptr     ()
 
 #if !(MIN_VERSION_base(4,5,0))
 import Data.Int
@@ -231,6 +232,13 @@ deriving instance TextShow CId
 --
 -- /Since: next/
 deriving instance TextShow CKey
+# endif
+
+# if defined(HTYPE_TIMER_T)
+-- | Only available with @base-4.10.0.0@ or later.
+--
+-- /Since: next/
+deriving instance TextShow CTimer
 # endif
 #endif
 

@@ -17,6 +17,7 @@ Portability: GHC
 module Instances.System.Posix.Types () where
 
 import Instances.Foreign.C.Types ()
+import Instances.Foreign.Ptr ()
 import System.Posix.Types
 import Test.QuickCheck (Arbitrary(..))
 
@@ -150,6 +151,10 @@ deriving instance Arbitrary CId
 
 # if defined(HTYPE_KEY_T)
 deriving instance Arbitrary CKey
+# endif
+
+# if defined(HTYPE_TIMER_T)
+deriving instance Arbitrary CTimer
 # endif
 #endif
 

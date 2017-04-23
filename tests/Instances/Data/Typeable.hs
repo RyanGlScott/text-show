@@ -1,5 +1,12 @@
-{-# LANGUAGE CPP       #-}
-{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE MagicHash           #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving  #-}
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds           #-}
+#endif
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -17,11 +24,7 @@ module Instances.Data.Typeable () where
 #include "MachDeps.h"
 
 #if MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (TypeRep(..))
 import Instances.Utils ((<@>))
-#else
-import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
-import Test.QuickCheck (Gen)
 #endif
 
 #if MIN_VERSION_base(4,9,0)
@@ -36,24 +39,82 @@ import Test.QuickCheck (oneof)
 import Data.Typeable.Internal (TyCon(..))
 #endif
 
+#if MIN_VERSION_base(4,10,0)
+import GHC.Exts (Int(..), Ptr(..))
+import GHC.Types (KindRep(..), RuntimeRep(..), TypeLitSort(..),
+                  VecCount(..), VecElem(..))
+import Type.Reflection (SomeTypeRep(..), Typeable, TypeRep, typeRep)
+#elif MIN_VERSION_base(4,4,0)
+import Data.Typeable.Internal (TypeRep(..))
+#else
+import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
+#endif
+
+import Instances.Foreign.Ptr ()
 import Instances.GHC.Fingerprint ()
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck
 
+#if MIN_VERSION_base(4,10,0)
+instance Typeable a => Arbitrary (TypeRep (a :: k)) where
+    arbitrary = pure (typeRep :: TypeRep (a :: k))
+
+instance Arbitrary SomeTypeRep where
+    arbitrary = SomeTypeRep <$> (arbitrary :: Gen (TypeRep Int))
+
+deriving instance Bounded TypeLitSort
+deriving instance Enum TypeLitSort
+instance Arbitrary TypeLitSort where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary KindRep where
+    arbitrary = oneof [ KindRepTyConApp <$> arbitrary <@> []
+                      , KindRepVar <$> arbitrary
+                      , KindRepApp <$> krt <*> krt
+                      , krt
+                      , do Ptr a# <- arbitrary
+                           (\a -> KindRepTypeLitS a a#) <$> arbitrary
+                      , KindRepTypeLitD <$> arbitrary <*> arbitrary
+                      ]
+      where
+        krt = KindRepTYPE <$> arbitrary
+
+instance Arbitrary RuntimeRep where
+    arbitrary = oneof [ VecRep <$> arbitrary <*> arbitrary
+                      , pure $ TupleRep []
+                      , pure $ SumRep []
+                      , pure LiftedRep
+                      , pure UnliftedRep
+                      , pure IntRep
+                      , pure WordRep
+                      , pure Int64Rep
+                      , pure Word64Rep
+                      , pure AddrRep
+                      , pure FloatRep
+                      , pure DoubleRep
+                      ]
+
+instance Arbitrary VecCount where
+    arbitrary = arbitraryBoundedEnum
+
+instance Arbitrary VecElem where
+    arbitrary = arbitraryBoundedEnum
+#else /* !(MIN_VERSION_base(4,10,0) */
 instance Arbitrary TypeRep where
-#if MIN_VERSION_base(4,4,0)
+# if MIN_VERSION_base(4,4,0)
     arbitrary = TypeRep <$> arbitrary
                         <*> arbitrary
-# if MIN_VERSION_base(4,8,0)
+#  if MIN_VERSION_base(4,8,0)
                         <@> [] <@> []
-# else
+#  else
                         <@> []
-# endif
-#else
+#  endif
+# else
     arbitrary = typeOf <$> (arbitrary :: Gen Int)
+# endif
 #endif
 
 instance Arbitrary TyCon where
@@ -66,7 +127,13 @@ instance Arbitrary TyCon where
         W#   w1# <- arbitrary
         W#   w2# <- arbitrary
 # endif
+# if MIN_VERSION_base(4,10,0)
+        I# i# <- arbitrary
+        (\a1 a2 a3 -> TyCon w1# w2# a1 a2 i# a3)
+            <$> arbitrary <*> arbitrary <*> arbitrary
+# else
         TyCon w1# w2# <$> arbitrary <*> arbitrary
+# endif
 #elif MIN_VERSION_base(4,4,0)
     arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #else

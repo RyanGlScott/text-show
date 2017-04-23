@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE KindSignatures       #-}
 {-# LANGUAGE MagicHash            #-}
+{-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE TypeSynonymInstances #-}
@@ -33,7 +34,7 @@ import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, makeShowbPrec,
 
 #if !(MIN_VERSION_template_haskell(2,7,0))
 import Data.Monoid.Compat ((<>))
-import Data.Text.Lazy.Builder (fromString, singleton)
+import Data.Text.Lazy.Builder (singleton)
 
 import GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import GHC.Show (appPrec)
@@ -130,8 +131,8 @@ instance TextShow (UChar p) where
 -- | /Since: 2.1.2/
 instance TextShow1 UChar where
     liftShowbPrec _ _ p (UChar c) = showbParen (p > appPrec) $
-           fromString "UChar "    <> singleton '{'
-        <> fromString "uChar# = " <> showb (C# c)
+           "UChar "    <> singleton '{'
+        <> "uChar# = " <> showb (C# c)
         <> singleton '}'
 
 -- | /Since: 2.1.2/
@@ -140,8 +141,8 @@ instance TextShow (UDouble p) where
 -- | /Since: 2.1.2/
 instance TextShow1 UDouble where
     liftShowbPrec _ _ p (UDouble d) = showbParen (p > appPrec) $
-           fromString "UDouble "    <> singleton '{'
-        <> fromString "uDouble# = " <> showb (D# d)
+           "UDouble "    <> singleton '{'
+        <> "uDouble# = " <> showb (D# d)
         <> singleton '}'
 
 -- | /Since: 2.1.2/
@@ -150,8 +151,8 @@ instance TextShow (UFloat p) where
 -- | /Since: 2.1.2/
 instance TextShow1 UFloat where
     liftShowbPrec _ _ p (UFloat f) = showbParen (p > appPrec) $
-           fromString "UFloat "    <> singleton '{'
-        <> fromString "uFloat# = " <> showb (F# f)
+           "UFloat "    <> singleton '{'
+        <> "uFloat# = " <> showb (F# f)
         <> singleton '}'
 
 -- | /Since: 2.1.2/
@@ -160,8 +161,8 @@ instance TextShow (UInt p) where
 -- | /Since: 2.1.2/
 instance TextShow1 UInt where
     liftShowbPrec _ _ p (UInt i) = showbParen (p > appPrec) $
-           fromString "UInt "    <> singleton '{'
-        <> fromString "uInt# = " <> showb (I# i)
+           "UInt "    <> singleton '{'
+        <> "uInt# = " <> showb (I# i)
         <> singleton '}'
 
 -- | /Since: 2.1.2/
@@ -170,8 +171,8 @@ instance TextShow (UWord p) where
 -- | /Since: 2.1.2/
 instance TextShow1 UWord where
     liftShowbPrec _ _ p (UWord w) = showbParen (p > appPrec) $
-           fromString "UWord "    <> singleton '{'
-        <> fromString "uWord# = " <> showb (W# w)
+           "UWord "    <> singleton '{'
+        <> "uWord# = " <> showb (W# w)
         <> singleton '}'
 #endif
 

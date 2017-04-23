@@ -90,6 +90,13 @@ deriving instance TextShow CSUSeconds
 deriving instance TextShow CFloat
 -- | /Since: 2/
 deriving instance TextShow CDouble
+
+# if MIN_VERSION_base(4,10,0)
+-- | Only available with @base-4.4.0.0@ or later.
+--
+-- /Since: next/
+deriving instance TextShow CBool
+# endif
 #else
 -- | /Since: 2/
 instance TextShow CChar where

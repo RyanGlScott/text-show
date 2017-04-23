@@ -89,8 +89,10 @@ import           Prelude ()
 import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
-                                   showbListWith, showbParen, showbSpace,
-                                   showtParen, showtSpace, showtlParen, showtlSpace)
+                                   showbListWith,
+                                   showbParen,  showbCommaSpace,  showbSpace,
+                                   showtParen,  showtCommaSpace,  showtSpace,
+                                   showtlParen, showtlCommaSpace, showtlSpace)
 import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
 import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
@@ -599,7 +601,7 @@ makeTextShowForCon p tsClass tsFun spls (RecC conName ts) = do
                                                                      (showString argNameBase) ""
                                          in [ varE (fromStringName tsFun) `appE` stringE (infixRec ++ " = ")
                                             , makeTextShowForArg 0 tsClass tsFun conName tvMap argTy arg
-                                            , varE (fromStringName tsFun) `appE` stringE ", "
+                                            , varE (showCommaSpaceName tsFun)
                                             ]
                                    )
                                    (zip3 ts argTys args)
@@ -1378,6 +1380,11 @@ showParenName :: TextShowFun -> Name
 showParenName ShowbPrec  = 'showbParen
 showParenName ShowtPrec  = 'showtParen
 showParenName ShowtlPrec = 'showtlParen
+
+showCommaSpaceName :: TextShowFun -> Name
+showCommaSpaceName ShowbPrec  = 'showbCommaSpace
+showCommaSpaceName ShowtPrec  = 'showtCommaSpace
+showCommaSpaceName ShowtlPrec = 'showtlCommaSpace
 
 showSpaceName :: TextShowFun -> Name
 showSpaceName ShowbPrec  = 'showbSpace

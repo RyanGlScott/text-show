@@ -19,7 +19,7 @@ module Instances.Data.Semigroup () where
 
 import           Data.Semigroup (Min(..), Max(..), First(..), Last(..),
                                  WrappedMonoid(..), Option(..), Arg(..))
-#if __GLASGOW_HASKELL__ < 704
+#if __GLASGOW_HASKELL__ < 702
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 #endif
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
@@ -35,6 +35,6 @@ deriving instance Arbitrary a => Arbitrary (Option a)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Arg a b) where
     arbitrary = genericArbitrary
 
-#if __GLASGOW_HASKELL__ < 704
+#if __GLASGOW_HASKELL__ < 702
 $(Generics.deriveAll0 ''Arg)
 #endif

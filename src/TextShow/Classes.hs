@@ -186,6 +186,12 @@ showbParen :: Bool -> Builder -> Builder
 showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
                      | otherwise = builder
 
+-- | Construct a 'Builder' containing a comma followed by a space.
+--
+-- /Since: next/
+showbCommaSpace :: Builder
+showbCommaSpace = ", "
+
 -- | Construct a 'Builder' containing a single space character.
 --
 -- /Since: 2/
@@ -214,6 +220,12 @@ showtParen :: Bool -> TS.Text -> TS.Text
 showtParen p t | p         = TS.singleton '(' <> t <> TS.singleton ')'
                | otherwise = t
 
+-- | Construct a strict 'TS.Text' containing a comma followed by a space.
+--
+-- /Since: next/
+showtCommaSpace :: TS.Text
+showtCommaSpace = ", "
+
 -- | Construct a strict 'TS.Text' containing a single space character.
 --
 -- /Since: 3.4/
@@ -239,6 +251,12 @@ showtlParen :: Bool -> TL.Text -> TL.Text
 showtlParen p t | p         = TL.singleton '(' <> t <> TL.singleton ')'
                 | otherwise = t
 {-# INLINE showtlParen #-}
+
+-- | Construct a lazy 'TL.Text' containing a comma followed by a space.
+--
+-- /Since: next/
+showtlCommaSpace :: TL.Text
+showtlCommaSpace = ", "
 
 -- | Construct a lazy 'TL.Text' containing a single space character.
 --

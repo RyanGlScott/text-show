@@ -23,6 +23,10 @@ import Test.Hspec (Spec, hspec, parallel)
 #if MIN_VERSION_base(4,7,0)
 import Data.Proxy (Proxy(..))
 import Data.Type.Equality ((:~:))
+# if MIN_VERSION_base(4,10,0)
+import Data.Type.Equality ((:~~:))
+# endif
+
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)
 #endif
@@ -31,10 +35,14 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = parallel $
+spec = parallel $ do
 #if MIN_VERSION_base(4,7,0)
     describe "Int :~: Int" $
         matchesTextShowSpec (Proxy :: Proxy (Int :~: Int))
+# if MIN_VERSION_base(4,10,0)
+    describe "Int :~~: Int" $
+        matchesTextShowSpec (Proxy :: Proxy (Int :~~: Int))
+# endif
 #else
     pure ()
 #endif

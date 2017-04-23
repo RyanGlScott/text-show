@@ -12,7 +12,7 @@ module Spec.Data.List.NonEmptySpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
 import Data.List.NonEmpty (NonEmpty)
-import Instances.Data.List.NonEmpty ()
+import Data.Orphans ()
 import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 
