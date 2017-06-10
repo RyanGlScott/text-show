@@ -1054,11 +1054,11 @@ dataConIError = error
 -- Expanding type synonyms
 -------------------------------------------------------------------------------
 
-substNameWithKind :: Name -> Kind -> Type -> Type
+substNameWithKind :: Name -> Type -> Type -> Type
 substNameWithKind n k = applySubstitution (Map.singleton n k)
 
 substNamesWithKindStar :: [Name] -> Type -> Type
-substNamesWithKindStar ns t = foldr' (flip substNameWithKind starK) t ns
+substNamesWithKindStar ns t = foldr' (flip substNameWithKind StarT) t ns
 
 -------------------------------------------------------------------------------
 -- Class-specific constants
