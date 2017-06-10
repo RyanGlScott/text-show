@@ -1054,11 +1054,18 @@ dataConIError = error
 -- Expanding type synonyms
 -------------------------------------------------------------------------------
 
-substNameWithKind :: Name -> Type -> Type -> Type
-substNameWithKind n k = applySubstitution (Map.singleton n k)
+applySubstitutionKind :: Map Name Kind -> Type -> Type
+#if MIN_VERSION_template_haskell(2,8,0)
+applySubstitutionKind = applySubstitution
+#else
+applySubstitutionKind _ t = t
+#endif
+
+substNameWithKind :: Name -> Kind -> Type -> Type
+substNameWithKind n k = applySubstitutionKind (Map.singleton n k)
 
 substNamesWithKindStar :: [Name] -> Type -> Type
-substNamesWithKindStar ns t = foldr' (flip substNameWithKind StarT) t ns
+substNamesWithKindStar ns t = foldr' (flip substNameWithKind starK) t ns
 
 -------------------------------------------------------------------------------
 -- Class-specific constants
