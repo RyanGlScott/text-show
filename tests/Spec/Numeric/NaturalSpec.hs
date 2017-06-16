@@ -14,6 +14,7 @@ import Data.Proxy (Proxy(..))
 import Numeric.Natural (Natural)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec

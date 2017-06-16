@@ -225,8 +225,6 @@ test-suite spec
                        Instances.Data.Data
                        Instances.Data.Dynamic
                        Instances.Data.Floating
-                       Instances.Data.Functor.Compose
-                       Instances.Data.Functor.Product
                        Instances.Data.Functor.Sum
                        Instances.Data.Ord
                        Instances.Data.Proxy
@@ -240,7 +238,6 @@ test-suite spec
                        Instances.Generic
                        Instances.GHC.Generics
                        Instances.Options
-                       Instances.System.Exit
                        Instances.System.IO
                        Instances.System.Posix.Types
                        Instances.Text.Read
@@ -371,8 +368,8 @@ test-suite spec
                      , hspec                >= 2      && < 3
                      , integer-gmp
                      , nats                 >= 0.1    && < 2
-                     , QuickCheck           >= 2.9    && < 3
-                     , quickcheck-instances >= 0.1    && < 0.4
+                     , QuickCheck           >= 2.10   && < 2.11
+                     , quickcheck-instances >= 0.3.15 && < 0.4
                      , semigroups           >= 0.18.3 && < 1
                      , tagged               >= 0.8.3  && < 1
                      , text                 >= 0.11.1 && < 1.3
