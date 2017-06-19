@@ -1,6 +1,6 @@
-# next [????.??.??]
+### next [2017.06.18]
 * Drop support for GHC 7.0 and 7.2
-* Require `QuickCheck-2.10`/`quickcheck-instances-0.13.5` or later
+* Require `QuickCheck-2.10`/`quickcheck-instances-0.13.6` or later
 
 ### 3.6 [2017.04.22]
 * Introduce some 'TextShow' instances for datatypes added in `base-4.10.0.0`:

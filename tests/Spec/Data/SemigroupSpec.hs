@@ -18,6 +18,7 @@ import Instances.Data.Semigroup ()
 import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec
