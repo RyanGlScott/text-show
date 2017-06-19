@@ -221,7 +221,6 @@ test-suite spec
                        Instances.Data.Floating
                        Instances.Data.Functor.Sum
                        Instances.Data.Ord
-                       Instances.Data.Proxy
                        Instances.Data.Semigroup
                        Instances.Data.Text
                        Instances.Data.Tuple
