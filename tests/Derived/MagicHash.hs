@@ -1,11 +1,8 @@
 {-# LANGUAGE CPP             #-}
+{-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE MagicHash       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies    #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric   #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds       #-}
@@ -86,10 +83,8 @@ data instance TyFamily# a b = TyFamily# {
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon# a b) where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_template_haskell(2,7,0)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily# a b) where
     arbitrary = genericArbitrary
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -106,19 +101,17 @@ $(deriveTextShow2 ''TyCon#)
 $(Generics.deriveAll0And1 ''TyCon#)
 #endif
 
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1Options legacyShowOptions 'TyFamily#)
-# else
+#else
 $(deriveShow1Options legacyShowOptions 'TyFamily#)
 $(deriveShow2Options legacyShowOptions 'TyFamily#)
-# endif
+#endif
 
 $(deriveTextShow  'TyFamily#)
 $(deriveTextShow1 'TyFamily#)
 $(deriveTextShow2 'TyFamily#)
 
-# if __GLASGOW_HASKELL__ < 711
+#if __GLASGOW_HASKELL__ < 711
 $(Generics.deriveAll0And1 'TyFamily#)
-# endif
 #endif

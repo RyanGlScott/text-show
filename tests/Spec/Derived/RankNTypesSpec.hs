@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Derived.RankNTypesSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -24,7 +22,5 @@ spec :: Spec
 spec = parallel $ do
     describe "TyCon Int Int" $
         matchesTextShow1Spec (Proxy :: Proxy (TyCon Int Int))
-#if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int" $
         matchesTextShow1Spec (Proxy :: Proxy (TyFamily Int Int))
-#endif

@@ -1,8 +1,5 @@
 {-# LANGUAGE CPP #-}
-
-#if MIN_VERSION_base(4,4,0)
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-#endif
 {-|
 Module:      TextShow.GHC.Fingerprint
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,13 +9,11 @@ Stability:   Provisional
 Portability: GHC
 
 'TextShow' instance for 'Fingerprint'.
-Only provided if using @base-4.4.0.0@ or later.
 
 /Since: 2/
 -}
 module TextShow.GHC.Fingerprint () where
 
-#if MIN_VERSION_base(4,4,0)
 import Data.Monoid.Compat ((<>))
 import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
@@ -37,4 +32,3 @@ instance TextShow Fingerprint where
         hex16 :: Word64 -> Builder
         hex16 i = let hex = showbHex i
                   in mtimesDefault (max 0 $ 16 - lengthB hex) (singleton '0') <> hex
-#endif

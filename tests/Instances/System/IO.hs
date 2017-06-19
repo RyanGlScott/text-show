@@ -1,12 +1,5 @@
-{-# LANGUAGE CPP                #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell    #-}
-{-# LANGUAGE TypeFamilies       #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
-
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -21,28 +14,20 @@ Portability: GHC
 -}
 module Instances.System.IO () where
 
-#if __GLASGOW_HASKELL__ >= 704
-import           GHC.Generics (Generic)
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
-#endif
+import GHC.Generics (Generic)
+import GHC.IO.Encoding.Failure (CodingFailureMode(..))
+import GHC.IO.Encoding.Types (CodingProgress(..))
+import GHC.IO.Handle (HandlePosn(..))
 
-#if MIN_VERSION_base(4,4,0)
-import           GHC.IO.Encoding.Failure (CodingFailureMode(..))
-import           GHC.IO.Encoding.Types (CodingProgress(..))
-#endif
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 
-import           GHC.IO.Handle (HandlePosn(..))
+import Prelude ()
+import Prelude.Compat
 
-import           Instances.Utils.GenericArbitrary (genericArbitrary)
+import System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
+                  SeekMode(..), Handle, stdin, stdout, stderr)
 
-import           Prelude ()
-import           Prelude.Compat
-
-import           System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
-                            SeekMode(..), Handle, stdin, stdout, stderr)
-
-import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
 
 instance Arbitrary Handle where
     arbitrary = oneof $ map pure [stdin, stdout, stderr]
@@ -61,7 +46,6 @@ deriving instance Bounded SeekMode
 instance Arbitrary SeekMode where
     arbitrary = arbitraryBoundedEnum
 
-#if MIN_VERSION_base(4,4,0)
 deriving instance Bounded CodingProgress
 deriving instance Enum CodingProgress
 instance Arbitrary CodingProgress where
@@ -71,7 +55,6 @@ deriving instance Bounded CodingFailureMode
 deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
     arbitrary = arbitraryBoundedEnum
-#endif
 
 deriving instance Bounded Newline
 deriving instance Enum Newline
@@ -81,12 +64,6 @@ instance Arbitrary Newline where
 instance Arbitrary NewlineMode where
     arbitrary = genericArbitrary
 
-#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic HandlePosn
 deriving instance Generic BufferMode
 deriving instance Generic NewlineMode
-#else
-$(Generics.deriveAll0 ''HandlePosn)
-$(Generics.deriveAll0 ''BufferMode)
-$(Generics.deriveAll0 ''NewlineMode)
-#endif

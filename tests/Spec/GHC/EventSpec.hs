@@ -19,7 +19,7 @@ import Prelude.Compat
 
 import Test.Hspec (Spec, hspec, parallel)
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
 import Data.Proxy (Proxy(..))
 
 import GHC.Event (Event)
@@ -38,7 +38,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
     describe "Event" $
         matchesTextShowSpec (Proxy :: Proxy Event)
 --     describe "FdKey" $

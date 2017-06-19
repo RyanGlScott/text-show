@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -19,11 +18,8 @@ module TextShow.System.IO () where
 import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 
-import GHC.IO.Encoding.Types (TextEncoding(textEncodingName))
-#if MIN_VERSION_base(4,4,0)
 import GHC.IO.Encoding.Failure (CodingFailureMode)
-import GHC.IO.Encoding.Types (CodingProgress)
-#endif
+import GHC.IO.Encoding.Types (CodingProgress, TextEncoding(textEncodingName))
 import GHC.IO.Handle (HandlePosn(..))
 import GHC.IO.Handle.Types (Handle(..))
 
@@ -63,17 +59,10 @@ instance TextShow TextEncoding where
     showb = fromString . textEncodingName
     {-# INLINE showb #-}
 
-#if MIN_VERSION_base(4,4,0)
--- | Only available with @base-4.4.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 $(deriveTextShow ''CodingProgress)
--- | Only available with @base-4.4.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 $(deriveTextShow ''CodingFailureMode)
-#endif
-
 -- | /Since: 2/
 $(deriveTextShow ''Newline)
 -- | /Since: 2/

@@ -66,12 +66,10 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy CClock)
     describe "CTime" $
         matchesTextShowSpec (Proxy :: Proxy CTime)
-#if MIN_VERSION_base(4,4,0)
     describe "CUSeconds" $
         matchesTextShowSpec (Proxy :: Proxy CUSeconds)
     describe "CSUSeconds" $
         matchesTextShowSpec (Proxy :: Proxy CSUSeconds)
-#endif
     describe "CFloat" $
         matchesTextShowSpec (Proxy :: Proxy CFloat)
     describe "CDouble" $

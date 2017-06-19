@@ -18,8 +18,6 @@ module.
 
 /Since: 2/
 -}
-#include "HsBaseConfig.h"
-
 module TextShow.System.Posix.Types () where
 
 import System.Posix.Types
@@ -29,159 +27,71 @@ import TextShow.Data.Integral   ()
 import TextShow.Foreign.C.Types ()
 import TextShow.Foreign.Ptr     ()
 
-#if !(MIN_VERSION_base(4,5,0))
-import Data.Int
-import Data.Text.Lazy.Builder (Builder)
-import Data.Word
+#include "HsBaseConfig.h"
 
-import Unsafe.Coerce (unsafeCoerce)
-
-# include "HsBaseConfig.h"
-#endif
-
-#if MIN_VERSION_base(4,5,0)
-# if defined(HTYPE_DEV_T)
+#if defined(HTYPE_DEV_T)
 -- | /Since: 2/
 deriving instance TextShow CDev
-# endif
+#endif
 
-# if defined(HTYPE_INO_T)
+#if defined(HTYPE_INO_T)
 -- | /Since: 2/
 deriving instance TextShow CIno
-# endif
+#endif
 
-# if defined(HTYPE_MODE_T)
+#if defined(HTYPE_MODE_T)
 -- | /Since: 2/
 deriving instance TextShow CMode
-# endif
+#endif
 
-# if defined(HTYPE_OFF_T)
+#if defined(HTYPE_OFF_T)
 -- | /Since: 2/
 deriving instance TextShow COff
-# endif
+#endif
 
-# if defined(HTYPE_PID_T)
+#if defined(HTYPE_PID_T)
 -- | /Since: 2/
 deriving instance TextShow CPid
-# endif
+#endif
 
-# if defined(HTYPE_SSIZE_T)
+#if defined(HTYPE_SSIZE_T)
 -- | /Since: 2/
 deriving instance TextShow CSsize
-# endif
+#endif
 
-# if defined(HTYPE_GID_T)
+#if defined(HTYPE_GID_T)
 -- | /Since: 2/
 deriving instance TextShow CGid
-# endif
+#endif
 
-# if defined(HTYPE_NLINK_T)
+#if defined(HTYPE_NLINK_T)
 -- | /Since: 2/
 deriving instance TextShow CNlink
-# endif
+#endif
 
-# if defined(HTYPE_UID_T)
+#if defined(HTYPE_UID_T)
 -- | /Since: 2/
 deriving instance TextShow CUid
-# endif
+#endif
 
-# if defined(HTYPE_CC_T)
+#if defined(HTYPE_CC_T)
 -- | /Since: 2/
 deriving instance TextShow CCc
-# endif
+#endif
 
-# if defined(HTYPE_SPEED_T)
+#if defined(HTYPE_SPEED_T)
 -- | /Since: 2/
 deriving instance TextShow CSpeed
-# endif
+#endif
 
-# if defined(HTYPE_TCFLAG_T)
+#if defined(HTYPE_TCFLAG_T)
 -- | /Since: 2/
 deriving instance TextShow CTcflag
-# endif
+#endif
 
-# if defined(HTYPE_RLIM_T)
+#if defined(HTYPE_RLIM_T)
 -- | /Since: 2/
 deriving instance TextShow CRLim
-# endif
-#else
-# if defined(HTYPE_DEV_T)
--- | /Since: 2/
-instance TextShow CDev where
-    showb = unsafeCoerce (showb :: HTYPE_DEV_T -> Builder)
-# endif
-
-# if defined(HTYPE_INO_T)
--- | /Since: 2/
-instance TextShow CIno where
-    showb = unsafeCoerce (showb :: HTYPE_INO_T -> Builder)
-# endif
-
-# if defined(HTYPE_MODE_T)
--- | /Since: 2/
-instance TextShow CMode where
-    showb = unsafeCoerce (showb :: HTYPE_MODE_T -> Builder)
-# endif
-
-# if defined(HTYPE_OFF_T)
--- | /Since: 2/
-instance TextShow COff where
-    showbPrec = unsafeCoerce (showbPrec :: Int -> HTYPE_OFF_T -> Builder)
-# endif
-
-# if defined(HTYPE_PID_T)
--- | /Since: 2/
-instance TextShow CPid where
-    showbPrec = unsafeCoerce (showbPrec :: Int -> HTYPE_PID_T -> Builder)
-# endif
-
-# if defined(HTYPE_SSIZE_T)
--- | /Since: 2/
-instance TextShow CSsize where
-    showbPrec = unsafeCoerce (showbPrec :: Int -> HTYPE_SSIZE_T -> Builder)
-# endif
-
-# if defined(HTYPE_GID_T)
--- | /Since: 2/
-instance TextShow CGid where
-    showb = unsafeCoerce (showb :: HTYPE_GID_T -> Builder)
-# endif
-
-# if defined(HTYPE_NLINK_T)
--- | /Since: 2/
-instance TextShow CNlink where
-    showb = unsafeCoerce (showb :: HTYPE_NLINK_T -> Builder)
-# endif
-
-# if defined(HTYPE_UID_T)
--- | /Since: 2/
-instance TextShow CUid where
-    showb = unsafeCoerce (showb :: HTYPE_UID_T -> Builder)
-# endif
-
-# if defined(HTYPE_CC_T)
--- | /Since: 2/
-instance TextShow CCc where
-    showb = unsafeCoerce (showb :: HTYPE_CC_T -> Builder)
-# endif
-
-# if defined(HTYPE_SPEED_T)
--- | /Since: 2/
-instance TextShow CSpeed where
-    showb = unsafeCoerce (showb :: HTYPE_SPEED_T -> Builder)
-# endif
-
-# if defined(HTYPE_TCFLAG_T)
--- | /Since: 2/
-instance TextShow CTcflag where
-    showb = unsafeCoerce (showb :: HTYPE_TCFLAG_T -> Builder)
-# endif
-
-# if defined(HTYPE_RLIM_T)
--- | /Since: 2/
-instance TextShow CRLim where
-    showb = unsafeCoerce (showb :: HTYPE_RLIM_T -> Builder)
-# endif
 #endif
 
 #if MIN_VERSION_base(4,10,0)

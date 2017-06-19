@@ -44,9 +44,7 @@ stability:           Provisional
 copyright:           (C) 2014-2017 Ryan Scott
 category:            Text
 build-type:          Simple
-tested-with:         GHC == 7.0.4
-                   , GHC == 7.2.2
-                   , GHC == 7.4.2
+tested-with:         GHC == 7.4.2
                    , GHC == 7.6.3
                    , GHC == 7.8.4
                    , GHC == 7.10.3
@@ -120,7 +118,9 @@ library
                        TextShow.Foreign.C.Types
                        TextShow.Foreign.Ptr
                        TextShow.Functions
+                       TextShow.GHC.Fingerprint
                        TextShow.GHC.Generics
+                       TextShow.GHC.Stats
                        TextShow.Numeric.Natural
                        TextShow.System.Exit
                        TextShow.System.IO
@@ -130,14 +130,8 @@ library
 
                        -- Only exports functions if using Windows
                        TextShow.GHC.Conc.Windows
-
-                       -- Only exports functions if base >= 4.4
-                       TextShow.GHC.Fingerprint
-                       -- Only exports functions if base >= 4.4 and not using Windows
+                       -- Only exports functions if not using Windows
                        TextShow.GHC.Event
-
-                       -- Only exports functions if base >= 4.5
-                       TextShow.GHC.Stats
 
                        -- Only exports functions if base >= 4.6
                        TextShow.GHC.TypeLits
@@ -236,7 +230,9 @@ test-suite spec
                        Instances.Foreign.Ptr
                        Instances.FromStringTextShow
                        Instances.Generic
+                       Instances.GHC.Fingerprint
                        Instances.GHC.Generics
+                       Instances.GHC.Stats
                        Instances.Options
                        Instances.System.IO
                        Instances.System.Posix.Types
@@ -246,14 +242,8 @@ test-suite spec
 
                        -- Only exports instances if using Windows
                        Instances.GHC.Conc.Windows
-
-                       -- Only exports instances if base >= 4.4
-                       Instances.GHC.Fingerprint
-                       -- Only exports instances if base >= 4.4 and not using Windows
+                       -- Only exports instances if not using Windows
                        Instances.GHC.Event
-
-                       -- Only exports instances if base >= 4.5
-                       Instances.GHC.Stats
 
                        -- Only exports instances if base >= 4.6
                        Instances.GHC.TypeLits
@@ -303,6 +293,7 @@ test-suite spec
                        Spec.Data.TupleSpec
                        Spec.Data.TypeableSpec
                        Spec.Data.VersionSpec
+                       Spec.Derived.DataFamiliesSpec
                        Spec.Derived.DatatypeContextsSpec
                        Spec.Derived.ExistentialQuantificationSpec
                        Spec.Derived.InfixSpec
@@ -316,7 +307,9 @@ test-suite spec
                        Spec.FromStringTextShowSpec
                        Spec.FunctionsSpec
                        Spec.GenericSpec
+                       Spec.GHC.FingerprintSpec
                        Spec.GHC.GenericsSpec
+                       Spec.GHC.StatsSpec
                        Spec.Numeric.NaturalSpec
                        Spec.OptionsSpec
                        Spec.System.ExitSpec
@@ -327,17 +320,8 @@ test-suite spec
 
                        -- Only exports tests if using Windows
                        Spec.GHC.Conc.WindowsSpec
-
-                       -- Only exports tests if base >= 4.4
-                       Spec.GHC.FingerprintSpec
-                       -- Only exports tests if base >= 4.4 and not using Windows
+                       -- Only exports tests if not using Windows
                        Spec.GHC.EventSpec
-
-                       -- Only exports tests if base >= 4.5
-                       Spec.GHC.StatsSpec
-
-                       -- Only exports tests if template-haskell >= 2.7
-                       Spec.Derived.DataFamiliesSpec
 
                        -- Only exports tests if base >= 4.6
                        Spec.GHC.TypeLitsSpec

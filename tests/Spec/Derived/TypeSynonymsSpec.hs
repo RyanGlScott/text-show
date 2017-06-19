@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Derived.TypeSynonymsSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -28,11 +26,9 @@ spec = parallel $ do
         matchesTextShowSpec  p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamily Int Int" $ do
         let p :: Proxy (TyFamily Int Int)
             p = Proxy
         matchesTextShowSpec  p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#endif

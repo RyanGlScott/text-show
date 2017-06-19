@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.GHC.FingerprintSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,30 +10,24 @@ Portability: GHC
 -}
 module Spec.GHC.FingerprintSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
 import Data.Orphans ()
+
+import GHC.Fingerprint.Type (Fingerprint)
 
 import Instances.GHC.Fingerprint ()
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.Hspec (Spec, hspec, parallel)
-
-#if MIN_VERSION_base(4,4,0)
-import Data.Proxy (Proxy(..))
-import GHC.Fingerprint.Type (Fingerprint)
 import Spec.Utils (matchesTextShowSpec)
-import Test.Hspec (describe)
-#endif
+
+import Test.Hspec (Spec, describe, hspec, parallel)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $
-#if MIN_VERSION_base(4,4,0)
     describe "Fingerprint" $
         matchesTextShowSpec (Proxy :: Proxy Fingerprint)
-#else
-    pure ()
-#endif

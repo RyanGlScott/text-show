@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Derived.InfixSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -34,7 +32,6 @@ spec = parallel $ do
         matchesTextShowSpec  p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyPlain Int Int" $ do
         let p :: Proxy (TyFamilyPlain Int Int)
             p = Proxy
@@ -47,4 +44,3 @@ spec = parallel $ do
         matchesTextShowSpec  p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#endif

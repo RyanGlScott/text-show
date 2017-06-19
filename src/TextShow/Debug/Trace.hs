@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE OverloadedStrings        #-}
+
 {-|
 Module:      TextShow.Debug.Trace
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -30,24 +31,20 @@ module TextShow.Debug.Trace (
     , tracetlId
     , traceTextShow
     , traceTextShowId
-#if MIN_VERSION_base(4,5,0)
     , tracetStack
     , tracetlStack
-#endif
     , tracetIO
     , tracetlIO
     , tracetM
     , tracetlM
     , traceTextShowM
 
-#if MIN_VERSION_base(4,5,0)
       -- * Eventlog tracing
       -- $eventlog_tracing
     , tracetEvent
     , tracetlEvent
     , tracetEventIO
     , tracetlEventIO
-#endif
 #if MIN_VERSION_base(4,7,0)
       -- * Execution phase markers
       -- $markers
@@ -62,23 +59,18 @@ import           Control.Monad (unless)
 
 import qualified Data.ByteString as BS (null, partition)
 import           Data.ByteString (ByteString, useAsCString)
-import           Data.ByteString.Internal (c2w)
-import qualified Data.Text as TS (Text)
-import           Data.Text.Encoding (encodeUtf8)
-import qualified Data.Text.Lazy as TL (Text)
-import           Data.Text.Lazy (toStrict)
-
-import           Foreign.C.String (CString)
-
-#if MIN_VERSION_base(4,5,0)
 import qualified Data.ByteString.Char8 as BS (pack)
-import qualified Data.Text as TS (unpack)
-import qualified Data.Text.Lazy as TL (unpack)
+import           Data.ByteString.Internal (c2w)
+import qualified Data.Text as TS (Text, unpack)
+import           Data.Text.Encoding (encodeUtf8)
+import qualified Data.Text.Lazy as TL (Text, unpack)
+import           Data.Text.Lazy (toStrict)
 
 import           Debug.Trace
 
+import           Foreign.C.String (CString)
+
 import           GHC.Stack (currentCallStack, renderStack)
-#endif
 
 import           Prelude ()
 import           Prelude.Compat
@@ -232,7 +224,6 @@ Like 'tracetM', but uses 'showt' on the argument to convert it to a 'TS.Text'.
 traceTextShowM :: (TextShow a, Applicative f) => a -> f ()
 traceTextShowM = tracetM . showt
 
-#if MIN_VERSION_base(4,5,0)
 -- | Like 'tracet' but additionally prints a call stack if one is
 -- available.
 --
@@ -307,7 +298,6 @@ tracetEventIO = traceEventIO . TS.unpack
 -- /Since: 2/
 tracetlEventIO :: TL.Text -> IO ()
 tracetlEventIO = traceEventIO . TL.unpack
-#endif
 
 #if MIN_VERSION_base(4,7,0)
 -- $markers

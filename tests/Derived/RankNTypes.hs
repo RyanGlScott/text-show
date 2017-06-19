@@ -94,18 +94,16 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamily)
-# else
+#else
 $(deriveShow1 'TyFamily)
 $(deriveShow2 'TyFamily)
-# endif
+#endif
 
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
-#endif
 
 -------------------------------------------------------------------------------
 

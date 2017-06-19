@@ -109,15 +109,13 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamilyClassConstraints)
-# else
+#else
 $(deriveShow1 'TyFamilyTypeRefinement1)
 $(deriveShow2 'TyFamilyTypeRefinement1)
-# endif
+#endif
 
 $(deriveTextShow  'TyFamilyClassConstraints)
 $(deriveTextShow1 'TyFamilyTypeRefinement1)
 $(deriveTextShow2 'TyFamilyTypeRefinement2)
-#endif
