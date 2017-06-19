@@ -12,13 +12,11 @@ Portability: GHC
 Template Haskell names to eliminate some boilerplate.
 -}
 module TextShow.TH.Names (
-#if MIN_VERSION_base(4,4,0)
     evtCloseValName,
     eventIsValName,
     fdKeyTypeName,
     uniqueTypeName,
     asInt64ValName,
-#endif
 #if MIN_VERSION_base(4,6,0)
     numberTypeName,
 #endif
@@ -30,9 +28,7 @@ module TextShow.TH.Names (
 #endif
     ) where
 
-#if MIN_VERSION_base(4,4,0)
 import Language.Haskell.TH.Syntax
-#endif
 
 #if MIN_VERSION_base(4,7,0)
 import Text.Read.Lex (Number)
@@ -44,7 +40,6 @@ import GHC.RTS.Flags (GiveGCStats, DoCostCentres, DoHeapProfile, DoTrace)
 
 -------------------------------------------------------------------------------
 
-#if MIN_VERSION_base(4,4,0)
 -- | Creates a 'Name' for a value from the "GHC.Event.Internal" module.
 mkEventName_v :: String -> Name
 mkEventName_v = mkNameG_v "base" "GHC.Event.Internal"
@@ -67,11 +62,10 @@ uniqueTypeName = mkNameG_tc "base" "GHC.Event.Unique" "Unique"
 
 -- | The 'Name' of 'asInt64' (or, 'asInt' on @base-4.10.0.0@ or later).
 asInt64ValName :: Name
-# if MIN_VERSION_base(4,10,0)
+#if MIN_VERSION_base(4,10,0)
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt"
-# else
+#else
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt64"
-# endif
 #endif
 
 #if MIN_VERSION_base(4,6,0)

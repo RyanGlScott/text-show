@@ -1,12 +1,9 @@
 {-# LANGUAGE CPP               #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs             #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric     #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds         #-}
@@ -35,11 +32,9 @@ module Derived.Infix (
 import qualified Generics.Deriving.TH as Generics
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
-# endif
 #endif
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
@@ -67,11 +62,9 @@ data TyConPlain a b = (:!:) a b
                     | a `TyConPlain` b
                     | TyConFakeInfix a b
   deriving ( Show
-#if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
            , Generic1
-# endif
 #endif
            )
 
@@ -138,13 +131,11 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConPlain a b) where
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyConGADT a b) where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_template_haskell(2,7,0)
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyPlain a b) where
     arbitrary = genericArbitrary
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
     arbitrary = genericArbitrary
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -169,22 +160,17 @@ $(Generics.deriveRepresentable1 ''TyConPlain)
 $(Generics.deriveAll0And1       ''TyConGADT)
 #endif
 
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveRepresentable0 ''TyConPlain)
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 '(:#:))
 
 $(deriveShow1 '(:*))
-# else
+#else
 $(deriveShow1 '(:#:))
 $(deriveShow2 '(:$:))
 
 $(deriveShow1 '(:*))
 $(deriveShow2 '(:***))
-# endif
+#endif
 
 $(deriveTextShow  '(:#:))
 $(deriveTextShow1 '(:$:))
@@ -194,15 +180,14 @@ $(deriveTextShow  '(:*))
 $(deriveTextShow1 '(:***))
 $(deriveTextShow2 '(:****))
 
-# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           '(:#:))
 $(Generics.deriveRepresentable1 '(:$:))
 $(Generics.deriveMeta           '(:*))
 $(Generics.deriveRepresentable1 '(:**))
-# endif
+#endif
 
-# if __GLASGOW_HASKELL__ < 706
+#if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'TyFamilyPlain)
 $(Generics.deriveRepresentable0 '(:***))
-# endif
 #endif

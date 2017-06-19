@@ -76,17 +76,16 @@ instance (Ord a, TextShow a, TextShow b) => TextShow1 (TyCon a b) where
 instance (Ord a, TextShow a) => TextShow2 (TyCon a) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyCon)
 
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
     showsPrec1 = $(makeShowsPrec1 'TyFamily)
-# else
+#else
 instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
     liftShowsPrec = $(makeLiftShowsPrec 'TyFamily)
 
 instance (Ord a, Show a) => Show2 (TyFamily a) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamily)
-# endif
+#endif
 
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyFamily a b c) where
     showbPrec = $(makeShowbPrec 'TyFamily)
@@ -94,4 +93,3 @@ instance (Ord a, TextShow a, TextShow b) => TextShow1 (TyFamily a b) where
     liftShowbPrec = $(makeLiftShowbPrec 'TyFamily)
 instance (Ord a, TextShow a) => TextShow2 (TyFamily a) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamily)
-#endif

@@ -50,31 +50,25 @@ import           Type.Reflection (pattern App, pattern Con, pattern Con', patter
 import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
-# if MIN_VERSION_base(4,4,0)
 import           Data.Typeable.Internal (tyConName)
-#  if MIN_VERSION_base(4,8,0)
+# if MIN_VERSION_base(4,8,0)
 import           Data.Typeable.Internal (typeRepKinds)
-#  endif
-#  if MIN_VERSION_base(4,9,0)
+# endif
+# if MIN_VERSION_base(4,9,0)
 import           Data.Text.Lazy.Builder (Builder)
 import           Data.Typeable.Internal (Proxy(..), Typeable,
                                          TypeRep(TypeRep), typeRep)
 import           GHC.Exts (RuntimeRep(..), TYPE)
-#  elif MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (funTc, listTc)
-# endif
 # else
-import           Data.Typeable (mkTyCon, tyConString, typeOf)
+import           Data.Typeable.Internal (funTc, listTc)
 # endif
 
 # if MIN_VERSION_base(4,9,0)
 import           GHC.Exts (Char(..))
 import           GHC.Prim (Addr#, (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (TyCon(..), TrName(..), Module(..), isTrue#)
-# elif MIN_VERSION_base(4,4,0)
-import           Data.Typeable.Internal (TyCon)
 # else
-import           Data.Typeable (TyCon)
+import           Data.Typeable.Internal (TyCon)
 # endif
 
 import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
@@ -102,7 +96,7 @@ tc'Lifted = tyConOf (Proxy :: Proxy 'PtrRepLifted)
 
 tc'Unlifted :: TyCon
 tc'Unlifted = tyConOf (Proxy :: Proxy 'PtrRepUnlifted)
-# elif MIN_VERSION_base(4,4,0)
+# else
 -- | The list 'TyCon'.
 tcList :: TyCon
 tcList = listTc
@@ -110,29 +104,13 @@ tcList = listTc
 -- | The function (@->@) 'TyCon'.
 tcFun :: TyCon
 tcFun = funTc
-# else
--- | The list 'TyCon'.
-tcList :: TyCon
-tcList = typeRepTyCon $ typeOf [()]
-
--- | The function (@->@) 'TyCon'.
-tcFun :: TyCon
-tcFun = mkTyCon "->"
 # endif
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?
 isTupleTyCon :: TyCon -> Bool
-isTupleTyCon = isTupleString . tyConString
+isTupleTyCon = isTupleString . tyConName
 {-# INLINE isTupleTyCon #-}
-
-#if MIN_VERSION_base(4,4,0)
--- | Identical to 'tyConName'. Defined to avoid using excessive amounts of pragmas
--- with base-4.3 and earlier, which use 'tyConString'.
-tyConString :: TyCon -> String
-tyConString = tyConName
-{-# INLINE tyConString #-}
-#endif
 
 #if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.10.0.0@ or later.
@@ -240,7 +218,7 @@ instance TextShow TyCon where
 #elif MIN_VERSION_base(4,9,0)
     showb (TyCon _ _ _ tc_name) = showb tc_name
 #else
-    showb = fromString . tyConString
+    showb = fromString . tyConName
 #endif
 
 #if MIN_VERSION_base(4,9,0)

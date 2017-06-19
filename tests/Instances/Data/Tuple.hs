@@ -1,12 +1,5 @@
-{-# LANGUAGE CPP                #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell    #-}
-{-# LANGUAGE TypeFamilies       #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
-
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -21,14 +14,10 @@ Portability: GHC
 -}
 module Instances.Data.Tuple () where
 
-import           Data.Orphans ()
-#if __GLASGOW_HASKELL__ >= 704
-import           GHC.Generics (Generic)
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
-#endif
-import           Instances.Utils.GenericArbitrary (genericArbitrary)
-import           Test.QuickCheck (Arbitrary(..))
+import Data.Orphans ()
+import GHC.Generics (Generic)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
+import Test.QuickCheck (Arbitrary(..))
 
 instance ( Arbitrary a
          , Arbitrary b
@@ -110,16 +99,8 @@ instance ( Arbitrary a
          ) => Arbitrary (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) where
     arbitrary = genericArbitrary
 
-#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-#else
-$(Generics.deriveAll0 ''(,,,,,,,,,,))
-$(Generics.deriveAll0 ''(,,,,,,,,,,,))
-$(Generics.deriveAll0 ''(,,,,,,,,,,,,))
-$(Generics.deriveAll0 ''(,,,,,,,,,,,,,))
-$(Generics.deriveAll0 ''(,,,,,,,,,,,,,,))
-#endif

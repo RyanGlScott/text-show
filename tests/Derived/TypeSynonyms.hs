@@ -1,11 +1,8 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric              #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds                  #-}
@@ -31,11 +28,9 @@ module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 import qualified Generics.Deriving.TH as Generics
 #endif
 
-#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic1)
-# endif
 #endif
 
 import           Prelude
@@ -69,11 +64,9 @@ newtype TyCon a b = TyCon
     )
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
            , Generic1
-# endif
 #endif
            )
 
@@ -119,28 +112,22 @@ $(Generics.deriveMeta           ''TyCon)
 $(Generics.deriveRepresentable1 ''TyCon)
 #endif
 
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveRepresentable0 ''TyCon)
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamily)
-# else
+#else
 $(deriveShow1 'TyFamily)
 $(deriveShow2 'TyFamily)
-# endif
+#endif
 
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
 
-# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamily)
 $(Generics.deriveRepresentable1 'TyFamily)
-# endif
+#endif
 
-# if __GLASGOW_HASKELL__ < 706
+#if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'TyFamily)
-# endif
 #endif

@@ -16,28 +16,24 @@ Portability: GHC
 -}
 module Spec.Derived.DataFamiliesSpec (main, spec) where
 
-import Prelude ()
-import Prelude.Compat
-
-import Test.Hspec (Spec, hspec, parallel)
-
-#if MIN_VERSION_template_haskell(2,7,0)
 import Data.Proxy (Proxy(..))
 
 import Derived.DataFamilies (NotAllShow)
 
+import Prelude ()
+import Prelude.Compat
+
 import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 
-import Test.Hspec (describe)
+import Test.Hspec (Spec, describe, hspec, parallel)
 
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
 import Derived.DataFamilies (KindDistinguished)
-# endif
+#endif
 
-# if __GLASGOW_HASKELL__ >= 708
+#if __GLASGOW_HASKELL__ >= 708
 import Derived.DataFamilies (NullaryData)
 import Spec.Utils (matchesTextShowSpec)
-# endif
 #endif
 
 main :: IO ()
@@ -45,14 +41,13 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if MIN_VERSION_template_haskell(2,7,0)
     describe "NotAllShow Int Int Int Int" $ do
         let p :: Proxy (NotAllShow Int Int Int Int)
             p = Proxy
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-# if __GLASGOW_HASKELL__ >= 706
+#if __GLASGOW_HASKELL__ >= 706
     describe "KindDistinguished '() Int Int" $ do
         let p :: Proxy (KindDistinguished '() Int Int)
             p = Proxy
@@ -65,14 +60,11 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-# endif
-# if __GLASGOW_HASKELL__ >= 708
+#endif
+#if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
         let p :: Proxy NullaryData
             p = Proxy
         matchesTextShowSpec p
         genericTextShowSpec p
-# endif
-#else
-    pure ()
 #endif

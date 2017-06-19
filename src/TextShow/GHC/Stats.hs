@@ -1,10 +1,8 @@
 {-# LANGUAGE CPP             #-}
-
-#if MIN_VERSION_base(4,5,0)
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 {-# OPTIONS_GHC -fno-warn-orphans      #-}
-#endif
+
 {-|
 Module:      TextShow.GHC.Stats
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -14,13 +12,11 @@ Stability:   Provisional
 Portability: GHC
 
 'TextShow' instance for 'GCStats'.
-Only provided if using @base-4.5.0.0@ or later.
 
 /Since: 2/
 -}
 module TextShow.GHC.Stats () where
 
-#if MIN_VERSION_base(4,5,0)
 import GHC.Stats (GCStats)
 
 import TextShow.Data.Integral ()
@@ -29,4 +25,3 @@ import TextShow.TH.Internal (deriveTextShow)
 
 -- /Since: 2/
 $(deriveTextShow ''GCStats)
-#endif

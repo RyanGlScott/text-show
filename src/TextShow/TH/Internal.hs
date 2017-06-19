@@ -118,7 +118,6 @@ newtype Box a = Box a
 $('deriveTextShow' ''Box) -- instance TextShow a => TextShow (Box a) where ...
 @
 
-If you are using @template-haskell-2.7.0.0@ or later (i.e., GHC 7.4 or later),
 'deriveTextShow' can also be used to derive 'TextShow' instances for data family
 instances (which requires the @-XTypeFamilies@ extension). To do so, pass the name of
 a data or newtype instance constructor (NOT a data family name!) to 'deriveTextShow'.
@@ -1038,18 +1037,6 @@ outOfPlaceTyVarError tsClass conName = error
     n :: Int
     n = fromEnum tsClass
 
-#if !(MIN_VERSION_template_haskell(2,7,0))
--- | Template Haskell didn't list all of a data family's instances upon reification
--- until template-haskell-2.7.0.0, which is necessary for a derived TextShow(1)(2)
--- instance to work.
-dataConIError :: a
-dataConIError = error
-    . showString "Cannot use a data constructor."
-    . showString "\n\t(Note: if you are trying to derive TextShow for a"
-    . showString "\n\ttype family, use GHC >= 7.4 instead.)"
-    $ ""
-#endif
-
 -------------------------------------------------------------------------------
 -- Expanding type synonyms
 -------------------------------------------------------------------------------
@@ -1329,10 +1316,8 @@ isTyFamily (ConT n) = do
     return $ case info of
 #if MIN_VERSION_template_haskell(2,11,0)
          FamilyI OpenTypeFamilyD{} _       -> True
-#elif MIN_VERSION_template_haskell(2,7,0)
-         FamilyI (FamilyD TypeFam _ _ _) _ -> True
 #else
-         TyConI  (FamilyD TypeFam _ _ _)   -> True
+         FamilyI (FamilyD TypeFam _ _ _) _ -> True
 #endif
 #if MIN_VERSION_template_haskell(2,9,0)
          FamilyI ClosedTypeFamilyD{} _     -> True

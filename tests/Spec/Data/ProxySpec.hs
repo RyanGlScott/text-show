@@ -11,10 +11,13 @@ Portability: GHC
 module Spec.Data.ProxySpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
+
 import Generics.Deriving.Base ()
-import Instances.Data.Proxy ()
+
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
+
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec

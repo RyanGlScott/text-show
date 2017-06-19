@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Derived.PolyKindsSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -40,7 +38,6 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#if MIN_VERSION_template_haskell(2,7,0)
     describe "TyFamilyCompose Either Either Either Maybe Maybe Int Int" $ do
         let p :: Proxy (TyFamilyCompose Either Either Either Maybe Maybe Int Int)
             p = Proxy
@@ -59,4 +56,3 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#endif

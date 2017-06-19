@@ -1,11 +1,8 @@
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric      #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds          #-}
@@ -37,11 +34,7 @@ module TextShow.Options (Options(..), GenTextMethods(..), defaultOptions) where
 import           Data.Data (Data, Typeable)
 import           Data.Ix (Ix)
 
-#if __GLASGOW_HASKELL__ >= 702
 import           GHC.Generics (Generic)
-#else
-import qualified Generics.Deriving.TH as Generics
-#endif
 
 import           Language.Haskell.TH.Lift
 
@@ -54,13 +47,11 @@ newtype Options = Options
     --   return @Text@?
   } deriving ( Data
              , Eq
+             , Generic
              , Ord
              , Read
              , Show
              , Typeable
-#if __GLASGOW_HASKELL__ >= 702
-             , Generic
-#endif
 #if __GLASGOW_HASKELL__ >= 800
              , Lift
 #endif
@@ -78,14 +69,12 @@ data GenTextMethods
            , Data
            , Enum
            , Eq
+           , Generic
            , Ix
            , Ord
            , Read
            , Show
            , Typeable
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
 #if __GLASGOW_HASKELL__ >= 800
            , Lift
 #endif
@@ -98,11 +87,6 @@ defaultOptions :: Options
 defaultOptions = Options { genTextMethods = SometimesTextMethods }
 
 -------------------------------------------------------------------------------
-
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''Options)
-$(Generics.deriveAll ''GenTextMethods)
-#endif
 
 #if __GLASGOW_HASKELL__ < 800
 $(deriveLift ''Options)

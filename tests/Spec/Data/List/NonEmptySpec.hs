@@ -15,6 +15,7 @@ import Data.List.NonEmpty (NonEmpty)
 import Data.Orphans ()
 import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec

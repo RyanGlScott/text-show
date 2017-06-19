@@ -15,11 +15,10 @@ import Control.Monad.Trans.Instances ()
 import Data.Functor.Product (Product)
 import Data.Proxy (Proxy(..))
 
-import Instances.Data.Functor.Product ()
-
 import Spec.Utils (matchesTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec

@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns          #-}
 {-# LANGUAGE CPP                   #-}
 {-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE DeriveGeneric        #-}
 {-# LANGUAGE EmptyDataDecls        #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -14,10 +15,6 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric        #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds            #-}
@@ -97,9 +94,6 @@ import qualified Data.Text.Lazy.Builder as TB (fromString, singleton)
 import           Data.Text.Lazy.Builder (Builder)
 
 import           Generics.Deriving.Base
-#if __GLASGOW_HASKELL__ < 702
-import qualified Generics.Deriving.TH as Generics (deriveAll)
-#endif
 
 import           GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import           GHC.Show (appPrec, appPrec1)
@@ -273,13 +267,11 @@ genericShowbPrec1 = genericLiftShowbPrec genericShowbPrec genericShowbList
 data ConType = Rec | Tup | Pref | Inf String
   deriving ( Data
            , Eq
+           , Generic
            , Ord
            , Read
            , Show
            , Typeable
-#if __GLASGOW_HASKELL__ >= 702
-           , Generic
-#endif
 #if __GLASGOW_HASKELL__ >= 800
            , Lift
 #endif
@@ -578,10 +570,6 @@ instance IsNullary UWord where
 -------------------------------------------------------------------------------
 
 $(deriveTextShow ''ConType)
-
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveAll ''ConType)
-#endif
 
 #if __GLASGOW_HASKELL__ < 800
 $(deriveLift ''ConType)

@@ -1,13 +1,7 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric              #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -22,24 +16,19 @@ Portability: GHC
 -}
 module Instances.Control.Exception () where
 
-import           Control.Exception hiding (IOException)
+import Control.Exception hiding (IOException)
 
-#if __GLASGOW_HASKELL__ >= 704
-import           GHC.Generics (Generic)
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
-#endif
+import GHC.Generics (Generic)
+import GHC.IO.Exception (IOException(..), IOErrorType(..))
 
-import           GHC.IO.Exception (IOException(..), IOErrorType(..))
+import Instances.Foreign.C.Types ()
+import Instances.System.IO ()
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 
-import           Instances.Foreign.C.Types ()
-import           Instances.System.IO ()
-import           Instances.Utils.GenericArbitrary (genericArbitrary)
+import Prelude ()
+import Prelude.Compat
 
-import           Prelude ()
-import           Prelude.Compat
-
-import           Test.QuickCheck (Arbitrary(..), Gen, arbitraryBoundedEnum)
+import Test.QuickCheck (Arbitrary(..), Gen, arbitraryBoundedEnum)
 
 instance Arbitrary SomeException where
     arbitrary = SomeException <$> (arbitrary :: Gen AssertionFailed)
@@ -136,7 +125,6 @@ deriving instance Enum MaskingState
 instance Arbitrary MaskingState where
     arbitrary = arbitraryBoundedEnum
 
-#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic ArrayException
 deriving instance Generic AssertionFailed
 deriving instance Generic IOException
@@ -147,15 +135,3 @@ deriving instance Generic RecConError
 deriving instance Generic RecSelError
 deriving instance Generic RecUpdError
 deriving instance Generic ErrorCall
-#else
-$(Generics.deriveAll0 ''ArrayException)
-$(Generics.deriveAll0 ''AssertionFailed)
-$(Generics.deriveAll0 ''IOException)
-$(Generics.deriveAll0 ''Deadlock)
-$(Generics.deriveAll0 ''NoMethodError)
-$(Generics.deriveAll0 ''PatternMatchFail)
-$(Generics.deriveAll0 ''RecConError)
-$(Generics.deriveAll0 ''RecSelError)
-$(Generics.deriveAll0 ''RecUpdError)
-$(Generics.deriveAll0 ''ErrorCall)
-#endif

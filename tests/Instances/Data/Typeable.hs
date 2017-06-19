@@ -23,10 +23,6 @@ module Instances.Data.Typeable () where
 
 #include "MachDeps.h"
 
-#if MIN_VERSION_base(4,4,0)
-import Instances.Utils ((<@>))
-#endif
-
 #if MIN_VERSION_base(4,9,0)
 import GHC.Types (TyCon(..), TrName(..), Module(..))
 # if WORD_SIZE_IN_BITS < 64
@@ -35,7 +31,7 @@ import GHC.Word (Word64(..))
 import GHC.Word (Word(..))
 # endif
 import Test.QuickCheck (oneof)
-#elif MIN_VERSION_base(4,4,0)
+#else
 import Data.Typeable.Internal (TyCon(..))
 #endif
 
@@ -44,14 +40,13 @@ import GHC.Exts (Int(..), Ptr(..))
 import GHC.Types (KindRep(..), RuntimeRep(..), TypeLitSort(..),
                   VecCount(..), VecElem(..))
 import Type.Reflection (SomeTypeRep(..), Typeable, TypeRep, typeRep)
-#elif MIN_VERSION_base(4,4,0)
-import Data.Typeable.Internal (TypeRep(..))
 #else
-import Data.Typeable (TyCon, TypeRep, mkTyCon, typeOf)
+import Data.Typeable.Internal (TypeRep(..))
 #endif
 
 import Instances.Foreign.Ptr ()
 import Instances.GHC.Fingerprint ()
+import Instances.Utils ((<@>))
 
 import Prelude ()
 import Prelude.Compat
@@ -104,16 +99,12 @@ instance Arbitrary VecElem where
     arbitrary = arbitraryBoundedEnum
 #else /* !(MIN_VERSION_base(4,10,0) */
 instance Arbitrary TypeRep where
-# if MIN_VERSION_base(4,4,0)
     arbitrary = TypeRep <$> arbitrary
                         <*> arbitrary
-#  if MIN_VERSION_base(4,8,0)
+# if MIN_VERSION_base(4,8,0)
                         <@> [] <@> []
-#  else
-                        <@> []
-#  endif
 # else
-    arbitrary = typeOf <$> (arbitrary :: Gen Int)
+                        <@> []
 # endif
 #endif
 
@@ -134,10 +125,8 @@ instance Arbitrary TyCon where
 # else
         TyCon w1# w2# <$> arbitrary <*> arbitrary
 # endif
-#elif MIN_VERSION_base(4,4,0)
-    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #else
-    arbitrary = mkTyCon <$> arbitrary
+    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 #endif
 
 #if MIN_VERSION_base(4,9,0)

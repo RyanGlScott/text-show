@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
@@ -7,10 +8,6 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric              #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds                  #-}
@@ -66,9 +63,7 @@ import           Text.Show.Deriving (makeShowsPrec1)
 -- NB: Don't use k as a type variable here! It'll trigger GHC Trac #12503.
 newtype TyConCompose f g h j p a b =
     TyConCompose (f (g (j a) (p a)) (h (j a) (p b)))
-#if __GLASGOW_HASKELL__ >= 702
   deriving Generic
-#endif
 
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyConCompose f g h j k a b)
@@ -88,11 +83,9 @@ newtype TyConProxy a b where
     TyConProxy :: () -> TyConProxy a b
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -101,11 +94,9 @@ newtype TyConProxy a b where
 newtype TyConReallyHighKinds f a b c d e = TyConReallyHighKinds (f a b c d e)
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 702
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -281,14 +272,7 @@ $(Generics.deriveMeta           ''TyConReallyHighKinds)
 $(Generics.deriveRepresentable1 ''TyConReallyHighKinds)
 #endif
 
-#if __GLASGOW_HASKELL__ < 702
-$(Generics.deriveRepresentable0 ''TyConCompose)
-$(Generics.deriveRepresentable0 ''TyConProxy)
-$(Generics.deriveRepresentable0 ''TyConReallyHighKinds)
-#endif
-
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 instance (Functor (f (g (j a) (k a))), Functor (h (j a)),
           Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
   Show1 (TyFamilyCompose f g h j k a) where
@@ -297,7 +281,7 @@ instance Show1 (TyFamilyProxy (a :: *)) where
     showsPrec1 = $(makeShowsPrec1 'TyFamilyProxy)
 instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
     showsPrec1 = $(makeShowsPrec1 'TyFamilyReallyHighKinds)
-# else
+#else
 instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
   Show1 (TyFamilyCompose f g h j k a) where
     liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyCompose)
@@ -313,7 +297,7 @@ instance Show2 TyFamilyProxy where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyProxy)
 instance Show2 (f a b c) => Show2 (TyFamilyReallyHighKinds f a b c) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyReallyHighKinds)
-# endif
+#endif
 
 instance TextShow (f (g (j a) (k a)) (h (j a) (k b))) =>
   TextShow (TyFamilyCompose f g h j k a b) where
@@ -336,7 +320,7 @@ instance TextShow1 (f a b c d) => TextShow1 (TyFamilyReallyHighKinds f a b c d) 
 instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamilyReallyHighKinds)
 
-# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta              'TyFamilyCompose)
 $(Generics.deriveRep1Options False 'TyFamilyCompose)
 
@@ -351,11 +335,10 @@ $(Generics.deriveMeta           'TyFamilyProxy)
 $(Generics.deriveRepresentable1 'TyFamilyProxy)
 $(Generics.deriveMeta           'TyFamilyReallyHighKinds)
 $(Generics.deriveRepresentable1 'TyFamilyReallyHighKinds)
-# endif
+#endif
 
-# if __GLASGOW_HASKELL__ < 706
+#if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'TyFamilyCompose)
 $(Generics.deriveRepresentable0 'TyFamilyProxy)
 $(Generics.deriveRepresentable0 'TyFamilyReallyHighKinds)
-# endif
 #endif

@@ -1,14 +1,11 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-
-#if __GLASGOW_HASKELL__ >= 702
-{-# LANGUAGE DeriveGeneric              #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds                  #-}
@@ -62,14 +59,12 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
-#if MIN_VERSION_template_haskell(2,7,0)
 import           Text.Show.Deriving (deriveShow1)
-import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
-
-# if defined(NEW_FUNCTOR_CLASSES)
+#if defined(NEW_FUNCTOR_CLASSES)
 import           Text.Show.Deriving (deriveShow2)
-# endif
 #endif
+
+import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
 -------------------------------------------------------------------------------
 
@@ -90,26 +85,24 @@ data instance NotAllShow Int b   c  d = NASShow1 c b
 instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b c d) where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_template_haskell(2,7,0)
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'NASShow1)
-# else
+#else
 $(deriveShow1 'NASShow1)
 $(deriveShow2 'NASShow2)
-# endif
+#endif
 
 $(deriveTextShow  'NASShow1)
 $(deriveTextShow1 'NASShow2)
 $(deriveTextShow2 'NASShow1)
 
-# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'NASShow1)
 $(Generics.deriveRepresentable1 'NASShow2)
-# endif
+#endif
 
-# if __GLASGOW_HASKELL__ < 706
+#if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'NASShow1)
-# endif
 #endif
 
 -------------------------------------------------------------------------------

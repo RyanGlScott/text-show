@@ -1,12 +1,5 @@
-{-# LANGUAGE CPP                #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell    #-}
-{-# LANGUAGE TypeFamilies       #-}
-
-#if __GLASGOW_HASKELL__ >= 702
 {-# LANGUAGE DeriveGeneric      #-}
-#endif
-
+{-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -21,21 +14,17 @@ Portability: GHC
 -}
 module Instances.Data.Data () where
 
-import           Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
-                            Fixity(..), mkConstr, mkDataType)
+import Data.Data (Constr, ConstrRep(..), DataRep(..), DataType,
+                  Fixity(..), mkConstr, mkDataType)
 
-#if __GLASGOW_HASKELL__ >= 704
-import           GHC.Generics (Generic)
-#else
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
-#endif
+import GHC.Generics (Generic)
 
-import           Instances.Utils.GenericArbitrary (genericArbitrary)
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 
-import           Prelude ()
-import           Prelude.Compat
+import Prelude ()
+import Prelude.Compat
 
-import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
+import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance Arbitrary Constr where
     arbitrary = mkConstr <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
@@ -54,10 +43,5 @@ deriving instance Enum Fixity
 instance Arbitrary Fixity where
     arbitrary = arbitraryBoundedEnum
 
-#if __GLASGOW_HASKELL__ >= 704
 deriving instance Generic ConstrRep
 deriving instance Generic DataRep
-#else
-$(Generics.deriveAll0 ''ConstrRep)
-$(Generics.deriveAll0 ''DataRep)
-#endif

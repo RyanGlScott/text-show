@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP             #-}
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -14,14 +14,13 @@ Stability:   Provisional
 Portability: GHC
 
 'TextShow' instances for data types in the @Event@ module.
-Only provided if using @base-4.4.0.0@ on a platform other
-than Windows or GHCJS.
+Only provided if using a platform other than Windows or GHCJS.
 
 /Since: 2/
 -}
 module TextShow.GHC.Event () where
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS) && MIN_VERSION_base(4,4,0)
+#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
 import Data.List (intersperse)
 import Data.Maybe (catMaybes)
 import Data.Monoid.Compat ((<>))

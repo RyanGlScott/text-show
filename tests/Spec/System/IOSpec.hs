@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.System.IOSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -14,10 +12,8 @@ module Spec.System.IOSpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
 
-#if MIN_VERSION_base(4,4,0)
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress)
-#endif
 
 import Instances.System.IO ()
 
@@ -50,12 +46,10 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy SeekMode)
     describe "TextEncoding" $
         prop "TextShow instance" prop_showTextEncoding
-#if MIN_VERSION_base(4,4,0)
     describe "CodingProgress" $
         matchesTextShowSpec (Proxy :: Proxy CodingProgress)
     describe "CodingFailureMode" $
         matchesTextShowSpec (Proxy :: Proxy CodingFailureMode)
-#endif
     describe "Newline" $
         matchesTextShowSpec (Proxy :: Proxy Newline)
     describe "NewlineMode" $
