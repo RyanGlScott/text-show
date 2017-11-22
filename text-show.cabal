@@ -336,6 +336,8 @@ test-suite spec
 
                        -- Only exports tests if base >= 4.9
                        Spec.GHC.StackSpec
+
+                       TextShow.TH.Names
   build-depends:       array                >= 0.3    && < 0.6
                      , base-compat          >= 0.8.2  && < 1
                      , base-orphans         >= 0.6    && < 0.7
