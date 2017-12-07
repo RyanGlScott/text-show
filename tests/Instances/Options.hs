@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -14,10 +12,12 @@ Portability: GHC
 -}
 module Instances.Options () where
 
+import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 import TextShow.TH (Options(..), GenTextMethods)
 
-deriving instance Arbitrary Options
+instance Arbitrary Options where
+    arbitrary = genericArbitrary
 
 instance Arbitrary GenTextMethods where
     arbitrary = arbitraryBoundedEnum
