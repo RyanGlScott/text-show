@@ -349,14 +349,14 @@ makeShowtl name = makeShowtlPrec name `appE` integerE 0
 --
 -- /Since: 2/
 makeShowtPrec :: Name -> Q Exp
-makeShowtPrec = makeShowbPrecClass TextShow ShowtPrec
+makeShowtPrec = makeShowbPrecClass TextShow ShowtPrec defaultOptions
 
 -- | Generates a lambda expression which behaves like 'showtlPrec' (without
 -- requiring a 'TextShow' instance).
 --
 -- /Since: 2/
 makeShowtlPrec :: Name -> Q Exp
-makeShowtlPrec = makeShowbPrecClass TextShow ShowtlPrec
+makeShowtlPrec = makeShowbPrecClass TextShow ShowtlPrec defaultOptions
 
 -- | Generates a lambda expression which behaves like 'showtList' (without requiring a
 -- 'TextShow' instance).
@@ -384,14 +384,14 @@ makeShowb name = makeShowbPrec name `appE` integerE 0
 --
 -- /Since: 2/
 makeShowbPrec :: Name -> Q Exp
-makeShowbPrec = makeShowbPrecClass TextShow ShowbPrec
+makeShowbPrec = makeShowbPrecClass TextShow ShowbPrec defaultOptions
 
 -- | Generates a lambda expression which behaves like 'liftShowbPrec' (without
 -- requiring a 'TextShow1' instance).
 --
 -- /Since: 3/
 makeLiftShowbPrec :: Name -> Q Exp
-makeLiftShowbPrec = makeShowbPrecClass TextShow1 ShowbPrec
+makeLiftShowbPrec = makeShowbPrecClass TextShow1 ShowbPrec defaultOptions
 
 -- | Generates a lambda expression which behaves like 'showbPrec1' (without
 -- requiring a 'TextShow1' instance).
@@ -405,7 +405,7 @@ makeShowbPrec1 name = [| $(makeLiftShowbPrec name) showbPrec showbList |]
 --
 -- /Since: 3/
 makeLiftShowbPrec2 :: Name -> Q Exp
-makeLiftShowbPrec2 = makeShowbPrecClass TextShow2 ShowbPrec
+makeLiftShowbPrec2 = makeShowbPrecClass TextShow2 ShowbPrec defaultOptions
 
 -- | Generates a lambda expression which behaves like 'showbPrec2' (without
 -- requiring a 'TextShow2' instance).
@@ -491,15 +491,15 @@ showbPrecDecs tsClass opts vars cons =
     genMethod method methodName
       = funD methodName
              [ clause []
-                      (normalB $ makeTextShowForCons tsClass method vars cons)
+                      (normalB $ makeTextShowForCons tsClass method opts vars cons)
                       []
              ]
 
 
 -- | Generates a lambda expression which behaves like showbPrec (for TextShow),
 -- liftShowbPrec (for TextShow1), or liftShowbPrec2 (for TextShow2).
-makeShowbPrecClass :: TextShowClass -> TextShowFun -> Name -> Q Exp
-makeShowbPrecClass tsClass tsFun name = do
+makeShowbPrecClass :: TextShowClass -> TextShowFun -> Options -> Name -> Q Exp
+makeShowbPrecClass tsClass tsFun opts name = do
   info <- reifyDatatype name
   case info of
     DatatypeInfo { datatypeContext = ctxt
@@ -512,14 +512,13 @@ makeShowbPrecClass tsClass tsFun name = do
       -- or not the provided datatype can actually have showbPrec/liftShowbPrec/etc.
       -- implemented for it, and produces errors if it can't.
       buildTypeInstance tsClass parentName ctxt vars variant
-        >> makeTextShowForCons tsClass tsFun vars cons
+        >> makeTextShowForCons tsClass tsFun opts vars cons
 
 -- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for the
 -- given constructors. All constructors must be from the same type.
-makeTextShowForCons :: TextShowClass -> TextShowFun -> [Type] -> [ConstructorInfo]
+makeTextShowForCons :: TextShowClass -> TextShowFun -> Options -> [Type] -> [ConstructorInfo]
                     -> Q Exp
-makeTextShowForCons _ _ _ [] = error "Must have at least one data constructor"
-makeTextShowForCons tsClass tsFun vars cons = do
+makeTextShowForCons tsClass tsFun opts vars cons = do
     p       <- newName "p"
     value   <- newName "value"
     sps     <- newNameList "sp" $ fromEnum tsClass
@@ -528,13 +527,33 @@ makeTextShowForCons tsClass tsFun vars cons = do
         spsAndSls  = interleave sps sls
         lastTyVars = map varTToName $ drop (length vars - fromEnum tsClass) vars
         splMap     = Map.fromList $ zip lastTyVars spls
-    matches <- mapM (makeTextShowForCon p tsClass tsFun splMap) cons
+
+        makeFun
+          | null cons && emptyCaseBehavior opts && ghc7'8OrLater
+          = caseE (varE value) []
+
+          | null cons
+          = appE (varE 'seq) (varE value) `appE`
+            appE (varE 'error)
+                 (stringE $ "Void " ++ nameBase (showPrecName tsClass tsFun))
+
+          | otherwise
+          = caseE (varE value)
+                  (map (makeTextShowForCon p tsClass tsFun splMap) cons)
+
     lamE (map varP $ spsAndSls ++ [p, value])
         . appsE
         $ [ varE $ showPrecConstName tsClass tsFun
-          , caseE (varE value) (map return matches)
+          , makeFun
           ] ++ map varE spsAndSls
             ++ [varE p, varE value]
+  where
+    ghc7'8OrLater :: Bool
+#if __GLASGOW_HASKELL__ >= 708
+    ghc7'8OrLater = True
+#else
+    ghc7'8OrLater = False
+#endif
 
 -- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for a
 -- single constructor.

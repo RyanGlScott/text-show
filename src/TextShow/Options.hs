@@ -18,7 +18,7 @@
 #endif
 
 {-|
-Module:      TextShow.FromStringTextShow
+Module:      TextShow.Options
 Copyright:   (C) 2014-2017 Ryan Scott
 License:     BSD-style (see the file LICENSE)
 Maintainer:  Ryan Scott
@@ -41,10 +41,20 @@ import           Language.Haskell.TH.Lift
 -- | Options that specify how to derive 'TextShow' instances using Template Haskell.
 --
 -- /Since: 3.4/
-newtype Options = Options
+data Options = Options
   { genTextMethods :: GenTextMethods
     -- ^ When Template Haskell should generate definitions for methods which
     --   return @Text@?
+    --
+    --   /Since: 3.4/
+  , emptyCaseBehavior :: Bool
+    -- ^ If 'True', derived instances for empty data types (i.e., ones with
+    --   no data constructors) will use the @EmptyCase@ language extension.
+    --   If 'False', derived instances will simply use 'seq' instead.
+    --   (This has no effect on GHCs before 7.8, since @EmptyCase@ is only
+    --   available in 7.8 or later.)
+    --
+    --   /Since: next/
   } deriving ( Data
              , Eq
              , Generic
@@ -84,7 +94,10 @@ data GenTextMethods
 --
 -- /Since: 3.4/
 defaultOptions :: Options
-defaultOptions = Options { genTextMethods = SometimesTextMethods }
+defaultOptions =
+  Options { genTextMethods    = SometimesTextMethods
+          , emptyCaseBehavior = False
+          }
 
 -------------------------------------------------------------------------------
 

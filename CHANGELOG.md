@@ -1,5 +1,6 @@
 ## next [????.??.??]
 * Use `EmptyCase` on GHC 7.8 or later for `TextShow(1)` instances for empty data types that are derived using `TextShow.Generic`
+* Add `emptyCaseBehavior` to `Options`, which configures whether derived instances (using `TextShow.TH`) for empty data types should use the `EmptyCase` extension (this is disabled by default).
 
 ### 3.6.2 [2017.06.18]
 * Drop support for GHC 7.0 and 7.2
