@@ -512,7 +512,7 @@ makeShowbPrecClass tsClass tsFun name = do
       -- or not the provided datatype can actually have showbPrec/liftShowbPrec/etc.
       -- implemented for it, and produces errors if it can't.
       buildTypeInstance tsClass parentName ctxt vars variant
-        `seq` makeTextShowForCons tsClass tsFun vars cons
+        >> makeTextShowForCons tsClass tsFun vars cons
 
 -- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for the
 -- given constructors. All constructors must be from the same type.
