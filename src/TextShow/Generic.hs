@@ -21,6 +21,10 @@
 {-# LANGUAGE PolyKinds            #-}
 #endif
 
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE EmptyCase            #-}
+#endif
+
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE DeriveLift           #-}
 #endif
@@ -325,12 +329,18 @@ two_hash  = mempty;              \
 hash_prec = id
 #endif
 
+#if __GLASGOW_HASKELL__ >= 708
+#define EMPTY_CASE(x) case x of {}
+#else
+#define EMPTY_CASE(x) case x of !_ -> undefined
+#endif
+
 #define GTEXT_SHOW(text_type,show_funs,no_show_funs,show1_funs,one_hash,two_hash,hash_prec,gtext_show,gshow_prec,gtext_show_con,gshow_prec_con,show_prec,lift_show_prec,show_space,show_paren,show_list_with,from_char,from_string) \
 {- | A 'show_funs' value either stores nothing (for 'TextShow') or it stores            \
 the two function arguments that show occurrences of the type parameter (for             \
 'TextShow1').                                                                           \
                                                                                         \
-/Since: 3.4/                                                                           \
+/Since: 3.4/                                                                            \
 -};                                                                                     \
 data show_funs arity a where {                                                          \
     no_show_funs :: show_funs Zero a                                                    \
@@ -347,7 +357,7 @@ a 'text_type'. The @arity@ type variable indicates which type class is          
 used. @'gtext_show' 'Zero'@ indicates 'TextShow' behavior, and                          \
 @'gtext_show' 'One'@ indicates 'TextShow1' behavior.                                    \
                                                                                         \
-/Since: 3.4/                                                                           \
+/Since: 3.4/                                                                            \
 -};                                                                                     \
 class gtext_show arity f where {                                                        \
     {- | This is used as the default generic implementation of 'show_prec' (if the      \
@@ -363,11 +373,11 @@ instance gtext_show arity f => gtext_show arity (D1 d f) where {                
  };                                                                                     \
                                                                                         \
 instance gtext_show Zero V1 where {                                                     \
-    gshow_prec _ _ !_ = error "Void show_prec"                                          \
+    gshow_prec _ _ x = EMPTY_CASE(x)                                                    \
  };                                                                                     \
                                                                                         \
 instance gtext_show One V1 where {                                                      \
-    gshow_prec _ _ !_ = error "Void lift_show_prec"                                     \
+    gshow_prec _ _ x = EMPTY_CASE(x)                                                    \
  };                                                                                     \
                                                                                         \
 instance (gtext_show arity f, gtext_show arity g) => gtext_show arity (f :+: g) where { \

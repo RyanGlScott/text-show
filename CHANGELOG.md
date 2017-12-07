@@ -1,3 +1,6 @@
+## next [????.??.??]
+* Use `EmptyCase` on GHC 7.8 or later for `TextShow(1)` instances for empty data types that are derived using `TextShow.Generic`
+
 ### 3.6.2 [2017.06.18]
 * Drop support for GHC 7.0 and 7.2
 * Require `QuickCheck-2.10`/`quickcheck-instances-0.13.6` or later
