@@ -54,7 +54,7 @@ data Options = Options
     --   (This has no effect on GHCs before 7.8, since @EmptyCase@ is only
     --   available in 7.8 or later.)
     --
-    --   /Since: next/
+    --   /Since: 3.7/
   } deriving ( Data
              , Eq
              , Generic
