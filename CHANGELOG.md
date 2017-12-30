@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.7.1 [2017.12.29]
 * Don't define a `TextShow GCStats` instance on GHC 8.4 or later, as `GCStats`
   has been removed from `base`. This fixes the build on GHC 8.4.
 
