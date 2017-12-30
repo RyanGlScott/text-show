@@ -50,6 +50,7 @@ tested-with:         GHC == 7.4.2
                    , GHC == 7.10.3
                    , GHC == 8.0.2
                    , GHC == 8.2.2
+                   , GHC == 8.4.1
 extra-source-files:  CHANGELOG.md, README.md, include/*.h
 cabal-version:       >=1.10
 
@@ -360,6 +361,7 @@ test-suite spec
                      , th-lift              >= 0.7.6  && < 1
                      , transformers-compat  >= 0.5    && < 1
                      , void                 >= 0.5    && < 1
+  build-tool-depends:  hspec-discover:hspec-discover
 
   if flag(base-4-9)
     build-depends:     base                >= 4.9 && < 5
