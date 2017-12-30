@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 {-|
@@ -12,23 +13,28 @@ Portability: GHC
 -}
 module Spec.GHC.StatsSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
-
-import GHC.Stats (GCStats)
-
 import Instances.GHC.Stats ()
 
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (matchesTextShowSpec)
+import Test.Hspec (Spec, hspec, parallel)
 
-import Test.Hspec (Spec, describe, hspec, parallel)
+#if !(MIN_VERSION_base(4,11,0))
+import Data.Proxy (Proxy(..))
+import GHC.Stats (GCStats)
+import Spec.Utils (matchesTextShowSpec)
+import Test.Hspec (describe)
+#endif
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $
+#if !(MIN_VERSION_base(4,11,0))
     describe "GCStats" $
         matchesTextShowSpec (Proxy :: Proxy GCStats)
+#else
+    pure ()
+#endif

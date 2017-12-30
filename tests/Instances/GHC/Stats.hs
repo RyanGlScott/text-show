@@ -1,7 +1,11 @@
+{-# LANGUAGE CPP                #-}
+
+#if !(MIN_VERSION_base(4,11,0))
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
 {-# OPTIONS_GHC -fno-warn-orphans      #-}
+#endif
 
 {-|
 Module:      Instances.GHC.Stats
@@ -15,6 +19,7 @@ Portability: GHC
 -}
 module Instances.GHC.Stats () where
 
+#if !(MIN_VERSION_base(4,11,0))
 import GHC.Generics (Generic)
 import GHC.Stats (GCStats(..))
 
@@ -25,3 +30,4 @@ import Test.QuickCheck (Arbitrary(..))
 deriving instance Generic GCStats
 instance Arbitrary GCStats where
     arbitrary = genericArbitrary
+#endif
