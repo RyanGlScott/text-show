@@ -215,7 +215,6 @@ test-suite spec
                        Instances.Control.Concurrent
                        Instances.Control.Exception
                        Instances.Control.Monad.ST
-                       Instances.Data.ByteString
                        Instances.Data.Char
                        Instances.Data.Data
                        Instances.Data.Dynamic
@@ -354,7 +353,7 @@ test-suite spec
                      , integer-gmp
                      , nats                 >= 0.1    && < 2
                      , QuickCheck           >= 2.10   && < 2.12
-                     , quickcheck-instances >= 0.3.16 && < 0.4
+                     , quickcheck-instances >= 0.3.17 && < 0.4
                      , semigroups           >= 0.18.3 && < 1
                      , tagged               >= 0.8.3  && < 1
                      , text                 >= 0.11.1 && < 1.3

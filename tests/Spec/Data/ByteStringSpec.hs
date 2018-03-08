@@ -15,8 +15,6 @@ import qualified Data.ByteString.Lazy as BL (ByteString)
 import           Data.ByteString.Short (ShortByteString)
 import           Data.Proxy (Proxy(..))
 
-import           Instances.Data.ByteString ()
-
 import           Spec.Utils (matchesTextShowSpec)
 
 import           Test.Hspec (Spec, describe, hspec, parallel)
