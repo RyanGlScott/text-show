@@ -30,6 +30,6 @@ main :: IO ()
 main = printT (Just "Hello, World!")
 ```
 
-If you desire it, there are also monomorphic versions of the `showb` function available in the submodules of `Text.Show.Text`. See the [naming conventions](https://github.com/RyanGlScott/text-show/wiki/Naming-conventions) page for more information.
+See also the [naming conventions](https://github.com/RyanGlScott/text-show/wiki/Naming-conventions) page.
 
 Support for automatically deriving `TextShow` instances can be found in the `TextShow.TH` and `TextShow.Generic` modules.
