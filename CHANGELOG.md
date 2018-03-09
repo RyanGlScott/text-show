@@ -1,5 +1,5 @@
 ### 3.7.2 [2018.03.08]
-* Depend on `quickcheck-instances-0.3.17` or later.
+* Depend on `quickcheck-instances-0.3.18` or later.
 
 ### 3.7.1 [2017.12.29]
 * Don't define a `TextShow GCStats` instance on GHC 8.4 or later, as `GCStats`
