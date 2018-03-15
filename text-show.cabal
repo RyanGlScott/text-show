@@ -181,8 +181,8 @@ library
     build-depends:     base                >= 4.3 && < 4.9
 
   if flag(template-haskell-2-11)
-    build-depends:     template-haskell    >= 2.11 && < 2.13
-                     , ghc-boot-th         >= 8.0  && < 8.3
+    build-depends:     template-haskell    >= 2.11 && < 2.14
+                     , ghc-boot-th         >= 8.0  && < 8.5
   else
     build-depends:     template-haskell    >= 2.5  && < 2.11
 
@@ -368,8 +368,8 @@ test-suite spec
     build-depends:     base                >= 4.3 && < 4.9
 
   if flag(template-haskell-2-11)
-    build-depends:     template-haskell    >= 2.11 && < 2.13
-                     , ghc-boot-th         >= 8.0  && < 8.3
+    build-depends:     template-haskell    >= 2.11 && < 2.14
+                     , ghc-boot-th         >= 8.0  && < 8.5
   else
     build-depends:     template-haskell    >= 2.5  && < 2.11
 
@@ -423,8 +423,8 @@ benchmark bench
     build-depends:     base                >= 4.5 && < 4.9
 
   if flag(template-haskell-2-11)
-    build-depends:     template-haskell    >= 2.11 && < 2.13
-                     , ghc-boot-th         >= 8.0  && < 8.3
+    build-depends:     template-haskell    >= 2.11 && < 2.14
+                     , ghc-boot-th         >= 8.0  && < 8.5
   else
     build-depends:     template-haskell    >= 2.5  && < 2.11
 
