@@ -29,8 +29,10 @@ Portability: GHC
 -}
 module TextShow.Data.Typeable () where
 
+import           Prelude ()
+import           Prelude.Compat
+
 #if MIN_VERSION_base(4,10,0)
-import           Data.Monoid.Compat ((<>))
 import           Data.Kind (Type)
 import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import           Data.Type.Equality ((:~~:)(..))
@@ -47,7 +49,6 @@ import           Type.Reflection (pattern App, pattern Con, pattern Con', patter
                                   SomeTypeRep(..), TypeRep,
                                   eqTypeRep, tyConName, typeRep, typeRepTyCon)
 #else /* !(MIN_VERSION_base(4,10,0) */
-import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 import           Data.Typeable.Internal (tyConName)

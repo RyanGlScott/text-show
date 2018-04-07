@@ -15,9 +15,10 @@ Portability: GHC
 -}
 module TextShow.Data.Ratio () where
 
-import Data.Monoid.Compat ((<>))
-
 import GHC.Real (Ratio(..), ratioPrec, ratioPrec1)
+
+import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..), TextShow1(..), showbParen)
 import TextShow.Data.Integral ()

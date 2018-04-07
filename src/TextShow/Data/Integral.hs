@@ -24,7 +24,6 @@ module TextShow.Data.Integral (
 
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Word (Word8, Word16, Word32, Word64)

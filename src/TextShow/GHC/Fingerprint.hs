@@ -14,12 +14,14 @@ Portability: GHC
 -}
 module TextShow.GHC.Fingerprint () where
 
-import Data.Monoid.Compat ((<>))
 import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 import Data.Word (Word64)
 
 import GHC.Fingerprint.Type (Fingerprint(..))
+
+import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral (showbHex)

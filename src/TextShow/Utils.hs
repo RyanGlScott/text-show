@@ -26,7 +26,6 @@ module TextShow.Utils (
 
 import           Data.Int (Int64)
 import           Data.Text (Text)
-import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy (length, toStrict, unpack)
 import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 

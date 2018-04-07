@@ -19,12 +19,14 @@ Portability: GHC
 -}
 module TextShow.Data.Text () where
 
-import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as TS
 import           Data.Text.Encoding.Error (UnicodeException(..))
 import           Data.Text.Foreign (I16)
 import qualified Data.Text.Lazy as TL
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+
+import           Prelude ()
+import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Char (showbString)

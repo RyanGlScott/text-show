@@ -17,7 +17,6 @@ Portability: GHC
 -}
 module TextShow.Control.Concurrent () where
 
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (fromString)
 
 import Foreign.C.Types
@@ -25,6 +24,9 @@ import Foreign.C.Types
 import GHC.Conc (BlockReason, ThreadStatus)
 import GHC.Conc.Sync (ThreadId(..))
 import GHC.Prim
+
+import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Foreign.C.Types ()

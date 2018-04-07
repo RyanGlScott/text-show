@@ -63,7 +63,6 @@ import           Data.List.NonEmpty (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, keys, lookup, singleton)
 import           Data.Map (Map)
 import           Data.Maybe
-import           Data.Monoid.Compat ((<>))
 import qualified Data.Set as Set
 import           Data.Set (Set)
 import qualified Data.Text    as TS

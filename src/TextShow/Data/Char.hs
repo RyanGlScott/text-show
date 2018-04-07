@@ -24,7 +24,6 @@ module TextShow.Data.Char (
 
 import           Data.Array (Array, (!), listArray)
 import           Data.Char (GeneralCategory, isDigit, ord)
-import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder, singleton)
 
 import           Prelude ()

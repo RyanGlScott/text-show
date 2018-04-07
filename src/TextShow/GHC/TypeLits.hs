@@ -28,6 +28,8 @@ Only provided if using @base-4.6.0.0@ or later.
 module TextShow.GHC.TypeLits () where
 
 #if MIN_VERSION_base(4,6,0)
+import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral ()
@@ -36,7 +38,6 @@ import TextShow.Data.Integral ()
 import GHC.TypeLits (SomeNat(..), SomeSymbol(..), natVal, symbolVal)
 import TextShow.Data.Char ()
 # else
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (singleton)
 import GHC.TypeLits (IsEven(..), IsZero(..), Kind, Sing, SingE(fromSing))
 # endif

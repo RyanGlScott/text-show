@@ -15,13 +15,15 @@ Portability: GHC
 -}
 module TextShow.System.IO () where
 
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress, TextEncoding(textEncodingName))
 import GHC.IO.Handle (HandlePosn(..))
 import GHC.IO.Handle.Types (Handle(..))
+
+import Prelude ()
+import Prelude.Compat
 
 import System.IO (BufferMode, IOMode, Newline, NewlineMode, SeekMode)
 

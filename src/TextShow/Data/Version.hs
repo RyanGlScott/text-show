@@ -15,7 +15,6 @@ Provides a 'TextShow' instance for 'Version' and the 'showbVersion' function.
 module TextShow.Data.Version (showbVersion) where
 
 import Data.List (intersperse)
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import Data.Version (Version(..))
 

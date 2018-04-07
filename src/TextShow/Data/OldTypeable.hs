@@ -20,10 +20,12 @@ This module only exports functions if using @base-4.7@.
 module TextShow.Data.OldTypeable () where
 
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
-import Data.Monoid.Compat ((<>))
 import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
                                   funTc, listTc)
 import Data.Text.Lazy.Builder (fromString, singleton)
+
+import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import TextShow.Data.Typeable.Utils (showbArgs, showbTuple)

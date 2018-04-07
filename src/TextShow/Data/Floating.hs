@@ -29,11 +29,13 @@ module TextShow.Data.Floating (
 
 import           Data.Array.Base (unsafeAt)
 import           Data.Array.IArray (Array, array)
-import           Data.Monoid.Compat ((<>))
 import qualified Data.Text as T (replicate)
 import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
+
+import           Prelude ()
+import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..), showbParen)
 import           TextShow.TH.Internal (deriveTextShow)

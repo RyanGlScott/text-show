@@ -22,7 +22,6 @@ import qualified Data.Array.Base as IArray (assocs, bounds)
 import           Data.Array.Base (IArray)
 import           Data.Array.Unboxed (UArray)
 import           Data.Ix (Ix)
-import           Data.Monoid.Compat ((<>))
 import           Data.Text.Lazy.Builder (Builder)
 
 import           GHC.Show (appPrec)

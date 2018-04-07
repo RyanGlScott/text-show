@@ -12,7 +12,7 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-@hspec@ tests for data types in the "Data.Monoid" module.
+@hspec@ tests for data types in the "Data.OldTypeable" module.
 -}
 module Spec.Data.OldTypeableSpec (main, spec) where
 

@@ -20,7 +20,6 @@ module TextShow.Classes where
 #if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Typeable)
 #endif
-import           Data.Monoid.Compat ((<>))
 import qualified Data.Text         as TS (Text, singleton)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, singleton)
@@ -30,6 +29,9 @@ import           Data.Text.Lazy.Builder (Builder, fromLazyText, fromString,
                                          fromText, singleton, toLazyText)
 
 import           GHC.Show (appPrec, appPrec1)
+
+import           Prelude ()
+import           Prelude.Compat
 
 import           System.IO (Handle)
 
@@ -46,7 +48,7 @@ import           TextShow.Utils (toString, toText)
 -- to combine 'Builder's when creating 'TextShow' instances. As an example:
 --
 -- @
--- import Data.Monoid
+-- import Data.Semigroup
 -- import TextShow
 --
 -- data Example = Example Int Int

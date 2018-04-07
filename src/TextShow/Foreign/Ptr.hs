@@ -16,7 +16,6 @@ Foreign Function Interface (FFI).
 -}
 module TextShow.Foreign.Ptr () where
 
-import Data.Monoid.Compat ((<>))
 import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 

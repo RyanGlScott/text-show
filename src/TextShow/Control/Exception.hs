@@ -18,7 +18,6 @@ module TextShow.Control.Exception () where
 
 import Control.Exception.Base
 
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (fromString)
 #if MIN_VERSION_base(4,9,0)
 import Data.Text.Lazy.Builder (singleton)

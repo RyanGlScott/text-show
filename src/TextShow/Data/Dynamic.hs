@@ -15,9 +15,9 @@ Portability: GHC
 module TextShow.Data.Dynamic () where
 
 import Data.Dynamic (Dynamic, dynTypeRep)
-import Data.Monoid.Compat ((<>))
 
 import Prelude ()
+import Prelude.Compat
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.Typeable ()

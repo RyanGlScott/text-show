@@ -23,7 +23,6 @@ module TextShow.GHC.Event () where
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
 import Data.List (intersperse)
 import Data.Maybe (catMaybes)
-import Data.Monoid.Compat ((<>))
 import Data.Text.Lazy.Builder (Builder, singleton)
 
 import GHC.Event (Event, evtRead, evtWrite)
