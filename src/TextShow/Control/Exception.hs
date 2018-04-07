@@ -134,7 +134,7 @@ instance TextShow CompactionFailed where
 #if MIN_VERSION_base(4,11,0)
 -- | Only available with @base-4.11.0.0@ or later.
 --
--- /Since: next/
+-- /Since: 3.7.3/
 instance TextShow FixIOException where
     showbPrec _ FixIOException = fromString "cyclic evaluation in fixIO"
 #endif

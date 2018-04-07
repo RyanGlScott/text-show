@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.7.3 [2018.04.07]
 * Use `base-compat-batteries`.
 * Add a `TextShow FixIOException` instance on `base-4.11` or later.
 
