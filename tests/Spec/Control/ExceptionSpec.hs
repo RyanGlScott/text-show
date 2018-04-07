@@ -13,6 +13,9 @@ Portability: GHC
 module Spec.Control.ExceptionSpec (main, spec) where
 
 import Control.Exception
+#if MIN_VERSION_base(4,11,0)
+import Control.Exception.Base (FixIOException)
+#endif
 import Data.Proxy (Proxy(..))
 import Instances.Control.Exception ()
 import Spec.Utils (matchesTextShowSpec)
@@ -58,6 +61,10 @@ spec = parallel . describe "TextShow.Control.Exception" $ do
 #if MIN_VERSION_base(4,10,0)
     describe "CompactionFailed" $
         matchesTextShowSpec (Proxy :: Proxy CompactionFailed)
+#endif
+#if MIN_VERSION_base(4,11,0)
+    describe "FixIOException" $
+        matchesTextShowSpec (Proxy :: Proxy FixIOException)
 #endif
     describe "Deadlock" $
         matchesTextShowSpec (Proxy :: Proxy Deadlock)

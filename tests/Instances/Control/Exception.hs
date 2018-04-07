@@ -20,6 +20,9 @@ import Control.Exception hiding (IOException)
 
 import GHC.Generics (Generic)
 import GHC.IO.Exception (IOException(..), IOErrorType(..))
+#if MIN_VERSION_base(4,11,0)
+import GHC.IO.Exception (FixIOException(..))
+#endif
 
 import Instances.Foreign.C.Types ()
 import Instances.System.IO ()
@@ -95,6 +98,13 @@ deriving instance Arbitrary TypeError
 
 #if MIN_VERSION_base(4,10,0)
 deriving instance Arbitrary CompactionFailed
+#endif
+
+#if MIN_VERSION_base(4,11,0)
+deriving instance Bounded FixIOException
+deriving instance Enum FixIOException
+instance Arbitrary FixIOException where
+    arbitrary = arbitraryBoundedEnum
 #endif
 
 deriving instance Bounded Deadlock

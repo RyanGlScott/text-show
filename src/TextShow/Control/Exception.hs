@@ -131,6 +131,14 @@ instance TextShow CompactionFailed where
     showb (CompactionFailed why) = fromString ("compaction failed: " <> why)
 #endif
 
+#if MIN_VERSION_base(4,11,0)
+-- | Only available with @base-4.11.0.0@ or later.
+--
+-- /Since: next/
+instance TextShow FixIOException where
+    showbPrec _ FixIOException = fromString "cyclic evaluation in fixIO"
+#endif
+
 -- | /Since: 2/
 instance TextShow Deadlock where
     showb Deadlock = "<<deadlock>>"

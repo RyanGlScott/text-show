@@ -1,5 +1,6 @@
 ### next [????.??.??]
 * Use `base-compat-batteries`.
+* Add a `TextShow FixIOException` instance on `base-4.11` or later.
 
 ### 3.7.2 [2018.03.08]
 * Depend on `quickcheck-instances-0.3.18` or later.
