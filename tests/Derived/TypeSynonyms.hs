@@ -22,16 +22,9 @@ Defines data types that use type synonyms.
 -}
 module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 
-#include "generic.h"
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
-#endif
 
 import           GHC.Generics (Generic)
-#if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics (Generic1)
-#endif
 
 import           Prelude
 
@@ -65,9 +58,6 @@ newtype TyCon a b = TyCon
   deriving ( Arbitrary
            , Show
            , Generic
-#if __GLASGOW_HASKELL__ >= 706
-           , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -84,9 +74,6 @@ newtype instance TyFamily a b = TyFamily
            , Show
 #if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-# endif
 #endif
            )
 
@@ -107,10 +94,8 @@ $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveMeta           ''TyCon)
 $(Generics.deriveRepresentable1 ''TyCon)
-#endif
 
 #if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'TyFamily)
@@ -123,10 +108,8 @@ $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
 
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           'TyFamily)
 $(Generics.deriveRepresentable1 'TyFamily)
-#endif
 
 #if __GLASGOW_HASKELL__ < 706
 $(Generics.deriveRepresentable0 'TyFamily)
