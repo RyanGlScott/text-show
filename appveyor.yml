@@ -30,5 +30,5 @@ build: off
 test_script:
  - IF EXIST configure.ac bash -c "autoreconf -i"
  - "echo packages:. > cabal.project"
- - "cabal %CABOPTS% new-build -j1 --enable-tests --enable-benchmarks -j1"
- - "cabal %CABOPTS% new-test -j1 all"
+ - "cabal %CABOPTS% new-build -j1 --enable-tests --enable-benchmarks all"
+ - "cabal %CABOPTS% new-test  -j1 --enable-tests --enable-benchmarks all"
