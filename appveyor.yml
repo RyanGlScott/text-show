@@ -1,0 +1,34 @@
+clone_folder: "c:\\WORK"
+
+environment:
+  global:
+    CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
+  matrix:
+    - GHCVER: "8.4.2"
+    - GHCVER: "8.2.2"
+    - GHCVER: "8.0.2.2"
+    - GHCVER: "7.10.3.2"
+    # - GHCVER: "7.8.4"
+    # - GHCVER: "7.6.3"
+    # - GHCVER: "7.4.2"
+    # - GHCVER: "7.2.2"
+    # - GHCVER: "7.0.4"
+
+cache:
+ - "C:\\SR"
+
+install:
+ - "choco install -y ghc --version %GHCVER%"
+ - "refreshenv"
+ - "set PATH=C:\\msys64\\mingw64\\bin;C:\\msys64\\usr\\bin;%PATH%"
+ - "cabal --version"
+ - "ghc --version"
+ - "cabal %CABOPTS% update -v"
+
+build: off
+
+test_script:
+ - IF EXIST configure.ac bash -c "autoreconf -i"
+ - "echo packages:. > cabal.project"
+ - "cabal %CABOPTS% new-build -j1 --enable-tests --enable-benchmarks -j1"
+ - "cabal %CABOPTS% new-test -j1 all"
