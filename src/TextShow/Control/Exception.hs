@@ -1,6 +1,10 @@
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE CPP                #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
+#if __GLASGOW_HASKELL__ >= 806
+{-# LANGUAGE DerivingVia        #-}
+#endif
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Control.Exception
@@ -31,14 +35,22 @@ import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
 
 -- | /Since: 2/
+#if __GLASGOW_HASKELL__ >= 806
+deriving via FromStringShow SomeException instance TextShow SomeException
+#else
 instance TextShow SomeException where
     showbPrec p (SomeException e) = showbPrec p $ FromStringShow e
     {-# INLINE showbPrec #-}
+#endif
 
 -- | /Since: 2/
+#if __GLASGOW_HASKELL__ >= 806
+deriving via FromStringShow IOException instance TextShow IOException
+#else
 instance TextShow IOException where
     showb = showb . FromStringShow
     {-# INLINE showb #-}
+#endif
 
 -- | /Since: 2/
 instance TextShow ArithException where

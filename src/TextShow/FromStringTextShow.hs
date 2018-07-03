@@ -83,7 +83,8 @@ import           Text.Show (showListWith)
 
 -------------------------------------------------------------------------------
 
--- | The 'TextShow' instance for 'FromStringShow' is based on its @String@
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The 'TextShow' instance for 'FromStringShow' is based on its @String@
 -- 'Show' instance. That is,
 --
 -- @
@@ -146,7 +147,8 @@ instance TextShow1 FromStringShow where
 
 -------------------------------------------------------------------------------
 
--- | The @String@ 'Show' instance for 'FromTextShow' is based on its
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The @String@ 'Show' instance for 'FromTextShow' is based on its
 -- 'TextShow' instance. That is,
 --
 -- @
@@ -206,7 +208,8 @@ instance TextShow1 FromTextShow where
 
 -------------------------------------------------------------------------------
 
--- | The 'TextShow1' instance for 'FromStringShow1' is based on its @String@
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The 'TextShow1' instance for 'FromStringShow1' is based on its @String@
 -- 'Show1' instance. That is,
 --
 -- @
@@ -286,7 +289,8 @@ instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
 
 -------------------------------------------------------------------------------
 
--- | The @String@ 'Show1' instance for 'FromTextShow1' is based on its
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The @String@ 'Show1' instance for 'FromTextShow1' is based on its
 -- 'TextShow1' instance. That is,
 --
 -- @
@@ -367,7 +371,8 @@ instance (TextShow1 f, TextShow a) => TextShow (FromTextShow1 f a) where
 
 -------------------------------------------------------------------------------
 
--- | The 'TextShow2' instance for 'FromStringShow2' is based on its @String@
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The 'TextShow2' instance for 'FromStringShow2' is based on its @String@
 -- 'Show2' instance. That is,
 --
 -- @
@@ -466,7 +471,8 @@ instance (Show2 f, Show a) => Show1 (FromStringShow2 f a) where
 
 -------------------------------------------------------------------------------
 
--- | The @String@ 'Show2' instance for 'FromTextShow2' is based on its
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The @String@ 'Show2' instance for 'FromTextShow2' is based on its
 -- 'TextShow2' instance. That is,
 --
 -- @

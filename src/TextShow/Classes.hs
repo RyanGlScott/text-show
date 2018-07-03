@@ -59,7 +59,7 @@ import           TextShow.Utils (toString, toText)
 -- If you do not want to create 'TextShow' instances manually, you can alternatively
 -- use the "TextShow.TH" module to automatically generate default 'TextShow'
 -- instances using Template Haskell, or the "TextShow.Generic" module to
--- quickly define 'TextShow' instances using 'genericShowbPrec'.
+-- quickly define 'TextShow' instances using "GHC.Generics".
 --
 -- /Since: 2/
 class TextShow a where

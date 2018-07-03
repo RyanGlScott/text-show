@@ -6,9 +6,16 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-A collection of utility functions.
+A collection of utilities.
 -}
-module Instances.Utils ((<@>)) where
+module Instances.Utils (GenericExample(..), (<@>)) where
+
+-- | A simple data type for testing if 'FromGeneric' and
+-- 'FromGeneric1' work as intended.
+data GenericExample a = GE1 a (Maybe a) (Maybe (Maybe a))
+                      | GE2
+                      | GE3 { ge3 :: a }
+                      | a :!@#$: a
 
 infixl 4 <@>
 -- | A useful way to escape a 'Functor' context.

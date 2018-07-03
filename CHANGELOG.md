@@ -1,4 +1,7 @@
 ### next [????.??.??]
+* Add `FromGeneric` and `FromGeneric1` newtype adapters to `TextShow.Generic`.
+  These are suitable for use with `DerivingVia`, and provide a convenient way
+  to obtain `Generic(1)`-based defaults for `TextShow(1)` instances.
 * Make `showbEFloat`'s behavior match that of `showEFloat` in `base-4.12`.
 
 ### 3.7.3 [2018.04.07]
