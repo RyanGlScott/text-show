@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Make `showbEFloat`'s behavior match that of `showEFloat` in `base-4.12`.
+
 ### 3.7.3 [2018.04.07]
 * Use `base-compat-batteries`.
 * Add a `TextShow FixIOException` instance on `base-4.11` or later.

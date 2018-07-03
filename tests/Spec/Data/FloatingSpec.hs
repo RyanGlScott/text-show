@@ -27,7 +27,7 @@ import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck (Gen, arbitrary, suchThat)
+import Test.QuickCheck (Property, (==>))
 
 import TextShow (Builder, fromString)
 import TextShow.Data.Floating (showbEFloat, showbFFloat, showbGFloat,
@@ -57,7 +57,13 @@ spec = parallel $ do
 
 -- | Verifies @showXFloat@ and @showbXFloat@ generate the same output (where @X@
 -- is one of E, F, or G).
-prop_showXFloat :: (Maybe Int -> Double -> ShowS) -> (Maybe Int -> Double -> Builder) -> Double -> Gen Bool
-prop_showXFloat f1 f2 val = do
-    digs <- arbitrary `suchThat` (<= 10)
-    pure $ fromString (f1 (Just digs) val "") == f2 (Just digs) val
+prop_showXFloat :: (Maybe Int -> Double -> ShowS)
+                -> (Maybe Int -> Double -> Builder)
+                -> Maybe Int -> Double -> Property
+prop_showXFloat f1 f2 mb_digs val =
+  mb_digs /= Nothing && mb_digs <= Just 10
+#if !(MIN_VERSION_base(4,12,0))
+    && mb_digs /= Just 0 -- Work around Trac #15115
+#endif
+      ==>
+    fromString (f1 mb_digs val "") == f2 mb_digs val
