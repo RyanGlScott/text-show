@@ -1,7 +1,10 @@
 {-# LANGUAGE BangPatterns          #-}
 {-# LANGUAGE CPP                   #-}
 {-# LANGUAGE DeriveDataTypeable    #-}
-{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE DeriveFoldable        #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DeriveTraversable     #-}
 {-# LANGUAGE EmptyDataDecls        #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -15,6 +18,7 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 #if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds            #-}
@@ -47,12 +51,16 @@ from the @generic-deriving@ library.
 /Since: 2/
 -}
 module TextShow.Generic (
+      -- * Generic adapter newtypes
+      FromGeneric(..)
+    , FromGeneric1(..)
+
       -- * Generic @show@ functions
       -- $generics
 
       -- ** Understanding a compiler error
       -- $generic_err
-      genericShowt
+    , genericShowt
     , genericShowtl
     , genericShowtPrec
     , genericShowtlPrec
@@ -97,6 +105,9 @@ import qualified Data.Text.Lazy.Builder as TB (fromString, singleton)
 import           Data.Text.Lazy.Builder (Builder)
 
 import           Generics.Deriving.Base
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+import qualified Generics.Deriving.TH as Generics
+#endif
 
 import           GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import           GHC.Show (appPrec, appPrec1)
@@ -120,50 +131,127 @@ import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 {- $generics
 
 'TextShow' instances can be easily defined for data types that are 'Generic' instances.
-The easiest way to do this is to use the @DeriveGeneric@ extension.
+If you are using GHC 8.6 or later, the easiest way to do this is to use the
+@DerivingVia@ extension.
 
 @
-&#123;-&#35; LANGUAGE DeriveGeneric &#35;-&#125;
+&#123;-&#35; LANGUAGE DeriveGeneric, DerivingVia &#35;-&#125;
 import GHC.Generics
 import TextShow
 import TextShow.Generic
 
 data D a = D a
-  deriving (Generic, Generic1)
+  deriving ('Generic', 'Generic1')
+  deriving 'TextShow'  via 'FromGeneric'  (D a)
+  deriving 'TextShow1' via 'FromGeneric1' D
+@
 
-instance TextShow a => TextShow (D a) where
-    showbPrec = 'genericShowbPrec'
+Or, if you are using a version of GHC older than 8.6, one can alternatively
+define these instances like so:
 
-instance TextShow1 D where
-    liftShowbPrec = 'genericLiftShowbPrec'
+@
+instance 'TextShow' a => 'TextShow' (D a) where
+    'showbPrec' = 'genericShowbPrec'
+
+instance 'TextShow1' D where
+    'liftShowbPrec' = 'genericLiftShowbPrec'
 @
 -}
 
 {- $generic_err
 
-Suppose you intend to use 'genericShowbPrec' to define a 'TextShow' instance.
+Suppose you intend to define a 'TextShow' instance via 'FromGeneric':
 
 @
 data Oops = Oops
+  deriving 'TextShow' via 'FromGeneric' Oops
     -- forgot to add \"deriving Generic\" here!
-
-instance TextShow Oops where
-    showbPrec = 'genericShowbPrec'
 @
 
 If you forget to add a @deriving 'Generic'@ clause to your data type, at
 compile-time, you might get an error message that begins roughly as follows:
 
 @
-No instance for ('GTextShowB' 'Zero' (Rep Oops))
+No instance for ('GTextShowB' 'Zero' ('Rep' Oops))
 @
 
 This error can be confusing, but don't let it intimidate you. The correct fix is
 simply to add the missing \"@deriving 'Generic'@\" clause.
 
 Similarly, if the compiler complains about not having an instance for @('GTextShowB'
-'One' (Rep1 Oops1))@, add a \"@deriving 'Generic1'@\" clause.
+'One' ('Rep1' Oops1))@, add a \"@deriving 'Generic1'@\" clause.
 -}
+
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The 'TextShow' instance for 'FromGeneric' leverages a 'Generic'-based
+-- default. That is,
+--
+-- @
+-- 'showbPrec' p ('FromGeneric' x) = 'genericShowbPrec' p x
+-- @
+--
+-- /Since: 3.7.4/
+newtype FromGeneric a = FromGeneric { fromGeneric :: a }
+  deriving ( Data
+           , Eq
+           , Foldable
+           , Functor
+           , Ord
+           , Read
+           , Show
+           , Traversable
+           , Typeable
+#if __GLASGOW_HASKELL__ >= 706
+           , Generic
+           , Generic1
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
+#endif
+           )
+
+-- | /Since: 3.7.4/
+instance (Generic a, GTextShowB Zero (Rep a)) => TextShow (FromGeneric a) where
+  showbPrec p = genericShowbPrec p . fromGeneric
+
+-- | An adapter newtype, suitable for @DerivingVia@.
+-- The 'TextShow1' instance for 'FromGeneric1' leverages a 'Generic1'-based
+-- default. That is,
+--
+-- @
+-- 'liftShowbPrec' sp sl p ('FromGeneric1' x) = 'genericLiftShowbPrec' sp sl p x
+-- @
+--
+-- /Since: 3.7.4/
+newtype FromGeneric1 f a = FromGeneric1 { fromGeneric1 :: f a }
+  deriving ( Eq
+           , Ord
+           , Read
+           , Show
+#if __GLASGOW_HASKELL__ >= 706
+           , Generic
+#endif
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
+           , Generic1
+#endif
+#if __GLASGOW_HASKELL__ >= 800
+           , Lift
+#endif
+           )
+
+deriving instance Foldable    f => Foldable    (FromGeneric1 f)
+deriving instance Functor     f => Functor     (FromGeneric1 f)
+deriving instance Traversable f => Traversable (FromGeneric1 f)
+
+#if __GLASGOW_HASKELL__ >= 708
+deriving instance Typeable FromGeneric1
+deriving instance ( Data (f a), Typeable f, Typeable a
+                  ) => Data (FromGeneric1 f (a :: *))
+#endif
+
+-- | /Since: 3.7.4/
+instance (Generic1 f, GTextShowB One (Rep1 f)) => TextShow1 (FromGeneric1 f) where
+  liftShowbPrec sp sl p = genericLiftShowbPrec sp sl p . fromGeneric1
 
 -- | A 'Generic' implementation of 'showt'.
 --
@@ -302,8 +390,8 @@ the code below is ever going to inline properly, and the runtime cost of all tho
 dictinary lookups is likely to be as bad as converting to Text at the end, if not worse.
 
 Therefore, I perform some ugly CPP hackery to copy-paste the generic functionality three
-times, once for each Text/Builder variant. I suppose I could use TH instead to make this
-look a little nicer, but I haven't attempted that.
+times, once for each Text/Builder variant. At some point, I should replace this with TH.
+See #33.
 -}
 
 #if __GLASGOW_HASKELL__ >= 708
@@ -582,4 +670,18 @@ $(deriveTextShow ''ConType)
 
 #if __GLASGOW_HASKELL__ < 800
 $(deriveLift ''ConType)
+$(deriveLift ''FromGeneric)
+
+instance Lift (f a) => Lift (FromGeneric1 f a) where
+    lift = $(makeLift ''FromGeneric1)
+#endif
+
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+$(Generics.deriveMeta           ''FromGeneric1)
+$(Generics.deriveRepresentable1 ''FromGeneric1)
+#endif
+
+#if __GLASGOW_HASKELL__ < 706
+$(Generics.deriveAll0And1       ''FromGeneric)
+$(Generics.deriveRepresentable0 ''FromGeneric1)
 #endif
