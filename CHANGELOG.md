@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.7.4 [2018.07.03]
 * Add `FromGeneric` and `FromGeneric1` newtype adapters to `TextShow.Generic`.
   These are suitable for use with `DerivingVia`, and provide a convenient way
   to obtain `Generic(1)`-based defaults for `TextShow(1)` instances.
