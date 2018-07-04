@@ -30,6 +30,10 @@ import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (makeShowbPrec)
 #endif
 
+#if MIN_VERSION_base(4,12,0)
+import Data.Monoid (Ap)
+#endif
+
 -- | /Since: 2/
 $(deriveTextShow  ''All)
 -- | /Since: 2/
@@ -66,4 +70,17 @@ instance TextShow (f a) => TextShow (Alt f a) where
 --
 -- /Since: 2/
 $(deriveTextShow1 ''Alt)
+#endif
+
+#if MIN_VERSION_base(4,12,0)
+-- | Only available with @base-4.12.0.0@ or later.
+--
+-- /Since: 3.7.4/
+instance TextShow (f a) => TextShow (Ap f a) where
+    showbPrec = $(makeShowbPrec ''Ap)
+
+-- | Only available with @base-4.12.0.0@ or later.
+--
+-- /Since: 3.7.4/
+$(deriveTextShow1 ''Ap)
 #endif

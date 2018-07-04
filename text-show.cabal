@@ -255,6 +255,9 @@ test-suite spec
                        -- Only exports instances if base >= 4.9
                        Instances.GHC.Stack
 
+                       -- Only exports instances if base >= 4.12
+                       Instances.Data.Monoid
+
                        Spec.BuilderSpec
                        Spec.Control.ApplicativeSpec
                        Spec.Control.ConcurrentSpec

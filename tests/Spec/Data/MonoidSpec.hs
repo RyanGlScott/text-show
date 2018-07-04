@@ -17,6 +17,8 @@ import Data.Proxy (Proxy(..))
 
 import Generics.Deriving.Instances ()
 
+import Instances.Data.Monoid ()
+
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec, genericTextShow1Spec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
@@ -69,6 +71,14 @@ spec = parallel $ do
 #if MIN_VERSION_base(4,8,0)
     describe "Alt Maybe Int" $ do
         let p :: Proxy (Alt Maybe Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        genericTextShowSpec  p
+        genericTextShow1Spec p
+#endif
+#if MIN_VERSION_base(4,12,0)
+    describe "Ap Maybe Int" $ do
+        let p :: Proxy (Ap Maybe Int)
             p = Proxy
         matchesTextShowSpec  p
         genericTextShowSpec  p
