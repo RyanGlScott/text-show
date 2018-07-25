@@ -4,15 +4,6 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
 
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds          #-}
-{-# LANGUAGE PolyKinds          #-}
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE AutoDeriveTypeable #-}
-#endif
-
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE DeriveLift         #-}
 #endif
@@ -31,12 +22,12 @@ Portability: GHC
 -}
 module TextShow.Options (Options(..), GenTextMethods(..), defaultOptions) where
 
-import           Data.Data (Data, Typeable)
-import           Data.Ix (Ix)
+import Data.Data (Data, Typeable)
+import Data.Ix (Ix)
 
-import           GHC.Generics (Generic)
+import GHC.Generics (Generic)
 
-import           Language.Haskell.TH.Lift
+import Language.Haskell.TH.Lift
 
 -- | Options that specify how to derive 'TextShow' instances using Template Haskell.
 --

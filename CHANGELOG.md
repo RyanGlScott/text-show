@@ -1,3 +1,9 @@
+### next [????.??.??]
+* Remove uses of `AutoDeriveTypeable`, since it is now deprecated. (As a
+  result, some things which used to have `Typeable` instances on GHC 7.8
+  no longer do, but I'm choosing not to be bothered by this unless someone
+  shouts.)
+
 ### 3.7.4 [2018.07.03]
 * Add `FromGeneric` and `FromGeneric1` newtype adapters to `TextShow.Generic`.
   These are suitable for use with `DerivingVia`, and provide a convenient way
