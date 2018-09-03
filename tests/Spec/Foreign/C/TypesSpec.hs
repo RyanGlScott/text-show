@@ -14,7 +14,7 @@ module Spec.Foreign.C.TypesSpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
 import Foreign.C.Types
-import Instances.Foreign.C.Types
+import Instances.Foreign.C.Types ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.QuickCheck.Instances ()
@@ -63,13 +63,13 @@ spec = parallel $ do
     describe "CUIntMax" $
         matchesTextShowSpec (Proxy :: Proxy CUIntMax)
     describe "CClock" $
-        matchesTextShowSpec (Proxy :: Proxy CClockHack)
+        matchesTextShowSpec (Proxy :: Proxy CClock)
     describe "CTime" $
-        matchesTextShowSpec (Proxy :: Proxy CTimeHack)
+        matchesTextShowSpec (Proxy :: Proxy CTime)
     describe "CUSeconds" $
-        matchesTextShowSpec (Proxy :: Proxy CUSecondsHack)
+        matchesTextShowSpec (Proxy :: Proxy CUSeconds)
     describe "CSUSeconds" $
-        matchesTextShowSpec (Proxy :: Proxy CSUSecondsHack)
+        matchesTextShowSpec (Proxy :: Proxy CSUSeconds)
     describe "CFloat" $
         matchesTextShowSpec (Proxy :: Proxy CFloat)
     describe "CDouble" $
