@@ -173,16 +173,18 @@ formatRealFloatAltB fmt decs alt x
           [d]     -> singleton d <> ".0e" <> show_e'
           (d:ds') -> singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> show_e'
           []      -> error "formatRealFloat/doFmt/Exponent: []"
-       Just 0 ->
+       Just d | d <= 0 ->
         -- handle this case specifically since we need to omit the
-        -- decimal point as well (#15115)
+        -- decimal point as well (#15115).
+        -- Note that this handles negative precisions as well for consistency
+        -- (see #15509).
         case is of
           [0] -> "0e0"
           _ ->
            let
              (ei,is') = roundTo 1 is
-             d:_ = map i2d (if ei > 0 then init is' else is')
-           in singleton d <> singleton 'e' <> decimal (e-1+ei)
+             n:_ = map i2d (if ei > 0 then init is' else is')
+           in singleton n <> singleton 'e' <> decimal (e-1+ei)
        Just dec ->
         let dec' = max dec 1 in
         case is of

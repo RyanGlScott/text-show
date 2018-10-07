@@ -1,4 +1,6 @@
 ### next [????.??.??]
+* _Actually_ make `showbEFloat`'s behavior match that of `showEFloat` in
+  `base-4.12`.
 * Remove uses of `AutoDeriveTypeable`, since it is now deprecated. (As a
   result, some things which used to have `Typeable` instances on GHC 7.8
   no longer do, but I'm choosing not to be bothered by this unless someone
