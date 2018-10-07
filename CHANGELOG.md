@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.7.5 [2018.10.07]
 * _Actually_ make `showbEFloat`'s behavior match that of `showEFloat` in
   `base-4.12`.
 * Remove uses of `AutoDeriveTypeable`, since it is now deprecated. (As a
