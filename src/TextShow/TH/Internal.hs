@@ -458,23 +458,27 @@ deriveTextShowClass :: TextShowClass -> Options -> Name -> Q [Dec]
 deriveTextShowClass tsClass opts name = do
   info <- reifyDatatype name
   case info of
-    DatatypeInfo { datatypeContext = ctxt
-                 , datatypeName    = parentName
-                 , datatypeVars    = vars
-                 , datatypeVariant = variant
-                 , datatypeCons    = cons
+    DatatypeInfo { datatypeContext   = ctxt
+                 , datatypeName      = parentName
+#if MIN_VERSION_th_abstraction(0,3,0)
+                 , datatypeInstTypes = instTys
+#else
+                 , datatypeVars      = instTys
+#endif
+                 , datatypeVariant   = variant
+                 , datatypeCons      = cons
                  } -> do
       (instanceCxt, instanceType)
-        <- buildTypeInstance tsClass parentName ctxt vars variant
+        <- buildTypeInstance tsClass parentName ctxt instTys variant
       (:[]) <$> instanceD (return instanceCxt)
                           (return instanceType)
-                          (showbPrecDecs tsClass opts vars cons)
+                          (showbPrecDecs tsClass opts instTys cons)
 
 -- | Generates a declaration defining the primary function corresponding to a
 -- particular class (showbPrec for TextShow, liftShowbPrec for TextShow1, and
 -- liftShowbPrec2 for TextShow2).
 showbPrecDecs :: TextShowClass -> Options -> [Type] -> [ConstructorInfo] -> [Q Dec]
-showbPrecDecs tsClass opts vars cons =
+showbPrecDecs tsClass opts instTys cons =
     [genMethod ShowbPrec (showbPrecName tsClass)]
     ++ if tsClass == TextShow && shouldGenTextMethods
           then [genMethod ShowtPrec 'showtPrec, genMethod ShowtlPrec 'showtlPrec]
@@ -490,7 +494,7 @@ showbPrecDecs tsClass opts vars cons =
     genMethod method methodName
       = funD methodName
              [ clause []
-                      (normalB $ makeTextShowForCons tsClass method opts vars cons)
+                      (normalB $ makeTextShowForCons tsClass method opts instTys cons)
                       []
              ]
 
@@ -501,30 +505,34 @@ makeShowbPrecClass :: TextShowClass -> TextShowFun -> Options -> Name -> Q Exp
 makeShowbPrecClass tsClass tsFun opts name = do
   info <- reifyDatatype name
   case info of
-    DatatypeInfo { datatypeContext = ctxt
-                 , datatypeName    = parentName
-                 , datatypeVars    = vars
-                 , datatypeVariant = variant
-                 , datatypeCons    = cons
+    DatatypeInfo { datatypeContext   = ctxt
+                 , datatypeName      = parentName
+#if MIN_VERSION_th_abstraction(0,3,0)
+                 , datatypeInstTypes = instTys
+#else
+                 , datatypeVars      = instTys
+#endif
+                 , datatypeVariant   = variant
+                 , datatypeCons      = cons
                  } ->
       -- We force buildTypeInstance here since it performs some checks for whether
       -- or not the provided datatype can actually have showbPrec/liftShowbPrec/etc.
       -- implemented for it, and produces errors if it can't.
-      buildTypeInstance tsClass parentName ctxt vars variant
-        >> makeTextShowForCons tsClass tsFun opts vars cons
+      buildTypeInstance tsClass parentName ctxt instTys variant
+        >> makeTextShowForCons tsClass tsFun opts instTys cons
 
 -- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for the
 -- given constructors. All constructors must be from the same type.
 makeTextShowForCons :: TextShowClass -> TextShowFun -> Options -> [Type] -> [ConstructorInfo]
                     -> Q Exp
-makeTextShowForCons tsClass tsFun opts vars cons = do
+makeTextShowForCons tsClass tsFun opts instTys cons = do
     p       <- newName "p"
     value   <- newName "value"
     sps     <- newNameList "sp" $ fromEnum tsClass
     sls     <- newNameList "sl" $ fromEnum tsClass
     let spls       = zip sps sls
         spsAndSls  = interleave sps sls
-        lastTyVars = map varTToName $ drop (length vars - fromEnum tsClass) vars
+        lastTyVars = map varTToName $ drop (length instTys - fromEnum tsClass) instTys
         splMap     = Map.fromList $ zip lastTyVars spls
 
         makeFun

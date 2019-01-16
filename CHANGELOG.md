@@ -1,5 +1,5 @@
 ### next [????.??.??]
-* Allow the test suite to compile with GHC 8.8.
+* Support `th-abstraction-0.3` or later.
 
 ## 3.8 [2019.03.19]
 * Remove the `TextShow I16` instance from `TextShow.Data.Text`. The usefulness
