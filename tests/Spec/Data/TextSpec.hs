@@ -26,7 +26,6 @@ import qualified Data.Text as TL
 import           Data.Text.Encoding (Decoding)
 #endif
 import           Data.Text.Encoding.Error (UnicodeException)
-import           Data.Text.Foreign (I16)
 #if MIN_VERSION_text(1,1,0)
 import           Data.Text.Internal.Fusion.Size (Size)
 #endif
@@ -43,8 +42,6 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy TS.Text)
     describe "lazy Text" $
         matchesTextShowSpec (Proxy :: Proxy TL.Text)
-    describe "I16" $
-        matchesTextShowSpec (Proxy :: Proxy I16)
     describe "UnicodeException" $
         matchesTextShowSpec (Proxy :: Proxy UnicodeException)
 #if MIN_VERSION_text(1,0,0)

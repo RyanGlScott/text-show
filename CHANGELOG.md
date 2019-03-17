@@ -1,3 +1,9 @@
+## next [????.??.??]
+* Remove the `TextShow I16` instance from `TextShow.Data.Text`. The usefulness
+  of this instance was dubious at best, and moreover, it was actively causing
+  issues when building `text-show` with `reflex-platform` (see
+  [#40](https://github.com/RyanGlScott/text-show/issues/40)).
+
 ### 3.7.5 [2018.10.07]
 * _Actually_ make `showbEFloat`'s behavior match that of `showEFloat` in
   `base-4.12`.
