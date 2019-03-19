@@ -13,7 +13,13 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-'TextShow' instances for 'Text' types.
+Defines 'TextShow' instances for 'Text' types, as well as other miscellaneous
+data types from the @text@ package.
+
+Note that this module deliberately does not define a 'TextShow' instance for
+the @I16@ data type from @Data.Text.Foreign@, as that module is not available
+on certain widely used variants of GHC (e.g., @reflex-platform@). See #40
+for more details. If this is a problem for you, please file an issue.
 
 /Since: 2/
 -}
@@ -21,7 +27,6 @@ module TextShow.Data.Text () where
 
 import qualified Data.Text as TS
 import           Data.Text.Encoding.Error (UnicodeException(..))
-import           Data.Text.Foreign (I16)
 import qualified Data.Text.Lazy as TL
 import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 
@@ -59,9 +64,6 @@ instance TextShow TL.Text where
 instance TextShow Builder where
     showb = showb . toLazyText
     {-# INLINE showb #-}
-
--- | /Since: 2/
-$(deriveTextShow ''I16)
 
 -- | /Since: 2/
 instance TextShow UnicodeException where
