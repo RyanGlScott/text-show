@@ -1,4 +1,4 @@
-## next [????.??.??]
+## 3.8 [2019.03.19]
 * Remove the `TextShow I16` instance from `TextShow.Data.Text`. The usefulness
   of this instance was dubious at best, and moreover, it was actively causing
   issues when building `text-show` with `reflex-platform` (see
