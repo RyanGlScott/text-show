@@ -30,7 +30,6 @@ import GHC.Word (Word64(..))
 # else
 import GHC.Word (Word(..))
 # endif
-import Test.QuickCheck (oneof)
 #else
 import Data.Typeable.Internal (TyCon(..))
 #endif

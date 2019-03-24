@@ -37,7 +37,7 @@ instance Arbitrary SomeNat where
         nat <- getNonNegative <$> arbitrary
         case someNatVal nat of
              Just sn -> pure sn
-             Nothing -> fail "Negative natural number" -- Should never happen
+             Nothing -> error "Negative natural number" -- Should never happen
 
 instance Arbitrary SomeSymbol where
     arbitrary = someSymbolVal <$> arbitrary
