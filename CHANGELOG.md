@@ -1,6 +1,8 @@
 ### next [????.??.??]
 * Make the `TextShow` instances for `UArray` and `Fixed` use the correct
   precedence on `base-4.13` or later.
+* Support deriving `TextShow(1)(2)` instances for data types with fields
+  of type `Int8#`, `Int16#`, `Word8#`, or `Word16#` on GHC 8.8 or later.
 
 ### 3.8.1 [2019.04.26]
 * Support `th-abstraction-0.3` or later.

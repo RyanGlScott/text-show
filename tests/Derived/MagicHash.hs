@@ -18,7 +18,12 @@ Portability: GHC
 
 Defines data types with fields that have unlifted types.
 -}
-module Derived.MagicHash (TyCon#(..), TyFamily#(..)) where
+module Derived.MagicHash (
+    TyCon#(..), TyFamily#(..)
+#if MIN_VERSION_base(4,13,0)
+  , TyCon'#(..), TyFamily'#(..)
+#endif
+  ) where
 
 #if __GLASGOW_HASKELL__ < 711
 import qualified Generics.Deriving.TH as Generics
@@ -59,6 +64,17 @@ data TyCon# a b = TyCon# {
 #endif
            )
 
+#if MIN_VERSION_base(4,13,0)
+data TyCon'# a b = TyCon'# {
+    tcA'      :: a
+  , tcB'      :: b
+  , tcInt8#   :: Int8#
+  , tcInt16#  :: Int16#
+  , tcWord8#  :: Word8#
+  , tcWord16# :: Word16#
+} deriving Show
+#endif
+
 -------------------------------------------------------------------------------
 
 data family TyFamily# y z :: *
@@ -78,6 +94,19 @@ data instance TyFamily# a b = TyFamily# {
 #endif
            )
 
+#if MIN_VERSION_base(4,13,0)
+data family TyFamily'# y z :: *
+
+data instance TyFamily'# a b = TyFamily'# {
+    tfA'      :: a
+  , tfB'      :: b
+  , tfInt8#   :: Int8#
+  , tfInt16#  :: Int16#
+  , tfWord8#  :: Word8#
+  , tfWord16# :: Word16#
+} deriving Show
+#endif
+
 -------------------------------------------------------------------------------
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon# a b) where
@@ -85,6 +114,30 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon# a b) where
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily# a b) where
     arbitrary = genericArbitrary
+
+#if MIN_VERSION_base(4,13,0)
+instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon'# a b) where
+    arbitrary = do
+      a     <- arbitrary
+      b     <- arbitrary
+      I# i1 <- arbitrary
+      I# i2 <- arbitrary
+      W# w1 <- arbitrary
+      W# w2 <- arbitrary
+      pure $ TyCon'# a b (narrowInt8# i1)  (narrowInt16# i2)
+                         (narrowWord8# w1) (narrowWord16# w2)
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily'# a b) where
+    arbitrary = do
+      a     <- arbitrary
+      b     <- arbitrary
+      I# i1 <- arbitrary
+      I# i2 <- arbitrary
+      W# w1 <- arbitrary
+      W# w2 <- arbitrary
+      pure $ TyFamily'# a b (narrowInt8# i1)  (narrowInt16# i2)
+                            (narrowWord8# w1) (narrowWord16# w2)
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -114,4 +167,18 @@ $(deriveTextShow2 'TyFamily#)
 
 #if __GLASGOW_HASKELL__ < 711
 $(Generics.deriveAll0And1 'TyFamily#)
+#endif
+
+#if MIN_VERSION_base(4,13,0)
+$(deriveShow1Options legacyShowOptions ''TyCon'#)
+$(deriveShow2Options legacyShowOptions ''TyCon'#)
+$(deriveTextShow  ''TyCon'#)
+$(deriveTextShow1 ''TyCon'#)
+$(deriveTextShow2 ''TyCon'#)
+
+$(deriveShow1Options legacyShowOptions 'TyFamily'#)
+$(deriveShow2Options legacyShowOptions 'TyFamily'#)
+$(deriveTextShow  'TyFamily'#)
+$(deriveTextShow1 'TyFamily'#)
+$(deriveTextShow2 'TyFamily'#)
 #endif

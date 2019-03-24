@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns       #-}
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE MagicHash          #-}
+{-# LANGUAGE NamedFieldPuns     #-}
 {-# LANGUAGE TemplateHaskell    #-}
 {-|
 Module:      TextShow.TH.Internal
@@ -73,7 +74,12 @@ import           Data.Text.Lazy.Builder (Builder, toLazyText)
 import qualified Data.Text.Lazy    as TL
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
-import           GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
+import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
+#if MIN_VERSION_base(4,13,0)
+                          , Int8#, Int16#, Word8#, Word16#
+                          , extendInt8#, extendInt16#, extendWord8#, extendWord16#
+#endif
+                          )
 import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
@@ -704,29 +710,29 @@ makeTextShowForArg p _ tsFun _ _ (ConT tyName) tyExpName =
     showPrecE = varE (showPrecName TextShow tsFun)
 
     showE :: Q Exp
-    showE | tyName == ''Char#   = showPrimE 'C# oneHashE
-          | tyName == ''Double# = showPrimE 'D# twoHashE
-          | tyName == ''Float#  = showPrimE 'F# oneHashE
-          | tyName == ''Int#    = showPrimE 'I# oneHashE
-          | tyName == ''Word#   = showPrimE 'W# twoHashE
-          | otherwise = showPrecE `appE` integerE p `appE` tyVarE
+    showE =
+      case Map.lookup tyName primShowTbl of
+        Just ps -> showPrimE ps
+        Nothing -> showPrecE `appE` integerE p `appE` tyVarE
 
-    -- Starting with GHC 7.10, data types containing unlifted types with derived Show
-    -- instances show hashed literals with actual hash signs, and negative hashed
-    -- literals are not surrounded with parentheses.
-    showPrimE :: Name -> Q Exp -> Q Exp
-    showPrimE con _hashE
-#if __GLASGOW_HASKELL__ >= 711
-      = infixApp (showPrecE `appE` integerE 0 `appE` (conE con `appE` tyVarE))
-                 [| (<>) |]
-                 _hashE
-#else
-      = showPrecE `appE` integerE p `appE` (conE con `appE` tyVarE)
+    showPrimE :: PrimShow -> Q Exp
+    showPrimE PrimShow{ primShowBoxer
+#if __GLASGOW_HASKELL__ >= 800
+                      , primShowPostfixMod, primShowConv
 #endif
+                      }
+#if __GLASGOW_HASKELL__ >= 800
+        -- Starting with GHC 8.0, data types containing unlifted types with
+        -- derived Show instances show hashed literals with actual hash signs,
+        -- and negative hashed literals are not surrounded with parentheses.
+      = primShowConv tsFun $ infixApp (primE 0) [| (<>) |] (primShowPostfixMod tsFun)
+#else
+      = primE p
+#endif
+      where
+        primE :: Int -> Q Exp
+        primE prec = showPrecE `appE` integerE prec `appE` primShowBoxer tyVarE
 
-    oneHashE, twoHashE :: Q Exp
-    oneHashE = varE (singletonName  tsFun) `appE` charE   '#'
-    twoHashE = varE (fromStringName tsFun) `appE` stringE "##"
 makeTextShowForArg p tsClass tsFun conName tvMap ty tyExpName =
     [| $(makeTextShowForType tsClass tsFun conName tvMap False ty) p $(varE tyExpName) |]
 
@@ -1221,6 +1227,81 @@ starKindStatusToName _             = Nothing
 -- the kind variables' Names out.
 catKindVarNames :: [StarKindStatus] -> [Name]
 catKindVarNames = mapMaybe starKindStatusToName
+
+-------------------------------------------------------------------------------
+-- PrimShow
+-------------------------------------------------------------------------------
+
+data PrimShow = PrimShow
+  { primShowBoxer      :: Q Exp -> Q Exp
+  , primShowPostfixMod :: TextShowFun -> Q Exp
+  , primShowConv       :: TextShowFun -> Q Exp -> Q Exp
+  }
+
+primShowTbl :: Map Name PrimShow
+primShowTbl = Map.fromList
+    [ (''Char#,   PrimShow
+                    { primShowBoxer      = appE (conE 'C#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Double#, PrimShow
+                    { primShowBoxer      = appE (conE 'D#)
+                    , primShowPostfixMod = twoHashE
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Float#,  PrimShow
+                    { primShowBoxer      = appE (conE 'F#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Int#,    PrimShow
+                    { primShowBoxer      = appE (conE 'I#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Word#,   PrimShow
+                    { primShowBoxer      = appE (conE 'W#)
+                    , primShowPostfixMod = twoHashE
+                    , primShowConv       = \_ x -> x
+                    })
+#if MIN_VERSION_base(4,13,0)
+    , (''Int8#,   PrimShow
+                    { primShowBoxer      = appE (conE 'I#) . appE (varE 'extendInt8#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = mkNarrowE "narrowInt8#"
+                    })
+    , (''Int16#,  PrimShow
+                    { primShowBoxer      = appE (conE 'I#) . appE (varE 'extendInt16#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = mkNarrowE "narrowInt16#"
+                    })
+    , (''Word8#,  PrimShow
+                    { primShowBoxer      = appE (conE 'W#) . appE (varE 'extendWord8#)
+                    , primShowPostfixMod = twoHashE
+                    , primShowConv       = mkNarrowE "narrowWord8#"
+                    })
+    , (''Word16#, PrimShow
+                    { primShowBoxer      = appE (conE 'W#) . appE (varE 'extendWord16#)
+                    , primShowPostfixMod = twoHashE
+                    , primShowConv       = mkNarrowE "narrowWord16#"
+                    })
+#endif
+    ]
+
+#if MIN_VERSION_base(4,13,0)
+mkNarrowE :: String -> TextShowFun -> Q Exp -> Q Exp
+mkNarrowE narrowStr tsFun e =
+  foldr (`infixApp` [| (<>) |])
+        (varE (singletonName tsFun) `appE` charE ')')
+        [ varE (fromStringName tsFun) `appE` stringE ('(':narrowStr ++ " ")
+        , e
+        ]
+#endif
+
+oneHashE, twoHashE :: TextShowFun -> Q Exp
+oneHashE tsFun = varE (singletonName tsFun)  `appE` charE '#'
+twoHashE tsFun = varE (fromStringName tsFun) `appE` stringE "##"
 
 -------------------------------------------------------------------------------
 -- Assorted utilities

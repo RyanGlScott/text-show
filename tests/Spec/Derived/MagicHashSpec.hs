@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
 
 {-|
@@ -14,7 +15,7 @@ module Spec.Derived.MagicHashSpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
 import Derived.MagicHash
-import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
+import Spec.Utils
 import Test.Hspec (Spec, describe, hspec, parallel)
 
 main :: IO ()
@@ -34,3 +35,15 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
+#if MIN_VERSION_base(4,13,0)
+    describe "TyCon'# Int Int" $ do
+        let p :: Proxy (TyCon'# Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow2Spec p
+    describe "TyFamily'# Int Int" $ do
+        let p :: Proxy (TyFamily'# Int Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow2Spec p
+#endif
