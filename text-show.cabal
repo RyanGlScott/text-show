@@ -347,7 +347,7 @@ test-suite spec
                      , ghc-prim
                      , hspec                 >= 2      && < 3
                      , nats                  >= 0.1    && < 2
-                     , QuickCheck            >= 2.12   && < 2.13
+                     , QuickCheck            >= 2.12   && < 2.14
                      , quickcheck-instances  >= 0.3.18 && < 0.4
                      , semigroups            >= 0.18.3 && < 1
                      , tagged                >= 0.8.3  && < 1
