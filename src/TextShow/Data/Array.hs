@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -41,11 +42,18 @@ import           TextShow.Data.Tuple ()
 --
 -- /Since: 2/
 showbIArrayPrec :: (IArray a e, Ix i, TextShow i, TextShow e) => Int -> a i e -> Builder
-showbIArrayPrec p a = showbParen (p > 9) $
+showbIArrayPrec p a = showbParen (p > arrayPrec) $
        "array "
     <> showb (IArray.bounds a)
     <> showbSpace
     <> showb (IArray.assocs a)
+  where
+    arrayPrec :: Int
+#if MIN_VERSION_base(4,13,0)
+    arrayPrec = appPrec
+#else
+    arrayPrec = 9
+#endif
 
 -- | /Since: 2/
 instance (TextShow i, TextShow e, Ix i) => TextShow (Array i e) where

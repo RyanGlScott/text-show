@@ -1,3 +1,7 @@
+### next [????.??.??]
+* Make the `TextShow` instances for `UArray` and `Fixed` use the correct
+  precedence on `base-4.13` or later.
+
 ### 3.8.1 [2019.04.26]
 * Support `th-abstraction-0.3` or later.
 

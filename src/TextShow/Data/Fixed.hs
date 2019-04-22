@@ -35,6 +35,10 @@ import Data.Fixed (Fixed, showFixed)
 import Data.Text.Lazy.Builder (fromString)
 #endif
 
+#if MIN_VERSION_base(4,13,0)
+import TextShow.Classes (showbParen)
+#endif
+
 -- | Convert a 'Fixed' value to a 'Builder', where the first argument indicates
 -- whether to chop off trailing zeroes.
 --
@@ -87,5 +91,9 @@ withDotB b | b == mempty = mempty
 
 -- | /Since: 2/
 instance HasResolution a => TextShow (Fixed a) where
+#if MIN_VERSION_base(4,13,0)
+    showbPrec p n = showbParen (p > 6 && n < 0) $ showbFixed False n
+#else
     showb = showbFixed False
     {-# INLINE showb #-}
+#endif
