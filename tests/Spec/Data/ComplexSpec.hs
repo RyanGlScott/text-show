@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.ComplexSpec (main, spec) where
 
 import Data.Complex (Complex)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

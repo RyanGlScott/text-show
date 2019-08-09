@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.GHC.FingerprintSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Orphans ()
 
 import GHC.Fingerprint.Type (Fingerprint)

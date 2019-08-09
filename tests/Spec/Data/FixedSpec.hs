@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.FixedSpec (main, spec) where
 
 import Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Derived.RankNTypesSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Derived.RankNTypes
 import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

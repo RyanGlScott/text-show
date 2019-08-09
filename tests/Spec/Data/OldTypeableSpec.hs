@@ -25,7 +25,7 @@ import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable (TyCon, TypeRep)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

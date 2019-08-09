@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Instances.Data.Semigroup () where
 
-import Data.Semigroup (Arg(..))
+import Data.Semigroup.Compat (Arg(..))
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..))
 

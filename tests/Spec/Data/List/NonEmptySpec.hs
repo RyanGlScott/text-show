@@ -10,8 +10,8 @@ Portability: GHC
 -}
 module Spec.Data.List.NonEmptySpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
-import Data.List.NonEmpty (NonEmpty)
+import Data.Proxy.Compat (Proxy(..))
+import Data.List.NonEmpty.Compat (NonEmpty)
 import Data.Orphans ()
 import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

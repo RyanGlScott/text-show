@@ -15,7 +15,7 @@ Portability: GHC
 -}
 module TextShow.Data.Semigroup () where
 
-import Data.Semigroup (Min, Max, First, Last, WrappedMonoid, Option, Arg)
+import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Option, Arg)
 
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)

@@ -13,7 +13,7 @@ Portability: GHC
 module Spec.Data.IntegralSpec (main, spec) where
 
 import Data.Int (Int8, Int16, Int32, Int64)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Word (Word8, Word16, Word32, Word64)
 
 import Prelude ()

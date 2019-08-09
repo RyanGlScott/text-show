@@ -59,8 +59,8 @@ module TextShow.TH.Internal (
 import           Control.Monad (unless, when)
 import           Data.Foldable.Compat
 import           Data.List.Compat
-import qualified Data.List.NonEmpty as NE (reverse)
-import           Data.List.NonEmpty (NonEmpty(..), (<|))
+import qualified Data.List.NonEmpty.Compat as NE (reverse)
+import           Data.List.NonEmpty.Compat (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, keys, lookup, singleton)
 import           Data.Map (Map)
 import           Data.Maybe

@@ -20,7 +20,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,8,0)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import GHC.StaticPtr (StaticPtrInfo)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)

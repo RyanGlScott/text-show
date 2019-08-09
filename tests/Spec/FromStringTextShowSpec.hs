@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.FromStringTextShowSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Instances.FromStringTextShow ()
 import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.System.Posix.TypesSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Instances.System.Posix.Types ()
 import Spec.Utils (matchesTextShowSpec)
 import System.Posix.Types

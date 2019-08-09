@@ -21,7 +21,7 @@ import Test.QuickCheck.Instances ()
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 import Data.Array (Array)
 import Data.Array.Unboxed (UArray)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

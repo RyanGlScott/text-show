@@ -96,7 +96,7 @@ module TextShow.Generic (
     ) where
 
 import           Data.Data (Data, Typeable)
-import           Data.Functor.Contravariant (Contravariant(..))
+import           Data.Functor.Contravariant.Compat (Contravariant(..))
 import qualified Data.Text    as TS (Text, pack, singleton)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, pack, singleton)

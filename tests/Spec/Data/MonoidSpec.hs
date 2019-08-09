@@ -13,7 +13,7 @@ Portability: GHC
 module Spec.Data.MonoidSpec (main, spec) where
 
 import Data.Monoid
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Generics.Deriving.Instances ()
 

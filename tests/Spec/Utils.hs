@@ -24,7 +24,7 @@ module Spec.Utils (
     ) where
 
 import Data.Functor.Classes (Show1, showsPrec1)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Generics.Deriving.Base
 

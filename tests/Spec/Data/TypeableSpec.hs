@@ -16,7 +16,7 @@ Portability: GHC
 -}
 module Spec.Data.TypeableSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Typeable (TyCon)
 
 #if MIN_VERSION_base(4,9,0)

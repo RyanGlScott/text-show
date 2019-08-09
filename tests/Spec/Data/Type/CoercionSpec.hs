@@ -21,7 +21,7 @@ import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,7,0)
 import Data.Monoid (All(..))
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Type.Coercion (Coercion)
 
 import Spec.Utils (matchesTextShowSpec)

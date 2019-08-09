@@ -13,7 +13,7 @@ module Spec.Data.Functor.SumSpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Sum (Sum)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShow1Spec)
 

@@ -14,7 +14,7 @@ Portability: GHC
 -}
 module TextShow.GHC.Fingerprint () where
 
-import Data.Semigroup (mtimesDefault)
+import Data.Semigroup.Compat (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 import Data.Word (Word64)
 

@@ -15,7 +15,7 @@ Portability: GHC
 -}
 module TextShow.Data.List.NonEmpty () where
 
-import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty.Compat (NonEmpty)
 
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)

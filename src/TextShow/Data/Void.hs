@@ -13,7 +13,7 @@ Portability: GHC
 -}
 module TextShow.Data.Void () where
 
-import Data.Void (Void, absurd)
+import Data.Void.Compat (Void, absurd)
 import Prelude ()
 import TextShow.Classes (TextShow(..))
 

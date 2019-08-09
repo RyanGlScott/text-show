@@ -16,7 +16,7 @@ import Control.Exception
 #if MIN_VERSION_base(4,11,0)
 import Control.Exception.Base (FixIOException)
 #endif
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Instances.Control.Exception ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)

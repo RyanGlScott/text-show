@@ -12,7 +12,7 @@ module Spec.Data.CharSpec (main, spec) where
 
 import Data.Array (elems)
 import Data.Char (GeneralCategory)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import GHC.Show (asciiTab)
 

@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.FloatingSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Text.Lazy.Builder.RealFloat (FPFormat)
 
 import Instances.Data.Floating ()

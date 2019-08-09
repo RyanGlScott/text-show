@@ -13,7 +13,7 @@ Portability: GHC
 -}
 module Spec.Derived.MagicHashSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Derived.MagicHash
 import Spec.Utils
 import Test.Hspec (Spec, describe, hspec, parallel)

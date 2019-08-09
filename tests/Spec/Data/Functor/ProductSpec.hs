@@ -13,7 +13,7 @@ module Spec.Data.Functor.ProductSpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Product (Product)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShow1Spec)
 

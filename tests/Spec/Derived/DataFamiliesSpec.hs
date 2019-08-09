@@ -16,7 +16,7 @@ Portability: GHC
 -}
 module Spec.Derived.DataFamiliesSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Derived.DataFamilies (NotAllShow)
 

@@ -18,7 +18,7 @@ Portability: GHC
 module Spec.GHC.GenericsSpec (main, spec) where
 
 import Data.Orphans ()
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
                               , UChar, UDouble, UFloat, UInt, UWord

@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.System.ExitSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Spec.Utils (matchesTextShowSpec)
 import System.Exit (ExitCode)
 import Test.Hspec (Spec, describe, hspec, parallel)

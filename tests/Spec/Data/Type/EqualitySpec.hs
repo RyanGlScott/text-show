@@ -21,7 +21,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if MIN_VERSION_base(4,7,0)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Data.Type.Equality ((:~:))
 # if MIN_VERSION_base(4,10,0)
 import Data.Type.Equality ((:~~:))

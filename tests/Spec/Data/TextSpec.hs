@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.TextSpec (main, spec) where
 
-import           Data.Proxy (Proxy(..))
+import           Data.Proxy.Compat (Proxy(..))
 
 import           Instances.Data.Text ()
 

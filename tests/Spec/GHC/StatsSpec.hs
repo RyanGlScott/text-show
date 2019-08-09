@@ -21,7 +21,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !(MIN_VERSION_base(4,11,0))
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import GHC.Stats (GCStats)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)

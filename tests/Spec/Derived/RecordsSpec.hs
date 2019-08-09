@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Derived.RecordsSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Derived.Records
 import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

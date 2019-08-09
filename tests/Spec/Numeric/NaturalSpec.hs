@@ -10,8 +10,8 @@ Portability: GHC
 -}
 module Spec.Numeric.NaturalSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
-import Numeric.Natural (Natural)
+import Data.Proxy.Compat (Proxy(..))
+import Numeric.Natural.Compat (Natural)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.QuickCheck.Instances ()

@@ -14,7 +14,7 @@ import Control.Applicative (Const, ZipList)
 import Control.Monad.Trans.Instances ()
 
 import Data.Orphans ()
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 
 import Generics.Deriving.Instances ()
 

@@ -20,7 +20,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import GHC.Conc.Windows (ConsoleEvent)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)

@@ -22,7 +22,7 @@ import GHC.Integer.GMP.Internals (Integer(..))
 import GHC.Natural (Natural(..))
 import GHC.Types (Word(..))
 #else
-import Numeric.Natural (Natural)
+import Numeric.Natural.Compat (Natural)
 #endif
 
 import TextShow.Classes (TextShow(..))

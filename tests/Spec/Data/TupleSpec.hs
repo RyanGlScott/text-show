@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.TupleSpec (main, spec) where
 
-import Data.Proxy (Proxy(..))
+import Data.Proxy.Compat (Proxy(..))
 import Generics.Deriving.Instances ()
 import Instances.Data.Tuple ()
 import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec,

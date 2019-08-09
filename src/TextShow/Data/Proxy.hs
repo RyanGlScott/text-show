@@ -22,7 +22,7 @@ Portability: GHC
 -}
 module TextShow.Data.Proxy () where
 
-import Data.Proxy (Proxy)
+import Data.Proxy.Compat (Proxy)
 
 import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,

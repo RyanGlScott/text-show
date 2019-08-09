@@ -25,7 +25,7 @@ import TextShow.Classes (TextShow(..))
 #if MIN_VERSION_base(4,7,0)
 import Data.Fixed (Fixed(..))
 import Data.Int (Int64)
-import Data.Semigroup (mtimesDefault)
+import Data.Semigroup.Compat (mtimesDefault)
 import Data.Text.Lazy.Builder (singleton)
 
 import TextShow.Data.Integral ()
