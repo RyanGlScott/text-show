@@ -1,12 +1,13 @@
 {-# LANGUAGE CPP             #-}
-
-#if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE GADTs           #-}
-{-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+
+#if __GLASGOW_HASKELL__ >= 706
+{-# LANGUAGE PolyKinds       #-}
 #endif
+
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Data.Type.Equality
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -22,11 +23,7 @@ Only provided if using @base-4.7.0.0@ or later.
 -}
 module TextShow.Data.Type.Equality () where
 
-#if MIN_VERSION_base(4,7,0)
-import Data.Type.Equality ((:~:))
-# if MIN_VERSION_base(4,10,0)
-import Data.Type.Equality ((:~~:))
-# endif
+import Data.Type.Equality.Compat
 
 import TextShow.Classes (TextShow1(..))
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow2, makeLiftShowbPrec)
@@ -41,7 +38,7 @@ instance TextShow1 ((:~:) a) where
 -- | /Since: 2/
 $(deriveTextShow2 ''(:~:))
 
-# if MIN_VERSION_base(4,10,0)
+#if MIN_VERSION_base(4,9,0)
 -- | /Since: 3.6/
 $(deriveTextShow ''(:~~:))
 
@@ -51,5 +48,4 @@ instance TextShow1 ((:~~:) a) where
 
 -- | /Since: 3.6/
 $(deriveTextShow2 ''(:~~:))
-# endif
 #endif

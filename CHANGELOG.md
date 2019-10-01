@@ -1,3 +1,7 @@
+### next [????.??.??]
+* Use `base-compat-batteries-0.11.0` to define instances for `(:~:)` back to
+  `base-4.5` and instances for `(:~~:)` back to `base-4.9`.
+
 ### 3.8.2 [2019.05.02]
 * Make the `TextShow` instances for `UArray` and `Fixed` use the correct
   precedence on `base-4.13` or later.
