@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.8.3 [2019.11.06]
 * Use `base-compat-batteries-0.11.0` to define instances for `(:~:)` back to
   `base-4.5` and instances for `(:~~:)` back to `base-4.9`.
 
