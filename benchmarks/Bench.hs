@@ -27,64 +27,9 @@ import           TextShow (TextShow(..))
 import           TextShow.Generic (genericShowbPrec, genericShowtPrec, genericShowtlPrec)
 import           TextShow.TH (deriveTextShow)
 
-main :: IO ()
-main = defaultMain
-    [ sampleGroup "String Show"                 BTLeaf1 BTBranch1 BTEmpty1 show
-    , sampleGroup "String Show, then Text.pack" BTLeaf1 BTBranch1 BTEmpty1 (T.pack . show)
-    , sampleGroup "TextShow (TH)"               BTLeaf2 BTBranch2 BTEmpty2 showt
-    , sampleGroup "TextShow (generics)"         BTLeaf3 BTBranch3 BTEmpty3 showt
-    , bgroup "Enumeration type"
-      [ bench "String Show"                 $ nf show            Violet
-      , bench "String Show, then Text.pack" $ nf (T.pack . show) Violet
-      , bench "TextShow (TH)"               $ nf showt           Violet
-      , bench "TextShow (generics)"         $ nf showt         $ Color2 Violet
-      , bench "Manually written showt"      $ nf colorShowt      Violet
-      ]
-    ]
-
 -------------------------------------------------------------------------------
 -- Tree-like ADTs
 -------------------------------------------------------------------------------
-
-sampleGroup :: forall a b. NFData b
-            => String -> (Int -> a) -> (a -> a -> a) -> a -> (a -> b) -> Benchmark
-sampleGroup title leaf branch empty showFun =
-    bgroup title
-        [ bench "Small sample"  $ nf smallSample  pile
-        , bench "Medium sample" $ nf mediumSample pile
-        , bench "Large sample"  $ nf largeSample  pile
-        ]
-  where
-    pile :: (Int -> a, a -> a -> a, a, a -> b)
-    pile = (leaf, branch, empty, showFun)
-
-type Sample = forall a b.
-    ( Int -> a
-    , a -> a -> a
-    , a
-    , a -> b
-    ) -> b
-
-smallSample :: Sample
-smallSample (leaf, branch, _, showFun) =
-    showFun $ sampleTree leaf branch
-{-# NOINLINE smallSample #-}
-
-mediumSample :: Sample
-mediumSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 1000 $ sampleTree leaf branch
-{-# NOINLINE mediumSample #-}
-
-largeSample :: Sample
-largeSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 100000 $ sampleTree leaf branch
-{-# NOINLINE largeSample #-}
-
-sampleTree :: (Int -> a) -> (a -> a -> a) -> a
-sampleTree leaf branch =
-    (leaf 12345 `branch` leaf 1234) `branch`
-    leaf 123456 `branch`
-    (leaf 1234567 `branch` leaf 123456)
 
 -- NB: constructors must be same length!
 data BinTree1 a = BTEmpty1
@@ -130,3 +75,62 @@ colorShowt c = case c of
 
 $(deriveTextShow ''BinTree2)
 $(deriveTextShow ''Color)
+
+-------------------------------------------------------------------------------
+-- Benchmarks
+-------------------------------------------------------------------------------
+
+main :: IO ()
+main = defaultMain
+    [ sampleGroup "String Show"                 BTLeaf1 BTBranch1 BTEmpty1 show
+    , sampleGroup "String Show, then Text.pack" BTLeaf1 BTBranch1 BTEmpty1 (T.pack . show)
+    , sampleGroup "TextShow (TH)"               BTLeaf2 BTBranch2 BTEmpty2 showt
+    , sampleGroup "TextShow (generics)"         BTLeaf3 BTBranch3 BTEmpty3 showt
+    , bgroup "Enumeration type"
+      [ bench "String Show"                 $ nf show            Violet
+      , bench "String Show, then Text.pack" $ nf (T.pack . show) Violet
+      , bench "TextShow (TH)"               $ nf showt           Violet
+      , bench "TextShow (generics)"         $ nf showt         $ Color2 Violet
+      , bench "Manually written showt"      $ nf colorShowt      Violet
+      ]
+    ]
+
+sampleGroup :: forall a b. NFData b
+            => String -> (Int -> a) -> (a -> a -> a) -> a -> (a -> b) -> Benchmark
+sampleGroup title leaf branch empty showFun =
+    bgroup title
+        [ bench "Small sample"  $ nf smallSample  pile
+        , bench "Medium sample" $ nf mediumSample pile
+        , bench "Large sample"  $ nf largeSample  pile
+        ]
+  where
+    pile :: (Int -> a, a -> a -> a, a, a -> b)
+    pile = (leaf, branch, empty, showFun)
+
+type Sample = forall a b.
+    ( Int -> a
+    , a -> a -> a
+    , a
+    , a -> b
+    ) -> b
+
+smallSample :: Sample
+smallSample (leaf, branch, _, showFun) =
+    showFun $ sampleTree leaf branch
+{-# NOINLINE smallSample #-}
+
+mediumSample :: Sample
+mediumSample (leaf, branch, empty, showFun) =
+    showFun . foldl' branch empty . replicate 1000 $ sampleTree leaf branch
+{-# NOINLINE mediumSample #-}
+
+largeSample :: Sample
+largeSample (leaf, branch, empty, showFun) =
+    showFun . foldl' branch empty . replicate 100000 $ sampleTree leaf branch
+{-# NOINLINE largeSample #-}
+
+sampleTree :: (Int -> a) -> (a -> a -> a) -> a
+sampleTree leaf branch =
+    (leaf 12345 `branch` leaf 1234) `branch`
+    leaf 123456 `branch`
+    (leaf 1234567 `branch` leaf 123456)

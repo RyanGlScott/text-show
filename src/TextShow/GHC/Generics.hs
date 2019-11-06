@@ -33,10 +33,10 @@ import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, makeShowbPrec,
                              makeLiftShowbPrec, makeLiftShowbPrec2)
 
 -- | /Since: 2/
+$(deriveTextShow1 ''U1)
+-- | /Since: 2/
 instance TextShow (U1 p) where
     showbPrec = liftShowbPrec undefined undefined
--- | /Since: 2/
-$(deriveTextShow1 ''U1)
 
 -- | /Since: 2/
 $(deriveTextShow  ''Par1)
@@ -115,9 +115,9 @@ instance TextShow (UWord p) where
 $(deriveTextShow1 'UWord)
 
 -- | /Since: 2/
-$(deriveTextShow ''Fixity)
--- | /Since: 2/
 $(deriveTextShow ''Associativity)
+-- | /Since: 2/
+$(deriveTextShow ''Fixity)
 #if MIN_VERSION_base(4,9,0)
 -- | Only available with @base-4.9.0.0@ or later.
 --

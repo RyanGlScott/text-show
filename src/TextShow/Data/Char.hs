@@ -33,6 +33,17 @@ import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Integral ()
 import           TextShow.TH.Internal (deriveTextShow)
 
+-- | /Since: 2/
+$(deriveTextShow ''GeneralCategory)
+
+-- | /Since: 2/
+instance TextShow Char where
+    showb = showbChar
+    {-# INLINE showb #-}
+
+    showbList = showbString
+    {-# INLINE showbList #-}
+
 -- | A table of ASCII control characters that needs to be escaped with a backslash.
 --
 -- /Since: 2/
@@ -94,14 +105,3 @@ showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 showbGeneralCategory :: GeneralCategory -> Builder
 showbGeneralCategory = showb
 {-# INLINE showbGeneralCategory #-}
-
--- | /Since: 2/
-instance TextShow Char where
-    showb = showbChar
-    {-# INLINE showb #-}
-
-    showbList = showbString
-    {-# INLINE showbList #-}
-
--- | /Since: 2/
-$(deriveTextShow ''GeneralCategory)

@@ -43,9 +43,12 @@ type FakeOut a = Int
 type Id a = a
 type Flip f a b = f b a
 
+#if __GLASGOW_HASKELL__ < 809
 -- Needed for the Generic1 instances
+-- TODO: Obtain this instance from base-orphans instead
 instance Functor ((,,,) a b c) where
     fmap f (a, b, c, d) = (a, b, c, f d)
+#endif
 
 -------------------------------------------------------------------------------
 

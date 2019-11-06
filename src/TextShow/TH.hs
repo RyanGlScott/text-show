@@ -22,5 +22,5 @@ import TextShow.TH.Internal
 
 -------------------------------------------------------------------------------
 
-$(deriveTextShow ''Options)
 $(deriveTextShow ''GenTextMethods)
+$(deriveTextShow ''Options)

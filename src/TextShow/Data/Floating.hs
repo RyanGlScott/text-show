@@ -41,6 +41,27 @@ import           TextShow.Classes (TextShow(..), showbParen)
 import           TextShow.TH.Internal (deriveTextShow)
 import           TextShow.Utils (i2d)
 
+-------------------------------------------------------------------------------
+-- TextShow instances
+-------------------------------------------------------------------------------
+
+-- | /Since: 2/
+$(deriveTextShow ''FPFormat)
+
+-- | /Since: 2/
+instance TextShow Float where
+    showbPrec = showbRealFloatPrec
+    {-# INLINE showbPrec #-}
+
+-- | /Since: 2/
+instance TextShow Double where
+    showbPrec = showbRealFloatPrec
+    {-# INLINE showbPrec #-}
+
+-------------------------------------------------------------------------------
+-- Standalone showb* functions
+-------------------------------------------------------------------------------
+
 -- | Convert a 'RealFloat' value to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
@@ -398,20 +419,3 @@ maxExpt10 = 324
 -- | Cached powers of 10.
 expts10 :: Array Int Integer
 expts10 = array (minExpt,maxExpt10) [(n,10^n) | n <- [minExpt .. maxExpt10]]
-
--------------------------------------------------------------------------------
--- TextShow instances
--------------------------------------------------------------------------------
-
--- | /Since: 2/
-instance TextShow Float where
-    showbPrec = showbRealFloatPrec
-    {-# INLINE showbPrec #-}
-
--- | /Since: 2/
-instance TextShow Double where
-    showbPrec = showbRealFloatPrec
-    {-# INLINE showbPrec #-}
-
--- | /Since: 2/
-$(deriveTextShow ''FPFormat)

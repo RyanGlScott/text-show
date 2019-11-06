@@ -74,6 +74,17 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily a b) where
 
 $(return [])
 
+instance TextShow c => TextShow (Tagged2 s t c) where
+    showbPrec = $(makeShowbPrec ''Tagged2)
+
+instance TextShow1 (Tagged2 s t) where
+    liftShowbPrec = $(makeLiftShowbPrec ''Tagged2)
+
+instance TextShow2 (Tagged2 s) where
+    liftShowbPrec2 = $(makeLiftShowbPrec2 ''Tagged2)
+
+-------------------------------------------------------------------------------
+
 instance Show1 (Tagged2 s t) where
 #if defined(NEW_FUNCTOR_CLASSES)
     liftShowsPrec = $(makeLiftShowsPrec ''Tagged2)
@@ -104,14 +115,3 @@ $(deriveShow2 'TyFamily)
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
-
--------------------------------------------------------------------------------
-
-instance TextShow c => TextShow (Tagged2 s t c) where
-    showbPrec = $(makeShowbPrec ''Tagged2)
-
-instance TextShow1 (Tagged2 s t) where
-    liftShowbPrec = $(makeLiftShowbPrec ''Tagged2)
-
-instance TextShow2 (Tagged2 s) where
-    liftShowbPrec2 = $(makeLiftShowbPrec2 ''Tagged2)

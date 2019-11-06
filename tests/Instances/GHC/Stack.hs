@@ -34,6 +34,11 @@ import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import           Test.QuickCheck (Arbitrary(..))
 
+# if !(MIN_VERSION_base(4,9,0))
+$(Generics.deriveAll0 ''CallStack)
+# endif
+$(Generics.deriveAll0 ''SrcLoc)
+
 instance Arbitrary CallStack where
 # if MIN_VERSION_base(4,9,0)
     arbitrary = oneof [ pure EmptyCallStack
@@ -46,9 +51,4 @@ instance Arbitrary CallStack where
 
 instance Arbitrary SrcLoc where
     arbitrary = genericArbitrary
-
-# if !(MIN_VERSION_base(4,9,0))
-$(Generics.deriveAll0 ''CallStack)
-# endif
-$(Generics.deriveAll0 ''SrcLoc)
 #endif

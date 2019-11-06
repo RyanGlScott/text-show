@@ -32,6 +32,11 @@ import           Language.Haskell.TH.Lib (conT)
 import           TextShow.TH.Names (numberTypeName)
 #endif
 
+$(Generics.deriveAll0 ''Lexeme)
+#if MIN_VERSION_base(4,6,0)
+$(Generics.deriveAll0 numberTypeName)
+#endif
+
 instance Arbitrary Lexeme where
     arbitrary = genericArbitrary
 
@@ -45,9 +50,4 @@ instance Arbitrary Lexeme where
 
 instance Arbitrary $(conT numberTypeName) where
     arbitrary = genericArbitrary
-#endif
-
-$(Generics.deriveAll0 ''Lexeme)
-#if MIN_VERSION_base(4,6,0)
-$(Generics.deriveAll0 numberTypeName)
 #endif

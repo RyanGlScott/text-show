@@ -23,15 +23,15 @@ import TextShow.Data.Ratio ()
 import TextShow.TH.Internal (deriveTextShow)
 
 -- | /Since: 2/
-$(deriveTextShow ''DataType)
+instance TextShow Constr where
+    showb = fromString . showConstr
+    {-# INLINE showb #-}
+
 -- | /Since: 2/
 $(deriveTextShow ''DataRep)
+-- | /Since: 2/
+$(deriveTextShow ''DataType)
 -- | /Since: 2/
 $(deriveTextShow ''ConstrRep)
 -- | /Since: 2/
 $(deriveTextShow ''Fixity)
-
--- | /Since: 2/
-instance TextShow Constr where
-    showb = fromString . showConstr
-    {-# INLINE showb #-}

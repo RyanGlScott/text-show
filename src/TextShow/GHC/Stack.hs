@@ -34,6 +34,9 @@ import TextShow.Data.List     ()
 import TextShow.Data.Tuple    ()
 import TextShow.TH.Internal (deriveTextShow)
 
+-- | /Since: 3.0.1/
+$(deriveTextShow ''SrcLoc)
+
 # if MIN_VERSION_base(4,9,0)
 -- | /Since: 3.0.1/
 instance TextShow CallStack where
@@ -43,7 +46,4 @@ instance TextShow CallStack where
 -- | /Since: 3.0.1/
 $(deriveTextShow ''CallStack)
 # endif
-
--- | /Since: 3.0.1/
-$(deriveTextShow ''SrcLoc)
 #endif

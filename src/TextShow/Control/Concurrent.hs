@@ -44,6 +44,6 @@ getThreadId :: ThreadId -> CInt
 getThreadId (ThreadId tid) = getThreadId# (unsafeCoerce# tid)
 
 -- | /Since: 2/
-$(deriveTextShow ''ThreadStatus)
--- | /Since: 2/
 $(deriveTextShow ''BlockReason)
+-- | /Since: 2/
+$(deriveTextShow ''ThreadStatus)

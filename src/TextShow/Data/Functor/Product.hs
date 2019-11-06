@@ -22,9 +22,9 @@ import TextShow.Classes (TextShow(..), TextShow1(..), showbPrec1)
 import TextShow.TH.Internal (deriveTextShow1)
 
 -- | /Since: 3/
+$(deriveTextShow1 ''Product)
+
+-- | /Since: 3/
 instance (TextShow1 f, TextShow1 g, TextShow a) => TextShow (Product f g a) where
     showbPrec = showbPrec1
     {-# INLINE showbPrec #-}
-
--- | /Since: 3/
-$(deriveTextShow1 ''Product)

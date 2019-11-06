@@ -28,11 +28,12 @@ import TextShow.TH.Internal (deriveTextShow)
 import TextShow.TH.Names (numberTypeName)
 #endif
 
--- | /Since: 2/
-$(deriveTextShow ''Lexeme)
 #if MIN_VERSION_base(4,6,0)
 -- | Only available with @base-4.6.0.0@ or later.
 --
 -- /Since: 2/
 $(deriveTextShow numberTypeName)
 #endif
+
+-- | /Since: 2/
+$(deriveTextShow ''Lexeme)

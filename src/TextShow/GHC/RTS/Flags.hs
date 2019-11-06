@@ -32,8 +32,15 @@ import TextShow.TH.Internal (deriveTextShow)
 import TextShow.TH.Names (giveGCStatsTypeName, doCostCentresTypeName,
                           doHeapProfileTypeName, doTraceTypeName)
 
--- | /Since: 2/
-$(deriveTextShow ''RTSFlags)
+-- | /Since: 2.1/
+$(deriveTextShow giveGCStatsTypeName)
+-- | /Since: 2.1/
+$(deriveTextShow doCostCentresTypeName)
+-- | /Since: 2.1/
+$(deriveTextShow doHeapProfileTypeName)
+-- | /Since: 2.1/
+$(deriveTextShow doTraceTypeName)
+
 -- | /Since: 2/
 $(deriveTextShow ''GCFlags)
 -- | /Since: 2/
@@ -56,13 +63,6 @@ $(deriveTextShow ''TickyFlags)
 -- /Since: 3.3/
 $(deriveTextShow ''ParFlags)
 # endif
-
--- | /Since: 2.1/
-$(deriveTextShow giveGCStatsTypeName)
--- | /Since: 2.1/
-$(deriveTextShow doCostCentresTypeName)
--- | /Since: 2.1/
-$(deriveTextShow doHeapProfileTypeName)
--- | /Since: 2.1/
-$(deriveTextShow doTraceTypeName)
+-- | /Since: 2/
+$(deriveTextShow ''RTSFlags)
 #endif

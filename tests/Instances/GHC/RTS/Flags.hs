@@ -36,6 +36,24 @@ import           Language.Haskell.TH.Lib (conT)
 import           Test.QuickCheck (Arbitrary(..))
 import           TextShow.TH.Names
 
+$(Generics.deriveAll0 ''RTSFlags)
+$(Generics.deriveAll0 ''GCFlags)
+$(Generics.deriveAll0 ''ConcFlags)
+$(Generics.deriveAll0 ''MiscFlags)
+$(Generics.deriveAll0 ''DebugFlags)
+$(Generics.deriveAll0 ''CCFlags)
+$(Generics.deriveAll0 ''ProfFlags)
+$(Generics.deriveAll0 ''TraceFlags)
+$(Generics.deriveAll0 ''TickyFlags)
+# if MIN_VERSION_base(4,10,0)
+$(Generics.deriveAll0 ''ParFlags)
+# endif
+
+$(Generics.deriveAll0 giveGCStatsTypeName)
+$(Generics.deriveAll0 doCostCentresTypeName)
+$(Generics.deriveAll0 doHeapProfileTypeName)
+$(Generics.deriveAll0 doTraceTypeName)
+
 instance Arbitrary RTSFlags where
     arbitrary = genericArbitrary
 
@@ -86,22 +104,4 @@ instance Arbitrary DoHeapProfile' where
 
 instance Arbitrary DoTrace' where
     arbitrary = genericArbitrary
-
-$(Generics.deriveAll0 ''RTSFlags)
-$(Generics.deriveAll0 ''GCFlags)
-$(Generics.deriveAll0 ''ConcFlags)
-$(Generics.deriveAll0 ''MiscFlags)
-$(Generics.deriveAll0 ''DebugFlags)
-$(Generics.deriveAll0 ''CCFlags)
-$(Generics.deriveAll0 ''ProfFlags)
-$(Generics.deriveAll0 ''TraceFlags)
-$(Generics.deriveAll0 ''TickyFlags)
-# if MIN_VERSION_base(4,10,0)
-$(Generics.deriveAll0 ''ParFlags)
-# endif
-
-$(Generics.deriveAll0 giveGCStatsTypeName)
-$(Generics.deriveAll0 doCostCentresTypeName)
-$(Generics.deriveAll0 doHeapProfileTypeName)
-$(Generics.deriveAll0 doTraceTypeName)
 #endif
