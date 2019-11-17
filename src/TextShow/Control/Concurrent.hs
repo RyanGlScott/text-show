@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE MagicHash                #-}
 {-# LANGUAGE TemplateHaskell          #-}
@@ -32,9 +33,18 @@ import TextShow.Classes (TextShow(..))
 import TextShow.Foreign.C.Types ()
 import TextShow.TH.Internal (deriveTextShow)
 
+#if MIN_VERSION_base(4,14,0)
+import TextShow.Classes (showbParen)
+import GHC.Show (appPrec)
+#endif
+
 -- | /Since: 2/
 instance TextShow ThreadId where
-    showbPrec p t = fromString "ThreadId " <> showbPrec p (getThreadId t)
+    showbPrec p t =
+#if MIN_VERSION_base(4,14,0)
+      showbParen (p > appPrec) $
+#endif
+      fromString "ThreadId " <> showbPrec p (getThreadId t)
     {-# INLINE showbPrec #-}
 
 -- Temporary workaround until Trac #8281 is fixed
