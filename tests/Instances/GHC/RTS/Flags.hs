@@ -29,11 +29,12 @@ module Instances.GHC.RTS.Flags (
     , DoTrace'
     ) where
 
+import           Data.Bounded.Deriving (deriveBounded)
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           GHC.RTS.Flags
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 import           Language.Haskell.TH.Lib (conT)
-import           Test.QuickCheck (Arbitrary(..))
+import           Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 import           TextShow.TH.Names
 
 $(Generics.deriveAll0 ''RTSFlags)
@@ -49,10 +50,10 @@ $(Generics.deriveAll0 ''TickyFlags)
 $(Generics.deriveAll0 ''ParFlags)
 # endif
 
-$(Generics.deriveAll0 giveGCStatsTypeName)
-$(Generics.deriveAll0 doCostCentresTypeName)
-$(Generics.deriveAll0 doHeapProfileTypeName)
-$(Generics.deriveAll0 doTraceTypeName)
+$(deriveBounded giveGCStatsTypeName)
+$(deriveBounded doCostCentresTypeName)
+$(deriveBounded doHeapProfileTypeName)
+$(deriveBounded doTraceTypeName)
 
 instance Arbitrary RTSFlags where
     arbitrary = genericArbitrary
@@ -91,17 +92,15 @@ type DoCostCentres' = $(conT doCostCentresTypeName)
 type DoHeapProfile' = $(conT doHeapProfileTypeName)
 type DoTrace'       = $(conT doTraceTypeName)
 
--- TODO: Perhaps we should add deriving (Enum, Bounded) to deriving-compat
--- and use that instead of Generic?
 instance Arbitrary GiveGCStats' where
-    arbitrary = genericArbitrary
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary DoCostCentres' where
-    arbitrary = genericArbitrary
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary DoHeapProfile' where
-    arbitrary = genericArbitrary
+    arbitrary = arbitraryBoundedEnum
 
 instance Arbitrary DoTrace' where
-    arbitrary = genericArbitrary
+    arbitrary = arbitraryBoundedEnum
 #endif
