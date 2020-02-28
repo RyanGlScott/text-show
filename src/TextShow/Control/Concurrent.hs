@@ -24,7 +24,7 @@ import Foreign.C.Types
 
 import GHC.Conc (BlockReason, ThreadStatus)
 import GHC.Conc.Sync (ThreadId(..))
-import GHC.Prim
+import GHC.Exts (Addr#, unsafeCoerce#)
 
 import Prelude ()
 import Prelude.Compat

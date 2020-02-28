@@ -37,8 +37,7 @@ import           Data.Kind (Type)
 import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import           Data.Type.Equality ((:~~:)(..))
 
-import           GHC.Exts (Char(..))
-import           GHC.Prim (Addr#, (+#), eqChar#, indexCharOffAddr#)
+import           GHC.Exts (Addr#, Char(..), (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (Module(..), TrName(..), TyCon(..), isTrue#)
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), showbParen, showbSpace)
@@ -65,8 +64,7 @@ import           Data.Typeable.Internal (funTc, listTc)
 # endif
 
 # if MIN_VERSION_base(4,9,0)
-import           GHC.Exts (Char(..))
-import           GHC.Prim (Addr#, (+#), eqChar#, indexCharOffAddr#)
+import           GHC.Exts (Addr#, Char(..), (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (TyCon(..), TrName(..), Module(..), isTrue#)
 # else
 import           Data.Typeable.Internal (TyCon)

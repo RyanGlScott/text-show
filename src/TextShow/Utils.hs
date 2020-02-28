@@ -29,8 +29,7 @@ import           Data.Text (Text)
 import           Data.Text.Lazy (length, toStrict, unpack)
 import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
 
-import           GHC.Exts (Char(C#), Int(I#))
-import           GHC.Prim ((+#), chr#, ord#)
+import           GHC.Exts (Char(C#), Int(I#), (+#), chr#, ord#)
 
 import           Prelude ()
 import           Prelude.Compat hiding (length)

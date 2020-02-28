@@ -28,12 +28,10 @@ import           Data.Text.Lazy.Builder (Builder, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Word (Word8, Word16, Word32, Word64)
 
-import           GHC.Exts (Int(I#))
+import           GHC.Exts (Int(I#), (<#), (>#))
 #if __GLASGOW_HASKELL__ >= 708
-import           GHC.Exts (isTrue#)
-import           GHC.Prim (Int#)
+import           GHC.Exts (Int#, isTrue#)
 #endif
-import           GHC.Prim ((<#), (>#))
 
 import           Prelude ()
 import           Prelude.Compat

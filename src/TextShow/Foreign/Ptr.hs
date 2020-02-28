@@ -22,10 +22,10 @@ import Data.Text.Lazy.Builder (Builder, singleton)
 import Foreign.ForeignPtr (ForeignPtr)
 import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
+import GHC.Exts (addr2Int#, int2Word#)
 import GHC.ForeignPtr (unsafeForeignPtrToPtr)
 import GHC.Num (wordToInteger)
 import GHC.Ptr (Ptr(..))
-import GHC.Prim (addr2Int#, int2Word#)
 
 import Prelude ()
 import Prelude.Compat

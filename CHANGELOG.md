@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Import from `GHC.Exts`, not `GHC.Prim`.
+
 ### 3.8.4 [2020.01.28]
 * Update the `TextShow(1)` instances for `Down` and `ThreadId` to match their
   implementations in `base-4.14`.

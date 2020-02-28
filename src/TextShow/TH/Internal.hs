@@ -75,12 +75,12 @@ import qualified Data.Text.Lazy    as TL
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
 import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
+                          , Char#, Double#, Float#, Int#, Word#
 #if MIN_VERSION_base(4,13,0)
                           , Int8#, Int16#, Word8#, Word16#
                           , extendInt8#, extendInt16#, extendWord8#, extendWord16#
 #endif
                           )
-import           GHC.Prim (Char#, Double#, Float#, Int#, Word#)
 import           GHC.Show (appPrec, appPrec1)
 
 import           Language.Haskell.TH.Datatype
