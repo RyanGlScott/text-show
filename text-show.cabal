@@ -1,5 +1,5 @@
 name:                text-show
-version:             3.8.4
+version:             3.8.5
 synopsis:            Efficient conversion of values into Text
 description:         @text-show@ offers a replacement for the @Show@ typeclass intended
                      for use with @Text@ instead of @String@s. This package was created
