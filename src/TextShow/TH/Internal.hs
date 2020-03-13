@@ -59,7 +59,6 @@ module TextShow.TH.Internal (
 import           Control.Monad (unless, when)
 import           Data.Foldable.Compat
 import           Data.List.Compat
-import qualified Data.List.NonEmpty.Compat as NE (reverse)
 import           Data.List.NonEmpty.Compat (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, keys, lookup, singleton)
 import           Data.Map (Map)
@@ -1478,13 +1477,16 @@ applyTyCon = applyTy . ConT
 -- [Either, Int, Char]
 -- @
 unapplyTy :: Type -> NonEmpty Type
-unapplyTy = NE.reverse . go
+unapplyTy ty = go ty ty []
   where
-    go :: Type -> NonEmpty Type
-    go (AppT t1 t2)    = t2 <| go t1
-    go (SigT t _)      = go t
-    go (ForallT _ _ t) = go t
-    go t               = t :| []
+    go :: Type -> Type -> [Type] -> NonEmpty Type
+    go _      (AppT ty1 ty2)     args = go ty1 ty1 (ty2:args)
+    go origTy (SigT ty' _)       args = go origTy ty' args
+#if MIN_VERSION_template_haskell(2,11,0)
+    go origTy (InfixT ty1 n ty2) args = go origTy (ConT n `AppT` ty1 `AppT` ty2) args
+    go origTy (ParensT ty')      args = go origTy ty' args
+#endif
+    go origTy _                  args = origTy :| args
 
 -- | Split a type signature by the arrows on its spine. For example, this:
 --
