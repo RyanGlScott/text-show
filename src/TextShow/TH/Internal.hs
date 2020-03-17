@@ -559,7 +559,7 @@ makeTextShowForCons tsClass tsFun opts instTys cons = do
     ghc7'8OrLater = False
 #endif
 
--- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for a
+-- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for a
 -- single constructor.
 makeTextShowForCon :: Name
                    -> TextShowClass
@@ -683,7 +683,7 @@ makeTextShowForCon p tsClass tsFun tvMap
       )
       []
 
--- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for an
+-- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for an
 -- argument of a constructor.
 makeTextShowForArg :: Int
                    -> TextShowClass
@@ -727,7 +727,7 @@ makeTextShowForArg p _ tsFun _ _ (ConT tyName) tyExpName =
 makeTextShowForArg p tsClass tsFun conName tvMap ty tyExpName =
     [| $(makeTextShowForType tsClass tsFun conName tvMap False ty) p $(varE tyExpName) |]
 
--- | Generates a lambda expression for howbPrec/liftShowbPrec/etc. for a
+-- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for a
 -- specific type. The generated expression depends on the number of type variables.
 --
 -- 1. If the type is of kind * (T), apply showbPrec.
