@@ -57,6 +57,7 @@ module TextShow.TH.Internal (
     ) where
 
 import           Control.Monad (unless, when)
+import qualified Control.Monad as Monad (fail)
 import           Data.Foldable.Compat
 import           Data.List.Compat
 import           Data.List.NonEmpty.Compat (NonEmpty(..), (<|))
@@ -765,9 +766,8 @@ makeTextShowForType tsClass tsFun conName tvMap sl ty = do
         tyVarNames :: [Name]
         tyVarNames = Map.keys tvMap
 
-    itf <- isTyFamily tyCon
-    if any (`mentionsName` tyVarNames) lhsArgs
-          || itf && any (`mentionsName` tyVarNames) tyArgs
+    itf <- isInTypeFamilyApp tyVarNames tyCon tyArgs
+    if any (`mentionsName` tyVarNames) lhsArgs || itf
        then outOfPlaceTyVarError tsClass conName
        else if any (`mentionsName` tyVarNames) rhsArgs
                then appsE $ [ varE $ showPrecOrListName sl (toEnum numLastArgs) tsFun]
@@ -1008,8 +1008,8 @@ things we can do to make instance contexts that work for 80% of use cases:
 
 -- | Either the given data type doesn't have enough type variables, or one of
 -- the type variables to be eta-reduced cannot realize kind *.
-derivingKindError :: TextShowClass -> Name -> a
-derivingKindError tsClass tyConName = error
+derivingKindError :: TextShowClass -> Name -> Q a
+derivingKindError tsClass tyConName = Monad.fail
     . showString "Cannot derive well-kinded instance of form ‘"
     . showString className
     . showChar ' '
@@ -1028,15 +1028,15 @@ derivingKindError tsClass tyConName = error
 
 -- | One of the last type variables cannot be eta-reduced (see the canEtaReduce
 -- function for the criteria it would have to meet).
-etaReductionError :: Type -> a
-etaReductionError instanceType = error $
+etaReductionError :: Type -> Q a
+etaReductionError instanceType = Monad.fail $
     "Cannot eta-reduce to an instance of form \n\tinstance (...) => "
     ++ pprint instanceType
 
 -- | The data type has a DatatypeContext which mentions one of the eta-reduced
 -- type variables.
-datatypeContextError :: Name -> Type -> a
-datatypeContextError dataName instanceType = error
+datatypeContextError :: Name -> Type -> Q a
+datatypeContextError dataName instanceType = Monad.fail
     . showString "Can't make a derived instance of ‘"
     . showString (pprint instanceType)
     . showString "‘:\n\tData type ‘"
@@ -1046,8 +1046,8 @@ datatypeContextError dataName instanceType = error
 
 -- | The data type mentions one of the n eta-reduced type variables in a place other
 -- than the last nth positions of a data type in a constructor's field.
-outOfPlaceTyVarError :: TextShowClass -> Name -> a
-outOfPlaceTyVarError tsClass conName = error
+outOfPlaceTyVarError :: TextShowClass -> Name -> Q a
+outOfPlaceTyVarError tsClass conName = Monad.fail
     . showString "Constructor ‘"
     . showString (nameBase conName)
     . showString "‘ must only use its last "
@@ -1407,21 +1407,52 @@ isTyVar (VarT _)   = True
 isTyVar (SigT t _) = isTyVar t
 isTyVar _          = False
 
--- | Is the given type a type family constructor (and not a data family constructor)?
-isTyFamily :: Type -> Q Bool
-isTyFamily (ConT n) = do
-    info <- reify n
-    return $ case info of
+-- | Detect if a Name in a list of provided Names occurs as an argument to some
+-- type family. This makes an effort to exclude /oversaturated/ arguments to
+-- type families. For instance, if one declared the following type family:
+--
+-- @
+-- type family F a :: Type -> Type
+-- @
+--
+-- Then in the type @F a b@, we would consider @a@ to be an argument to @F@,
+-- but not @b@.
+isInTypeFamilyApp :: [Name] -> Type -> [Type] -> Q Bool
+isInTypeFamilyApp names tyFun tyArgs =
+  case tyFun of
+    ConT tcName -> go tcName
+    _           -> return False
+  where
+    go :: Name -> Q Bool
+    go tcName = do
+      info <- reify tcName
+      case info of
 #if MIN_VERSION_template_haskell(2,11,0)
-         FamilyI OpenTypeFamilyD{} _       -> True
+        FamilyI (OpenTypeFamilyD (TypeFamilyHead _ bndrs _ _)) _
+          -> withinFirstArgs bndrs
+#elif MIN_VERSION_template_haskell(2,7,0)
+        FamilyI (FamilyD TypeFam _ bndrs _) _
+          -> withinFirstArgs bndrs
 #else
-         FamilyI (FamilyD TypeFam _ _ _) _ -> True
+        TyConI (FamilyD TypeFam _ bndrs _)
+          -> withinFirstArgs bndrs
 #endif
-#if MIN_VERSION_template_haskell(2,9,0)
-         FamilyI ClosedTypeFamilyD{} _     -> True
+
+#if MIN_VERSION_template_haskell(2,11,0)
+        FamilyI (ClosedTypeFamilyD (TypeFamilyHead _ bndrs _ _) _) _
+          -> withinFirstArgs bndrs
+#elif MIN_VERSION_template_haskell(2,9,0)
+        FamilyI (ClosedTypeFamilyD _ bndrs _ _) _
+          -> withinFirstArgs bndrs
 #endif
-         _ -> False
-isTyFamily _ = return False
+
+        _ -> return False
+      where
+        withinFirstArgs :: [a] -> Q Bool
+        withinFirstArgs bndrs =
+          let firstArgs = take (length bndrs) tyArgs
+              argFVs    = freeVariables firstArgs
+          in return $ any (`elem` argFVs) names
 
 -- | Are all of the items in a list (which have an ordering) distinct?
 --

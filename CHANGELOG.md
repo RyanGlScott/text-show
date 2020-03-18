@@ -1,3 +1,8 @@
+### next [????.??.??]
+* Fix a bug in which `deriveTextShow{1,2}` would needlessly reject data types
+  whose last type parameters appear as oversaturated arguments to a type
+  family.
+
 ### 3.8.5 [2020.02.28]
 * Import from `GHC.Exts`, not `GHC.Prim`.
 

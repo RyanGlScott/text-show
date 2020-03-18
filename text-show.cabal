@@ -202,6 +202,7 @@ test-suite spec
                        Derived.PolyKinds
                        Derived.RankNTypes
                        Derived.Records
+                       Derived.TypeFamilies
                        Derived.TypeSynonyms
 
                        Instances.Control.Concurrent
@@ -294,6 +295,7 @@ test-suite spec
                        Spec.Derived.PolyKindsSpec
                        Spec.Derived.RankNTypesSpec
                        Spec.Derived.RecordsSpec
+                       Spec.Derived.TypeFamiliesSpec
                        Spec.Derived.TypeSynonymsSpec
                        Spec.Foreign.C.TypesSpec
                        Spec.Foreign.PtrSpec
