@@ -4,7 +4,7 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.9.20200125
+# version: 0.9.20200306
 #
 version: ~> 1.0
 language: c
@@ -29,8 +29,8 @@ before_cache:
   - rm -rfv $CABALHOME/packages/head.hackage
 jobs:
   include:
-    - compiler: ghc-8.8.2
-      addons: {"apt":{"sources":[{"sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main","key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286"}],"packages":["ghc-8.8.2","cabal-install-3.0"]}}
+    - compiler: ghc-8.8.3
+      addons: {"apt":{"sources":[{"sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main","key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286"}],"packages":["ghc-8.8.3","cabal-install-3.0"]}}
       os: linux
     - compiler: ghc-8.6.5
       addons: {"apt":{"sources":[{"sourceline":"deb http://ppa.launchpad.net/hvr/ghc/ubuntu xenial main","key_url":"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x063dab2bdc0b3f9fcebc378bff3aeacef6f88286"}],"packages":["ghc-8.6.5","cabal-install-3.0"]}}
@@ -78,7 +78,7 @@ before_install:
   - TEST=--enable-tests
   - BENCH=--enable-benchmarks
   - HEADHACKAGE=false
-  - if [ $HCNUMVER -gt 80802 ] ; then HEADHACKAGE=true ; fi
+  - if [ $HCNUMVER -gt 80803 ] ; then HEADHACKAGE=true ; fi
   - rm -f $CABALHOME/config
   - |
     echo "verbose: normal +nowrap +markoutput"          >> $CABALHOME/config
@@ -131,7 +131,7 @@ install:
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
   - rm  cabal.project.freeze
-  - ${CABAL} v2-build $WITHCOMPILER ${TEST} ${BENCH} --dep -j2 all
+  - travis_wait 40 ${CABAL} v2-build $WITHCOMPILER ${TEST} ${BENCH} --dep -j2 all
 script:
   - DISTDIR=$(mktemp -d /tmp/dist-test.XXXX)
   # Packaging...
@@ -163,5 +163,5 @@ script:
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
 
-# REGENDATA ("0.9.20200125",["--output=.travis.yml","--config=cabal.haskell-ci","cabal.project"])
+# REGENDATA ("0.9.20200306",["--output=.travis.yml","--config=cabal.haskell-ci","cabal.project"])
 # EOF
