@@ -188,6 +188,8 @@ library
   hs-source-dirs:      src, shared
   default-language:    Haskell2010
   ghc-options:         -Wall
+  if impl(ghc >= 8.6)
+    ghc-options:       -Wno-star-is-type
   include-dirs:        include
   includes:            generic.h
 
@@ -367,6 +369,8 @@ test-suite spec
   hs-source-dirs:      tests, shared
   default-language:    Haskell2010
   ghc-options:         -Wall -threaded -rtsopts
+  if impl(ghc >= 8.6)
+    ghc-options:       -Wno-star-is-type
   include-dirs:        include
   includes:            generic.h
                      , overlap.h
