@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP             #-}
+{-# LANGUAGE CPP                  #-}
 
 #if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE DataKinds            #-}
@@ -7,6 +7,14 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+# if __GLASGOW_HASKELL__ == 802
+-- For whatever reason, compiling this module with optimizations on GHC 8.2.2
+-- triggers a "Simplifier ticks exhausted" panic, and increasing the tick limit
+-- doesn't seem to help. Moreover, 8.2.2 is the /only/ GHC version I have seen
+-- this happen on. Life is short, so I'm just going to work around this by
+-- disabling optimizations on 8.2.2 only.
+{-# OPTIONS_GHC -O0               #-}
+# endif
 #endif
 
 {-|
