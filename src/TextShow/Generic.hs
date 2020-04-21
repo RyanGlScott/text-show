@@ -459,11 +459,7 @@ instance gtext_show arity f => gtext_show arity (D1 d f) where {                
     gshow_prec sfs p (M1 x) = gshow_prec sfs p x                                        \
  };                                                                                     \
                                                                                         \
-instance gtext_show Zero V1 where {                                                     \
-    gshow_prec _ _ x = EMPTY_CASE(x)                                                    \
- };                                                                                     \
-                                                                                        \
-instance gtext_show One V1 where {                                                      \
+instance gtext_show arity V1 where {                                                    \
     gshow_prec _ _ x = EMPTY_CASE(x)                                                    \
  };                                                                                     \
                                                                                         \
