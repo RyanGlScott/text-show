@@ -2,7 +2,7 @@ clone_folder: "c:\\WORK"
 
 environment:
   global:
-    CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http"
+    CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http --enable-tests --enable-benchmarks"
   matrix:
     - GHCVER: "8.10.1"
     - GHCVER: "8.8.3"
