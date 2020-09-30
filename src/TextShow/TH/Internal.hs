@@ -59,7 +59,7 @@ module TextShow.TH.Internal (
 import           Control.Monad (unless, when)
 import qualified Control.Monad as Monad (fail)
 import           Data.Foldable.Compat
-import           Data.List.Compat
+import qualified Data.List.Compat as List
 import           Data.List.NonEmpty.Compat (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, keys, lookup, singleton)
 import           Data.Map (Map)
@@ -603,7 +603,7 @@ makeTextShowForCon p tsClass tsFun tvMap
        then do
          let showArgs       = zipWith (makeTextShowForArg 0 tsClass tsFun conName tvMap) argTys' args
              parenCommaArgs = (varE (singletonName tsFun) `appE` charE '(')
-                              : intersperse (varE (singletonName tsFun) `appE` charE ',') showArgs
+                              : List.intersperse (varE (singletonName tsFun) `appE` charE ',') showArgs
              mappendArgs    = foldr' (`infixApp` [| (<>) |])
                                      (varE (singletonName tsFun) `appE` charE ')')
                                      parenCommaArgs
@@ -869,7 +869,7 @@ buildTypeInstance tsClass tyConName dataCxt varTysOrig variant = do
         --   instance C (Fam [Char])
         remainingTysOrigSubst :: [Type]
         remainingTysOrigSubst =
-          map (substNamesWithKindStar (union droppedKindVarNames kvNames'))
+          map (substNamesWithKindStar (List.union droppedKindVarNames kvNames'))
             $ take remainingLength varTysOrig
 
         isDataFamily :: Bool
