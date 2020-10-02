@@ -44,6 +44,7 @@ import           Language.Haskell.TH.Lib (conT)
 import           Test.QuickCheck (Arbitrary(..))
 import           TextShow.TH.Names
 
+#if !(MIN_VERSION_base(4,15,0))
 $(Generics.deriveAll0 ''RTSFlags)
 $(Generics.deriveAll0 ''GCFlags)
 $(Generics.deriveAll0 ''ConcFlags)
@@ -61,6 +62,11 @@ $(Generics.deriveAll0 giveGCStatsTypeName)
 $(Generics.deriveAll0 doCostCentresTypeName)
 $(Generics.deriveAll0 doHeapProfileTypeName)
 $(Generics.deriveAll0 doTraceTypeName)
+#endif
+
+#if MIN_VERSION_base(4,15,0)
+$(Generics.deriveAll0 ''IoSubSystem)
+#endif
 
 instance Arbitrary RTSFlags where
     arbitrary = genericArbitrary
@@ -70,6 +76,11 @@ instance Arbitrary GCFlags where
 
 instance Arbitrary ConcFlags where
     arbitrary = genericArbitrary
+
+#if MIN_VERSION_base(4,15,0)
+instance Arbitrary IoSubSystem where
+    arbitrary = genericArbitrary
+#endif
 
 instance Arbitrary MiscFlags where
     arbitrary = genericArbitrary

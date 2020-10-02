@@ -24,7 +24,7 @@ import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
 
 import GHC.Exts (addr2Int#, int2Word#)
 import GHC.ForeignPtr (unsafeForeignPtrToPtr)
-import GHC.Num (wordToInteger)
+import GHC.Num
 import GHC.Ptr (Ptr(..))
 
 import Prelude ()
@@ -45,13 +45,18 @@ instance TextShow (Ptr a) where
 
 -- | /Since: 2/
 instance TextShow1 Ptr where
-    liftShowbPrec _ _ _ (Ptr a) = padOut . showbHex $ wordToInteger (int2Word# (addr2Int# a))
+    liftShowbPrec _ _ _ (Ptr a) = padOut . showbHex $
+      integerFromWord# (int2Word# (addr2Int# a))
       where
         padOut :: Builder -> Builder
         padOut ls =
              singleton '0' <> singleton 'x'
           <> mtimesDefault (max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (singleton '0')
           <> ls
+
+#if !(MIN_VERSION_base(4,15,0))
+        integerFromWord# = wordToInteger
+#endif
 
 -- | /Since: 2/
 instance TextShow (FunPtr a) where

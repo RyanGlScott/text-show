@@ -42,7 +42,11 @@ import GHC.RTS.Flags (GiveGCStats, DoCostCentres, DoHeapProfile, DoTrace)
 
 -- | Creates a 'Name' for a value from the "GHC.Event.Internal" module.
 mkEventName_v :: String -> Name
+#if MIN_VERSION_base(4,15,0)
+mkEventName_v = mkNameG_v "base" "GHC.Event.Internal.Types"
+#else
 mkEventName_v = mkNameG_v "base" "GHC.Event.Internal"
+#endif
 
 -- | The 'Name' of 'evtClose'.
 evtCloseValName :: Name

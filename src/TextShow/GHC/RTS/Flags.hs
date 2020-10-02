@@ -45,6 +45,10 @@ $(deriveTextShow doTraceTypeName)
 $(deriveTextShow ''GCFlags)
 -- | /Since: 2/
 $(deriveTextShow ''ConcFlags)
+# if MIN_VERSION_base(4,15,0)
+-- | /Since: 3.9/
+$(deriveTextShow ''IoSubSystem)
+# endif
 -- | /Since: 2/
 $(deriveTextShow ''MiscFlags)
 -- | /Since: 2/

@@ -16,7 +16,9 @@ Portability: GHC
 module Instances.GHC.Fingerprint () where
 
 import GHC.Fingerprint.Type (Fingerprint(..))
+#if !(MIN_VERSION_base(4,15,0))
 import GHC.Generics (Generic)
+#endif
 
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 
@@ -25,4 +27,6 @@ import Test.QuickCheck (Arbitrary(..))
 instance Arbitrary Fingerprint where
     arbitrary = genericArbitrary
 
+#if !(MIN_VERSION_base(4,15,0))
 deriving instance Generic Fingerprint
+#endif

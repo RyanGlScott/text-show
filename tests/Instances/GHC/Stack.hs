@@ -20,7 +20,6 @@ Portability: GHC
 module Instances.GHC.Stack () where
 
 #if MIN_VERSION_base(4,8,1)
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
 # if MIN_VERSION_base(4,9,0)
 import           GHC.Stack.Types (CallStack(..), SrcLoc(..))
 import           Instances.Utils ((<@>))
@@ -30,6 +29,10 @@ import           GHC.SrcLoc (SrcLoc)
 import           GHC.Stack (CallStack)
 # endif
 
+# if !(MIN_VERSION_base(4,15,0))
+import qualified Generics.Deriving.TH as Generics (deriveAll0)
+# endif
+
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import           Test.QuickCheck (Arbitrary(..))
@@ -37,7 +40,9 @@ import           Test.QuickCheck (Arbitrary(..))
 # if !(MIN_VERSION_base(4,9,0))
 $(Generics.deriveAll0 ''CallStack)
 # endif
+# if !(MIN_VERSION_base(4,15,0))
 $(Generics.deriveAll0 ''SrcLoc)
+# endif
 
 instance Arbitrary CallStack where
 # if MIN_VERSION_base(4,9,0)
