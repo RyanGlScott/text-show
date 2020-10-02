@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.SemigroupSpec (main, spec) where
 
 import Data.Proxy.Compat (Proxy(..))
-import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Option, Arg)
+import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Arg)
 
 import Instances.Data.Semigroup ()
 
@@ -35,7 +35,5 @@ spec = parallel $ do
         matchesTextShowSpec  (Proxy :: Proxy (Last Int))
     describe "WrappedMonoid ()" $
         matchesTextShowSpec  (Proxy :: Proxy (WrappedMonoid ()))
-    describe "Option Int" $
-        matchesTextShowSpec  (Proxy :: Proxy (Option Int))
     describe "Arg Int Char" $
         matchesTextShowSpec  (Proxy :: Proxy (Arg Int Char))

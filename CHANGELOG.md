@@ -1,5 +1,7 @@
-### next [????.??.??]
+### 3.9 [????.??.??]
 * Allow building with GHC 9.0.
+* Remove `TextShow(1)` instances for `Data.Semigroup.Option`, which is
+  deprecated as of `base-4.15.0.0`.
 * Fix a bug in which `deriveTextShow{1,2}` would needlessly reject data types
   whose last type parameters appear as oversaturated arguments to a type
   family.

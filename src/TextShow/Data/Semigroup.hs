@@ -15,7 +15,7 @@ Portability: GHC
 -}
 module TextShow.Data.Semigroup () where
 
-import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Option, Arg)
+import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Arg)
 
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
@@ -44,11 +44,6 @@ $(deriveTextShow1 ''Last)
 $(deriveTextShow  ''WrappedMonoid)
 -- | /Since: 3/
 $(deriveTextShow1 ''WrappedMonoid)
-
--- | /Since: 3/
-$(deriveTextShow  ''Option)
--- | /Since: 3/
-$(deriveTextShow1 ''Option)
 
 -- | /Since: 3/
 $(deriveTextShow  ''Arg)
