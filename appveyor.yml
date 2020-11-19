@@ -4,8 +4,8 @@ environment:
   global:
     CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http --enable-tests --enable-benchmarks"
   matrix:
-    - GHCVER: "8.10.1"
-    - GHCVER: "8.8.3"
+    - GHCVER: "8.10.2.2"
+    - GHCVER: "8.8.4.1"
     - GHCVER: "8.6.5"
     - GHCVER: "8.4.4"
     - GHCVER: "8.2.2"
