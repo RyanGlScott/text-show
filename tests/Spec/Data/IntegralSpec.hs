@@ -31,6 +31,7 @@ import Data.Char (intToDigit)
 import Numeric (showIntAtBase)
 
 import Test.QuickCheck (Gen, arbitrary, getNonNegative, suchThat)
+import Test.Hspec (Expectation, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
@@ -72,9 +73,9 @@ spec = parallel $ do
 
 -- | Verifies 'showIntAtBase' and 'showbIntAtBase' generate the same output.
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
-prop_showIntAtBase :: Gen Bool
+prop_showIntAtBase :: Gen Expectation
 prop_showIntAtBase = do
     base <- arbitrary `suchThat` liftA2 (&&) (> 1) (<= 16)
     i    <- getNonNegative <$> arbitrary :: Gen Int
-    pure $ fromString (showIntAtBase base intToDigit i "") == showbIntAtBase base intToDigit i
+    pure $ fromString (showIntAtBase base intToDigit i "") `shouldBe` showbIntAtBase base intToDigit i
 #endif

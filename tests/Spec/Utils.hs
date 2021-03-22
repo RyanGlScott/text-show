@@ -28,7 +28,7 @@ import Data.Proxy.Compat (Proxy(..))
 
 import Generics.Deriving.Base
 
-import Test.Hspec (Spec)
+import Test.Hspec (Expectation, Spec, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck (Arbitrary)
 
@@ -44,24 +44,24 @@ import TextShow (TextShow2(..), showbPrec2)
 -- irrespective of precedence.
 matchesTextShowSpec :: forall a. (Arbitrary a, Show a, TextShow a)
                     => Proxy a -> Spec
-matchesTextShowSpec _ = prop "TextShow instance" (prop_matchesTextShow :: Int -> a -> Bool)
+matchesTextShowSpec _ = prop "TextShow instance" (prop_matchesTextShow :: Int -> a -> Expectation)
 
 -- | Verifies that a type's 'Show' instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
-prop_matchesTextShow :: (Show a, TextShow a) => Int -> a -> Bool
-prop_matchesTextShow p x = fromString (showsPrec p x "") == showbPrec p x
+prop_matchesTextShow :: (Show a, TextShow a) => Int -> a -> Expectation
+prop_matchesTextShow p x = fromString (showsPrec p x "") `shouldBe` showbPrec p x
 
 -- | Expect a type's 'Show1' instances to coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 matchesTextShow1Spec :: forall f a.
                         (Arbitrary (f a), Show1 f, Show a, Show (f a), TextShow1 f, TextShow a)
                      => Proxy (f a) -> Spec
-matchesTextShow1Spec _ = prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> f a -> Bool)
+matchesTextShow1Spec _ = prop "TextShow1 instance" (prop_matchesTextShow1 :: Int -> f a -> Expectation)
 
 -- | Verifies that a type's 'Show1' instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
-prop_matchesTextShow1 :: (Show1 f, Show a, TextShow1 f, TextShow a) => Int -> f a -> Bool
-prop_matchesTextShow1 p x = fromString (showsPrec1 p x "") == showbPrec1 p x
+prop_matchesTextShow1 :: (Show1 f, Show a, TextShow1 f, TextShow a) => Int -> f a -> Expectation
+prop_matchesTextShow1 p x = fromString (showsPrec1 p x "") `shouldBe` showbPrec1 p x
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Expect a type's 'Show2' instances to coincide for both 'String's and 'Text',
@@ -70,13 +70,13 @@ matchesTextShow2Spec :: forall f a b.
                         (Arbitrary (f a b), Show2 f, Show a, Show b, Show (f a b),
                          TextShow2 f, TextShow a, TextShow b)
                      => Proxy (f a b) -> Spec
-matchesTextShow2Spec _ = prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> f a b -> Bool)
+matchesTextShow2Spec _ = prop "TextShow2 instance" (prop_matchesTextShow2 :: Int -> f a b -> Expectation)
 
 -- | Verifies that a type's 'Show2' instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 prop_matchesTextShow2 :: (Show2 f, Show a, Show b, TextShow2 f, TextShow a, TextShow b)
-                      => Int -> f a b -> Bool
-prop_matchesTextShow2 p x = fromString (showsPrec2 p x "") == showbPrec2 p x
+                      => Int -> f a b -> Expectation
+prop_matchesTextShow2 p x = fromString (showsPrec2 p x "") `shouldBe` showbPrec2 p x
 #endif
 
 -- | Expect a type's 'TextShow' instance to coincide with the output produced
@@ -84,26 +84,26 @@ prop_matchesTextShow2 p x = fromString (showsPrec2 p x "") == showbPrec2 p x
 genericTextShowSpec :: forall a. (Arbitrary a, Show a, TextShow a,
                                   Generic a, GTextShowB Zero (Rep a))
                     => Proxy a -> Spec
-genericTextShowSpec _ = prop "generic TextShow" (prop_genericTextShow  :: Int -> a -> Bool)
+genericTextShowSpec _ = prop "generic TextShow" (prop_genericTextShow  :: Int -> a -> Expectation)
 
 -- | Verifies that a type's 'TextShow' instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
 prop_genericTextShow :: (TextShow a, Generic a, GTextShowB Zero (Rep a))
-                     => Int -> a -> Bool
-prop_genericTextShow p x = showbPrec p x == genericShowbPrec p x
+                     => Int -> a -> Expectation
+prop_genericTextShow p x = showbPrec p x `shouldBe` genericShowbPrec p x
 
 -- | Expect a type's 'TextShow1' instance to coincide with the output produced
 -- by the equivalent 'Generic1' functions.
 genericTextShow1Spec :: forall f a. (Arbitrary (f a), Show (f a), TextShow1 f,
                                      Generic1 f, GTextShowB One (Rep1 f), TextShow a)
                      => Proxy (f a) -> Spec
-genericTextShow1Spec _ = prop "generic TextShow1" (prop_genericTextShow1 :: Int -> f a -> Bool)
+genericTextShow1Spec _ = prop "generic TextShow1" (prop_genericTextShow1 :: Int -> f a -> Expectation)
 
 -- | Verifies that a type's 'TextShow1' instance coincides with the output produced
 -- by the equivalent 'Generic1' functions.
 prop_genericTextShow1 :: ( TextShow1 f, Generic1 f
                          , GTextShowB One (Rep1 f), TextShow a
                          )
-                      => Int -> f a -> Bool
+                      => Int -> f a -> Expectation
 prop_genericTextShow1 p x =
-    showbPrec1 p x == genericLiftShowbPrec showbPrec showbList p x
+    showbPrec1 p x `shouldBe` genericLiftShowbPrec showbPrec showbList p x

@@ -15,7 +15,7 @@ import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 
-import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
@@ -44,5 +44,5 @@ spec = parallel $ do
         prop "has the same output as showFixed" prop_showFixed
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
-prop_showFixed :: Bool -> Fixed E12 -> Bool
-prop_showFixed b f = fromString (showFixed b f) == showbFixed b f
+prop_showFixed :: Bool -> Fixed E12 -> Expectation
+prop_showFixed b f = fromString (showFixed b f) `shouldBe` showbFixed b f

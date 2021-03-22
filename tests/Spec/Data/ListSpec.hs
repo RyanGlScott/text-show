@@ -14,7 +14,7 @@ import Data.Proxy.Compat (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 
-import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 
 import Text.Show (showListWith)
@@ -36,5 +36,5 @@ spec = parallel $ do
         prop "has the same output as showListWith" prop_showListWith
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
-prop_showListWith :: String -> Bool
-prop_showListWith str = fromString (showListWith shows str "") == showbListWith showb str
+prop_showListWith :: String -> Expectation
+prop_showListWith str = fromString (showListWith shows str "") `shouldBe` showbListWith showb str

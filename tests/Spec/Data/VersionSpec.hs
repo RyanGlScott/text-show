@@ -5,7 +5,7 @@ import Data.Version (Version, showVersion)
 
 import Spec.Utils (matchesTextShowSpec)
 
-import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
@@ -22,5 +22,5 @@ spec = parallel $ do
         prop "has the same output as showVersion" prop_showVersion
 
 -- | Verifies 'showVersion' and 'showbVersion' generate the same output.
-prop_showVersion :: Version -> Bool
-prop_showVersion v = fromString (showVersion v) == showbVersion v
+prop_showVersion :: Version -> Expectation
+prop_showVersion v = fromString (showVersion v) `shouldBe` showbVersion v
