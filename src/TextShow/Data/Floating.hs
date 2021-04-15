@@ -204,7 +204,9 @@ formatRealFloatAltB fmt decs alt x
           _ ->
            let
              (ei,is') = roundTo 1 is
-             n:_ = map i2d (if ei > 0 then init is' else is')
+             n = case map i2d (if ei > 0 then init is' else is') of
+                   n':_ -> n'
+                   []   -> error "formatRealFloatAltB (Exponent, negative decs): Unexpected empty list"
            in singleton n <> singleton 'e' <> decimal (e-1+ei)
        Just dec ->
         let dec' = max dec 1 in
@@ -213,7 +215,9 @@ formatRealFloatAltB fmt decs alt x
          _ ->
           let
            (ei,is') = roundTo (dec'+1) is
-           (d:ds') = map i2d (if ei > 0 then init is' else is')
+           (d,ds') = case map i2d (if ei > 0 then init is' else is') of
+                       (d':ds'') -> (d',ds'')
+                       []        -> error "formatRealFloatAltB (Exponent, non-negative decs): Unexpected empty list"
           in
           singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> decimal (e-1+ei)
      Fixed ->
@@ -241,7 +245,9 @@ formatRealFloatAltB fmt decs alt x
         else
          let
           (ei,is') = roundTo dec' (replicate (-e) 0 ++ is)
-          d:ds' = map i2d (if ei > 0 then is' else 0:is')
+          (d,ds') = case map i2d (if ei > 0 then is' else 0:is') of
+                      (d':ds'') -> (d',ds'')
+                      []        -> error "formatRealFloatAltB (Fixed): Unexpected empty list"
          in
          singleton d <> (if null ds' && not alt then "" else singleton '.' <> fromString ds')
 
