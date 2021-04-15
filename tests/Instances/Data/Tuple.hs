@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -15,9 +16,12 @@ Portability: GHC
 module Instances.Data.Tuple () where
 
 import Data.Orphans ()
-import GHC.Generics (Generic)
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..))
+
+#if !(MIN_VERSION_base(4,16,0))
+import GHC.Generics (Generic)
+#endif
 
 instance ( Arbitrary a
          , Arbitrary b
@@ -99,8 +103,11 @@ instance ( Arbitrary a
          ) => Arbitrary (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) where
     arbitrary = genericArbitrary
 
+-- TODO: Replace these instances with generic-deriving
+#if !(MIN_VERSION_base(4,16,0))
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
 deriving instance Generic (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
+#endif
