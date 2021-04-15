@@ -77,10 +77,12 @@ newtype instance TyFamily a b = TyFamily
 
 -------------------------------------------------------------------------------
 
--- TODO: Replace these with non-orphan instances
+-- TODO: Replace these with base-orphans when possible
+#if !(MIN_VERSION_base(4,16,0))
 $(deriveShow1 ''(,,,))
-#if defined(NEW_FUNCTOR_CLASSES)
+# if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''(,,,))
+# endif
 #endif
 
 $(deriveShow1 ''TyCon)
