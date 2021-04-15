@@ -36,8 +36,12 @@ import Data.Typeable.Internal (TyCon(..))
 
 #if MIN_VERSION_base(4,10,0)
 import GHC.Exts (Int(..), Ptr(..))
-import GHC.Types (KindRep(..), RuntimeRep(..), TypeLitSort(..),
-                  VecCount(..), VecElem(..))
+import GHC.Types ( KindRep(..), RuntimeRep(..), TypeLitSort(..)
+                 , VecCount(..), VecElem(..)
+# if MIN_VERSION_base(4,16,0)
+                 , Levity(..)
+# endif
+                 )
 import Type.Reflection (SomeTypeRep(..), Typeable, TypeRep, typeRep)
 #else
 import Data.Typeable.Internal (TypeRep(..))
@@ -80,8 +84,13 @@ instance Arbitrary RuntimeRep where
     arbitrary = oneof [ VecRep <$> arbitrary <*> arbitrary
                       , pure $ TupleRep []
                       , pure $ SumRep []
+# if MIN_VERSION_base(4,16,0)
+                      , pure $ BoxedRep Lifted
+                      , pure $ BoxedRep Unlifted
+# else
                       , pure LiftedRep
                       , pure UnliftedRep
+# endif
                       , pure IntRep
                       , pure WordRep
                       , pure Int64Rep
