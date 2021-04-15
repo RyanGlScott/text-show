@@ -124,8 +124,8 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon'# a b) where
       I# i2 <- arbitrary
       W# w1 <- arbitrary
       W# w2 <- arbitrary
-      pure $ TyCon'# a b (narrowInt8# i1)  (narrowInt16# i2)
-                         (narrowWord8# w1) (narrowWord16# w2)
+      pure $ TyCon'# a b (intToInt8Compat# i1)   (intToInt16Compat# i2)
+                         (wordToWord8Compat# w1) (wordToWord16Compat# w2)
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily'# a b) where
     arbitrary = do
@@ -135,8 +135,34 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily'# a b) where
       I# i2 <- arbitrary
       W# w1 <- arbitrary
       W# w2 <- arbitrary
-      pure $ TyFamily'# a b (narrowInt8# i1)  (narrowInt16# i2)
-                            (narrowWord8# w1) (narrowWord16# w2)
+      pure $ TyFamily'# a b (intToInt8Compat# i1)   (intToInt16Compat# i2)
+                            (wordToWord8Compat# w1) (wordToWord16Compat# w2)
+
+# if MIN_VERSION_base(4,16,0)
+intToInt8Compat# :: Int# -> Int8#
+intToInt8Compat# = intToInt8#
+
+intToInt16Compat# :: Int# -> Int16#
+intToInt16Compat# = intToInt16#
+
+wordToWord8Compat# :: Word# -> Word8#
+wordToWord8Compat# = wordToWord8#
+
+wordToWord16Compat# :: Word# -> Word16#
+wordToWord16Compat# = wordToWord16#
+# else
+intToInt8Compat# :: Int# -> Int8#
+intToInt8Compat# = narrowInt8#
+
+intToInt16Compat# :: Int# -> Int16#
+intToInt16Compat# = narrowInt16#
+
+wordToWord8Compat# :: Word# -> Word8#
+wordToWord8Compat# = narrowWord8#
+
+wordToWord16Compat# :: Word# -> Word16#
+wordToWord16Compat# = narrowWord16#
+# endif
 #endif
 
 -------------------------------------------------------------------------------

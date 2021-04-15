@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Allow building with GHC 9.2.
+
 ## 3.9 [2020.10.03]
 * Allow building with GHC 9.0.
 * Remove `TextShow(1)` instances for `Data.Semigroup.Option`, which is

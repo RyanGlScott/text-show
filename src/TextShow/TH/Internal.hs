@@ -78,7 +78,13 @@ import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
                           , Char#, Double#, Float#, Int#, Word#
 #if MIN_VERSION_base(4,13,0)
                           , Int8#, Int16#, Word8#, Word16#
+# if MIN_VERSION_base(4,16,0)
+                          , int8ToInt#, int16ToInt#, intToInt8#, intToInt16#
+                          , word8ToWord#, word16ToWord#, wordToWord8#, wordToWord16#
+# else
                           , extendInt8#, extendInt16#, extendWord8#, extendWord16#
+                          , narrowInt8#, narrowInt16#, narrowWord8#, narrowWord16#
+# endif
 #endif
                           )
 import           GHC.Show (appPrec, appPrec1)
@@ -1258,36 +1264,100 @@ primShowTbl = Map.fromList
                     })
 #if MIN_VERSION_base(4,13,0)
     , (''Int8#,   PrimShow
-                    { primShowBoxer      = appE (conE 'I#) . appE (varE 'extendInt8#)
+                    { primShowBoxer      = appE (conE 'I#) . appE (varE int8ToIntHashValName)
                     , primShowPostfixMod = oneHashE
-                    , primShowConv       = mkNarrowE "narrowInt8#"
+                    , primShowConv       = mkNarrowE intToInt8HashValName
                     })
     , (''Int16#,  PrimShow
-                    { primShowBoxer      = appE (conE 'I#) . appE (varE 'extendInt16#)
+                    { primShowBoxer      = appE (conE 'I#) . appE (varE int16ToIntHashValName)
                     , primShowPostfixMod = oneHashE
-                    , primShowConv       = mkNarrowE "narrowInt16#"
+                    , primShowConv       = mkNarrowE intToInt16HashValName
                     })
     , (''Word8#,  PrimShow
-                    { primShowBoxer      = appE (conE 'W#) . appE (varE 'extendWord8#)
+                    { primShowBoxer      = appE (conE 'W#) . appE (varE word8ToWordHashValName)
                     , primShowPostfixMod = twoHashE
-                    , primShowConv       = mkNarrowE "narrowWord8#"
+                    , primShowConv       = mkNarrowE wordToWord8HashValName
                     })
     , (''Word16#, PrimShow
-                    { primShowBoxer      = appE (conE 'W#) . appE (varE 'extendWord16#)
+                    { primShowBoxer      = appE (conE 'W#) . appE (varE word16ToWordHashValName)
                     , primShowPostfixMod = twoHashE
-                    , primShowConv       = mkNarrowE "narrowWord16#"
+                    , primShowConv       = mkNarrowE wordToWord16HashValName
                     })
 #endif
     ]
 
 #if MIN_VERSION_base(4,13,0)
-mkNarrowE :: String -> TextShowFun -> Q Exp -> Q Exp
-mkNarrowE narrowStr tsFun e =
+mkNarrowE :: Name -> TextShowFun -> Q Exp -> Q Exp
+mkNarrowE narrowName tsFun e =
   foldr (`infixApp` [| (<>) |])
         (varE (singletonName tsFun) `appE` charE ')')
-        [ varE (fromStringName tsFun) `appE` stringE ('(':narrowStr ++ " ")
+        [ varE (fromStringName tsFun) `appE` stringE ('(':nameBase narrowName ++ " ")
         , e
         ]
+
+int8ToIntHashValName :: Name
+int8ToIntHashValName =
+# if MIN_VERSION_base(4,16,0)
+  'int8ToInt#
+# else
+  'extendInt8#
+# endif
+
+int16ToIntHashValName :: Name
+int16ToIntHashValName =
+# if MIN_VERSION_base(4,16,0)
+  'int16ToInt#
+# else
+  'extendInt16#
+# endif
+
+intToInt8HashValName :: Name
+intToInt8HashValName =
+# if MIN_VERSION_base(4,16,0)
+  'intToInt8#
+# else
+  'narrowInt8#
+# endif
+
+intToInt16HashValName :: Name
+intToInt16HashValName =
+# if MIN_VERSION_base(4,16,0)
+  'intToInt16#
+# else
+  'narrowInt16#
+# endif
+
+word8ToWordHashValName :: Name
+word8ToWordHashValName =
+# if MIN_VERSION_base(4,16,0)
+  'word8ToWord#
+# else
+  'extendWord8#
+# endif
+
+word16ToWordHashValName :: Name
+word16ToWordHashValName =
+# if MIN_VERSION_base(4,16,0)
+  'word16ToWord#
+# else
+  'extendWord16#
+# endif
+
+wordToWord8HashValName :: Name
+wordToWord8HashValName =
+# if MIN_VERSION_base(4,16,0)
+  'wordToWord8#
+# else
+  'narrowWord8#
+# endif
+
+wordToWord16HashValName :: Name
+wordToWord16HashValName =
+# if MIN_VERSION_base(4,16,0)
+  'wordToWord16#
+# else
+  'narrowWord16#
+# endif
 #endif
 
 oneHashE, twoHashE :: TextShowFun -> Q Exp
