@@ -1,4 +1,4 @@
--- {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
@@ -20,12 +20,10 @@ module Derived.TypeFamilies (
 
 import Test.QuickCheck (Arbitrary)
 
-{-
 import Text.Show.Deriving (deriveShow1)
 #if defined(NEW_FUNCTOR_CLASSES)
 import Text.Show.Deriving (deriveShow2)
 #endif
--}
 
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -43,16 +41,12 @@ newtype instance TyFamilyOverSat a b = TyFamilyOverSat (F a b)
 
 -------------------------------------------------------------------------------
 
-{-
-TODO: Define these once we depend on deriving-compat-0.5.8 as the minimum
-
 $(deriveShow1 ''TyConOverSat)
 $(deriveShow1 'TyFamilyOverSat)
 #if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''TyConOverSat)
 $(deriveShow2 'TyFamilyOverSat)
 #endif
--}
 
 $(deriveTextShow  ''TyConOverSat)
 $(deriveTextShow1 ''TyConOverSat)
@@ -61,8 +55,3 @@ $(deriveTextShow2 ''TyConOverSat)
 $(deriveTextShow  'TyFamilyOverSat)
 $(deriveTextShow1 'TyFamilyOverSat)
 $(deriveTextShow2 'TyFamilyOverSat)
-
-{-
-TODO: Define Generic(1) instances once we depend on generic-deriving-1.13.2
-as the minimum
--}

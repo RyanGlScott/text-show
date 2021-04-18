@@ -77,7 +77,6 @@ newtype instance TyFamily a b = TyFamily
 
 -------------------------------------------------------------------------------
 
--- TODO: Consider backporting these instances somewhere
 #if !(MIN_VERSION_base(4,9,0))
 $(deriveShow1 ''(,,,))
 # if defined(NEW_FUNCTOR_CLASSES)

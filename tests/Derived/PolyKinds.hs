@@ -38,6 +38,7 @@ module Derived.PolyKinds (
 #include "generic.h"
 
 import           Data.Functor.Classes (Show1(..))
+import           Data.Orphans ()
 
 import           Generics.Deriving.Base
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)

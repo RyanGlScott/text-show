@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Instances.Data.Tuple () where
 
-import Data.Orphans ()
+import Generics.Deriving.Instances ()
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..))
 
