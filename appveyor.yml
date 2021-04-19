@@ -4,6 +4,7 @@ environment:
   global:
     CABOPTS:  "--store-dir=C:\\SR --http-transport=plain-http --enable-tests --enable-benchmarks"
   matrix:
+    - GHCVER: "9.0.1"
     - GHCVER: "8.10.4"
     - GHCVER: "8.8.4.1"
     - GHCVER: "8.6.5"
@@ -30,6 +31,5 @@ build: off
 
 test_script:
  - IF EXIST configure.ac bash -c "autoreconf -i"
- - "echo packages:. > cabal.project"
- - "cabal %CABOPTS% new-build -j1 --enable-tests --enable-benchmarks all"
- - "cabal %CABOPTS% new-test  -j1 --enable-tests --enable-benchmarks all"
+ - "cabal %CABOPTS% new-build -j2 --enable-tests --enable-benchmarks all"
+ - "cabal %CABOPTS% new-test  -j2 --enable-tests --enable-benchmarks all"
