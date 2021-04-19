@@ -12,31 +12,23 @@ Portability: GHC
 -}
 module Spec.Data.Type.CoercionSpec (main, spec) where
 
+import Data.Monoid (All(..))
+import Data.Proxy.Compat (Proxy(..))
+import Data.Type.Coercion (Coercion)
+
 import Instances.Data.Type.Coercion ()
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.Hspec (Spec, hspec, parallel)
-
-#if MIN_VERSION_base(4,7,0)
-import Data.Monoid (All(..))
-import Data.Proxy.Compat (Proxy(..))
-import Data.Type.Coercion (Coercion)
-
 import Spec.Utils (matchesTextShowSpec)
 
-import Test.Hspec (describe)
-#endif
+import Test.Hspec (Spec, describe, hspec, parallel)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $
-#if MIN_VERSION_base(4,7,0)
     describe "Coercion All Bool" $
         matchesTextShowSpec (Proxy :: Proxy (Coercion All Bool))
-#else
-    pure ()
-#endif

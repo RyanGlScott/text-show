@@ -1,10 +1,7 @@
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE OverloadedStrings          #-}
-
-#if __GLASGOW_HASKELL__ >= 708
 {-# LANGUAGE StandaloneDeriving         #-}
-#endif
 {-|
 Module:      TextShow.Classes
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -17,9 +14,7 @@ The 'TextShow', 'TextShow1', and 'TextShow2' typeclasses.
 -}
 module TextShow.Classes where
 
-#if __GLASGOW_HASKELL__ >= 708
 import           Data.Data (Typeable)
-#endif
 import qualified Data.Text         as TS (Text, singleton)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, singleton)
@@ -175,11 +170,9 @@ class TextShow a where
                -> TL.Text
     showtlList = toLazyText . showbList
 
-#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL showbPrec | showb #-}
 
 deriving instance Typeable TextShow
-#endif
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 --
@@ -417,11 +410,9 @@ class TextShow1 f where
                   -> [f a] -> Builder
     liftShowbList sp sl = showbListWith (liftShowbPrec sp sl 0)
 
-#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL liftShowbPrec #-}
 
 deriving instance Typeable TextShow1
-#endif
 
 -- | Lift the standard 'showbPrec' and 'showbList' functions through the
 -- type constructor.
@@ -487,11 +478,9 @@ class TextShow2 f where
     liftShowbList2 sp1 sl1 sp2 sl2 =
         showbListWith (liftShowbPrec2 sp1 sl1 sp2 sl2 0)
 
-#if __GLASGOW_HASKELL__ >= 708
     {-# MINIMAL liftShowbPrec2 #-}
 
 deriving instance Typeable TextShow2
-#endif
 
 -- | Lift two 'showbPrec' functions through the type constructor.
 --

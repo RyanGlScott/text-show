@@ -1,18 +1,15 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE PolyKinds                  #-}
-#endif
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -104,30 +101,17 @@ newtype TyConReallyHighKinds f a b c d e = TyConReallyHighKinds (f a b c d e)
 -------------------------------------------------------------------------------
 
 data family TyFamilyCompose
-#if __GLASGOW_HASKELL__ >= 706
     (t :: k1 -> k2 -> *)
     (u :: k3 -> k4 -> k1)
     (v :: k3 -> k4 -> k2)
     (w :: k5 -> k3)
     (x :: k5 -> k4)
     (y :: k5)
-    (z :: k5)
-#else
-    (t :: * -> * -> *)
-    (u :: * -> * -> *)
-    (v :: * -> * -> *)
-    (w :: * -> *)
-    (x :: * -> *)
-    (y :: *)
-    (z :: *)
-#endif
-    :: *
+    (z :: k5) :: *
 
 newtype instance TyFamilyCompose f g h j k a b =
     TyFamilyCompose (f (g (j a) (k a)) (h (j a) (k b)))
-#if __GLASGOW_HASKELL__ >= 706
   deriving Generic
-#endif
 
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyFamilyCompose f g h j k a b)
@@ -143,55 +127,35 @@ deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
 
 -------------------------------------------------------------------------------
 
-data family TyFamilyProxy
-#if __GLASGOW_HASKELL__ >= 706
-    (x :: k1) (y :: k2)
-#else
-    (x :: *)  (y :: *)
-#endif
-    :: *
+data family TyFamilyProxy (x :: k1) (y :: k2) :: *
 
 newtype instance TyFamilyProxy a b where
     TyFamilyProxy :: () -> TyFamilyProxy a b
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
 -------------------------------------------------------------------------------
 
 data family TyFamilyReallyHighKinds
-#if __GLASGOW_HASKELL__ >= 706
     (g :: k1 -> k2 -> k3 -> k4 -> k5 -> *)
     (v :: k1)
     (w :: k2)
     (x :: k3)
     (y :: k4)
-    (z :: k5)
-#else
-    (g :: * -> * -> * -> * -> * -> *)
-    (v :: *)
-    (w :: *)
-    (x :: *)
-    (y :: *)
-    (z :: *)
-#endif
-    :: *
+    (z :: k5) :: *
 
 newtype instance TyFamilyReallyHighKinds f a b c d e =
     TyFamilyReallyHighKinds (f a b c d e)
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -336,10 +300,4 @@ $(Generics.deriveMeta           'TyFamilyProxy)
 $(Generics.deriveRepresentable1 'TyFamilyProxy)
 $(Generics.deriveMeta           'TyFamilyReallyHighKinds)
 $(Generics.deriveRepresentable1 'TyFamilyReallyHighKinds)
-#endif
-
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveRepresentable0 'TyFamilyCompose)
-$(Generics.deriveRepresentable0 'TyFamilyProxy)
-$(Generics.deriveRepresentable0 'TyFamilyReallyHighKinds)
 #endif

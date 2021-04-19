@@ -55,10 +55,8 @@ instance Arbitrary ArrayException where
 instance Arbitrary AssertionFailed where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_base(4,7,0)
 instance Arbitrary SomeAsyncException where
     arbitrary = SomeAsyncException <$> (arbitrary :: Gen AsyncException)
-#endif
 
 deriving instance Bounded AsyncException
 deriving instance Enum AsyncException

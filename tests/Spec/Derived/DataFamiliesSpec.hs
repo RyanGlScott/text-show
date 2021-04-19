@@ -1,8 +1,4 @@
-{-# LANGUAGE CPP #-}
-
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds #-}
-#endif
 
 {-|
 Module:      Spec.Derived.DataFamiliesSpec
@@ -18,23 +14,15 @@ module Spec.Derived.DataFamiliesSpec (main, spec) where
 
 import Data.Proxy.Compat (Proxy(..))
 
-import Derived.DataFamilies (NotAllShow)
+import Derived.DataFamilies (NotAllShow, KindDistinguished, NullaryData)
 
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
+import Spec.Utils ( matchesTextShowSpec, matchesTextShow1Spec
+                  , genericTextShowSpec, genericTextShow1Spec )
 
 import Test.Hspec (Spec, describe, hspec, parallel)
-
-#if __GLASGOW_HASKELL__ >= 706
-import Derived.DataFamilies (KindDistinguished)
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708
-import Derived.DataFamilies (NullaryData)
-import Spec.Utils (matchesTextShowSpec)
-#endif
 
 main :: IO ()
 main = hspec spec
@@ -47,7 +35,6 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#if __GLASGOW_HASKELL__ >= 706
     describe "KindDistinguished '() Int Int" $ do
         let p :: Proxy (KindDistinguished '() Int Int)
             p = Proxy
@@ -60,11 +47,8 @@ spec = parallel $ do
         matchesTextShow1Spec p
         genericTextShowSpec  p
         genericTextShow1Spec p
-#endif
-#if __GLASGOW_HASKELL__ >= 708
     describe "NullaryData" $ do
         let p :: Proxy NullaryData
             p = Proxy
         matchesTextShowSpec p
         genericTextShowSpec p
-#endif

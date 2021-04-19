@@ -1,12 +1,8 @@
 {-# LANGUAGE CPP             #-}
 {-# LANGUAGE GADTs           #-}
+{-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE PolyKinds       #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Data.Type.Equality
@@ -17,7 +13,6 @@ Stability:   Provisional
 Portability: GHC
 
 'TextShow' instance for propositional equality.
-Only provided if using @base-4.7.0.0@ or later.
 
 /Since: 2/
 -}

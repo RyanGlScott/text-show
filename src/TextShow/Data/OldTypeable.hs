@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP               #-}
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans -fno-warn-warnings-deprecations #-}
 #endif
@@ -19,7 +19,7 @@ This module only exports functions if using @base-4.7@.
 -}
 module TextShow.Data.OldTypeable () where
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable.Internal (TyCon(TyCon, tyConName), TypeRep(..),
                                   funTc, listTc)
 import Data.Text.Lazy.Builder (fromString, singleton)

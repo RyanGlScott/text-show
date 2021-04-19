@@ -1,13 +1,9 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds                  #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -70,9 +66,7 @@ newtype instance TyFamily a b = TyFamily
     )
   deriving ( Arbitrary
            , Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -109,7 +103,3 @@ $(deriveTextShow2 'TyFamily)
 
 $(Generics.deriveMeta           'TyFamily)
 $(Generics.deriveRepresentable1 'TyFamily)
-
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveRepresentable0 'TyFamily)
-#endif

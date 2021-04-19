@@ -20,12 +20,7 @@ Provides instances for 'GenericExample', and an 'Arbitrary' instance for 'ConTyp
 -}
 module Instances.Generic () where
 
-import GHC.Generics (Generic)
-#if __GLASGOW_HASKELL__ >= 706
-import GHC.Generics (Generic1)
-#else
-import Generics.Deriving.TH (deriveAll1)
-#endif
+import GHC.Generics (Generic, Generic1)
 
 import Instances.Data.Text ()
 import Instances.Utils (GenericExample(..))
@@ -50,11 +45,7 @@ instance Arbitrary a => Arbitrary (GenericExample a) where
   arbitrary = genericArbitrary
 
 deriving instance Generic (GenericExample a)
-#if __GLASGOW_HASKELL__ >= 706
 deriving instance Generic1 GenericExample
-#else
-$(deriveAll1 ''GenericExample)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 806
 deriving via FromGeneric (GenericExample a)

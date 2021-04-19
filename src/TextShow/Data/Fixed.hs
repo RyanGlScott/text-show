@@ -14,26 +14,17 @@ Provides 'TextShow' instance for 'Fixed', as well as the 'showbFixed' function.
 -}
 module TextShow.Data.Fixed (showbFixed) where
 
-import Data.Fixed (HasResolution(..))
-import Data.Text.Lazy.Builder (Builder)
+import Data.Fixed (Fixed(..), HasResolution(..))
+import Data.Int (Int64)
+import Data.Semigroup.Compat (mtimesDefault)
+import Data.Text.Lazy.Builder (Builder, singleton)
 
 import Prelude ()
 import Prelude.Compat
 
 import TextShow.Classes (TextShow(..))
-
-#if MIN_VERSION_base(4,7,0)
-import Data.Fixed (Fixed(..))
-import Data.Int (Int64)
-import Data.Semigroup.Compat (mtimesDefault)
-import Data.Text.Lazy.Builder (singleton)
-
 import TextShow.Data.Integral ()
 import TextShow.Utils (lengthB)
-#else
-import Data.Fixed (Fixed, showFixed)
-import Data.Text.Lazy.Builder (fromString)
-#endif
 
 #if MIN_VERSION_base(4,13,0)
 import TextShow.Classes (showbParen)
@@ -44,7 +35,6 @@ import TextShow.Classes (showbParen)
 --
 -- /Since: 2/
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
-#if MIN_VERSION_base(4,7,0)
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0
     = singleton '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
 showbFixed chopTrailingZeroes fa@(MkFixed a)
@@ -54,18 +44,13 @@ showbFixed chopTrailingZeroes fa@(MkFixed a)
     (i, d)  = divMod (fromInteger a) res
     digits  = ceiling (logBase 10 (fromInteger $ resolution fa) :: Double)
     maxnum  = 10 ^ digits
-# if MIN_VERSION_base(4,8,0)
+#if MIN_VERSION_base(4,8,0)
     fracNum = divCeil (d * maxnum) res
     divCeil x y = (x + y - 1) `div` y
-# else
-    fracNum = div (d * maxnum) res
-# endif
 #else
-showbFixed chopTrailingZeroes = fromString . showFixed chopTrailingZeroes
-{-# INLINE showbFixed #-}
+    fracNum = div (d * maxnum) res
 #endif
 
-#if MIN_VERSION_base(4,7,0)
 -- | Only works for positive 'Integer's.
 showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder
 showbIntegerZeroes True _ 0 = mempty
@@ -87,7 +72,6 @@ withDotB :: Builder -> Builder
 withDotB b | b == mempty = mempty
            | otherwise   = singleton '.' <> b
 {-# INLINE withDotB #-}
-#endif
 
 -- | /Since: 2/
 instance HasResolution a => TextShow (Fixed a) where

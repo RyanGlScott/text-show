@@ -1,11 +1,7 @@
-{-# LANGUAGE CPP             #-}
-
-#if MIN_VERSION_base(4,7,0)
 {-# LANGUAGE GADTs           #-}
 {-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-#endif
 {-|
 Module:      TextShow.Data.Type.Coercion
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -15,13 +11,11 @@ Stability:   Provisional
 Portability: GHC
 
 'TextShow' instance for representational equality.
-Only provided if using @base-4.7.0.0@ or later.
 
 /Since: 2/
 -}
 module TextShow.Data.Type.Coercion () where
 
-#if MIN_VERSION_base(4,7,0)
 import Data.Type.Coercion (Coercion)
 
 import TextShow.Classes (TextShow1(..))
@@ -36,4 +30,3 @@ instance TextShow1 (Coercion a) where
 
 -- | /Since: 2/
 $(deriveTextShow2 ''Coercion)
-#endif

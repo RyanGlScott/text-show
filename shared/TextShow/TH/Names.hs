@@ -17,9 +17,6 @@ module TextShow.TH.Names (
     fdKeyTypeName,
     uniqueTypeName,
     asInt64ValName,
-#if MIN_VERSION_base(4,6,0)
-    numberTypeName,
-#endif
 #if MIN_VERSION_base(4,8,0)
     giveGCStatsTypeName,
     doCostCentresTypeName,
@@ -29,10 +26,6 @@ module TextShow.TH.Names (
     ) where
 
 import Language.Haskell.TH.Syntax
-
-#if MIN_VERSION_base(4,7,0)
-import Text.Read.Lex (Number)
-#endif
 
 #if MIN_VERSION_base(4,8,2)
 import GHC.RTS.Flags (GiveGCStats, DoCostCentres, DoHeapProfile, DoTrace)
@@ -70,16 +63,6 @@ asInt64ValName :: Name
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt"
 #else
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt64"
-#endif
-
-#if MIN_VERSION_base(4,6,0)
--- | The 'Name' of 'Number'.
-numberTypeName :: Name
-# if MIN_VERSION_base(4,7,0)
-numberTypeName = ''Number
-# else
-numberTypeName = mkNameG_tc "base" "Text.Read.Lex" "Number"
-# endif
 #endif
 
 #if MIN_VERSION_base(4,8,0)

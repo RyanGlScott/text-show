@@ -1,11 +1,7 @@
 {-# LANGUAGE CPP           #-}
+{-# LANGUAGE PolyKinds     #-}
 {-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE TypeOperators #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE PolyKinds #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|

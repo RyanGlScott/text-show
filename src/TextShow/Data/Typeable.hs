@@ -2,11 +2,8 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE GADTs             #-}
 {-# LANGUAGE MagicHash         #-}
-{-# LANGUAGE OverloadedStrings #-}
-
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds         #-}
-#endif
+{-# LANGUAGE OverloadedStrings #-}
 
 #if __GLASGOW_HASKELL__ >= 801
 {-# LANGUAGE PatternSynonyms   #-}

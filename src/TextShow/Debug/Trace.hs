@@ -45,14 +45,13 @@ module TextShow.Debug.Trace (
     , tracetlEvent
     , tracetEventIO
     , tracetlEventIO
-#if MIN_VERSION_base(4,7,0)
+
       -- * Execution phase markers
       -- $markers
     , tracetMarker
     , tracetlMarker
     , tracetMarkerIO
     , tracetlMarkerIO
-#endif
     ) where
 
 import           Control.Monad (unless)
@@ -299,7 +298,6 @@ tracetEventIO = traceEventIO . TS.unpack
 tracetlEventIO :: TL.Text -> IO ()
 tracetlEventIO = traceEventIO . TL.unpack
 
-#if MIN_VERSION_base(4,7,0)
 -- $markers
 --
 -- When looking at a profile for the execution of a program we often want to
@@ -356,4 +354,3 @@ tracetMarkerIO = traceMarkerIO . TS.unpack
 -- /Since: 2/
 tracetlMarkerIO :: TL.Text -> IO ()
 tracetlMarkerIO = traceMarkerIO . TL.unpack
-#endif

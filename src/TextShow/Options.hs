@@ -42,8 +42,6 @@ data Options = Options
     -- ^ If 'True', derived instances for empty data types (i.e., ones with
     --   no data constructors) will use the @EmptyCase@ language extension.
     --   If 'False', derived instances will simply use 'seq' instead.
-    --   (This has no effect on GHCs before 7.8, since @EmptyCase@ is only
-    --   available in 7.8 or later.)
     --
     --   /Since: 3.7/
   } deriving ( Data

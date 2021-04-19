@@ -12,8 +12,7 @@ Portability: GHC
 Miscellaneous utility functions.
 -}
 module TextShow.Utils (
-      coerce
-    , i2d
+      i2d
     , isInfixDataCon
     , isSymVar
     , isTupleString
@@ -34,26 +33,10 @@ import           GHC.Exts (Char(C#), Int(I#), (+#), chr#, ord#)
 import           Prelude ()
 import           Prelude.Compat hiding (length)
 
-#if __GLASGOW_HASKELL__ >= 708
-import qualified Data.Coerce as C (Coercible, coerce)
-#else
-import           Unsafe.Coerce (unsafeCoerce)
-#endif
-
 #if defined(MIN_VERSION_ghc_boot_th)
 import           GHC.Lexeme (startsVarSym)
 #else
 import           Data.Char (isSymbol, ord)
-#endif
-
--- | On GHC 7.8 and later, this is 'C.coerce' from "Data.Coerce". Otherwise, it's
--- 'unsafeCoerce'.
-#if __GLASGOW_HASKELL__ >= 708
-coerce :: C.Coercible a b => a -> b
-coerce = C.coerce
-#else
-coerce :: a -> b
-coerce = unsafeCoerce
 #endif
 
 -- | Unsafe conversion for decimal digits.

@@ -1,10 +1,7 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE PolyKinds         #-}
-#endif
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|

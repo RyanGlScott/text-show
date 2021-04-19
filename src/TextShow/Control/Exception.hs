@@ -59,9 +59,7 @@ instance TextShow ArithException where
     showb LossOfPrecision      = "loss of precision"
     showb DivideByZero         = "divide by zero"
     showb Denormal             = "denormal"
-#if MIN_VERSION_base(4,6,0)
     showb RatioZeroDenominator = "Ratio has zero denominator"
-#endif
 
 -- | /Since: 2/
 instance TextShow ArrayException where
@@ -80,14 +78,10 @@ instance TextShow AssertionFailed where
     showb (AssertionFailed err) = fromString err
     {-# INLINE showb #-}
 
-#if MIN_VERSION_base(4,7,0)
--- | Only available with @base-4.7.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 instance TextShow SomeAsyncException where
     showb (SomeAsyncException e) = showb $ FromStringShow e
     {-# INLINE showb #-}
-#endif
 
 -- | /Since: 2/
 instance TextShow AsyncException where

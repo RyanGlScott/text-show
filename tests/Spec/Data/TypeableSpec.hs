@@ -1,8 +1,5 @@
 {-# LANGUAGE CPP       #-}
-
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds #-}
-#endif
 
 {-|
 Module:      Spec.Data.TypeableSpec

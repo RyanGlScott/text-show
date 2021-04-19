@@ -28,10 +28,7 @@ import           Data.Text.Lazy.Builder (Builder, singleton)
 import           Data.Text.Lazy.Builder.Int (decimal)
 import           Data.Word (Word8, Word16, Word32, Word64)
 
-import           GHC.Exts (Int(I#), (<#), (>#))
-#if __GLASGOW_HASKELL__ >= 708
-import           GHC.Exts (Int#, isTrue#)
-#endif
+import           GHC.Exts (Int(I#), (<#), (>#), isTrue#)
 
 import           Prelude ()
 import           Prelude.Compat
@@ -102,18 +99,10 @@ showbOct = showbIntAtBase 8 intToDigit
 -- | /Since: 2/
 instance TextShow Int where
     showbPrec (I# p) n'@(I# n)
-        | isTrue (n <# 0#) && isTrue (p ># 6#)
+        | isTrue# (n <# 0#) && isTrue# (p ># 6#)
         = singleton '(' <> decimal n' <> singleton ')'
         | otherwise
         = decimal n'
-      where
-#if __GLASGOW_HASKELL__ >= 708
-        isTrue :: Int# -> Bool
-        isTrue b = isTrue# b
-#else
-        isTrue :: Bool -> Bool
-        isTrue = id
-#endif
 
 -- | /Since: 2/
 instance TextShow Int8 where

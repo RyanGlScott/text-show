@@ -1,9 +1,6 @@
 {-# LANGUAGE CPP           #-}
-{-# LANGUAGE TypeOperators #-}
-
-#if __GLASGOW_HASKELL__ >= 706
 {-# LANGUAGE DataKinds     #-}
-#endif
+{-# LANGUAGE TypeOperators #-}
 
 {-|
 Module:      Spec.GHC.GenericsSpec

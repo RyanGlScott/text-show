@@ -36,10 +36,8 @@ spec = parallel . describe "TextShow.Control.Exception" $ do
         matchesTextShowSpec (Proxy :: Proxy ArrayException)
     describe "AssertionFailed" $
         matchesTextShowSpec (Proxy :: Proxy AssertionFailed)
-#if MIN_VERSION_base(4,7,0)
     describe "SomeAsyncException" $
         matchesTextShowSpec (Proxy :: Proxy SomeAsyncException)
-#endif
     describe "AsyncException" $
         matchesTextShowSpec (Proxy :: Proxy AsyncException)
     describe "NonTermination" $

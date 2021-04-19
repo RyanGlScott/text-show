@@ -1,6 +1,3 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE TemplateHaskell #-}
-
 {-|
 Module:      Spec.Text.ReadSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -18,11 +15,7 @@ import Instances.Text.Read ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Text.Read (Lexeme)
-
-#if MIN_VERSION_base(4,6,0)
-import Language.Haskell.TH.Lib (conT)
-import TextShow.TH.Names (numberTypeName)
-#endif
+import Text.Read.Lex (Number)
 
 main :: IO ()
 main = hspec spec
@@ -31,7 +24,5 @@ spec :: Spec
 spec = parallel $ do
     describe "Lexeme" $
         matchesTextShowSpec (Proxy :: Proxy Lexeme)
-#if MIN_VERSION_base(4,6,0)
     describe "Number" $
-        matchesTextShowSpec (Proxy :: Proxy $(conT numberTypeName))
-#endif
+        matchesTextShowSpec (Proxy :: Proxy Number)

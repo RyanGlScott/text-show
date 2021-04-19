@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Drop support for GHC 7.4 and 7.6.
+
 ### 3.9.2 [2021.08.30]
 * Require `generic-deriving-1.14.1` or later in the test suite.
 

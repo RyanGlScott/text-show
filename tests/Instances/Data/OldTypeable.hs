@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP                #-}
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans               #-}
@@ -19,7 +19,7 @@ Portability: GHC
 -}
 module Instances.Data.OldTypeable () where
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable.Internal (TyCon(..), TypeRep(..))
 
 import GHC.Generics (Generic)

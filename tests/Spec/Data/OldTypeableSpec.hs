@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 #endif
 
@@ -23,7 +23,7 @@ import Prelude.Compat
 
 import Test.Hspec (Spec, hspec, parallel)
 
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
 import Data.OldTypeable (TyCon, TypeRep)
 import Data.Proxy.Compat (Proxy(..))
 
@@ -37,7 +37,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if MIN_VERSION_base(4,7,0) && !(MIN_VERSION_base(4,8,0))
+#if !(MIN_VERSION_base(4,8,0))
     describe "TypeRep" $
         matchesTextShowSpec (Proxy :: Proxy TypeRep)
     describe "TyCon" $

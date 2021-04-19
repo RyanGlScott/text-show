@@ -1,13 +1,10 @@
 {-# LANGUAGE CPP               #-}
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs             #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds         #-}
-#endif
 
 {-|
 Module:      Derived.Infix
@@ -32,10 +29,7 @@ module Derived.Infix (
 import qualified Generics.Deriving.TH as Generics
 #endif
 
-import           GHC.Generics (Generic)
-#if __GLASGOW_HASKELL__ >= 706
-import           GHC.Generics (Generic1)
-#endif
+import           GHC.Generics (Generic, Generic1)
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
@@ -63,9 +57,7 @@ data TyConPlain a b = (:!:) a b
                     | TyConFakeInfix a b
   deriving ( Show
            , Generic
-#if __GLASGOW_HASKELL__ >= 706
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -77,10 +69,8 @@ data TyConGADT a b where
     (:...)  ::           g ->       h -> Int -> TyConGADT g h
     (:....) :: { tcg1 :: i, tcg2 :: j }      -> TyConGADT i j
   deriving ( Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -96,11 +86,9 @@ data instance TyFamilyPlain a b = (:#:) a b
                                 | a `TyFamilyPlain` b
                                 | TyFamilyFakeInfix a b
   deriving ( Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -115,11 +103,9 @@ data instance TyFamilyGADT a b where
     (:***)  ::           g ->       h -> Int -> TyFamilyGADT g h
     (:****) :: { tfg1 :: i, tfg2 :: j }      -> TyFamilyGADT i j
   deriving ( Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -154,12 +140,6 @@ $(deriveTextShow  ''TyConGADT)
 $(deriveTextShow1 ''TyConGADT)
 $(deriveTextShow2 ''TyConGADT)
 
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveMeta           ''TyConPlain)
-$(Generics.deriveRepresentable1 ''TyConPlain)
-$(Generics.deriveAll0And1       ''TyConGADT)
-#endif
-
 #if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 '(:#:))
 
@@ -185,9 +165,4 @@ $(Generics.deriveMeta           '(:#:))
 $(Generics.deriveRepresentable1 '(:$:))
 $(Generics.deriveMeta           '(:*))
 $(Generics.deriveRepresentable1 '(:**))
-#endif
-
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveRepresentable0 'TyFamilyPlain)
-$(Generics.deriveRepresentable0 '(:***))
 #endif

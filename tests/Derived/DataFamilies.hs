@@ -1,18 +1,15 @@
 {-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE PolyKinds                  #-}
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708 && __GLASGOW_HASKELL__ < 710
+#if __GLASGOW_HASKELL__ < 710
 -- Starting with GHC 7.10, NullaryTypeClasses was deprecated in favor of
 -- MultiParamTypeClasses, which is already enabled
 {-# LANGUAGE NullaryTypeClasses         #-}
@@ -30,13 +27,9 @@ Defines corner case-provoking data families.
 -}
 module Derived.DataFamilies (
       NotAllShow(..)
-#if __GLASGOW_HASKELL__ >= 706
     , KindDistinguished(..)
-#endif
-#if __GLASGOW_HASKELL__ >= 708
     , NullaryClass(..)
     , NullaryData(..)
-#endif
     ) where
 
 #include "generic.h"
@@ -45,11 +38,9 @@ module Derived.DataFamilies (
 import qualified Generics.Deriving.TH as Generics
 #endif
 
-#if __GLASGOW_HASKELL__ >= 706
 import           GHC.Generics (Generic)
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 import           GHC.Generics (Generic1)
-# endif
 #endif
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
@@ -74,11 +65,9 @@ data instance NotAllShow ()  ()  () d = NASNoShow
 data instance NotAllShow Int b   c  d = NASShow1 c b
                                       | NASShow2 d
   deriving ( Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
 #endif
            )
 
@@ -101,29 +90,24 @@ $(Generics.deriveMeta           'NASShow1)
 $(Generics.deriveRepresentable1 'NASShow2)
 #endif
 
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveRepresentable0 'NASShow1)
-#endif
-
 -------------------------------------------------------------------------------
 
-#if __GLASGOW_HASKELL__ >= 706
 data family KindDistinguished (x :: k) (y :: *) (z :: *) :: *
 
 data instance KindDistinguished (a :: ()) b c = KindDistinguishedUnit b c
   deriving ( Show
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
+#endif
            )
 
 data instance KindDistinguished (a :: Bool) b c = KindDistinguishedBool b c
   deriving ( Show
            , Generic
-# if defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-# endif
+#endif
            )
 
 instance (Arbitrary b, Arbitrary c)
@@ -134,17 +118,17 @@ instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: Bool) b c) where
     arbitrary = genericArbitrary
 
-# if !defined(NEW_FUNCTOR_CLASSES)
+#if !defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow1 'KindDistinguishedUnit)
 
 $(deriveShow1 'KindDistinguishedBool)
-# else
+#else
 $(deriveShow1 'KindDistinguishedUnit)
 $(deriveShow2 'KindDistinguishedUnit)
 
 $(deriveShow1 'KindDistinguishedBool)
 $(deriveShow2 'KindDistinguishedBool)
-# endif
+#endif
 
 $(deriveTextShow  'KindDistinguishedUnit)
 $(deriveTextShow1 'KindDistinguishedUnit)
@@ -154,15 +138,13 @@ $(deriveTextShow  'KindDistinguishedBool)
 $(deriveTextShow1 'KindDistinguishedBool)
 $(deriveTextShow2 'KindDistinguishedBool)
 
-# if !defined(__LANGUAGE_DERIVE_GENERIC1__)
+#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveAll1 'KindDistinguishedUnit)
 $(Generics.deriveAll1 'KindDistinguishedBool)
-# endif
 #endif
 
 -------------------------------------------------------------------------------
 
-#if __GLASGOW_HASKELL__ >= 708
 class NullaryClass where
     data NullaryData :: *
 
@@ -171,4 +153,3 @@ instance NullaryClass where
       deriving (Arbitrary, Show, Generic)
 
 $(deriveTextShow 'NullaryCon)
-#endif

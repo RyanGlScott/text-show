@@ -1,12 +1,8 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE MagicHash           #-}
+{-# LANGUAGE PolyKinds           #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving  #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE PolyKinds           #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|

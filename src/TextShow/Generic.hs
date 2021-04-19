@@ -1,10 +1,12 @@
 {-# LANGUAGE BangPatterns          #-}
 {-# LANGUAGE CPP                   #-}
+{-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE DeriveDataTypeable    #-}
 {-# LANGUAGE DeriveFoldable        #-}
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DeriveTraversable     #-}
+{-# LANGUAGE EmptyCase             #-}
 {-# LANGUAGE EmptyDataDecls        #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -12,6 +14,7 @@
 {-# LANGUAGE MagicHash             #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE PolyKinds             #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TypeOperators         #-}
@@ -19,15 +22,6 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE UndecidableInstances  #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds            #-}
-{-# LANGUAGE PolyKinds            #-}
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE EmptyCase            #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE DeriveLift           #-}
@@ -196,15 +190,13 @@ newtype FromGeneric a = FromGeneric { fromGeneric :: a }
            , Eq
            , Foldable
            , Functor
+           , Generic
+           , Generic1
            , Ord
            , Read
            , Show
            , Traversable
            , Typeable
-#if __GLASGOW_HASKELL__ >= 706
-           , Generic
-           , Generic1
-#endif
 #if __GLASGOW_HASKELL__ >= 800
            , Lift
 #endif
@@ -228,9 +220,7 @@ newtype FromGeneric1 f a = FromGeneric1 { fromGeneric1 :: f a }
            , Ord
            , Read
            , Show
-#if __GLASGOW_HASKELL__ >= 706
            , Generic
-#endif
 #if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 #endif
@@ -242,12 +232,9 @@ newtype FromGeneric1 f a = FromGeneric1 { fromGeneric1 :: f a }
 deriving instance Foldable    f => Foldable    (FromGeneric1 f)
 deriving instance Functor     f => Functor     (FromGeneric1 f)
 deriving instance Traversable f => Traversable (FromGeneric1 f)
-
-#if __GLASGOW_HASKELL__ >= 708
 deriving instance Typeable FromGeneric1
 deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromGeneric1 f (a :: *))
-#endif
 
 -- | /Since: 3.7.4/
 instance (Generic1 f, GTextShowB One (Rep1 f)) => TextShow1 (FromGeneric1 f) where
@@ -394,12 +381,6 @@ times, once for each Text/Builder variant. At some point, I should replace this 
 See #33.
 -}
 
-#if __GLASGOW_HASKELL__ >= 708
-#define DERIVE_TYPEABLE(name) deriving instance Typeable name
-#else
-#define DERIVE_TYPEABLE(name)
-#endif
-
 #if __GLASGOW_HASKELL__ >= 711
 #define HASH_FUNS(text_type,one_hash,two_hash,hash_prec,from_char,from_string) \
 one_hash, two_hash :: text_type; \
@@ -414,12 +395,6 @@ hash_prec :: Int -> Int;         \
 one_hash  = mempty;              \
 two_hash  = mempty;              \
 hash_prec = id
-#endif
-
-#if __GLASGOW_HASKELL__ >= 708
-#define EMPTY_CASE(x) case x of {}
-#else
-#define EMPTY_CASE(x) case x of !_ -> undefined
 #endif
 
 #define GTEXT_SHOW(text_type,show_funs,no_show_funs,show1_funs,one_hash,two_hash,hash_prec,gtext_show,gshow_prec,gtext_show_con,gshow_prec_con,show_prec,lift_show_prec,show_space,show_paren,show_list_with,from_char,from_string) \
@@ -453,14 +428,14 @@ class gtext_show arity f where {                                                
   ; gshow_prec :: show_funs arity a -> Int -> f a -> text_type                          \
  };                                                                                     \
                                                                                         \
-DERIVE_TYPEABLE(gtext_show);                                                            \
+deriving instance Typeable gtext_show;                                                  \
                                                                                         \
 instance gtext_show arity f => gtext_show arity (D1 d f) where {                        \
     gshow_prec sfs p (M1 x) = gshow_prec sfs p x                                        \
  };                                                                                     \
                                                                                         \
 instance gtext_show arity V1 where {                                                    \
-    gshow_prec _ _ x = EMPTY_CASE(x)                                                    \
+    gshow_prec _ _ x = case x of {}                                                     \
  };                                                                                     \
                                                                                         \
 instance (gtext_show arity f, gtext_show arity g) => gtext_show arity (f :+: g) where { \
@@ -522,7 +497,7 @@ class gtext_show_con arity f where {                                            
   ; gshow_prec_con :: ConType -> show_funs arity a -> Int -> f a -> text_type           \
  };                                                                                     \
                                                                                         \
-DERIVE_TYPEABLE(gtext_show_con);                                                        \
+deriving instance Typeable gtext_show_con;                                              \
                                                                                         \
 instance gtext_show_con arity U1 where {                                                \
     gshow_prec_con _ _ _ U1 = mempty                                                    \
@@ -675,9 +650,4 @@ instance Lift (f a) => Lift (FromGeneric1 f a) where
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 $(Generics.deriveMeta           ''FromGeneric1)
 $(Generics.deriveRepresentable1 ''FromGeneric1)
-#endif
-
-#if __GLASGOW_HASKELL__ < 706
-$(Generics.deriveAll0And1       ''FromGeneric)
-$(Generics.deriveRepresentable0 ''FromGeneric1)
 #endif

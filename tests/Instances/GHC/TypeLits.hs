@@ -1,9 +1,4 @@
-{-# LANGUAGE CPP       #-}
-
-#if MIN_VERSION_base(4,6,0) && !(MIN_VERSION_base(4,7,0))
 {-# LANGUAGE PolyKinds #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -18,20 +13,13 @@ Portability: GHC
 -}
 module Instances.GHC.TypeLits () where
 
-#if MIN_VERSION_base(4,6,0)
 import GHC.TypeLits
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), getNonNegative)
 
-# if MIN_VERSION_base(4,7,0)
-import Test.QuickCheck (getNonNegative)
-# endif
-#endif
-
-#if MIN_VERSION_base(4,7,0)
 instance Arbitrary SomeNat where
     arbitrary = do
         nat <- getNonNegative <$> arbitrary
@@ -41,13 +29,3 @@ instance Arbitrary SomeNat where
 
 instance Arbitrary SomeSymbol where
     arbitrary = someSymbolVal <$> arbitrary
-#elif MIN_VERSION_base(4,6,0)
-instance SingI a => Arbitrary (Sing a) where
-    arbitrary = pure sing
-
-instance SingI n => Arbitrary (IsZero n) where
-    arbitrary = pure $ isZero sing
-
-instance SingI n => Arbitrary (IsEven n) where
-    arbitrary = pure $ isEven sing
-#endif

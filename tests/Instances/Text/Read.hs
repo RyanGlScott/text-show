@@ -1,13 +1,8 @@
-{-# LANGUAGE CPP                  #-}
+{-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-
-#if __GLASGOW_HASKELL__ >= 706
-{-# LANGUAGE DataKinds            #-}
-#endif
-
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 {-|
@@ -26,28 +21,13 @@ import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 import           Test.QuickCheck (Arbitrary(..))
 import           Text.Read (Lexeme(..))
-
-#if MIN_VERSION_base(4,6,0)
-import           Language.Haskell.TH.Lib (conT)
-import           TextShow.TH.Names (numberTypeName)
-#endif
+import           Text.Read.Lex (Number)
 
 $(Generics.deriveAll0 ''Lexeme)
-#if MIN_VERSION_base(4,6,0)
-$(Generics.deriveAll0 numberTypeName)
-#endif
+$(Generics.deriveAll0 ''Number)
 
 instance Arbitrary Lexeme where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_base(4,6,0)
--- NB: Don't attempt to define
---
--- type Number' = $(conT numberTypeName)
---
--- here. Sadly, due to a bizarre GHC 7.6 bug, it'll think it's a recursive
--- type synonym and reject it.
-
-instance Arbitrary $(conT numberTypeName) where
+instance Arbitrary Number where
     arbitrary = genericArbitrary
-#endif

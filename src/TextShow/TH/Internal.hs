@@ -540,7 +540,7 @@ makeTextShowForCons tsClass tsFun opts instTys cons = do
         splMap     = Map.fromList $ zip lastTyVars spls
 
         makeFun
-          | null cons && emptyCaseBehavior opts && ghc7'8OrLater
+          | null cons && emptyCaseBehavior opts
           = caseE (varE value) []
 
           | null cons
@@ -558,13 +558,6 @@ makeTextShowForCons tsClass tsFun opts instTys cons = do
           , makeFun
           ] ++ map varE spsAndSls
             ++ [varE p, varE value]
-  where
-    ghc7'8OrLater :: Bool
-#if __GLASGOW_HASKELL__ >= 708
-    ghc7'8OrLater = True
-#else
-    ghc7'8OrLater = False
-#endif
 
 -- | Generates a lambda expression for showbPrec/liftShowbPrec/etc. for a
 -- single constructor.
@@ -1070,15 +1063,8 @@ outOfPlaceTyVarError tsClass conName = Monad.fail
 -- Expanding type synonyms
 -------------------------------------------------------------------------------
 
-applySubstitutionKind :: Map Name Kind -> Type -> Type
-#if MIN_VERSION_template_haskell(2,8,0)
-applySubstitutionKind = applySubstitution
-#else
-applySubstitutionKind _ t = t
-#endif
-
 substNameWithKind :: Name -> Kind -> Type -> Type
-substNameWithKind n k = applySubstitutionKind (Map.singleton n k)
+substNameWithKind n k = applySubstitution (Map.singleton n k)
 
 substNamesWithKindStar :: [Name] -> Type -> Type
 substNamesWithKindStar ns t = foldr' (flip substNameWithKind starK) t ns
@@ -1209,9 +1195,7 @@ canRealizeKindStar :: Type -> StarKindStatus
 canRealizeKindStar t
   | hasKindStar t = KindStar
   | otherwise = case t of
-#if MIN_VERSION_template_haskell(2,8,0)
                      SigT _ (VarT k) -> IsKindVar k
-#endif
                      _               -> NotKindStar
 
 -- | Returns 'Just' the kind variable 'Name' of a 'StarKindStatus' if it exists.
@@ -1377,21 +1361,13 @@ charE = litE . charL
 -- | Returns True if a Type has kind *.
 hasKindStar :: Type -> Bool
 hasKindStar VarT{}         = True
-#if MIN_VERSION_template_haskell(2,8,0)
 hasKindStar (SigT _ StarT) = True
-#else
-hasKindStar (SigT _ StarK) = True
-#endif
 hasKindStar _              = False
 
 -- Returns True is a kind is equal to *, or if it is a kind variable.
 isStarOrVar :: Kind -> Bool
-#if MIN_VERSION_template_haskell(2,8,0)
 isStarOrVar StarT  = True
 isStarOrVar VarT{} = True
-#else
-isStarOrVar StarK  = True
-#endif
 isStarOrVar _      = False
 
 -- Generate a list of fresh names with a common prefix, and numbered suffixes.
@@ -1403,7 +1379,7 @@ newNameList prefix n = mapM (newName . (prefix ++) . show) [1..n]
 -- kind variables.
 hasKindVarChain :: Int -> Type -> Maybe [Name]
 hasKindVarChain kindArrows t =
-  let uk = uncurryKind (tyKind t)
+  let uk = uncurryTy (tyKind t)
   in if (length uk - 1 == kindArrows) && all isStarOrVar uk
         then Just (concatMap freeVariables uk)
         else Nothing
@@ -1500,18 +1476,15 @@ isInTypeFamilyApp names tyFun tyArgs =
 #if MIN_VERSION_template_haskell(2,11,0)
         FamilyI (OpenTypeFamilyD (TypeFamilyHead _ bndrs _ _)) _
           -> withinFirstArgs bndrs
-#elif MIN_VERSION_template_haskell(2,7,0)
-        FamilyI (FamilyD TypeFam _ bndrs _) _
-          -> withinFirstArgs bndrs
 #else
-        TyConI (FamilyD TypeFam _ bndrs _)
+        FamilyI (FamilyD TypeFam _ bndrs _) _
           -> withinFirstArgs bndrs
 #endif
 
 #if MIN_VERSION_template_haskell(2,11,0)
         FamilyI (ClosedTypeFamilyD (TypeFamilyHead _ bndrs _ _) _) _
           -> withinFirstArgs bndrs
-#elif MIN_VERSION_template_haskell(2,9,0)
+#else
         FamilyI (ClosedTypeFamilyD _ bndrs _ _) _
           -> withinFirstArgs bndrs
 #endif
@@ -1542,10 +1515,7 @@ mentionsName = go
   where
     go :: Type -> [Name] -> Bool
     go (AppT t1 t2) names = go t1 names || go t2 names
-    go (SigT t _k)  names = go t names
-#if MIN_VERSION_template_haskell(2,8,0)
-                              || go _k names
-#endif
+    go (SigT t k)   names = go t  names || go k  names
     go (VarT n)     names = n `elem` names
     go _            _     = False
 
@@ -1605,15 +1575,6 @@ uncurryTy (AppT (AppT ArrowT t1) t2) = t1 <| uncurryTy t2
 uncurryTy (SigT t _)                 = uncurryTy t
 uncurryTy (ForallT _ _ t)            = uncurryTy t
 uncurryTy t                          = t :| []
-
--- | Like uncurryType, except on a kind level.
-uncurryKind :: Kind -> NonEmpty Kind
-#if MIN_VERSION_template_haskell(2,8,0)
-uncurryKind = uncurryTy
-#else
-uncurryKind (ArrowK k1 k2) = k1 <| uncurryKind k2
-uncurryKind k              = k :| []
-#endif
 
 createKindChain :: Int -> Kind
 createKindChain = go starK
