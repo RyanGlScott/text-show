@@ -79,8 +79,11 @@ import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
 #if MIN_VERSION_base(4,13,0)
                           , Int8#, Int16#, Word8#, Word16#
 # if MIN_VERSION_base(4,16,0)
-                          , int8ToInt#, int16ToInt#, intToInt8#, intToInt16#
-                          , word8ToWord#, word16ToWord#, wordToWord8#, wordToWord16#
+                          , Int32#, Word32#
+                          , int8ToInt#, int16ToInt#, int32ToInt#
+                          , intToInt8#, intToInt16#, intToInt32#
+                          , word8ToWord#, word16ToWord#, word32ToWord#
+                          , wordToWord8#, wordToWord16#, wordToWord32#
 # else
                           , extendInt8#, extendInt16#, extendWord8#, extendWord16#
                           , narrowInt8#, narrowInt16#, narrowWord8#, narrowWord16#
@@ -1266,6 +1269,18 @@ primShowTbl = Map.fromList
                     { primShowBoxer      = appE (conE 'W#) . appE (varE word16ToWordHashValName)
                     , primShowPostfixMod = twoHashE
                     , primShowConv       = mkNarrowE wordToWord16HashValName
+                    })
+#endif
+#if MIN_VERSION_base(4,16,0)
+    , (''Int32#,  PrimShow
+                    { primShowBoxer      = appE (conE 'I#) . appE (varE 'int32ToInt#)
+                    , primShowPostfixMod = oneHashE
+                    , primShowConv       = mkNarrowE 'intToInt32#
+                    })
+    , (''Word32#, PrimShow
+                    { primShowBoxer      = appE (conE 'W#) . appE (varE 'word32ToWord#)
+                    , primShowPostfixMod = twoHashE
+                    , primShowConv       = mkNarrowE 'wordToWord32#
                     })
 #endif
     ]

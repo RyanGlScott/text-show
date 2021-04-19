@@ -69,6 +69,10 @@ data TyCon'# a b = TyCon'# {
   , tcInt16#  :: Int16#
   , tcWord8#  :: Word8#
   , tcWord16# :: Word16#
+# if MIN_VERSION_base(4,16,0)
+  , tcInt32#  :: Int32#
+  , tcWord32# :: Word32#
+# endif
 } deriving Show
 #endif
 
@@ -101,6 +105,10 @@ data instance TyFamily'# a b = TyFamily'# {
   , tfInt16#  :: Int16#
   , tfWord8#  :: Word8#
   , tfWord16# :: Word16#
+# if MIN_VERSION_base(4,16,0)
+  , tfInt32#  :: Int32#
+  , tfWord32# :: Word32#
+# endif
 } deriving Show
 #endif
 
@@ -121,8 +129,15 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyCon'# a b) where
       I# i2 <- arbitrary
       W# w1 <- arbitrary
       W# w2 <- arbitrary
+# if MIN_VERSION_base(4,16,0)
+      I# i3 <- arbitrary
+      W# w3 <- arbitrary
+# endif
       pure $ TyCon'# a b (intToInt8Compat# i1)   (intToInt16Compat# i2)
                          (wordToWord8Compat# w1) (wordToWord16Compat# w2)
+# if MIN_VERSION_base(4,16,0)
+                         (intToInt32# i3)        (wordToWord32# w3)
+# endif
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily'# a b) where
     arbitrary = do
@@ -132,8 +147,15 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamily'# a b) where
       I# i2 <- arbitrary
       W# w1 <- arbitrary
       W# w2 <- arbitrary
+# if MIN_VERSION_base(4,16,0)
+      I# i3 <- arbitrary
+      W# w3 <- arbitrary
+# endif
       pure $ TyFamily'# a b (intToInt8Compat# i1)   (intToInt16Compat# i2)
                             (wordToWord8Compat# w1) (wordToWord16Compat# w2)
+# if MIN_VERSION_base(4,16,0)
+                            (intToInt32# i3)        (wordToWord32# w3)
+# endif
 
 # if MIN_VERSION_base(4,16,0)
 intToInt8Compat# :: Int# -> Int8#

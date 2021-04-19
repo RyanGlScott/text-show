@@ -1,5 +1,8 @@
 ### next [????.??.??]
+* Allow building with GHC 9.2.
 * Drop support for GHC 7.4 and 7.6.
+* Support deriving `TextShow(1)(2)` instances for data types with fields
+  of type `Int32#` or `Word32#` on GHC 8.2 or later.
 
 ### 3.9.2 [2021.08.30]
 * Require `generic-deriving-1.14.1` or later in the test suite.
