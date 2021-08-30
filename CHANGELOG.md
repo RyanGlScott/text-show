@@ -1,5 +1,5 @@
 ### next [????.??.??]
-* Allow building with GHC 9.2.
+* Require `base-orphans-0.8.5` or later in the test suite.
 
 ## 3.9 [2020.10.03]
 * Allow building with GHC 9.0.
