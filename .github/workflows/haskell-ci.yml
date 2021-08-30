@@ -8,9 +8,9 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.12
+# version: 0.12.1
 #
-# REGENDATA ("0.12",["github","--config=cabal.haskell-ci","cabal.project"])
+# REGENDATA ("0.12.1",["github","--config=cabal.haskell-ci","cabal.project"])
 #
 name: Haskell-CI
 on:
@@ -148,6 +148,8 @@ jobs:
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package text-show" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           cat >> cabal.project <<EOF
+          allow-newer: aeson:base-compat-batteries
+
           package text-show
             ghc-options: -Werror
           EOF
