@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.9.1 [2021.08.29]
 * Require `base-orphans-0.8.5` or later in the test suite.
 
 ## 3.9 [2020.10.03]
