@@ -148,9 +148,6 @@ jobs:
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package text-show" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           cat >> cabal.project <<EOF
-          allow-newer: aeson:base-compat
-          allow-newer: aeson:base-compat-batteries
-
           package text-show
             ghc-options: -Werror
           EOF

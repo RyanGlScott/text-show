@@ -2,6 +2,3 @@ distribution:           bionic
 no-tests-no-benchmarks: False
 unconstrained:          False
 local-ghc-options:      -Werror
-
--- Temporary hack until https://github.com/haskell/aeson/pull/862 is released
-copy-fields: some

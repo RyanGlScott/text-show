@@ -1,6 +1,1 @@
 packages: .
-
--- Temporary hacks until https://github.com/haskell/aeson/pull/862 is released
-allow-newer:
-  aeson:base-compat,
-  aeson:base-compat-batteries
