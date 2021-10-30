@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module:      Spec.Data.TupleSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,10 +14,14 @@ module Spec.Data.TupleSpec (main, spec) where
 
 import Data.Proxy.Compat (Proxy(..))
 import Generics.Deriving.Instances ()
+#if MIN_VERSION_ghc_prim(0,7,0)
+import GHC.Tuple (Solo)
+#endif
 import Instances.Data.Tuple ()
 import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec,
                    genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
+import Test.QuickCheck.Instances ()
 
 main :: IO ()
 main = hspec spec
@@ -79,3 +85,10 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
         matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
+#if MIN_VERSION_ghc_prim(0,7,0)
+    describe "Solo Int" $ do
+        let p :: Proxy (Solo Int)
+            p = Proxy
+        matchesTextShowSpec  p
+        matchesTextShow1Spec p
+#endif

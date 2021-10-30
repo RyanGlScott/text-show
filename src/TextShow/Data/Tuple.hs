@@ -1,5 +1,6 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-|
 Module:      TextShow.Data.Tuple
@@ -14,6 +15,12 @@ Portability: GHC
 /Since: 2/
 -}
 module TextShow.Data.Tuple () where
+
+#if MIN_VERSION_ghc_prim(0,7,0)
+import GHC.Tuple (Solo(..))
+import TextShow.Classes (TextShow(..), TextShow1(..),
+                         showbPrec1, showbUnaryWith)
+#endif
 
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -106,3 +113,15 @@ $(deriveTextShow2 ''(,,,,,,,,,,,,))
 $(deriveTextShow2 ''(,,,,,,,,,,,,,))
 -- | /Since: 2/
 $(deriveTextShow2 ''(,,,,,,,,,,,,,,))
+
+#if MIN_VERSION_ghc_prim(0,7,0)
+-- | /Since: 3.9.3/
+instance TextShow a => TextShow (Solo a) where
+    showbPrec = showbPrec1
+    {-# INLINE showbPrec #-}
+
+-- | /Since: 3.9.3/
+instance TextShow1 Solo where
+    liftShowbPrec sp _ p (Solo x) = showbUnaryWith sp "Solo" p x
+    {-# INLINE liftShowbPrec #-}
+#endif

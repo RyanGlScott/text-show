@@ -1,6 +1,8 @@
-### next [????.??.??]
+### 3.9.3 [????.??.??]
 * Allow building with GHC 9.2.
 * Drop support for GHC 7.4 and 7.6.
+* Add `TextShow(1)` instances for `Solo` when building with `ghc-prim-0.7` or
+  later.
 * Support deriving `TextShow(1)(2)` instances for data types with fields
   of type `Int32#` or `Word32#` on GHC 8.2 or later.
 
