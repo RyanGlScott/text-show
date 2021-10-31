@@ -1,4 +1,4 @@
-### 3.9.3 [????.??.??]
+### 3.9.3 [2021.10.31]
 * Allow building with GHC 9.2.
 * Drop support for GHC 7.4 and 7.6.
 * Add `TextShow(1)` instances for `Solo` when building with `ghc-prim-0.7` or
