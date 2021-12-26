@@ -17,6 +17,8 @@ module Instances.Data.Floating () where
 import Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
+#if !(MIN_VERSION_text(2,0,0))
 deriving instance Bounded FPFormat
+#endif
 instance Arbitrary FPFormat where
     arbitrary = arbitraryBoundedEnum

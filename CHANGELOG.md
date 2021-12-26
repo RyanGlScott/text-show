@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Allow the test suite to build with `text-2.0.*`.
+
 ### 3.9.3 [2021.10.31]
 * Allow building with GHC 9.2.
 * Drop support for GHC 7.4 and 7.6.
