@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.9.4 [2021.12.26]
 * Allow the test suite to build with `text-2.0.*` and
   `transformers-compat-0.7.1`.
 
