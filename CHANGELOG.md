@@ -1,5 +1,6 @@
 ### next [????.??.??]
-* Allow the test suite to build with `text-2.0.*`.
+* Allow the test suite to build with `text-2.0.*` and
+  `transformers-compat-0.7.1`.
 
 ### 3.9.3 [2021.10.31]
 * Allow building with GHC 9.2.

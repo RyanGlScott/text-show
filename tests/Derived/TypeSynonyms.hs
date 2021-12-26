@@ -72,9 +72,13 @@ newtype instance TyFamily a b = TyFamily
 -------------------------------------------------------------------------------
 
 #if !(MIN_VERSION_base(4,9,0))
+-- TODO: Delete this code once we depend on transformers-compat-0.7.1 as the
+-- minimum
+# if !(MIN_VERSION_transformers_compat(0,7,1))
 $(deriveShow1 ''(,,,))
-# if defined(NEW_FUNCTOR_CLASSES)
+#  if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''(,,,))
+#  endif
 # endif
 #endif
 
