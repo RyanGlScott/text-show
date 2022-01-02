@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.9.5 [2022.01.03]
 * Work around a GHC 8.0–specific issue in which GHC's simplifier ticks would
   become exhausted, causing compilation to fail.
 
