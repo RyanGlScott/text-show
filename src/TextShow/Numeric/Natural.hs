@@ -18,17 +18,15 @@ Portability: GHC
 module TextShow.Numeric.Natural () where
 
 #if MIN_VERSION_base(4,15,0)
+import GHC.Exts (Word(..))
 import GHC.Num (integerFromNatural)
 import GHC.Num.Natural (Natural(..))
-#elif MIN_VERSION_base(4,8,0)
+#elif MIN_VERSION_base(4,8,0) && defined(MIN_VERSION_integer_gmp)
+import GHC.Exts (Word(..))
 import GHC.Integer.GMP.Internals (Integer(..))
 import GHC.Natural (Natural(..))
 #else
 import Numeric.Natural.Compat (Natural)
-#endif
-
-#if MIN_VERSION_base(4,8,0)
-import GHC.Exts (Word(..))
 #endif
 
 import TextShow.Classes (TextShow(..))
@@ -39,7 +37,7 @@ instance TextShow Natural where
 #if MIN_VERSION_base(4,15,0)
     showbPrec p (NS w) = showbPrec p (W# w)
     showbPrec p n      = showbPrec p (integerFromNatural n)
-#elif MIN_VERSION_base(4,8,0)
+#elif MIN_VERSION_base(4,8,0) && defined(MIN_VERSION_integer_gmp)
     showbPrec _ (NatS# w#)  = showb $ W# w#
     showbPrec p (NatJ# bn)  = showbPrec p $ Jp# bn
 #else

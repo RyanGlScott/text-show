@@ -1,6 +1,7 @@
 ### next [????.??.??]
 * `text-show` no longer depends on `integer-gmp` when built with GHC 9.0 or
-  later.
+  later. When building with older versions of GHC, the `integer-gmp` dependency
+  can be toggled by disabling the `integer-gmp` `cabal` flag.
 
 ### 3.9.5 [2022.01.03]
 * Work around a GHC 8.0–specific issue in which GHC's simplifier ticks would
