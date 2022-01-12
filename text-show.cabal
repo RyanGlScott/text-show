@@ -75,6 +75,13 @@ flag new-functor-classes
                        a different version of Data.Functor.Classes.
   default:             True
 
+flag integer-gmp
+  description:         When building with a version of GHC older than 9.0,
+                       depend on the @integer-gmp@ library. You can disable
+                       this if you do not wish to link against GMP, but at the
+                       expense of having a slower @TextShow Natural@ instance.
+  default:             True
+
 library
   exposed-modules:     TextShow
                        TextShow.Control.Applicative
@@ -187,10 +194,7 @@ library
 
   -- integer-gmp is only needed on pre-9.0 versions of GHC, as GHC 9.0+ add
   -- enough functionality to base to avoid the use of integer-gmp entirely.
-  -- Ideally, one would be able to choose between integer-gmp and
-  -- integer-simple on pre-9.0 versions of GHC, but that is not currently
-  -- possible due to #31.
-  if !impl(ghc >= 9.0)
+  if !impl(ghc >= 9.0) && flag(integer-gmp)
     build-depends:     integer-gmp
 
   hs-source-dirs:      src, shared
