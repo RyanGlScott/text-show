@@ -162,7 +162,6 @@ library
                      , containers            >= 0.1    && < 0.7
                      , generic-deriving      >= 1.14.1 && < 2
                      , ghc-prim
-                     , integer-gmp
                      , text                  >= 0.11.1 && < 2.1
                      , th-abstraction        >= 0.4    && < 0.5
                      , th-lift               >= 0.7.6  && < 1
@@ -185,6 +184,14 @@ library
     cpp-options:       "-DNEW_FUNCTOR_CLASSES"
   else
     build-depends:     transformers          == 0.4.*
+
+  -- integer-gmp is only needed on pre-9.0 versions of GHC, as GHC 9.0+ add
+  -- enough functionality to base to avoid the use of integer-gmp entirely.
+  -- Ideally, one would be able to choose between integer-gmp and
+  -- integer-simple on pre-9.0 versions of GHC, but that is not currently
+  -- possible due to #31.
+  if !impl(ghc >= 9.0)
+    build-depends:     integer-gmp
 
   hs-source-dirs:      src, shared
   default-language:    Haskell2010
