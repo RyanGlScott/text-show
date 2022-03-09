@@ -21,7 +21,7 @@ module Instances.Data.Typeable () where
 
 #if MIN_VERSION_base(4,9,0)
 import GHC.Types (TyCon(..), TrName(..), Module(..))
-# if WORD_SIZE_IN_BITS < 64
+# if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
 import GHC.Word (Word64(..))
 # else
 import GHC.Word (Word(..))
@@ -115,7 +115,7 @@ instance Arbitrary TypeRep where
 instance Arbitrary TyCon where
 #if MIN_VERSION_base(4,9,0)
     arbitrary = do
-# if WORD_SIZE_IN_BITS < 64
+# if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
         W64# w1# <- arbitrary
         W64# w2# <- arbitrary
 # else
