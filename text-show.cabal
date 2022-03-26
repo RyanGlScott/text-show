@@ -202,6 +202,8 @@ library
   ghc-options:         -Wall
   if impl(ghc >= 8.6)
     ghc-options:       -Wno-star-is-type
+  if impl(ghc >= 9.0)
+    ghc-options:       -fenable-th-splice-warnings
   include-dirs:        include
   includes:            generic.h
 
@@ -383,6 +385,8 @@ test-suite spec
   ghc-options:         -Wall -threaded -rtsopts
   if impl(ghc >= 8.6)
     ghc-options:       -Wno-star-is-type
+  if impl(ghc >= 9.0)
+    ghc-options:       -fenable-th-splice-warnings
   include-dirs:        include
   includes:            generic.h
                      , overlap.h
