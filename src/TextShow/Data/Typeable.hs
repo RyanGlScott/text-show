@@ -156,11 +156,11 @@ splitApps :: TypeRep a -> (TyCon, [SomeTypeRep])
 splitApps = go []
   where
     go :: [SomeTypeRep] -> TypeRep a -> (TyCon, [SomeTypeRep])
-    go xs (Con tc)  = (tc, xs)
-    go xs (App f x) = go (SomeTypeRep x : xs) f
     go [] (Fun a b) = (funTyCon, [SomeTypeRep a, SomeTypeRep b])
     go _  (Fun _ _) =
         errorWithoutStackTrace "Data.Typeable.Internal.splitApps: Impossible"
+    go xs (Con tc)  = (tc, xs)
+    go xs (App f x) = go (SomeTypeRep x : xs) f
 
 funTyCon :: TyCon
 funTyCon = typeRepTyCon (typeRep @(->))
