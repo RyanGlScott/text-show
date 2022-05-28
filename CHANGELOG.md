@@ -1,5 +1,6 @@
 ### next [????.??.??]
 * Allow the test suite to build with GHC 9.4.
+* Allow building with `transformers-0.6.*`.
 
 ### 3.9.6 [2022.01.14]
 * `text-show` no longer depends on `integer-gmp` when built with GHC 9.0 or

@@ -186,7 +186,7 @@ library
     build-depends:     template-haskell      >= 2.9  && < 2.11
 
   if flag(new-functor-classes)
-    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.6)
+    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.7)
                      , transformers-compat   >= 0.5 && < 1
     cpp-options:       "-DNEW_FUNCTOR_CLASSES"
   else
@@ -375,7 +375,7 @@ test-suite spec
     build-depends:     base                  >= 4.7 && < 4.9
 
   if flag(new-functor-classes)
-    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.6)
+    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.7)
     cpp-options:       "-DNEW_FUNCTOR_CLASSES"
   else
     build-depends:     transformers          == 0.4.*
