@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.9.7 [2022.05.28]
 * Allow the test suite to build with GHC 9.4.
 * Allow building with `transformers-0.6.*`.
 
