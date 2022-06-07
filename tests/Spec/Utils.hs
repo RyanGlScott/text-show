@@ -49,7 +49,7 @@ matchesTextShowSpec _ = prop "TextShow instance" (prop_matchesTextShow :: Int ->
 -- | Verifies that a type's 'Show' instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 prop_matchesTextShow :: (Show a, TextShow a) => Int -> a -> Expectation
-prop_matchesTextShow p x = fromString (showsPrec p x "") `shouldBe` showbPrec p x
+prop_matchesTextShow p x = showbPrec p x `shouldBe` fromString (showsPrec p x "")
 
 -- | Expect a type's 'Show1' instances to coincide for both 'String's and 'Text',
 -- irrespective of precedence.
@@ -61,7 +61,7 @@ matchesTextShow1Spec _ = prop "TextShow1 instance" (prop_matchesTextShow1 :: Int
 -- | Verifies that a type's 'Show1' instances coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 prop_matchesTextShow1 :: (Show1 f, Show a, TextShow1 f, TextShow a) => Int -> f a -> Expectation
-prop_matchesTextShow1 p x = fromString (showsPrec1 p x "") `shouldBe` showbPrec1 p x
+prop_matchesTextShow1 p x = showbPrec1 p x `shouldBe` fromString (showsPrec1 p x "")
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Expect a type's 'Show2' instances to coincide for both 'String's and 'Text',
@@ -76,7 +76,7 @@ matchesTextShow2Spec _ = prop "TextShow2 instance" (prop_matchesTextShow2 :: Int
 -- irrespective of precedence.
 prop_matchesTextShow2 :: (Show2 f, Show a, Show b, TextShow2 f, TextShow a, TextShow b)
                       => Int -> f a b -> Expectation
-prop_matchesTextShow2 p x = fromString (showsPrec2 p x "") `shouldBe` showbPrec2 p x
+prop_matchesTextShow2 p x = showbPrec2 p x `shouldBe` fromString (showsPrec2 p x "")
 #endif
 
 -- | Expect a type's 'TextShow' instance to coincide with the output produced
