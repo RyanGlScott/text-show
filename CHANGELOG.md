@@ -1,3 +1,48 @@
+## 3.10 [????.??.??]
+* The instances in `TextShow.FromStringTextShow` module have been scaled back
+  somewhat for forward compatibility with Core Libraries proposal #10, which
+  will add quantified `Show` superclasses to `Show1` and `Show2`:
+  * `FromStringShow` and `FromTextShow` no longer have `Show1` or `TextShow1`
+    instances. If you want to derive instances of `Show1` or `TextShow1` via
+    a newtype, use `FromStringShow1` or `FromTextShow1` instead.
+  * The `Show` instances for `FromTextShow1` and `FromTextShow2` have had their
+    instance contexts changed to accommodate the new superclasses in `Show1`
+    and `Show2`:
+
+    ```diff
+    -instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a)
+    +instance (TextShow1 f, Show a)     => Show (FromTextShow1 f a)
+
+    -instance (TextShow2 f, TextShow a, TextShow b) => Show (FromTextShow2 f a b)
+    +instance (TextShow2 f, Show a,     Show b)     => Show (FromTextShow2 f a b)
+    ```
+
+    While these instances do technically work, they are probably not what you
+    would have in mind if you wanted to derive a `Show` instance purely in
+    terms of `TextShow` classes. For this reason, if you want to derive an
+    instance of `Show` via a newtype, use `FromTextShow` instead.
+  * By similar reasoning, the `Show1` instance for `FromTextShow2` has had its
+    instance context changed:
+
+    ```diff
+    -instance (TextShow2 f, TextShow a) => Show1 (FromTextShow2 f a)
+    +instance (TextShow2 f, Show a)     => Show1 (FromTextShow2 f a)
+    ```
+  * By similar reasoning, the `TextShow` instances for `FromStringShow1` and
+    `FromStringShow2`, as well as the `TextShow1` instance for
+    `FromStringShow2`, have had their instance contexts changed:
+
+    ```diff
+    -instance (Show1 f, Show a)     => TextShow (FromStringShow1 f a)
+    +instance (Show1 f, TextShow a) => TextShow (FromStringShow1 f a)
+
+    -instance (Show2 f, Show a,     Show b)     => TextShow (FromStringShow2 f a b)
+    +instance (Show2 f, TextShow a, TextShow b) => TextShow (FromStringShow2 f a b)
+
+    -instance (Show2 f, Show a)     => TextShow1 (FromStringShow2 f a)
+    +instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a)
+    ```
+
 ### 3.9.7 [2022.05.28]
 * Allow the test suite to build with GHC 9.4.
 * Allow building with `transformers-0.6.*`.

@@ -45,7 +45,7 @@ import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
                                     deriveBitraversable)
 import           Data.Coerce (coerce)
 import           Data.Data (Data, Typeable)
-import           Data.Functor.Classes (Show1(..))
+import           Data.Functor.Classes (Show1(..), showsPrec1)
 
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
@@ -67,7 +67,7 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showbToShows, showsToShowb)
 
 #if defined(NEW_FUNCTOR_CLASSES)
-import           Data.Functor.Classes (Show2(..), showsPrec1, showsPrec2)
+import           Data.Functor.Classes (Show2(..), showsPrec2)
 #else
 import           Text.Show (showListWith)
 #endif
@@ -114,26 +114,6 @@ instance Show a => Show (FromStringShow a) where
     show      = coerce (show      :: a -> String)
     showList  = coerce (showList  :: [a] -> ShowS)
 
-instance Show1 FromStringShow where
-#if defined(NEW_FUNCTOR_CLASSES)
-    liftShowList  _  sl   = sl   . coerceList
-      where
-        coerceList :: [FromStringShow a] -> [a]
-        coerceList = coerce
-    liftShowsPrec sp _ p = sp p . fromStringShow
-#else
-    showsPrec1 p = showsPrec p . fromStringShow
-#endif
-
-instance TextShow1 FromStringShow where
-    liftShowbPrec sp' _ p =
-        showsPrecToShowbPrec (showbPrecToShowsPrec sp') p . fromStringShow
-
-    liftShowbList _ sl' = showsToShowb (showbToShows sl') . coerceList
-      where
-        coerceList :: [FromStringShow a] -> [a]
-        coerceList = coerce
-
 -------------------------------------------------------------------------------
 
 -- | An adapter newtype, suitable for @DerivingVia@.
@@ -171,27 +151,6 @@ instance TextShow a => Show (FromTextShow a) where
     showsPrec p = showbPrecToShowsPrec showbPrec p . fromTextShow
     show (FromTextShow x) = showbToShows showb x ""
     showList l = showbToShows showbList (coerce l :: [a])
-
-instance Show1 FromTextShow where
-#if defined(NEW_FUNCTOR_CLASSES)
-    liftShowList _ sl = showbToShows (showsToShowb sl) . coerceList
-      where
-        coerceList :: [FromTextShow a] -> [a]
-        coerceList = coerce
-    liftShowsPrec sp _ p
-      = showbPrecToShowsPrec (showsPrecToShowbPrec sp) p . fromTextShow
-#else
-    showsPrec1 p
-      = showbPrecToShowsPrec (showsPrecToShowbPrec showsPrec) p . fromTextShow
-#endif
-
-instance TextShow1 FromTextShow where
-    liftShowbPrec sp' _ p = sp' p . fromTextShow
-
-    liftShowbList _ sl' = sl' . coerceList
-      where
-        coerceList :: [FromTextShow a] -> [a]
-        coerceList = coerce
 
 -------------------------------------------------------------------------------
 
@@ -244,11 +203,14 @@ instance Read (f a) => Read (FromStringShow1 f a) where
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
-instance (Show1 f, Show a) => TextShow (FromStringShow1 f a) where
-    showbPrec = liftShowbPrec (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
-    showbList = liftShowbList (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'Show1' constraint with a 'TextShow' constraint. This is done for
+-- consistency with the 'Show' instance for 'FromTextShow1', which mixes
+-- constraints in a similar way to satisfy superclass constraints. See the
+-- Haddocks on the 'Show' instance for 'FromTextShow1' for more details.
+instance (Show1 f, TextShow a) => TextShow (FromStringShow1 f a) where
+    showbPrec = showbPrec1
 
 -- | Not available if using @transformers-0.4@
 instance Show1 f => TextShow1 (FromStringShow1 f) where
@@ -318,11 +280,19 @@ instance Read (f a) => Read (FromTextShow1 f a) where
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
-instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a) where
-    showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
-    showList  = liftShowList  (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'TextShow1' constraint with a 'Show' constraint. The 'Show' constraint is
+-- necessary to satisfy the quantified 'Show' superclass in 'Show1'. Really,
+-- the 'Show' constraint ought to be a 'TextShow' constraint instead, but GHC
+-- has no way of knowing that the 'TextShow' constraint can be converted to a
+-- 'Show' constraint when checking superclasses.
+--
+-- This is all to say: this instance is almost surely not what you want if you
+-- are looking to derive a 'Show' instance only via 'TextShow'-related
+-- classes. If you wish to do this, derive via 'FromTextShow' instead.
+instance (TextShow1 f, Show a) => Show (FromTextShow1 f a) where
+  showsPrec = showsPrec1
 #endif
 
 instance TextShow1 f => Show1 (FromTextShow1 f) where
@@ -399,18 +369,25 @@ instance Read (f a b) => Read (FromStringShow2 f a b) where
 deriving instance Show2 f => Show2 (FromStringShow2 f)
 
 -- | Not available if using @transformers-0.4@
-instance (Show2 f, Show a, Show b) => TextShow (FromStringShow2 f a b) where
-    showbPrec = liftShowbPrec (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
-    showbList = liftShowbList (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'Show2' constraint with 'TextShow' constraints. This is done for consistency
+-- with the 'Show' instance for 'FromTextShow2', which mixes constraints in a
+-- similar way to satisfy superclass constraints. See the Haddocks on the
+-- 'Show' instance for 'FromTextShow2' for more details.
+instance (Show2 f, TextShow a, TextShow b) => TextShow (FromStringShow2 f a b) where
+    showbPrec = showbPrec2
 
 -- | Not available if using @transformers-0.4@
-instance (Show2 f, Show a) => TextShow1 (FromStringShow2 f a) where
-    liftShowbPrec = liftShowbPrec2 (showsPrecToShowbPrec showsPrec)
-                                   (showsToShowb showList)
-    liftShowbList = liftShowbList2 (showsPrecToShowbPrec showsPrec)
-                                   (showsToShowb showList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'Show2' constraint with a 'TextShow' constraint. This is done for
+-- consistency with the 'Show1' instance for 'FromTextShow2', which mixes
+-- constraints in a similar way to satisfy superclass constraints. See the
+-- Haddocks on the 'Show1' instance for 'FromTextShow2' for more details.
+instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a) where
+    liftShowbPrec = liftShowbPrec2 showbPrec showbList
+    liftShowbList = liftShowbList2 showbPrec showbList
 
 -- | Not available if using @transformers-0.4@
 instance Show2 f => TextShow2 (FromStringShow2 f) where
@@ -492,18 +469,35 @@ instance Read (f a b) => Read (FromTextShow2 f a b) where
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
-instance (TextShow2 f, TextShow a, TextShow b) => Show (FromTextShow2 f a b) where
-    showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
-    showList  = liftShowList  (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'TextShow2' constraint with 'Show' constraints. The 'Show' constraints are
+-- necessary to satisfy the quantified 'Show' superclass in 'Show2'. Really,
+-- the 'Show' constraints ought to be 'TextShow' constraints instead, but GHC
+-- has no way of knowing that the 'TextShow' constraints can be converted to
+-- 'Show' constraints when checking superclasses.
+--
+-- This is all to say: this instance is almost surely not what you want if you
+-- are looking to derive a 'Show' instance only via 'TextShow'-related
+-- classes. If you wish to do this, derive via 'FromTextShow' instead.
+instance (TextShow2 f, Show a, Show b) => Show (FromTextShow2 f a b) where
+  showsPrec = showsPrec2
 
 -- | Not available if using @transformers-0.4@
-instance (TextShow2 f, TextShow a) => Show1 (FromTextShow2 f a) where
-    liftShowsPrec = liftShowsPrec2 (showbPrecToShowsPrec showbPrec)
-                                   (showbToShows         showbList)
-    liftShowList = liftShowList2 (showbPrecToShowsPrec showbPrec)
-                                 (showbToShows         showbList)
+--
+-- This instance is somewhat strange, as its instance context mixes a
+-- 'TextShow2' constraint with a 'Show' constraint. The 'Show' constraint is
+-- necessary to satisfy the quantified 'Show' superclass in 'Show2'. Really,
+-- the 'Show' constraint ought to be a 'TextShow' constraint instead, but GHC
+-- has no way of knowing that the 'TextShow' constraint can be converted to a
+-- 'Show' constraint when checking superclasses.
+--
+-- This is all to say: this instance is almost surely not what you want if you
+-- are looking to derive a 'Show1' instance only via 'TextShow'-related
+-- classes. If you wish to do this, derive via 'FromTextShow1' instead.
+instance (TextShow2 f, Show a) => Show1 (FromTextShow2 f a) where
+    liftShowsPrec = liftShowsPrec2 showsPrec showList
+    liftShowList = liftShowList2 showsPrec showList
 
 -- | Not available if using @transformers-0.4@
 instance TextShow2 f => Show2 (FromTextShow2 f) where
