@@ -2,6 +2,10 @@
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE StandaloneDeriving         #-}
+#if __GLASGOW_HASKELL__ >= 806
+{-# LANGUAGE QuantifiedConstraints      #-}
+#endif
+
 {-|
 Module:      TextShow.Classes
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -392,7 +396,11 @@ showbToShowtl sf = toLazyText . sf
 -- | Lifting of the 'TextShow' class to unary type constructors.
 --
 -- /Since: 2/
-class TextShow1 f where
+class
+#if __GLASGOW_HASKELL__ >= 806
+  (forall a. TextShow a => TextShow (f a)) =>
+#endif
+  TextShow1 f where
     -- | 'showbPrec' function for an application of the type constructor
     -- based on 'showbPrec' and 'showbList' functions for the argument type.
     --
@@ -457,7 +465,11 @@ liftShowtlPrec sp sl = showbPrecToShowtlPrec $ liftShowbPrec (showtlPrecToShowbP
 -- | Lifting of the 'TextShow' class to binary type constructors.
 --
 -- /Since: 2/
-class TextShow2 f where
+class
+#if __GLASGOW_HASKELL__ >= 806
+  (forall a b. (TextShow a, TextShow b) => TextShow (f a b)) =>
+#endif
+  TextShow2 f where
     -- | 'showbPrec' function for an application of the type constructor
     -- based on 'showbPrec' and 'showbList' functions for the argument types.
     --

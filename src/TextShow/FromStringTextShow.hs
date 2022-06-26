@@ -19,6 +19,8 @@
 #endif
 
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 {-|
 Module:      TextShow.FromStringTextShow
@@ -43,9 +45,10 @@ module TextShow.FromStringTextShow (
 
 import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
                                     deriveBitraversable)
-import           Data.Coerce (coerce)
+import           Data.Coerce (Coercible, coerce)
 import           Data.Data (Data, Typeable)
 import           Data.Functor.Classes (Show1(..))
+import           Data.Text.Lazy.Builder (Builder)
 
 #if !defined(__LANGUAGE_DERIVE_GENERIC1__)
 import qualified Generics.Deriving.TH as Generics
@@ -104,6 +107,15 @@ instance Read a => Read (FromStringShow a) where
     readList     = coerce (readList     :: ReadS [a])
     readListPrec = coerce (readListPrec :: ReadPrec [a])
 
+type ShowBuilderPrec a = Int -> a -> Builder
+type ShowStringPrec a = Int -> a -> ShowS
+
+showsPrecToShowbPrec' :: ShowStringPrec a -> ShowBuilderPrec (FromStringShow a)
+showsPrecToShowbPrec' sp = \p -> showsPrecToShowbPrec sp p . fromStringShow
+
+showsToShowb' :: (a -> ShowS) -> FromStringShow a -> Builder
+showsToShowb' s (FromStringShow x) = showsToShowb s x
+
 instance Show a => TextShow (FromStringShow a) where
     showbPrec p = showsPrecToShowbPrec showsPrec p . fromStringShow
     showb = showsToShowb shows . fromStringShow
@@ -125,6 +137,7 @@ instance Show1 FromStringShow where
     showsPrec1 p = showsPrec p . fromStringShow
 #endif
 
+#if 0
 instance TextShow1 FromStringShow where
     liftShowbPrec sp' _ p =
         showsPrecToShowbPrec (showbPrecToShowsPrec sp') p . fromStringShow
@@ -133,6 +146,7 @@ instance TextShow1 FromStringShow where
       where
         coerceList :: [FromStringShow a] -> [a]
         coerceList = coerce
+#endif
 
 -------------------------------------------------------------------------------
 
@@ -167,11 +181,18 @@ instance Read a => Read (FromTextShow a) where
     readList     = coerce (readList     :: ReadS [a])
     readListPrec = coerce (readListPrec :: ReadPrec [a])
 
+showbPrecToShowsPrec' :: ShowBuilderPrec a -> ShowStringPrec (FromTextShow a)
+showbPrecToShowsPrec' sp = \p -> showbPrecToShowsPrec sp p . fromTextShow
+
+showbToShows' :: (a -> Builder) -> FromTextShow a -> ShowS
+showbToShows' s (FromTextShow x) = showbToShows s x
+
 instance TextShow a => Show (FromTextShow a) where
-    showsPrec p = showbPrecToShowsPrec showbPrec p . fromTextShow
-    show (FromTextShow x) = showbToShows showb x ""
+    showsPrec = showbPrecToShowsPrec' showbPrec
+    show x = showbToShows' showb x ""
     showList l = showbToShows showbList (coerce l :: [a])
 
+#if 0
 instance Show1 FromTextShow where
 #if defined(NEW_FUNCTOR_CLASSES)
     liftShowList _ sl = showbToShows (showsToShowb sl) . coerceList
@@ -183,6 +204,7 @@ instance Show1 FromTextShow where
 #else
     showsPrec1 p
       = showbPrecToShowsPrec (showsPrecToShowbPrec showsPrec) p . fromTextShow
+#endif
 #endif
 
 instance TextShow1 FromTextShow where
@@ -207,27 +229,29 @@ instance TextShow1 FromTextShow where
 -- @
 --
 -- /Since: 3/
-newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
-  deriving ( Eq
-           , Ord
-           , Generic
+newtype FromStringShow1 f a = FromStringShow1
+  { fromStringShow1 :: FromStringShow (f (FromTextShow a))
+  }
+  deriving ( Generic
 #if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 #endif
 #if __GLASGOW_HASKELL__ >= 800
-           , Data
            , Foldable
            , Functor
-           , Lift
-           , Show1 -- TODO: Manually implement this when you
-                   -- can derive Show1 (someday)
            , Traversable
 #endif
            )
 
-#if __GLASGOW_HASKELL__ < 800
+deriving instance Eq      (f (FromTextShow a)) => Eq    (FromStringShow1 f a)
+deriving instance Ord     (f (FromTextShow a)) => Ord   (FromStringShow1 f a)
+deriving instance Lift    (f (FromTextShow a)) => Lift  (FromStringShow1 f a)
+deriving instance ( Typeable f, Typeable a
+                  , Data  (f (FromTextShow a))
+                  ) => Data  (FromStringShow1 f a)
+
 -- TODO: Manually implement this when you can derive Show1 (someday)
-deriving instance Show1       f => Show1       (FromStringShow1 f)
+#if __GLASGOW_HASKELL__ < 800
 deriving instance Functor     f => Functor     (FromStringShow1 f)
 deriving instance Foldable    f => Foldable    (FromStringShow1 f)
 deriving instance Traversable f => Traversable (FromStringShow1 f)
@@ -236,38 +260,53 @@ deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromStringShow1 f (a :: *))
 #endif
 
-instance Read (f a) => Read (FromStringShow1 f a) where
-    readPrec     = coerce (readPrec     :: ReadPrec (f a))
-    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a))
-    readList     = coerce (readList     :: ReadS [f a])
-    readListPrec = coerce (readListPrec :: ReadPrec [f a])
+mapFst :: (a -> c) -> (a, b) -> (c, b)
+mapFst f (a, b) = (f a, b)
+
+mapReadS :: (a -> b) -> ReadS a -> ReadS b
+mapReadS = fmap . fmap . mapFst
+
+instance (Read (f a), Functor f) => Read (FromStringShow1 f a) where
+    readPrec     = coerce $ (fmap . fmap)            FromTextShow (readPrec     :: ReadPrec (f a))
+    readsPrec    = coerce $ (fmap . mapReadS . fmap) FromTextShow (readsPrec    :: Int -> ReadS (f a))
+    readList     = coerce $ (mapReadS . fmap . fmap) FromTextShow (readList     :: ReadS [f a])
+    readListPrec = coerce $ (fmap . fmap . fmap)     FromTextShow (readListPrec :: ReadPrec [f a])
 
 #if defined(NEW_FUNCTOR_CLASSES)
+
 -- | Not available if using @transformers-0.4@
-instance (Show1 f, Show a) => TextShow (FromStringShow1 f a) where
-    showbPrec = liftShowbPrec (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
-    showbList = liftShowbList (showsPrecToShowbPrec showsPrec)
-                              (showsToShowb showList)
+instance (Show1 f, TextShow a) => TextShow (FromStringShow1 f a) where
+    showbPrec = liftShowbPrec showbPrec showbList
+    showbList = liftShowbList showbPrec showbList
 
 -- | Not available if using @transformers-0.4@
 instance Show1 f => TextShow1 (FromStringShow1 f) where
     liftShowbPrec sp sl p =
-        showsPrecToShowbPrec (liftShowsPrec (showbPrecToShowsPrec sp)
-                                            (showbToShows         sl))
-                             p . fromStringShow1
+        showsPrecToShowbPrec'
+            (liftShowsPrec
+                (showbPrecToShowsPrec' sp)
+                (showbToShows'         sl . (coerce :: [FromTextShow a] -> FromTextShow [a])))
+            p . fromStringShow1
     liftShowbList sp sl =
-        showsToShowb (liftShowList (showbPrecToShowsPrec sp)
-                                   (showbToShows         sl))
-                     . coerceList
+        showsToShowb'
+            (liftShowList
+                (showbPrecToShowsPrec' sp)
+                (showbToShows'         sl . (coerce :: [FromTextShow a] -> FromTextShow [a])))
+            . coerceList
       where
-        coerceList :: [FromStringShow1 f a] -> [f a]
+        coerceList :: [FromStringShow1 f a] -> FromStringShow [f (FromTextShow a)]
         coerceList = coerce
 #endif
 
-instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
-    showsPrec = showsPrec1
-    showList  = liftShowList showsPrec showList
+contraShowS :: (b -> a) -> (a -> ShowS) -> (b -> ShowS)
+contraShowS f s = s . f
+
+contraShowsPrec :: (b -> a) -> ShowStringPrec a -> ShowStringPrec b
+contraShowsPrec = fmap . contraShowS
+
+instance (Show (f a), Functor f) => Show (FromStringShow1 f a) where
+    showsPrec = coerce $ (contraShowsPrec . fmap)    fromTextShow (showsPrec :: ShowStringPrec (f a))
+    showList  = coerce $ (contraShowS . fmap . fmap) fromTextShow (showList  :: [f a] -> ShowS)
 
 -------------------------------------------------------------------------------
 
@@ -283,25 +322,28 @@ instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
 -- @
 --
 -- /Since: 3/
-newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
-  deriving ( Eq
-           , Ord
-           , Generic
+newtype FromTextShow1 f a = FromTextShow1
+  { fromTextShow1 :: FromTextShow (f (FromStringShow a))
+  }
+  deriving ( Generic
 #if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
 #endif
 #if __GLASGOW_HASKELL__ >= 800
-           , Data
            , Foldable
            , Functor
-           , Lift
-           , TextShow1
            , Traversable
 #endif
            )
 
+deriving instance Eq      (f (FromStringShow a)) => Eq    (FromTextShow1 f a)
+deriving instance Ord     (f (FromStringShow a)) => Ord   (FromTextShow1 f a)
+deriving instance Lift    (f (FromStringShow a)) => Lift  (FromTextShow1 f a)
+deriving instance ( Typeable f, Typeable a
+                  , Data  (f (FromStringShow a))
+                  ) => Data  (FromTextShow1 f a)
+
 #if __GLASGOW_HASKELL__ < 800
-deriving instance TextShow1   f => TextShow1   (FromTextShow1 f)
 deriving instance Functor     f => Functor     (FromTextShow1 f)
 deriving instance Foldable    f => Foldable    (FromTextShow1 f)
 deriving instance Traversable f => Traversable (FromTextShow1 f)
@@ -310,41 +352,63 @@ deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromTextShow1 f (a :: *))
 #endif
 
-instance Read (f a) => Read (FromTextShow1 f a) where
-    readPrec     = coerce (readPrec     :: ReadPrec (f a))
-    readsPrec    = coerce (readsPrec    :: Int -> ReadS (f a))
-    readList     = coerce (readList     :: ReadS [f a])
-    readListPrec = coerce (readListPrec :: ReadPrec [f a])
+instance (Read (f a), Functor f) => Read (FromTextShow1 f a) where
+    readPrec     = coerce $ (fmap . fmap)            FromStringShow (readPrec     :: ReadPrec (f a))
+    readsPrec    = coerce $ (fmap . mapReadS . fmap) FromStringShow (readsPrec    :: Int -> ReadS (f a))
+    readList     = coerce $ (mapReadS . fmap . fmap) FromStringShow (readList     :: ReadS [f a])
+    readListPrec = coerce $ (fmap . fmap . fmap)     FromStringShow (readListPrec :: ReadPrec [f a])
 
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
-instance (TextShow1 f, TextShow a) => Show (FromTextShow1 f a) where
-    showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
-    showList  = liftShowList  (showbPrecToShowsPrec showbPrec)
-                              (showbToShows showbList)
+instance (TextShow1 f, Show a) => Show (FromTextShow1 f a) where
+    showsPrec = liftShowsPrec showsPrec showList
+    showList  = liftShowList showsPrec showList
+
+ourLiftShowsPrec
+    :: TextShow1 f
+    => (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> FromTextShow1 f a -> ShowS
+ourLiftShowsPrec sp sl p
+      = showbPrecToShowsPrec'
+          (liftShowbPrec
+              (showsPrecToShowbPrec' sp)
+              (showsToShowb'         sl . (coerce :: [FromStringShow a] -> FromStringShow [a])))
+          p . fromTextShow1
+
+ourLiftShowList
+    :: TextShow1 f
+    => (Int -> a -> ShowS) -> ([a] -> ShowS) -> [FromTextShow1 f a] -> ShowS
+ourLiftShowList sp sl =
+        showbToShows'
+            (liftShowbList
+                (showsPrecToShowbPrec' sp)
+                (showsToShowb'         sl . (coerce :: [FromStringShow a] -> FromStringShow [a])))
+            . coerceList
+      where
+        coerceList :: [FromTextShow1 f a] -> FromTextShow [f (FromStringShow a)]
+        coerceList = coerce
+
 #endif
 
-instance TextShow1 f => Show1 (FromTextShow1 f) where
+instance (TextShow1 f) => Show1 (FromTextShow1 f) where
 #if defined(NEW_FUNCTOR_CLASSES)
-    liftShowList sp sl =
-        showbToShows (liftShowbList (showsPrecToShowbPrec sp)
-                                    (showsToShowb         sl))
-                     . coerceList
-      where
-        coerceList :: [FromTextShow1 f a] -> [f a]
-        coerceList = coerce
-    liftShowsPrec sp sl p
+    liftShowList = ourLiftShowList
+    liftShowsPrec = ourLiftShowsPrec
 #else
     showsPrec1 p
-#endif
       = showbPrecToShowsPrec (liftShowbPrec (showsPrecToShowbPrec sp)
                                             (showsToShowb         sl))
                              p . fromTextShow1
+#endif
 
-instance (TextShow1 f, TextShow a) => TextShow (FromTextShow1 f a) where
-    showbPrec = showbPrec1
-    showbList = liftShowbList showbPrec showbList
+contraBuilder :: (b -> a) -> (a -> Builder) -> (b -> Builder)
+contraBuilder f s = s . f
+
+contraShowbPrec :: (b -> a) -> ShowBuilderPrec a -> ShowBuilderPrec b
+contraShowbPrec = fmap . contraBuilder
+
+instance (TextShow (f a), Functor f) => TextShow (FromTextShow1 f a) where
+    showbPrec = coerce $ (contraShowbPrec . fmap)      fromStringShow (showbPrec :: ShowBuilderPrec (f a))
+    showbList = coerce $ (contraBuilder . fmap . fmap) fromStringShow (showbList :: [f a] -> Builder)
 
 -------------------------------------------------------------------------------
 
@@ -493,35 +557,51 @@ instance Read (f a b) => Read (FromTextShow2 f a b) where
 #if defined(NEW_FUNCTOR_CLASSES)
 -- | Not available if using @transformers-0.4@
 instance (TextShow2 f, TextShow a, TextShow b) => Show (FromTextShow2 f a b) where
-    showsPrec = liftShowsPrec (showbPrecToShowsPrec showbPrec)
+    showsPrec = ourLiftShowsPrec1 (showbPrecToShowsPrec showbPrec)
                               (showbToShows showbList)
-    showList  = liftShowList  (showbPrecToShowsPrec showbPrec)
+    showList  = ourLiftShowList1  (showbPrecToShowsPrec showbPrec)
                               (showbToShows showbList)
 
--- | Not available if using @transformers-0.4@
-instance (TextShow2 f, TextShow a) => Show1 (FromTextShow2 f a) where
-    liftShowsPrec = liftShowsPrec2 (showbPrecToShowsPrec showbPrec)
-                                   (showbToShows         showbList)
-    liftShowList = liftShowList2 (showbPrecToShowsPrec showbPrec)
-                                 (showbToShows         showbList)
+ourLiftShowsPrec1
+    :: (TextShow2 f, TextShow a) => (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> FromTextShow2 f a b -> ShowS
+ourLiftShowsPrec1 = ourLiftShowsPrec2 (showbPrecToShowsPrec showbPrec)
+                               (showbToShows         showbList)
+
+ourLiftShowList1
+    :: (TextShow2 f, TextShow a) => (Int -> b -> ShowS) -> ([b] -> ShowS) -> [FromTextShow2 f a b] -> ShowS
+ourLiftShowList1 = ourLiftShowList2 (showbPrecToShowsPrec showbPrec)
+                             (showbToShows         showbList)
 
 -- | Not available if using @transformers-0.4@
-instance TextShow2 f => Show2 (FromTextShow2 f) where
-    liftShowsPrec2 sp1 sl1 sp2 sl2 p =
-        showbPrecToShowsPrec (liftShowbPrec2 (showsPrecToShowbPrec sp1)
-                                             (showsToShowb         sl1)
-                                             (showsPrecToShowbPrec sp2)
-                                             (showsToShowb         sl2))
-                             p . fromTextShow2
-    liftShowList2 sp1 sl1 sp2 sl2 =
-        showbToShows (liftShowbList2 (showsPrecToShowbPrec sp1)
-                                     (showsToShowb         sl1)
-                                     (showsPrecToShowbPrec sp2)
-                                     (showsToShowb         sl2))
-                     . coerceList
-      where
-        coerceList :: [FromTextShow2 f a b] -> [f a b]
-        coerceList = coerce
+instance (TextShow2 f, TextShow a, forall b. Show b => TextShow b) => Show1 (FromTextShow2 f a) where
+    liftShowsPrec = ourLiftShowsPrec1
+    liftShowList = ourLiftShowList1
+
+ourLiftShowsPrec2
+    :: TextShow2 f => (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> Int -> FromTextShow2 f a b -> ShowS
+ourLiftShowsPrec2 sp1 sl1 sp2 sl2 p =
+    showbPrecToShowsPrec (liftShowbPrec2 (showsPrecToShowbPrec sp1)
+                                         (showsToShowb         sl1)
+                                         (showsPrecToShowbPrec sp2)
+                                         (showsToShowb         sl2))
+                         p . fromTextShow2
+
+ourLiftShowList2
+    :: TextShow2 f => (Int -> a -> ShowS) -> ([a] -> ShowS) -> (Int -> b -> ShowS) -> ([b] -> ShowS) -> [FromTextShow2 f a b] -> ShowS
+ourLiftShowList2 sp1 sl1 sp2 sl2 =
+    showbToShows (liftShowbList2 (showsPrecToShowbPrec sp1)
+                                 (showsToShowb         sl1)
+                                 (showsPrecToShowbPrec sp2)
+                                 (showsToShowb         sl2))
+                 . coerceList
+  where
+    coerceList :: [FromTextShow2 f a b] -> [f a b]
+    coerceList = coerce
+
+-- | Not available if using @transformers-0.4@
+instance (TextShow2 f) => Show2 (FromTextShow2 f) where
+    liftShowsPrec2 = ourLiftShowsPrec2
+    liftShowList2 = ourLiftShowList2
 #endif
 
 instance (TextShow2 f, TextShow a, TextShow b) => TextShow (FromTextShow2 f a b) where
