@@ -42,6 +42,8 @@
     -instance (Show2 f, Show a)     => TextShow1 (FromStringShow2 f a)
     +instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a)
     ```
+* Add a `TextShow` instance for `ByteArray` from `Data.Array.Byte` when
+  building with `base-4.17.0.0` or later.
 
 ### 3.9.7 [2022.05.28]
 * Allow the test suite to build with GHC 9.4.

@@ -18,6 +18,7 @@ import TextShow.Control.Exception     ()
 import TextShow.Control.Monad.ST      ()
 
 import TextShow.Data.Array            ()
+import TextShow.Data.Array.Byte       ()
 import TextShow.Data.Bool             ()
 import TextShow.Data.ByteString       ()
 import TextShow.Data.Char             ()

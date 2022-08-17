@@ -89,6 +89,7 @@ library
                        TextShow.Control.Exception
                        TextShow.Control.Monad.ST
                        TextShow.Data.Array
+                       TextShow.Data.Array.Byte
                        TextShow.Data.Bool
                        TextShow.Data.ByteString
                        TextShow.Data.Char
@@ -277,6 +278,7 @@ test-suite spec
                        Spec.Control.ExceptionSpec
                        Spec.Control.Monad.STSpec
                        Spec.Data.ArraySpec
+                       Spec.Data.Array.ByteSpec
                        Spec.Data.BoolSpec
                        Spec.Data.ByteStringSpec
                        Spec.Data.CharSpec
@@ -361,7 +363,7 @@ test-suite spec
                      , ghc-prim
                      , hspec                 >= 2      && < 3
                      , QuickCheck            >= 2.12   && < 2.15
-                     , quickcheck-instances  >= 0.3.26 && < 0.4
+                     , quickcheck-instances  >= 0.3.28 && < 0.4
                      , template-haskell      >= 2.9    && < 2.20
                      , text                  >= 0.11.1 && < 2.1
                      , text-show
