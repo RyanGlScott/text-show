@@ -42,6 +42,7 @@
     -instance (Show2 f, Show a)     => TextShow1 (FromStringShow2 f a)
     +instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a)
     ```
+* TODO RGS: Mention `TextShow.Generic` rework
 * Add a `TextShow` instance for `ByteArray` from `Data.Array.Byte` when
   building with `base-4.17.0.0` or later.
 
