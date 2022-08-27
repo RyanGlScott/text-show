@@ -51,9 +51,6 @@ module TextShow.Generic (
 
       -- * Generic @show@ functions
       -- $generics
-
-      -- ** Understanding a compiler error
-      -- $generic_err
     , genericShowt
     , genericShowtl
     , genericShowtPrec
@@ -150,30 +147,6 @@ instance 'TextShow' a => 'TextShow' (D a) where
 instance 'TextShow1' D where
     'liftShowbPrec' = 'genericLiftShowbPrec'
 @
--}
-
-{- $generic_err
-
-Suppose you intend to define a 'TextShow' instance via 'FromGeneric':
-
-@
-data Oops = Oops
-  deriving 'TextShow' via 'FromGeneric' Oops
-    -- forgot to add \"deriving Generic\" here!
-@
-
-If you forget to add a @deriving 'Generic'@ clause to your data type, at
-compile-time, you might get an error message that begins roughly as follows:
-
-@
-No instance for ('GTextShowB' 'Zero' ('Rep' Oops))
-@
-
-This error can be confusing, but don't let it intimidate you. The correct fix is
-simply to add the missing \"@deriving 'Generic'@\" clause.
-
-Similarly, if the compiler complains about not having an instance for @('GTextShowB'
-'One' ('Rep1' Oops1))@, add a \"@deriving 'Generic1'@\" clause.
 -}
 
 -- | An adapter newtype, suitable for @DerivingVia@.
