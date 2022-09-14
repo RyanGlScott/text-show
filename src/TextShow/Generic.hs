@@ -70,24 +70,24 @@ module TextShow.Generic (
       -- ** 'Builder'
     , GTextShowB(..)
     , GTextShowConB(..)
-    , ShowFunsB(..)
+    , GTextShowB1(..)
+    , GTextShowConB1(..)
       -- ** Strict 'TS.Text'
     , GTextShowT(..)
     , GTextShowConT(..)
-    , ShowFunsT(..)
+    , GTextShowT1(..)
+    , GTextShowConT1(..)
       -- ** Lazy 'TL.Text'
     , GTextShowTL(..)
     , GTextShowConTL(..)
-    , ShowFunsTL(..)
+    , GTextShowTL1(..)
+    , GTextShowConTL1(..)
       -- ** Other internals
     , IsNullary(..)
     , ConType(..)
-    , Zero
-    , One
     ) where
 
 import           Data.Data (Data, Typeable)
-import           Data.Functor.Contravariant.Compat (Contravariant(..))
 import qualified Data.Text    as TS (Text, pack, singleton)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, pack, singleton)
@@ -176,7 +176,7 @@ newtype FromGeneric a = FromGeneric { fromGeneric :: a }
            )
 
 -- | /Since: 3.7.4/
-instance (Generic a, GTextShowB Zero (Rep a)) => TextShow (FromGeneric a) where
+instance (Generic a, GTextShowB (Rep a ())) => TextShow (FromGeneric a) where
   showbPrec p = genericShowbPrec p . fromGeneric
 
 -- | An adapter newtype, suitable for @DerivingVia@.
@@ -210,104 +210,108 @@ deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromGeneric1 f (a :: *))
 
 -- | /Since: 3.7.4/
-instance (Generic1 f, GTextShowB One (Rep1 f)) => TextShow1 (FromGeneric1 f) where
+instance (Generic1 f, GTextShowB1 (Rep1 f)) => TextShow1 (FromGeneric1 f) where
   liftShowbPrec sp sl p = genericLiftShowbPrec sp sl p . fromGeneric1
 
 -- | A 'Generic' implementation of 'showt'.
 --
 -- /Since: 2/
-genericShowt :: (Generic a, GTextShowT Zero (Rep a)) => a -> TS.Text
+genericShowt :: (Generic a, GTextShowT (Rep a ())) => a -> TS.Text
 genericShowt = genericShowtPrec 0
 
 -- | A 'Generic' implementation of 'showtl'.
 --
 -- /Since: 2/
-genericShowtl :: (Generic a, GTextShowTL Zero (Rep a)) => a -> TL.Text
+genericShowtl :: (Generic a, GTextShowTL (Rep a ())) => a -> TL.Text
 genericShowtl = genericShowtlPrec 0
 
 -- | A 'Generic' implementation of 'showPrect'.
 --
 -- /Since: 2/
-genericShowtPrec :: (Generic a, GTextShowT Zero (Rep a)) => Int -> a -> TS.Text
-genericShowtPrec p = gShowtPrec NoShowFunsT p . from
+genericShowtPrec :: (Generic a, GTextShowT (Rep a ())) => Int -> a -> TS.Text
+genericShowtPrec p = gShowtPrec p . fromRepUnit
 
 -- | A 'Generic' implementation of 'showtlPrec'.
 --
 -- /Since: 2/
-genericShowtlPrec :: (Generic a, GTextShowTL Zero (Rep a)) => Int -> a -> TL.Text
-genericShowtlPrec p = gShowtlPrec NoShowFunsTL p . from
+genericShowtlPrec :: (Generic a, GTextShowTL (Rep a ())) => Int -> a -> TL.Text
+genericShowtlPrec p = gShowtlPrec p . fromRepUnit
 
 -- | A 'Generic' implementation of 'showtList'.
 --
 -- /Since: 2/
-genericShowtList :: (Generic a, GTextShowT Zero (Rep a)) => [a] -> TS.Text
+genericShowtList :: (Generic a, GTextShowT (Rep a ())) => [a] -> TS.Text
 genericShowtList = showtListWith genericShowt
 
 -- | A 'Generic' implementation of 'showtlList'.
 --
 -- /Since: 2/
-genericShowtlList :: (Generic a, GTextShowTL Zero (Rep a)) => [a] -> TL.Text
+genericShowtlList :: (Generic a, GTextShowTL (Rep a ())) => [a] -> TL.Text
 genericShowtlList = showtlListWith genericShowtl
 
 -- | A 'Generic' implementation of 'showb'.
 --
 -- /Since: 2/
-genericShowb :: (Generic a, GTextShowB Zero (Rep a)) => a -> Builder
+genericShowb :: (Generic a, GTextShowB (Rep a ())) => a -> Builder
 genericShowb = genericShowbPrec 0
 
 -- | A 'Generic' implementation of 'showbPrec'.
 --
 -- /Since: 2/
-genericShowbPrec :: (Generic a, GTextShowB Zero (Rep a)) => Int -> a -> Builder
-genericShowbPrec p = gShowbPrec NoShowFunsB p . from
+genericShowbPrec :: (Generic a, GTextShowB (Rep a ())) => Int -> a -> Builder
+genericShowbPrec p = gShowbPrec p . fromRepUnit
 
 -- | A 'Generic' implementation of 'showbList'.
 --
 -- /Since: 2/
-genericShowbList :: (Generic a, GTextShowB Zero (Rep a)) => [a] -> Builder
+genericShowbList :: (Generic a, GTextShowB (Rep a ())) => [a] -> Builder
 genericShowbList = showbListWith genericShowb
 
 -- | A 'Generic' implementation of 'printT'.
 --
 -- /Since: 2/
-genericPrintT :: (Generic a, GTextShowT Zero (Rep a)) => a -> IO ()
+genericPrintT :: (Generic a, GTextShowT (Rep a ())) => a -> IO ()
 genericPrintT = TS.putStrLn . genericShowt
 
 -- | A 'Generic' implementation of 'printTL'.
 --
 -- /Since: 2/
-genericPrintTL :: (Generic a, GTextShowTL Zero (Rep a)) => a -> IO ()
+genericPrintTL :: (Generic a, GTextShowTL (Rep a ())) => a -> IO ()
 genericPrintTL = TL.putStrLn . genericShowtl
 
 -- | A 'Generic' implementation of 'hPrintT'.
 --
 -- /Since: 2/
-genericHPrintT :: (Generic a, GTextShowT Zero (Rep a)) => Handle -> a -> IO ()
+genericHPrintT :: (Generic a, GTextShowT (Rep a ())) => Handle -> a -> IO ()
 genericHPrintT h = TS.hPutStrLn h . genericShowt
 
 -- | A 'Generic' implementation of 'hPrintTL'.
 --
 -- /Since: 2/
-genericHPrintTL :: (Generic a, GTextShowTL Zero (Rep a)) => Handle -> a -> IO ()
+genericHPrintTL :: (Generic a, GTextShowTL (Rep a ())) => Handle -> a -> IO ()
 genericHPrintTL h = TL.hPutStrLn h . genericShowtl
 
 -- | A 'Generic1' implementation of 'genericLiftShowbPrec'.
 --
 -- /Since: 2/
-genericLiftShowbPrec :: (Generic1 f, GTextShowB One (Rep1 f))
+genericLiftShowbPrec :: (Generic1 f, GTextShowB1 (Rep1 f))
                      => (Int -> a -> Builder) -> ([a] -> Builder)
                      -> Int -> f a -> Builder
-genericLiftShowbPrec sp sl p = gShowbPrec (Show1FunsB sp sl) p . from1
+genericLiftShowbPrec sp sl p = gLiftShowbPrec sp sl p . from1
 
 -- | A 'Generic'/'Generic1' implementation of 'showbPrec1'.
 --
 -- /Since: 2/
 genericShowbPrec1 :: ( Generic a, Generic1 f
-                     , GTextShowB Zero (Rep  a)
-                     , GTextShowB One  (Rep1 f)
+                     , GTextShowB (Rep a ())
+                     , GTextShowB1 (Rep1 f)
                      )
                   => Int -> f a -> Builder
 genericShowbPrec1 = genericLiftShowbPrec genericShowbPrec genericShowbList
+
+-- | A type-specialized version of 'from' used to assist type inference.
+fromRepUnit :: Generic a => a -> Rep a ()
+fromRepUnit = from
 
 -------------------------------------------------------------------------------
 
@@ -328,16 +332,6 @@ data ConType = Rec | Tup | Pref | Inf String
 #endif
            )
 
--- | A type-level indicator that 'TextShow' is being derived generically.
---
--- /Since: 3.2/
-data Zero
-
--- | A type-level indicator that 'TextShow1' is being derived generically.
---
--- /Since: 3.2/
-data One
-
 {-
 I'm not particularly proud of the code below. The issue is that we need to be able to
 generically work over Builders, strict Text, and lazy Text. We could just work
@@ -354,217 +348,326 @@ times, once for each Text/Builder variant. At some point, I should replace this 
 See #33.
 -}
 
+hashPrec :: Int -> Int
 #if __GLASGOW_HASKELL__ >= 711
-#define HASH_FUNS(text_type,one_hash,two_hash,hash_prec,from_char,from_string) \
-one_hash, two_hash :: text_type; \
-hash_prec :: Int -> Int;         \
-one_hash  = from_char '#';       \
-two_hash  = from_string "##";    \
-hash_prec = const 0
+hashPrec = const 0
 #else
-#define HASH_FUNS(text_type,one_hash,two_hash,hash_prec,from_char,from_string) \
-one_hash, two_hash :: text_type; \
-hash_prec :: Int -> Int;         \
-one_hash  = mempty;              \
-two_hash  = mempty;              \
-hash_prec = id
+hashPrec = id
 #endif
 
-#define GTEXT_SHOW(text_type,show_funs,no_show_funs,show1_funs,one_hash,two_hash,hash_prec,gtext_show,gshow_prec,gtext_show_con,gshow_prec_con,show_prec,lift_show_prec,show_space,show_paren,show_list_with,from_char,from_string) \
-{- | A 'show_funs' value either stores nothing (for 'TextShow') or it stores            \
-the two function arguments that show occurrences of the type parameter (for             \
-'TextShow1').                                                                           \
+#if __GLASGOW_HASKELL__ >= 711
+#define HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string) \
+one_hash, two_hash :: text_type; \
+one_hash  = from_char '#';       \
+two_hash  = from_string "##";
+#else
+#define HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string) \
+one_hash, two_hash :: text_type; \
+one_hash  = mempty;              \
+two_hash  = mempty;
+#endif
+
+#define GTEXT_SHOW(text_type,show_funs,one_hash,two_hash,gtext_show,gtext_show1,gshow_prec,glift_show_prec,gtext_show_con,gtext_show_con1,gshow_prec_con,glift_show_prec_con,show_prec,lift_show_prec,show_space,show_paren,show_list,show_list_with,from_char,from_string,c1_show_prec,s1_show_prec,product_show_prec,u_char_show_prec,u_double_show_prec,u_float_show_prec,u_int_show_prec,u_word_show_prec) \
+{- | Class of generic representation types that can be converted to a                   \
+'text_type'.                                                                            \
                                                                                         \
-/Since: 3.4/                                                                            \
+/Since: 3.10/                                                                           \
 -};                                                                                     \
-data show_funs arity a where {                                                          \
-    no_show_funs :: show_funs Zero a                                                    \
-  ; show1_funs   :: (Int -> a -> text_type) -> ([a] -> text_type) -> show_funs One a    \
- } deriving Typeable;                                                                   \
-                                                                                        \
-instance Contravariant (show_funs arity) where {                                        \
-    contramap _ no_show_funs       = no_show_funs                                       \
-  ; contramap f (show1_funs sp sl) = show1_funs (\p -> sp p . f) (sl . map f)           \
- };                                                                                     \
-                                                                                        \
-{- | Class of generic representation types that can be converted to                     \
-a 'text_type'. The @arity@ type variable indicates which type class is                  \
-used. @'gtext_show' 'Zero'@ indicates 'TextShow' behavior, and                          \
-@'gtext_show' 'One'@ indicates 'TextShow1' behavior.                                    \
-                                                                                        \
-/Since: 3.4/                                                                            \
--};                                                                                     \
-class gtext_show arity f where {                                                        \
-    {- | This is used as the default generic implementation of 'show_prec' (if the      \
-    @arity@ is 'Zero') or 'lift_show_prec' (if the @arity@ is 'One').                   \
-    -}                                                                                  \
-  ; gshow_prec :: show_funs arity a -> Int -> f a -> text_type                          \
- };                                                                                     \
-                                                                                        \
+class gtext_show a where {                                                              \
+  ; gshow_prec :: Int -> a -> text_type                                                 \
+};                                                                                      \
 deriving instance Typeable gtext_show;                                                  \
                                                                                         \
-instance gtext_show arity f => gtext_show arity (D1 d f) where {                        \
-    gshow_prec sfs p (M1 x) = gshow_prec sfs p x                                        \
- };                                                                                     \
+instance gtext_show (f p) => gtext_show (D1 d f p) where {                              \
+  ; gshow_prec p (M1 x) = gshow_prec p x                                                \
+};                                                                                      \
                                                                                         \
-instance gtext_show arity V1 where {                                                    \
-    gshow_prec _ _ x = case x of {}                                                     \
- };                                                                                     \
+instance gtext_show (V1 p) where {                                                      \
+  ; gshow_prec _ x = case x of {}                                                       \
+};                                                                                      \
                                                                                         \
-instance (gtext_show arity f, gtext_show arity g) => gtext_show arity (f :+: g) where { \
-    gshow_prec sfs p (L1 x) = gshow_prec sfs p x                                        \
-  ; gshow_prec sfs p (R1 x) = gshow_prec sfs p x                                        \
- };                                                                                     \
+instance (gtext_show (f p), gtext_show (g p))                                           \
+      => gtext_show ((f :+: g) p) where {                                               \
+  ; gshow_prec p (L1 x) = gshow_prec p x                                                \
+  ; gshow_prec p (R1 x) = gshow_prec p x                                                \
+};                                                                                      \
                                                                                         \
-instance (Constructor c, gtext_show_con arity f, IsNullary f)                           \
-      => gtext_show arity (C1 c f) where {                                              \
-    gshow_prec sfs p c@(M1 x) = case fixity of {                                        \
-        Prefix -> show_paren ( p > appPrec                                              \
-                               && not (isNullary x || conIsTuple c)                     \
-                             ) $                                                        \
-               (if conIsTuple c                                                         \
-                   then mempty                                                          \
-                   else let cn = conName c                                              \
-                        in show_paren (isInfixDataCon cn) $ from_string cn)             \
-            <> (if isNullary x || conIsTuple c                                          \
-                   then mempty                                                          \
-                   else from_char ' ')                                                  \
-            <> showbBraces t (gshow_prec_con t sfs appPrec1 x)                          \
-      ; Infix _ m -> show_paren (p > m) $ gshow_prec_con t sfs (m+1) x                  \
-      }                                                                                 \
-    where {                                                                             \
-        fixity :: Fixity                                                                \
-      ; fixity = conFixity c                                                            \
-                                                                                        \
-      ; t :: ConType                                                                    \
-      ; t = if conIsRecord c                                                            \
-            then Rec                                                                    \
-            else case conIsTuple c of {                                                 \
-                True  -> Tup                                                            \
-              ; False -> case fixity of {                                               \
-                    Prefix    -> Pref                                                   \
-                  ; Infix _ _ -> Inf $ conName c                                        \
-                };                                                                      \
-              }                                                                         \
-                                                                                        \
-      ; showbBraces :: ConType -> text_type -> text_type                                \
-      ; showbBraces Rec     b = from_char '{' <> b <> from_char '}'                     \
-      ; showbBraces Tup     b = from_char '(' <> b <> from_char ')'                     \
-      ; showbBraces Pref    b = b                                                       \
-      ; showbBraces (Inf _) b = b                                                       \
-                                                                                        \
-      ; conIsTuple :: C1 c f p -> Bool                                                  \
-      ; conIsTuple = isTupleString . conName                                            \
-     };                                                                                 \
- };                                                                                     \
+instance (Constructor c, gtext_show_con (f p), IsNullary f)                             \
+    => gtext_show (C1 c f p) where {                                                    \
+  gshow_prec = c1_show_prec gshow_prec_con                                              \
+};                                                                                      \
                                                                                         \
 {- | Class of generic representation types for which the 'ConType' has been             \
-determined. The @arity@ type variable indicates which type class is                     \
-used. @'gtext_show_con' 'Zero'@ indicates 'TextShow' behavior, and                      \
-@'gtext_show_con' 'One'@ indicates 'TextShow1' behavior.                                \
--};                                                                                     \
-class gtext_show_con arity f where {                                                    \
-    {- | Convert value of a specific 'ConType' to a 'text_type' with the given          \
-    precedence.                                                                         \
-    -}                                                                                  \
-  ; gshow_prec_con :: ConType -> show_funs arity a -> Int -> f a -> text_type           \
- };                                                                                     \
+determined.                                                                             \
                                                                                         \
+/Since: 3.10/                                                                           \
+-};                                                                                     \
+class gtext_show_con a where {                                                          \
+  ; gshow_prec_con :: ConType -> Int -> a -> text_type                                  \
+};                                                                                      \
 deriving instance Typeable gtext_show_con;                                              \
                                                                                         \
-instance gtext_show_con arity U1 where {                                                \
-    gshow_prec_con _ _ _ U1 = mempty                                                    \
- };                                                                                     \
+instance gtext_show_con (U1 p) where {                                                  \
+  ; gshow_prec_con _ _ U1 = mempty                                                      \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con One Par1 where {                                                \
-    gshow_prec_con _ (show1_funs sp _) p (Par1 x) = sp p x                              \
- };                                                                                     \
+instance TextShow p => gtext_show_con (Par1 p) where {                                  \
+  ; gshow_prec_con _ p (Par1 x) = show_prec p x                                         \
+};                                                                                      \
                                                                                         \
-instance TextShow c => gtext_show_con arity (K1 i c) where {                            \
-    gshow_prec_con _ _ p (K1 x) = show_prec p x                                         \
- };                                                                                     \
+instance TextShow c => gtext_show_con (K1 i c p) where {                                \
+  ; gshow_prec_con _ p (K1 x) = show_prec p x                                           \
+};                                                                                      \
                                                                                         \
-instance TextShow1 f => gtext_show_con One (Rec1 f) where {                             \
-    gshow_prec_con _ (show1_funs sp sl) p (Rec1 x) = lift_show_prec sp sl p x           \
- };                                                                                     \
+instance (TextShow1 f, TextShow p) => gtext_show_con (Rec1 f p) where {                 \
+  ; gshow_prec_con _ p (Rec1 x) = lift_show_prec show_prec show_list p x                \
+};                                                                                      \
                                                                                         \
-instance (Selector s, gtext_show_con arity f) => gtext_show_con arity (S1 s f) where {  \
-    gshow_prec_con t sfs p sel@(M1 x)                                                   \
-      | selName sel == "" = gshow_prec_con t sfs p x                                    \
-      | otherwise         = infixRec                                                    \
-                            <> " = "                                                    \
-                            <> gshow_prec_con t sfs 0 x                                 \
-      where {                                                                           \
-        infixRec :: text_type                                                           \
-      ; infixRec | isSymVar selectorName                                                \
-                 = from_char '(' <> from_string selectorName <> from_char ')'           \
-                 | otherwise                                                            \
-                 = from_string selectorName                                             \
+instance (Selector s, gtext_show_con (f p)) => gtext_show_con (S1 s f p) where {        \
+  ; gshow_prec_con t = s1_show_prec $ gshow_prec_con t                                  \
+};                                                                                      \
                                                                                         \
-      ; selectorName :: String                                                          \
-      ; selectorName = selName sel                                                      \
-      }                                                                                 \
- };                                                                                     \
+instance (gtext_show_con (f p), gtext_show_con (g p))                                   \
+      => gtext_show_con ((f :*: g) p) where {                                           \
+  ; gshow_prec_con t = product_show_prec (gshow_prec_con t) (gshow_prec_con t) t        \
+};                                                                                      \
                                                                                         \
-instance (gtext_show_con arity f, gtext_show_con arity g)                               \
-      => gtext_show_con arity (f :*: g) where {                                         \
-    gshow_prec_con t@Rec sfs _ (a :*: b) =                                              \
-           gshow_prec_con t sfs 0 a                                                     \
-        <> ", "                                                                         \
-        <> gshow_prec_con t sfs 0 b                                                     \
-  ; gshow_prec_con t@(Inf o) sfs p (a :*: b) =                                          \
-           gshow_prec_con t sfs p a                                                     \
-        <> show_space                                                                   \
-        <> infixOp                                                                      \
-        <> show_space                                                                   \
-        <> gshow_prec_con t sfs p b                                                     \
-      where {                                                                           \
-        infixOp :: text_type                                                            \
-      ; infixOp = if isInfixDataCon o                                                   \
-                     then from_string o                                                 \
-                     else from_char '`' <> from_string o <> from_char '`'               \
-      }                                                                                 \
-  ; gshow_prec_con t@Tup sfs _ (a :*: b) =                                              \
-           gshow_prec_con t sfs 0 a                                                     \
-        <> from_char ','                                                                \
-        <> gshow_prec_con t sfs 0 b                                                     \
-  ; gshow_prec_con t@Pref sfs p (a :*: b) =                                             \
-           gshow_prec_con t sfs p a                                                     \
-        <> show_space                                                                   \
-        <> gshow_prec_con t sfs p b                                                     \
- };                                                                                     \
-                                                                                        \
-instance (TextShow1 f, gtext_show_con One g) => gtext_show_con One (f :.: g) where {    \
-    gshow_prec_con t sfs p (Comp1 x) =                                                  \
-      let gspc = gshow_prec_con t sfs                                                   \
+instance (TextShow1 f, gtext_show_con (g p)) => gtext_show_con ((f :.: g) p) where {    \
+  ; gshow_prec_con t p (Comp1 x) =                                                      \
+      let gspc = gshow_prec_con t                                                       \
       in lift_show_prec gspc (show_list_with (gspc 0)) p x                              \
- };                                                                                     \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con arity UChar where {                                             \
-    gshow_prec_con _ _ p (UChar c)   = show_prec (hash_prec p) (C# c) <> one_hash       \
- };                                                                                     \
+instance gtext_show_con (UChar p) where {                                               \
+  ; gshow_prec_con _ = u_char_show_prec show_prec                                       \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con arity UDouble where {                                           \
-    gshow_prec_con _ _ p (UDouble d) = show_prec (hash_prec p) (D# d) <> two_hash       \
- };                                                                                     \
+instance gtext_show_con (UDouble p) where {                                             \
+  ; gshow_prec_con _ = u_double_show_prec show_prec                                     \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con arity UFloat where {                                            \
-    gshow_prec_con _ _ p (UFloat f)  = show_prec (hash_prec p) (F# f) <> one_hash       \
- };                                                                                     \
+instance gtext_show_con (UFloat p) where {                                              \
+  ; gshow_prec_con _ = u_float_show_prec show_prec                                      \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con arity UInt where {                                              \
-    gshow_prec_con _ _ p (UInt i)    = show_prec (hash_prec p) (I# i) <> one_hash       \
- };                                                                                     \
+instance gtext_show_con (UInt p) where {                                                \
+  ; gshow_prec_con _ = u_int_show_prec show_prec                                        \
+};                                                                                      \
                                                                                         \
-instance gtext_show_con arity UWord where {                                             \
-    gshow_prec_con _ _ p (UWord w)   = show_prec (hash_prec p) (W# w) <> two_hash       \
- };                                                                                     \
+instance gtext_show_con (UWord p) where {                                               \
+  ; gshow_prec_con _ = u_word_show_prec show_prec                                       \
+};                                                                                      \
                                                                                         \
-HASH_FUNS(text_type,one_hash,two_hash,hash_prec,from_char,from_string);
+{- | Class of generic representation types for unary type constructors that can         \
+be converted to a 'text_type'.                                                          \
+                                                                                        \
+/Since: 3.10/                                                                           \
+-};                                                                                     \
+class gtext_show1 f where {                                                             \
+  ; glift_show_prec :: (Int -> a -> text_type) -> ([a] -> text_type)                    \
+                    -> Int -> f a -> text_type                                          \
+};                                                                                      \
+deriving instance Typeable gtext_show1;                                                 \
+                                                                                        \
+instance gtext_show1 f => gtext_show1 (D1 d f) where {                                  \
+  ; glift_show_prec sp sl p (M1 x) = glift_show_prec sp sl p x                          \
+};                                                                                      \
+                                                                                        \
+instance gtext_show1 V1 where {                                                         \
+  ; glift_show_prec _ _ _ x = case x of {}                                              \
+};                                                                                      \
+                                                                                        \
+instance (gtext_show1 f, gtext_show1 g) => gtext_show1 (f :+: g) where {                \
+  ; glift_show_prec sp sl p (L1 x) = glift_show_prec sp sl p x                          \
+  ; glift_show_prec sp sl p (R1 x) = glift_show_prec sp sl p x                          \
+};                                                                                      \
+                                                                                        \
+instance (Constructor c, gtext_show_con1 f, IsNullary f)                                \
+    => gtext_show1 (C1 c f) where {                                                     \
+  ; glift_show_prec sp sl = c1_show_prec $ glift_show_prec_con sp sl                    \
+};                                                                                      \
+                                                                                        \
+{- | Class of generic representation types for unary type constructors for which        \
+the 'ConType' has been determined.                                                      \
+                                                                                        \
+/Since: 3.10/                                                                           \
+-};                                                                                     \
+class gtext_show_con1 f where {                                                         \
+  ; glift_show_prec_con :: (Int -> a -> text_type) -> ([a] -> text_type)                \
+                        -> ConType -> Int -> f a -> text_type                           \
+};                                                                                      \
+deriving instance Typeable gtext_show_con1;                                             \
+                                                                                        \
+instance gtext_show_con1 U1 where {                                                     \
+  ; glift_show_prec_con _ _ _ _ U1 = mempty                                             \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 Par1 where {                                                   \
+  ; glift_show_prec_con sp _ _ p (Par1 x) = sp p x                                      \
+};                                                                                      \
+                                                                                        \
+instance TextShow c => gtext_show_con1 (K1 i c) where {                                 \
+  ; glift_show_prec_con _ _ _ p (K1 x) = show_prec p x                                  \
+};                                                                                      \
+                                                                                        \
+instance TextShow1 f => gtext_show_con1 (Rec1 f) where {                                \
+  ; glift_show_prec_con sp sl _ p (Rec1 x) = lift_show_prec sp sl p x                   \
+};                                                                                      \
+                                                                                        \
+instance (Selector s, gtext_show_con1 f) => gtext_show_con1 (S1 s f) where {            \
+  ; glift_show_prec_con sp sl t = s1_show_prec $ glift_show_prec_con sp sl t            \
+};                                                                                      \
+                                                                                        \
+instance (gtext_show_con1 f, gtext_show_con1 g)                                         \
+      => gtext_show_con1 (f :*: g) where {                                              \
+  ; glift_show_prec_con sp sl t =                                                       \
+      product_show_prec (glift_show_prec_con sp sl t) (glift_show_prec_con sp sl t) t   \
+};                                                                                      \
+                                                                                        \
+instance (TextShow1 f, gtext_show_con1 g) => gtext_show_con1 (f :.: g) where {          \
+  ; glift_show_prec_con sp sl t p (Comp1 x) =                                           \
+      let gspc = glift_show_prec_con sp sl t                                            \
+      in lift_show_prec gspc (show_list_with (gspc 0)) p x                              \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 UChar where {                                                  \
+  ; glift_show_prec_con _ _ _ = u_char_show_prec show_prec                              \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 UDouble where {                                                \
+  ; glift_show_prec_con _ _ _ = u_double_show_prec show_prec                            \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 UFloat where {                                                 \
+  ; glift_show_prec_con _ _ _ = u_float_show_prec show_prec                             \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 UInt where {                                                   \
+  ; glift_show_prec_con _ _ _ = u_int_show_prec show_prec                               \
+};                                                                                      \
+                                                                                        \
+instance gtext_show_con1 UWord where {                                                  \
+  ; glift_show_prec_con _ _ _ = u_word_show_prec show_prec                              \
+};                                                                                      \
+                                                                                        \
+c1_show_prec :: forall c f p.                                                           \
+                (Constructor c, IsNullary f)                                            \
+             => (ConType -> Int -> f p -> text_type)                                    \
+             -> Int -> C1 c f p -> text_type;                                           \
+c1_show_prec sp p c@(M1 x) = case fixity of {                                           \
+  ; Prefix -> show_paren ( p > appPrec                                                  \
+                           && not (isNullary x || conIsTuple c)                         \
+                         ) $                                                            \
+           (if conIsTuple c                                                             \
+               then mempty                                                              \
+               else let cn = conName c                                                  \
+                    in show_paren (isInfixDataCon cn) $ from_string cn)                 \
+        <> (if isNullary x || conIsTuple c                                              \
+               then mempty                                                              \
+               else from_char ' ')                                                      \
+        <> showBraces t (sp t appPrec1 x)                                               \
+  ; Infix _ m -> show_paren (p > m) $ sp t (m+1) x                                      \
+} where {                                                                               \
+    ; fixity :: Fixity                                                                  \
+    ; fixity = conFixity c                                                              \
+                                                                                        \
+    ; t :: ConType                                                                      \
+    ; t = if conIsRecord c                                                              \
+          then Rec                                                                      \
+          else case conIsTuple c of {                                                   \
+                 ; True  -> Tup                                                         \
+                 ; False -> case fixity of {                                            \
+                     ; Prefix    -> Pref                                                \
+                     ; Infix _ _ -> Inf $ conName c                                     \
+                     };                                                                 \
+                 };                                                                     \
+                                                                                        \
+    ; showBraces :: ConType -> text_type -> text_type                                   \
+    ; showBraces Rec     b = from_char '{' <> b <> from_char '}'                        \
+    ; showBraces Tup     b = from_char '(' <> b <> from_char ')'                        \
+    ; showBraces Pref    b = b                                                          \
+    ; showBraces (Inf _) b = b                                                          \
+                                                                                        \
+    ; conIsTuple :: C1 c f p -> Bool                                                    \
+    ; conIsTuple = isTupleString . conName                                              \
+  };                                                                                    \
+{-# INLINE c1_show_prec #-};                                                            \
+                                                                                        \
+s1_show_prec :: Selector s                                                              \
+             => (Int -> f p -> text_type)                                               \
+             -> Int -> S1 s f p -> text_type;                                           \
+s1_show_prec sp p sel@(M1 x)                                                            \
+  | selName sel == "" = sp p x                                                          \
+  | otherwise         = infixRec                                                        \
+                        <> " = "                                                        \
+                        <> sp 0 x                                                       \
+  where {                                                                               \
+    ; infixRec :: text_type                                                             \
+    ; infixRec | isSymVar selectorName                                                  \
+               = from_char '(' <> from_string selectorName <> from_char ')'             \
+               | otherwise                                                              \
+               = from_string selectorName                                               \
+                                                                                        \
+    ; selectorName :: String                                                            \
+    ; selectorName = selName sel                                                        \
+  };                                                                                    \
+{-# INLINE s1_show_prec #-};                                                            \
+                                                                                        \
+product_show_prec :: (Int -> f p -> text_type) -> (Int -> g p -> text_type)             \
+                  -> ConType -> Int -> (f :*: g) p -> text_type;                        \
+product_show_prec spf spg t p (a :*: b) =                                               \
+  case t of {                                                                           \
+    ; Rec ->                                                                            \
+           spf 0 a                                                                      \
+        <> ", "                                                                         \
+        <> spg 0 b                                                                      \
+    ; Inf o ->                                                                          \
+           spf p a                                                                      \
+        <> show_space                                                                   \
+        <> infixOp o                                                                    \
+        <> show_space                                                                   \
+        <> spg p b                                                                      \
+    ; Tup ->                                                                            \
+           spf 0 a                                                                      \
+        <> from_char ','                                                                \
+        <> spg 0 b                                                                      \
+    ; Pref ->                                                                           \
+           spf p a                                                                      \
+        <> show_space                                                                   \
+        <> spg p b                                                                      \
+  } where {                                                                             \
+      ; infixOp :: String -> text_type                                                  \
+      ; infixOp o = if isInfixDataCon o                                                 \
+                       then from_string o                                               \
+                       else from_char '`' <> from_string o <> from_char '`'             \
+  };                                                                                    \
+{-# INLINE product_show_prec #-};                                                       \
+                                                                                        \
+u_char_show_prec :: (Int -> Char -> text_type) -> Int -> UChar p -> text_type;          \
+u_char_show_prec sp p (UChar c) = sp (hashPrec p) (C# c) <> one_hash;                   \
+{-# INLINE u_char_show_prec #-};                                                        \
+                                                                                        \
+u_double_show_prec :: (Int -> Double -> text_type) -> Int -> UDouble p -> text_type;    \
+u_double_show_prec sp p (UDouble d) = sp (hashPrec p) (D# d) <> two_hash;               \
+{-# INLINE u_double_show_prec #-};                                                      \
+                                                                                        \
+u_float_show_prec :: (Int -> Float -> text_type) -> Int -> UFloat p -> text_type;       \
+u_float_show_prec sp p (UFloat f) = sp (hashPrec p) (F# f) <> one_hash;                 \
+{-# INLINE u_float_show_prec #-};                                                       \
+                                                                                        \
+u_int_show_prec :: (Int -> Int -> text_type) -> Int -> UInt p -> text_type;             \
+u_int_show_prec sp p (UInt i) = sp (hashPrec p) (I# i) <> one_hash;                     \
+{-# INLINE u_int_show_prec #-};                                                         \
+                                                                                        \
+u_word_show_prec :: (Int -> Word -> text_type) -> Int -> UWord p -> text_type;          \
+u_word_show_prec sp p (UWord w) = sp (hashPrec p) (W# w) <> two_hash;                   \
+{-# INLINE u_word_show_prec #-};                                                        \
+                                                                                        \
+HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string);
 
-GTEXT_SHOW(Builder,ShowFunsB,NoShowFunsB,Show1FunsB,oneHashB,twoHashB,hashPrecB,GTextShowB,gShowbPrec,GTextShowConB,gShowbPrecCon,showbPrec,liftShowbPrec,showbSpace,showbParen,showbListWith,TB.singleton,TB.fromString)
-GTEXT_SHOW(TS.Text,ShowFunsT,NoShowFunsT,Show1FunsT,oneHashT,twoHashT,hashPrecT,GTextShowT,gShowtPrec,GTextShowConT,gShowtPrecCon,showtPrec,liftShowtPrec,showtSpace,showtParen,showtListWith,TS.singleton,TS.pack)
-GTEXT_SHOW(TL.Text,ShowFunsTL,NoShowFunsTL,Show1FunsTL,oneHashTL,twoHashTL,hashPrecTL,GTextShowTL,gShowtlPrec,GTextShowConTL,gShowtlPrecCon,showtlPrec,liftShowtlPrec,showtlSpace,showtlParen,showtlListWith,TL.singleton,TL.pack)
+GTEXT_SHOW(Builder,ShowFunsB,oneHashB,twoHashB,GTextShowB,GTextShowB1,gShowbPrec,gLiftShowbPrec,GTextShowConB,GTextShowConB1,gShowbPrecCon,gLiftShowbPrecCon,showbPrec,liftShowbPrec,showbSpace,showbParen,showbList,showbListWith,TB.singleton,TB.fromString,c1ShowbPrec,s1ShowbPrec,productShowbPrec,uCharShowbPrec,uDoubleShowbPrec,uFloatShowbPrec,uIntShowbPrec,uWordShowbPrec)
+GTEXT_SHOW(TS.Text,ShowFunsT,oneHashT,twoHashT,GTextShowT,GTextShowT1,gShowtPrec,gLiftShowtPrec,GTextShowConT,GTextShowConT1,gShowtPrecCon,gLiftShowtPrecCon,showtPrec,liftShowtPrec,showtSpace,showtParen,showtList,showtListWith,TS.singleton,TS.pack,c1ShowtPrec,s1ShowtPrec,productShowtPrec,uCharShowtPrec,uDoubleShowtPrec,uFloatShowtPrec,uIntShowtPrec,uWordShowtPrec)
+GTEXT_SHOW(TL.Text,ShowFunsTL,oneHashTL,twoHashTL,GTextShowTL,GTextShowTL1,gShowtlPrec,gLiftShowtlPrec,GTextShowConTL,GTextShowConTL1,gShowtlPrecCon,gLiftShowtlPrecCon,showtlPrec,liftShowtlPrec,showtlSpace,showtlParen,showtlList,showtlListWith,TL.singleton,TL.pack,c1ShowtlPrec,s1ShowtlPrec,productShowtlPrec,uCharShowtlPrec,uDoubleShowtlPrec,uFloatShowtlPrec,uIntShowtlPrec,uWordShowtlPrec)
 
 -- | Class of generic representation types that represent a constructor with
 -- zero or more fields.

@@ -82,27 +82,27 @@ prop_matchesTextShow2 p x = showbPrec2 p x `shouldBe` fromString (showsPrec2 p x
 -- | Expect a type's 'TextShow' instance to coincide with the output produced
 -- by the equivalent 'Generic' functions.
 genericTextShowSpec :: forall a. (Arbitrary a, Show a, TextShow a,
-                                  Generic a, GTextShowB Zero (Rep a))
+                                  Generic a, GTextShowB (Rep a ()))
                     => Proxy a -> Spec
 genericTextShowSpec _ = prop "generic TextShow" (prop_genericTextShow  :: Int -> a -> Expectation)
 
 -- | Verifies that a type's 'TextShow' instance coincides with the output produced
 -- by the equivalent 'Generic' functions.
-prop_genericTextShow :: (TextShow a, Generic a, GTextShowB Zero (Rep a))
+prop_genericTextShow :: (TextShow a, Generic a, GTextShowB (Rep a ()))
                      => Int -> a -> Expectation
 prop_genericTextShow p x = showbPrec p x `shouldBe` genericShowbPrec p x
 
 -- | Expect a type's 'TextShow1' instance to coincide with the output produced
 -- by the equivalent 'Generic1' functions.
 genericTextShow1Spec :: forall f a. (Arbitrary (f a), Show (f a), TextShow1 f,
-                                     Generic1 f, GTextShowB One (Rep1 f), TextShow a)
+                                     Generic1 f, GTextShowB1 (Rep1 f), TextShow a)
                      => Proxy (f a) -> Spec
 genericTextShow1Spec _ = prop "generic TextShow1" (prop_genericTextShow1 :: Int -> f a -> Expectation)
 
 -- | Verifies that a type's 'TextShow1' instance coincides with the output produced
 -- by the equivalent 'Generic1' functions.
 prop_genericTextShow1 :: ( TextShow1 f, Generic1 f
-                         , GTextShowB One (Rep1 f), TextShow a
+                         , GTextShowB1 (Rep1 f), TextShow a
                          )
                       => Int -> f a -> Expectation
 prop_genericTextShow1 p x =
