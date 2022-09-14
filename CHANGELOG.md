@@ -42,6 +42,15 @@
     -instance (Show2 f, Show a)     => TextShow1 (FromStringShow2 f a)
     +instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a)
     ```
+* The `GTextShow*` classes in `TextShow.Generic`, which power generic
+  derivation of `TextShow` and `TextShow1` instances, have been split up to
+  facilitate the addition of a quantified superclass to `TextShow1`. Moreover,
+  the `ShowFuns*` data types, the `Zero` data type, and the `One data type have
+  been removed, as they are no longer necessary in light of this split.
+
+  Although this is a breaking API change, the changes should be invisible to
+  most users of the module, especially if your code only uses it to derive
+  `TextShow{,1}` instances.
 * Add a `TextShow` instance for `ByteArray` from `Data.Array.Byte` when
   building with `base-4.17.0.0` or later.
 
