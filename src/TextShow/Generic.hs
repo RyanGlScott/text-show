@@ -24,7 +24,11 @@
 {-# LANGUAGE UndecidableInstances  #-}
 
 #if __GLASGOW_HASKELL__ >= 800
-{-# LANGUAGE DeriveLift           #-}
+{-# LANGUAGE DeriveLift            #-}
+#endif
+
+#if __GLASGOW_HASKELL__ >= 806
+{-# LANGUAGE QuantifiedConstraints #-}
 #endif
 
 {-|
@@ -209,8 +213,21 @@ deriving instance Typeable FromGeneric1
 deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromGeneric1 f (a :: *))
 
+-- | /Since: 3.10/
+instance (Generic1 f, GTextShowB (Rep1 f a)) => TextShow (FromGeneric1 f a) where
+  showbPrec p = gShowbPrec p . from1 . fromGeneric1
+
 -- | /Since: 3.7.4/
-instance (Generic1 f, GTextShowB1 (Rep1 f)) => TextShow1 (FromGeneric1 f) where
+instance ( Generic1 f, GTextShowB1 (Rep1 f)
+#if __GLASGOW_HASKELL__ >= 806 && __GLASGOW_HASKELL__ < 902
+           -- Unfortunately, the quantified superclass for GTextShowB1 doesn't
+           -- work on pre-9.2 versions of GHC, perhaps due to
+           -- https://gitlab.haskell.org/ghc/ghc/-/issues/14860#note_454218.
+           -- Fortunately, we can make GHC come to its senses by using an
+           -- equality constraint.
+         , g ~ Rep1 f, forall a. TextShow a => GTextShowB (g a)
+#endif
+         ) => TextShow1 (FromGeneric1 f) where
   liftShowbPrec sp sl p = genericLiftShowbPrec sp sl p . fromGeneric1
 
 -- | A 'Generic' implementation of 'showt'.
@@ -367,6 +384,12 @@ one_hash  = mempty;              \
 two_hash  = mempty;
 #endif
 
+#if __GLASGOW_HASKELL__ >= 806
+#define QUANTIFIED_SUPERCLASS(class_name,f) (forall a. TextShow a => class_name (f a)) =>
+#else
+#define QUANTIFIED_SUPERCLASS(class_name,f)
+#endif
+
 #define GTEXT_SHOW(text_type,show_funs,one_hash,two_hash,gtext_show,gtext_show1,gshow_prec,glift_show_prec,gtext_show_con,gtext_show_con1,gshow_prec_con,glift_show_prec_con,show_prec,lift_show_prec,show_space,show_paren,show_list,show_list_with,from_char,from_string,c1_show_prec,s1_show_prec,product_show_prec,u_char_show_prec,u_double_show_prec,u_float_show_prec,u_int_show_prec,u_word_show_prec) \
 {- | Class of generic representation types that can be converted to a                   \
 'text_type'.                                                                            \
@@ -463,7 +486,8 @@ be converted to a 'text_type'.                                                  
                                                                                         \
 /Since: 3.10/                                                                           \
 -};                                                                                     \
-class gtext_show1 f where {                                                             \
+class QUANTIFIED_SUPERCLASS(gtext_show,f)                                               \
+      gtext_show1 f where {                                                             \
   ; glift_show_prec :: (Int -> a -> text_type) -> ([a] -> text_type)                    \
                     -> Int -> f a -> text_type                                          \
 };                                                                                      \
@@ -492,7 +516,8 @@ the 'ConType' has been determined.                                              
                                                                                         \
 /Since: 3.10/                                                                           \
 -};                                                                                     \
-class gtext_show_con1 f where {                                                         \
+class QUANTIFIED_SUPERCLASS(gtext_show_con,f)                                           \
+      gtext_show_con1 f where {                                                         \
   ; glift_show_prec_con :: (Int -> a -> text_type) -> ([a] -> text_type)                \
                         -> ConType -> Int -> f a -> text_type                           \
 };                                                                                      \

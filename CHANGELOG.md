@@ -42,6 +42,21 @@
     -instance (Show2 f, Show a)     => TextShow1 (FromStringShow2 f a)
     +instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a)
     ```
+* The `TextShow{1,2}` classes now have quantified superclasses:
+
+  ```hs
+  class (forall a. TextShow a => TextShow  (f a)) => TextShow1 f where ...
+  class (forall a. TextShow a => TextShow1 (f a)) => TextShow2 f where ...
+  ```
+
+  This mirrors corresponding changes made to `Show1` and `Show2` in the `base`
+  library. See https://github.com/haskell/core-libraries-committee/issues/10.
+
+  Because of this change, any code that defines a `TextShow1` instance for a
+  data type without a corresponding `TextShow` instance will no longer compile,
+  so you may need to define more `TextShow` instances to adapt to this change.
+  Similarly, `TextShow2` instances will now also require corresponding
+  `TextShow` and `TextShow1` instances.
 * The `GTextShow*` classes in `TextShow.Generic`, which power generic
   derivation of `TextShow` and `TextShow1` instances, have been split up to
   facilitate the addition of a quantified superclass to `TextShow1`. Moreover,
