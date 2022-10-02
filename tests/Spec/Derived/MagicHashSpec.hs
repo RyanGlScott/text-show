@@ -1,5 +1,9 @@
 {-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
+#if __GLASGOW_HASKELL__ == 800
+-- See Note [Increased simpl-tick-factor on old GHCs] in TextShow.Data.Complex
+{-# OPTIONS_GHC -fsimpl-tick-factor=250 #-}
+#endif
 
 {-|
 Module:      Spec.Derived.MagicHashSpec

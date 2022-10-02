@@ -1,3 +1,9 @@
+{-# LANGUAGE CPP #-}
+#if __GLASGOW_HASKELL__ == 800
+-- See Note [Increased simpl-tick-factor on old GHCs] in TextShow.Data.Complex
+{-# OPTIONS_GHC -fsimpl-tick-factor=200 #-}
+#endif
+
 {-|
 Module:      Spec.Derived.RecordsSpec
 Copyright:   (C) 2014-2017 Ryan Scott
