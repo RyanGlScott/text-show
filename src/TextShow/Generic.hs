@@ -386,15 +386,18 @@ two_hash  = mempty;
 
 -- For some mysterious reason, attaching INLINE pragmas to things in this
 -- module causes GHC 8.10's simplifier to absolutely explode in terms of
--- compile times. Moreover, 8.10 is the /only/ version of GHC in which I've
--- observed this happening. We'd still like to include the INLINE pragmas
--- whenever possible, however, as it delivers a modest but measurable
--- performance boost in the benchmark suite. As a compromise, we use CPP to
--- only attach INLINE annotations on non-8.10 versions of GHC.
-#if __GLASGOW_HASKELL__ == 810
-#define INLINE_NON_810(f)
+-- compile times. This also affects 9.0, 8.8, and older versions of GHC to
+-- varying degrees, usually adding a couple of minutes or more to the overall
+-- compile times.
+--
+-- We'd still like to include the INLINE pragmas on 9.2 or later, however, as
+-- it delivers a modest but measurable performance boost in the benchmark suite.
+-- As a compromise, we use CPP to only attach INLINE annotations on 9.2 or
+-- later.
+#if __GLASGOW_HASKELL__ >= 902
+#define INLINE_GE_902(f) {-# INLINE f #-};
 #else
-#define INLINE_NON_810(f) {-# INLINE f #-};
+#define INLINE_GE_902(f)
 #endif
 
 #if __GLASGOW_HASKELL__ >= 806
@@ -629,7 +632,7 @@ c1_show_prec sp p c@(M1 x) = case fixity of {                                   
     ; conIsTuple :: C1 c f p -> Bool                                                    \
     ; conIsTuple = isTupleString . conName                                              \
   };                                                                                    \
-INLINE_NON_810(c1_show_prec)                                                            \
+INLINE_GE_902(c1_show_prec)                                                            \
                                                                                         \
 s1_show_prec :: Selector s                                                              \
              => (Int -> f p -> text_type)                                               \
@@ -649,7 +652,7 @@ s1_show_prec sp p sel@(M1 x)                                                    
     ; selectorName :: String                                                            \
     ; selectorName = selName sel                                                        \
   };                                                                                    \
-INLINE_NON_810(s1_show_prec)                                                            \
+INLINE_GE_902(s1_show_prec)                                                            \
                                                                                         \
 product_show_prec :: (Int -> f p -> text_type) -> (Int -> g p -> text_type)             \
                   -> ConType -> Int -> (f :*: g) p -> text_type;                        \
@@ -679,27 +682,27 @@ product_show_prec spf spg t p (a :*: b) =                                       
                        then from_string o                                               \
                        else from_char '`' <> from_string o <> from_char '`'             \
   };                                                                                    \
-INLINE_NON_810(product_show_prec)                                                       \
+INLINE_GE_902(product_show_prec)                                                       \
                                                                                         \
 u_char_show_prec :: (Int -> Char -> text_type) -> Int -> UChar p -> text_type;          \
 u_char_show_prec sp p (UChar c) = sp (hashPrec p) (C# c) <> one_hash;                   \
-INLINE_NON_810(u_char_show_prec)                                                        \
+INLINE_GE_902(u_char_show_prec)                                                        \
                                                                                         \
 u_double_show_prec :: (Int -> Double -> text_type) -> Int -> UDouble p -> text_type;    \
 u_double_show_prec sp p (UDouble d) = sp (hashPrec p) (D# d) <> two_hash;               \
-INLINE_NON_810(u_double_show_prec)                                                      \
+INLINE_GE_902(u_double_show_prec)                                                      \
                                                                                         \
 u_float_show_prec :: (Int -> Float -> text_type) -> Int -> UFloat p -> text_type;       \
 u_float_show_prec sp p (UFloat f) = sp (hashPrec p) (F# f) <> one_hash;                 \
-INLINE_NON_810(u_float_show_prec)                                                       \
+INLINE_GE_902(u_float_show_prec)                                                       \
                                                                                         \
 u_int_show_prec :: (Int -> Int -> text_type) -> Int -> UInt p -> text_type;             \
 u_int_show_prec sp p (UInt i) = sp (hashPrec p) (I# i) <> one_hash;                     \
-INLINE_NON_810(u_int_show_prec)                                                         \
+INLINE_GE_902(u_int_show_prec)                                                         \
                                                                                         \
 u_word_show_prec :: (Int -> Word -> text_type) -> Int -> UWord p -> text_type;          \
 u_word_show_prec sp p (UWord w) = sp (hashPrec p) (W# w) <> two_hash;                   \
-INLINE_NON_810(u_word_show_prec)                                                        \
+INLINE_GE_902(u_word_show_prec)                                                        \
                                                                                         \
 HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string);
 
