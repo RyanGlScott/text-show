@@ -1,4 +1,4 @@
-## 3.10 [????.??.??]
+## 3.10 [2022.10.05]
 * The instances in `TextShow.FromStringTextShow` module have been scaled back
   somewhat for forward compatibility with Core Libraries proposal #10, which
   will add quantified `Show` superclasses to `Show1` and `Show2`:
