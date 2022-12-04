@@ -218,14 +218,17 @@ instance (Generic1 f, GTextShowB (Rep1 f a)) => TextShow (FromGeneric1 f a) wher
   showbPrec p = gShowbPrec p . from1 . fromGeneric1
 
 -- | /Since: 3.7.4/
-instance ( Generic1 f, GTextShowB1 (Rep1 f)
+instance ( Generic1 f
 #if __GLASGOW_HASKELL__ >= 806 && __GLASGOW_HASKELL__ < 902
            -- Unfortunately, the quantified superclass for GTextShowB1 doesn't
-           -- work on pre-9.2 versions of GHC, perhaps due to
+           -- work on pre-9.2 versions of GHC when using a GTextShowB1 (Rep1 f)
+           -- constraint directly, perhaps due to
            -- https://gitlab.haskell.org/ghc/ghc/-/issues/14860#note_454218.
            -- Fortunately, we can make GHC come to its senses by using an
            -- equality constraint.
-         , g ~ Rep1 f, forall a. TextShow a => GTextShowB (g a)
+         , g ~ Rep1 f, GTextShowB1 g
+#else
+         , GTextShowB1 (Rep1 f)
 #endif
          ) => TextShow1 (FromGeneric1 f) where
   liftShowbPrec sp sl p = genericLiftShowbPrec sp sl p . fromGeneric1
