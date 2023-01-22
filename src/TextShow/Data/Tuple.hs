@@ -122,6 +122,10 @@ instance TextShow a => TextShow (Solo a) where
 
 -- | /Since: 3.9.3/
 instance TextShow1 Solo where
-    liftShowbPrec sp _ p (Solo x) = showbUnaryWith sp "Solo" p x
+# if MIN_VERSION_ghc_prim(0,10,0)
+    liftShowbPrec sp _ p (MkSolo x) = showbUnaryWith sp "MkSolo" p x
+# else
+    liftShowbPrec sp _ p (Solo   x) = showbUnaryWith sp "Solo"   p x
+# endif
     {-# INLINE liftShowbPrec #-}
 #endif

@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Allow building with GHC 9.6.
+
 ### 3.10.1 [2023.02.27]
 * Support `th-abstraction-0.5.*`.
 
