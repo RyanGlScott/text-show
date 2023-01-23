@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PolyKinds #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -19,6 +20,12 @@ import Prelude ()
 import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), getNonNegative)
+import Test.QuickCheck.Instances ()
+
+#if MIN_VERSION_base(4,18,0)
+import qualified GHC.TypeNats as TN
+import Spec.Utils (GArbitrary(..), Some(..))
+#endif
 
 instance Arbitrary SomeNat where
     arbitrary = do
@@ -29,3 +36,25 @@ instance Arbitrary SomeNat where
 
 instance Arbitrary SomeSymbol where
     arbitrary = someSymbolVal <$> arbitrary
+
+#if MIN_VERSION_base(4,16,0)
+instance Arbitrary SomeChar where
+    arbitrary = someCharVal <$> arbitrary
+#endif
+
+#if MIN_VERSION_base(4,18,0)
+instance GArbitrary SNat where
+  garbitrary = do
+    n <- arbitrary
+    TN.withSomeSNat n (pure . Some)
+
+instance GArbitrary SSymbol where
+  garbitrary = do
+    s <- arbitrary
+    withSomeSSymbol s (pure . Some)
+
+instance GArbitrary SChar where
+  garbitrary = do
+    c <- arbitrary
+    withSomeSChar c (pure . Some)
+#endif
