@@ -1,5 +1,8 @@
 ### next [????.??.??]
 * Allow building with GHC 9.6.
+* Add `TextShow` instances for `SomeChar` (if building with `base-4.16` or
+  later), as well as `SNat`, `SSymbol`, and `SChar` (if building with
+  `base-4.18` or later).
 
 ### 3.10.1 [2023.02.27]
 * Support `th-abstraction-0.5.*`.

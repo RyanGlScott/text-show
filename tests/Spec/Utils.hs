@@ -1,6 +1,13 @@
-{-# LANGUAGE CPP                 #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE StandaloneDeriving    #-}
+
+#if __GLASGOW_HASKELL__ >= 806
+{-# LANGUAGE QuantifiedConstraints #-}
+#endif
 
 {-|
 Module:      Spec.Utils
@@ -21,6 +28,9 @@ module Spec.Utils (
 #endif
     , genericTextShowSpec
     , genericTextShow1Spec
+
+    , Some(..)
+    , GArbitrary(..)
     ) where
 
 import Data.Functor.Classes (Show1, showsPrec1)
@@ -30,7 +40,7 @@ import Generics.Deriving.Base
 
 import Test.Hspec (Expectation, Spec, shouldBe)
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck (Arbitrary)
+import Test.QuickCheck (Arbitrary(..), Gen)
 
 import TextShow (TextShow(..), TextShow1(..), showbPrec1, fromString)
 import TextShow.Generic
@@ -38,6 +48,11 @@ import TextShow.Generic
 #if defined(NEW_FUNCTOR_CLASSES)
 import Data.Functor.Classes (Show2, showsPrec2)
 import TextShow (TextShow2(..), showbPrec2)
+#endif
+
+#if __GLASGOW_HASKELL__ >= 806
+import GHC.Show (appPrec, appPrec1)
+import TextShow (showbParen, showbSpace)
 #endif
 
 -- | Expect a type's 'Show' instances to coincide for both 'String's and 'Text',
@@ -107,3 +122,22 @@ prop_genericTextShow1 :: ( TextShow1 f, Generic1 f
                       => Int -> f a -> Expectation
 prop_genericTextShow1 p x =
     showbPrec1 p x `shouldBe` genericLiftShowbPrec showbPrec showbList p x
+
+-- | A data type that existentially closes over something.
+data Some t where
+  Some :: t a -> Some t
+
+#if __GLASGOW_HASKELL__ >= 806
+deriving instance (forall a. Show (t a)) => Show (Some t)
+instance (forall a. TextShow (t a)) => TextShow (Some t) where
+  showbPrec p (Some x) =
+    showbParen (p > appPrec) $
+    fromString "Some" <> showbSpace <> showbPrec appPrec1 x
+#endif
+
+instance GArbitrary t => Arbitrary (Some t) where
+  arbitrary = garbitrary
+
+-- | An 'Arbitrary'-like class for 1-type-parameter GADTs.
+class GArbitrary t where
+  garbitrary :: Gen (Some t)
