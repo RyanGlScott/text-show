@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Support `th-abstraction-0.5.*`.
+
 ## 3.10 [2022.10.05]
 * The instances in `TextShow.FromStringTextShow` module have been scaled back
   somewhat for forward compatibility with Core Libraries proposal #10, which
