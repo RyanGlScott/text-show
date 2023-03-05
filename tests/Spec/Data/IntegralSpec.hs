@@ -24,8 +24,6 @@ import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
-import Control.Applicative (liftA2)
-
 import Data.Char (intToDigit)
 
 import Numeric (showIntAtBase)
@@ -75,7 +73,7 @@ spec = parallel $ do
 #if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
 prop_showIntAtBase :: Gen Expectation
 prop_showIntAtBase = do
-    base <- arbitrary `suchThat` liftA2 (&&) (> 1) (<= 16)
+    base <- arbitrary `suchThat` \b -> 1 < b && b <= 16
     i    <- getNonNegative <$> arbitrary :: Gen Int
     pure $ fromString (showIntAtBase base intToDigit i "") `shouldBe` showbIntAtBase base intToDigit i
 #endif
