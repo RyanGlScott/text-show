@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.10.2 [2023.03.05]
 * Allow building with GHC 9.6.
 * Add `TextShow` instances for `SomeChar` (if building with `base-4.16` or
   later), as well as `SNat`, `SSymbol`, and `SChar` (if building with
