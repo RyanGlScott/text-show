@@ -1069,7 +1069,7 @@ outOfPlaceTyVarError tsClass conName = Monad.fail
 -- | We cannot implement class methods at the term level for @type data@
 -- declarations, which only exist at the type level.
 typeDataError :: Name -> Q a
-typeDataError dataName = fail
+typeDataError dataName = Monad.fail
   . showString "Cannot derive instance for ‘"
   . showString (nameBase dataName)
   . showString "‘, which is a ‘type data‘ declaration"
