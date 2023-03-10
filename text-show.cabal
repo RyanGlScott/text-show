@@ -165,7 +165,7 @@ library
                        TextShow.TH.Names
                        TextShow.Utils
   build-depends:       array                 >= 0.3    && < 0.6
-                     , base-compat-batteries >= 0.11   && < 0.13
+                     , base-compat-batteries >= 0.11   && < 0.14
                      , bifunctors            >= 5.1    && < 6
                      , bytestring            >= 0.9    && < 0.12
                      , bytestring-builder
@@ -356,7 +356,7 @@ test-suite spec
 
                        TextShow.TH.Names
   build-depends:       array                 >= 0.3    && < 0.6
-                     , base-compat-batteries >= 0.11   && < 0.13
+                     , base-compat-batteries >= 0.11   && < 0.14
                      , base-orphans          >= 0.8.5  && < 0.10
                      , bytestring            >= 0.9    && < 0.12
                      , bytestring-builder
