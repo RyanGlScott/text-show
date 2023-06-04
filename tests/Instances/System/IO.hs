@@ -24,8 +24,8 @@ import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Prelude ()
 import Prelude.Compat
 
-import System.IO (BufferMode(..), IOMode(..), Newline(..), NewlineMode(..),
-                  SeekMode(..), Handle, stdin, stdout, stderr)
+import System.IO (BufferMode(..), IOMode(..), SeekMode(..), Handle,
+                  stdin, stdout, stderr)
 
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum, oneof)
 
@@ -56,14 +56,5 @@ deriving instance Enum CodingFailureMode
 instance Arbitrary CodingFailureMode where
     arbitrary = arbitraryBoundedEnum
 
-deriving instance Bounded Newline
-deriving instance Enum Newline
-instance Arbitrary Newline where
-    arbitrary = arbitraryBoundedEnum
-
-instance Arbitrary NewlineMode where
-    arbitrary = genericArbitrary
-
 deriving instance Generic HandlePosn
 deriving instance Generic BufferMode
-deriving instance Generic NewlineMode

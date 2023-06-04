@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Support building with `QuickCheck-2.14.3` in the test suite.
+
 ### 3.10.2 [2023.03.05]
 * Allow building with GHC 9.6.
 * Add `TextShow` instances for `SomeChar` (if building with `base-4.16` or
