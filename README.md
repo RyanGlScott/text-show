@@ -18,8 +18,6 @@
 
 `text-show` offers a replacement for the `Show` typeclass intended for use with `Text` instead of `String`s. This package was created in the spirit of [`bytestring-show`](http://hackage.haskell.org/package/bytestring-show).
 
-At the moment, `text-show` provides instances for most data types in the [`array`](http://hackage.haskell.org/package/array), [`base`](http://hackage.haskell.org/package/base), [`bytestring`](http://hackage.haskell.org/package/bytestring), and [`text`](http://hackage.haskell.org/package/text) packages. Therefore, much of the source code for `text-show` consists of borrowed code from those packages in order to ensure that the behaviors of `Show` and `TextShow` coincide.
-
 For most uses, simply importing `TextShow` will suffice:
 
 ```haskell
@@ -34,3 +32,18 @@ main = printT (Just "Hello, World!")
 See also the [naming conventions](https://github.com/RyanGlScott/text-show/wiki/Naming-conventions) page.
 
 Support for automatically deriving `TextShow` instances can be found in the `TextShow.TH` and `TextShow.Generic` modules.
+
+## Scope of the library
+
+`text-show` only provides instances for data types in the following packages:
+
+* [`array`](http://hackage.haskell.org/package/array)
+* [`base`](http://hackage.haskell.org/package/base)
+* [`bytestring`](http://hackage.haskell.org/package/bytestring)
+* [`text`](http://hackage.haskell.org/package/text)
+
+This policy is in place to keep `text-show`'s dependencies reasonably light. If
+you need a `TextShow` instance for a library that is not in this list, it may
+be covered by the
+[`text-show-instances`](https://github.com/RyanGlScott/text-show-instances)
+library.
