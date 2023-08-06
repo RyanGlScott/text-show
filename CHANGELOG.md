@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.10.4 [2023.08.06]
 * Support building with GHC 9.8.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays
   `TypeRep []` as `"[]"`.
