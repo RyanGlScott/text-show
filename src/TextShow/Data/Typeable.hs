@@ -42,8 +42,7 @@ import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 
 import           Type.Reflection (pattern App, pattern Con, pattern Con', pattern Fun,
                                   SomeTypeRep(..), TypeRep,
-                                  eqTypeRep, tyConName, typeRep, typeRepKind,
-                                  typeRepTyCon)
+                                  eqTypeRep, tyConName, typeRep, typeRepTyCon)
 #else /* !(MIN_VERSION_base(4,10,0) */
 import           Data.Text.Lazy.Builder (fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
@@ -70,7 +69,10 @@ import           Data.Typeable.Internal (TyCon)
 import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
-import           TextShow.Utils (isTupleString)
+#endif
+
+#if MIN_VERSION_base(4,13,0)
+import           Type.Reflection (typeRepKind)
 #endif
 
 #if MIN_VERSION_base(4,19,0)
@@ -172,9 +174,11 @@ showbTypeable _ rep
   | Just n <- isTupleTyCon tc, [] <- tys =
       singleton '(' <> fromString (replicate (n-1) ',') <> singleton ')'
 # else
-  | isTupleTyCon tc,
-    Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep =
-    showbTuple tys
+  | isTupleTyCon tc
+#  if MIN_VERSION_base(4,13,0)
+  , Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep
+#  endif
+  = showbTuple tys
 # endif
   where (tc, tys) = splitApps rep
 showbTypeable p (Con' tycon [])
