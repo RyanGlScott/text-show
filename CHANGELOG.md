@@ -2,6 +2,13 @@
 * Support building with GHC 9.8.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays
   `TypeRep []` as `"[]"`.
+* Support deriving `TextShow(1)(2)` instances for data types with fields
+  of type `Int64#` or `Word64#` on GHC 9.8 or later.
+* When generating `TextShow(1)(2)` instances with `TextShow.TH` using GHC 9.8 or
+  later, data types that have fields of type `Int{8,16,32,64}#` or
+  `Word{8,16,32,64}#` will be printed using  extended literal syntax, mirroring
+  corresponding changes introduced in GHC 9.8 (see
+  https://github.com/ghc-proposals/ghc-proposals/pull/596).
 
 ### 3.10.3 [2023.06.03]
 * Support building with `QuickCheck-2.14.3` in the test suite.

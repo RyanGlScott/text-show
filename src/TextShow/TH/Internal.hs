@@ -80,10 +80,14 @@ import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
                           , Int8#, Int16#, Word8#, Word16#
 # if MIN_VERSION_base(4,16,0)
                           , Int32#, Word32#
+#  if MIN_VERSION_base(4,19,0)
+                          , Int64#, Word64#
+#  else
                           , int8ToInt#, int16ToInt#, int32ToInt#
                           , intToInt8#, intToInt16#, intToInt32#
                           , word8ToWord#, word16ToWord#, word32ToWord#
                           , wordToWord8#, wordToWord16#, wordToWord32#
+#  endif
 # else
                           , extendInt8#, extendInt16#, extendWord8#, extendWord16#
                           , narrowInt8#, narrowInt16#, narrowWord8#, narrowWord16#
@@ -91,6 +95,10 @@ import           GHC.Exts ( Char(..), Double(..), Float(..), Int(..), Word(..)
 #endif
                           )
 import           GHC.Show (appPrec, appPrec1)
+#if MIN_VERSION_base(4,19,0)
+import           GHC.Int (Int8(..), Int16(..), Int32(..), Int64(..))
+import           GHC.Word (Word8(..), Word16(..), Word32(..), Word64(..))
+#endif
 
 import           Language.Haskell.TH.Datatype as Datatype
 import           Language.Haskell.TH.Lib
@@ -1263,7 +1271,49 @@ primShowTbl = Map.fromList
                     , primShowPostfixMod = twoHashE
                     , primShowConv       = \_ x -> x
                     })
-#if MIN_VERSION_base(4,13,0)
+#if MIN_VERSION_base(4,19,0)
+    , (''Int8#,   PrimShow
+                    { primShowBoxer      = appE (conE 'I8#)
+                    , primShowPostfixMod = extendedLitE "Int8"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Int16#,  PrimShow
+                    { primShowBoxer      = appE (conE 'I16#)
+                    , primShowPostfixMod = extendedLitE "Int16"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Int32#,  PrimShow
+                    { primShowBoxer      = appE (conE 'I32#)
+                    , primShowPostfixMod = extendedLitE "Int32"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Int64#,  PrimShow
+                    { primShowBoxer      = appE (conE 'I64#)
+                    , primShowPostfixMod = extendedLitE "Int64"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Word8#,  PrimShow
+                    { primShowBoxer      = appE (conE 'W8#)
+                    , primShowPostfixMod = extendedLitE "Word8"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Word16#, PrimShow
+                    { primShowBoxer      = appE (conE 'W16#)
+                    , primShowPostfixMod = extendedLitE "Word16"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Word32#, PrimShow
+                    { primShowBoxer      = appE (conE 'W32#)
+                    , primShowPostfixMod = extendedLitE "Word32"
+                    , primShowConv       = \_ x -> x
+                    })
+    , (''Word64#, PrimShow
+                    { primShowBoxer      = appE (conE 'W64#)
+                    , primShowPostfixMod = extendedLitE "Word64"
+                    , primShowConv       = \_ x -> x
+                    })
+#else
+# if MIN_VERSION_base(4,13,0)
     , (''Int8#,   PrimShow
                     { primShowBoxer      = appE (conE 'I#) . appE (varE int8ToIntHashValName)
                     , primShowPostfixMod = oneHashE
@@ -1284,8 +1334,8 @@ primShowTbl = Map.fromList
                     , primShowPostfixMod = twoHashE
                     , primShowConv       = mkNarrowE wordToWord16HashValName
                     })
-#endif
-#if MIN_VERSION_base(4,16,0)
+# endif
+# if MIN_VERSION_base(4,16,0)
     , (''Int32#,  PrimShow
                     { primShowBoxer      = appE (conE 'I#) . appE (varE 'int32ToInt#)
                     , primShowPostfixMod = oneHashE
@@ -1296,10 +1346,11 @@ primShowTbl = Map.fromList
                     , primShowPostfixMod = twoHashE
                     , primShowConv       = mkNarrowE 'wordToWord32#
                     })
+# endif
 #endif
     ]
 
-#if MIN_VERSION_base(4,13,0)
+#if MIN_VERSION_base(4,13,0) && !(MIN_VERSION_base(4,19,0))
 mkNarrowE :: Name -> TextShowFun -> Q Exp -> Q Exp
 mkNarrowE narrowName tsFun e =
   foldr (`infixApp` [| (<>) |])
@@ -1376,6 +1427,11 @@ wordToWord16HashValName =
 oneHashE, twoHashE :: TextShowFun -> Q Exp
 oneHashE tsFun = varE (singletonName tsFun)  `appE` charE '#'
 twoHashE tsFun = varE (fromStringName tsFun) `appE` stringE "##"
+
+#if MIN_VERSION_base(4,19,0)
+extendedLitE :: String -> TextShowFun -> Q Exp
+extendedLitE suffix tsFun = varE (fromStringName tsFun) `appE` stringE ("#" ++ suffix)
+#endif
 
 -------------------------------------------------------------------------------
 -- Assorted utilities
