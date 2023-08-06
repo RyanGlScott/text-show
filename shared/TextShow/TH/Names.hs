@@ -59,7 +59,9 @@ uniqueTypeName = mkNameG_tc "base" "GHC.Event.Unique" "Unique"
 
 -- | The 'Name' of 'asInt64' (or, 'asInt' on @base-4.10.0.0@ or later).
 asInt64ValName :: Name
-#if MIN_VERSION_base(4,10,0)
+#if MIN_VERSION_base(4,19,0)
+asInt64ValName = mkNameG_fld "base" "GHC.Event.Unique" "Unique" "asInt"
+#elif MIN_VERSION_base(4,10,0)
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt"
 #else
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt64"
