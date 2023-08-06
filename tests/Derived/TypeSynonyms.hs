@@ -18,6 +18,8 @@ Defines data types that use type synonyms.
 -}
 module Derived.TypeSynonyms (TyCon(..), TyFamily(..)) where
 
+import           Control.Monad.Trans.Instances ()
+
 import           Data.Orphans ()
 
 import qualified Generics.Deriving.TH as Generics
