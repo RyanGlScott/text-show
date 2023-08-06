@@ -39,7 +39,6 @@ import           GHC.Types (Module(..), TrName(..), TyCon(..), isTrue#)
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), showbParen, showbSpace)
 import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
-import           TextShow.Utils (isTupleString)
 
 import           Type.Reflection (pattern App, pattern Con, pattern Con', pattern Fun,
                                   SomeTypeRep(..), TypeRep,
@@ -74,6 +73,13 @@ import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
 import           TextShow.Utils (isTupleString)
 #endif
 
+#if MIN_VERSION_base(4,19,0)
+import           Data.Char (isDigit, ord)
+import           Type.Reflection (tyConModule, tyConPackage)
+#else
+import           TextShow.Utils (isTupleString)
+#endif
+
 #if !(MIN_VERSION_base(4,10,0))
 # if MIN_VERSION_base(4,9,0)
 tyConOf :: Typeable a => Proxy a -> TyCon
@@ -105,9 +111,31 @@ tcFun = funTc
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?
+#if MIN_VERSION_base(4,19,0)
+isTupleTyCon :: TyCon -> Maybe Int
+isTupleTyCon tc
+  | tyConPackage tc == "ghc-prim"
+  , tyConModule  tc == "GHC.Tuple.Prim"
+  = case tyConName tc of
+      "Unit" -> Just 0
+      'T' : 'u' : 'p' : 'l' : 'e' : arity -> readTwoDigits arity
+      _ -> Nothing
+  | otherwise                   = Nothing
+
+readTwoDigits :: String -> Maybe Int
+readTwoDigits s = case s of
+  [c] | isDigit c -> Just (digit_to_int c)
+  [c1, c2] | isDigit c1, isDigit c2
+    -> Just (digit_to_int c1 * 10 + digit_to_int c2)
+  _ -> Nothing
+  where
+    digit_to_int :: Char -> Int
+    digit_to_int c = ord c - ord '0'
+#else
 isTupleTyCon :: TyCon -> Bool
 isTupleTyCon = isTupleString . tyConName
 {-# INLINE isTupleTyCon #-}
+#endif
 
 #if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.10.0.0@ or later.
@@ -136,9 +164,18 @@ showbTypeable _ rep
     fromString "[]"
   | isListTyCon tc, [ty] <- tys =
     singleton '[' <> showb ty <> singleton ']'
+# if MIN_VERSION_base(4,19,0)
+  | Just _ <- isTupleTyCon tc,
+    Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep =
+    showbTuple tys
+    -- Print (,,,) instead of Tuple4
+  | Just n <- isTupleTyCon tc, [] <- tys =
+      singleton '(' <> fromString (replicate (n-1) ',') <> singleton ')'
+# else
   | isTupleTyCon tc,
     Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep =
     showbTuple tys
+# endif
   where (tc, tys) = splitApps rep
 showbTypeable p (Con' tycon [])
   = showbPrec p tycon
