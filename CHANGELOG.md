@@ -2,6 +2,8 @@
 * Support building with GHC 9.8.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays
   `TypeRep []` as `"[]"`.
+* Ensure that the `TextShow` instance for `TypeRep` properly handles partial
+  applications of tuple constructors (e.g., `(,) Int`).
 * Support deriving `TextShow(1)(2)` instances for data types with fields
   of type `Int64#` or `Word64#` on GHC 9.8 or later.
 * When generating `TextShow(1)(2)` instances with `TextShow.TH` using GHC 9.8 or

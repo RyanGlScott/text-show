@@ -43,7 +43,8 @@ import           TextShow.Utils (isTupleString)
 
 import           Type.Reflection (pattern App, pattern Con, pattern Con', pattern Fun,
                                   SomeTypeRep(..), TypeRep,
-                                  eqTypeRep, tyConName, typeRep, typeRepTyCon)
+                                  eqTypeRep, tyConName, typeRep, typeRepKind,
+                                  typeRepTyCon)
 #else /* !(MIN_VERSION_base(4,10,0) */
 import           Data.Text.Lazy.Builder (fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
@@ -135,7 +136,8 @@ showbTypeable _ rep
     fromString "[]"
   | isListTyCon tc, [ty] <- tys =
     singleton '[' <> showb ty <> singleton ']'
-  | isTupleTyCon tc =
+  | isTupleTyCon tc,
+    Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep =
     showbTuple tys
   where (tc, tys) = splitApps rep
 showbTypeable p (Con' tycon [])

@@ -64,6 +64,10 @@ spec = parallel $ do
             matchesTextShowSpec (Proxy :: Proxy (TypeRep '(Int, Int)))
         describe "TypeRep (Int -> Int)" $
             matchesTextShowSpec (Proxy :: Proxy (TypeRep (Int -> Int)))
+        describe "TypeRep ((,) Int)" $
+            matchesTextShowSpec (Proxy :: Proxy (TypeRep ((,) Int)))
+        describe "TypeRep ('(,) Int)" $
+            matchesTextShowSpec (Proxy :: Proxy (TypeRep ('(,) Int)))
         describe "TypeRep (Either Int)" $
             matchesTextShowSpec (Proxy :: Proxy (TypeRep (Either Int)))
 #else
