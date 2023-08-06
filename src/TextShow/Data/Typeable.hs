@@ -131,6 +131,8 @@ showbTypeable :: Int -> TypeRep (a :: k) -> Builder
 showbTypeable _ rep
   | Just HRefl <- rep `eqTypeRep` (typeRep :: TypeRep Type) =
     singleton '*'
+  | isListTyCon tc, [] <- tys =
+    fromString "[]"
   | isListTyCon tc, [ty] <- tys =
     singleton '[' <> showb ty <> singleton ']'
   | isTupleTyCon tc =

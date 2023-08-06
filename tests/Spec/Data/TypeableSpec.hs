@@ -52,6 +52,8 @@ spec = parallel $ do
     describe "TypeRep" $ do
         describe "TypeRep Type" $
             matchesTextShowSpec (Proxy :: Proxy (TypeRep Type))
+        describe "TypeRep []" $
+            matchesTextShowSpec (Proxy :: Proxy (TypeRep []))
         describe "TypeRep [Int]" $
             matchesTextShowSpec (Proxy :: Proxy (TypeRep [Int]))
         describe "TypeRep '[Int]" $

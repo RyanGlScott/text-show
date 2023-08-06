@@ -1,5 +1,7 @@
 ### next [????.??.??]
 * Support building with GHC 9.8.
+* Ensure that the `TextShow` instance for `TypeRep` properly displays
+  `TypeRep []` as `"[]"`.
 
 ### 3.10.3 [2023.06.03]
 * Support building with `QuickCheck-2.14.3` in the test suite.
