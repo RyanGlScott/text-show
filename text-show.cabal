@@ -181,7 +181,7 @@ library
                      , containers            >= 0.1    && < 0.7
                      , generic-deriving      >= 1.14.1 && < 2
                      , ghc-prim
-                     , text                  >= 0.11.1 && < 2.1
+                     , text                  >= 0.11.1 && < 2.2
                      , th-abstraction        >= 0.4    && < 0.7
                      , th-lift               >= 0.7.6  && < 1
 
@@ -376,7 +376,7 @@ test-suite spec
                      , QuickCheck            >= 2.14.3 && < 2.15
                      , quickcheck-instances  >= 0.3.28 && < 0.4
                      , template-haskell      >= 2.9    && < 2.22
-                     , text                  >= 0.11.1 && < 2.1
+                     , text                  >= 0.11.1 && < 2.2
                      , text-show
                      , transformers-compat   >= 0.5    && < 1
   build-tool-depends:  hspec-discover:hspec-discover
@@ -412,7 +412,7 @@ benchmark bench
                      , deepseq   >= 1.3    && < 2
                      , ghc-prim
                      , text-show
-                     , text      >= 0.11.1 && < 2.1
+                     , text      >= 0.11.1 && < 2.2
 
   hs-source-dirs:      benchmarks
   default-language:    Haskell2010
