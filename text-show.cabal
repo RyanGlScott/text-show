@@ -178,7 +178,7 @@ library
                      , bifunctors            >= 5.1    && < 6
                      , bytestring            >= 0.9    && < 0.13
                      , bytestring-builder
-                     , containers            >= 0.1    && < 0.7
+                     , containers            >= 0.1    && < 0.8
                      , generic-deriving      >= 1.14.1 && < 2
                      , ghc-prim
                      , text                  >= 0.11.1 && < 2.2
