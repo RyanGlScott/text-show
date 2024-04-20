@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.10.5 [2024.04.20]
 * Support building with GHC 9.10.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays unboxed
   tuple `TypeRep` values.
