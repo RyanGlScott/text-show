@@ -38,7 +38,10 @@ import           GHC.Exts (Addr#, Char(..), (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (Module(..), TrName(..), TyCon(..), isTrue#)
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), showbParen, showbSpace)
-import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
+import           TextShow.Data.Typeable.Utils (showbArgs)
+# if !(MIN_VERSION_base(4,20,0))
+import           TextShow.Data.Typeable.Utils (showbTuple)
+#endif
 
 import           Type.Reflection (pattern App, pattern Con, pattern Con', pattern Fun,
                                   SomeTypeRep(..), TypeRep,
@@ -113,7 +116,35 @@ tcFun = funTc
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?
-#if MIN_VERSION_base(4,19,0)
+#if MIN_VERSION_base(4,20,0)
+isTupleTyCon :: TyCon -> Maybe (Bool, Int)
+isTupleTyCon tc
+  | tyConPackage tc == "ghc-prim"
+  , tyConModule  tc == "GHC.Tuple" || tyConModule tc == "GHC.Types"
+  = case tyConName tc of
+      "Unit" -> Just (True, 0)
+      "Unit#" -> Just (False, 0)
+      'T' : 'u' : 'p' : 'l' : 'e' : arity -> readTwoDigits arity
+      _ -> Nothing
+  | otherwise                   = Nothing
+
+readTwoDigits :: String -> Maybe (Bool, Int)
+readTwoDigits s = case s of
+  c1 : t1 | isDigit c1 -> case t1 of
+    [] -> Just (True, digit_to_int c1)
+    ['#'] -> Just (False, digit_to_int c1)
+    c2 : t2 | isDigit c2 ->
+      let ar = digit_to_int c1 * 10 + digit_to_int c2
+      in case t2 of
+        [] -> Just (True, ar)
+        ['#'] -> Just (False, ar)
+        _ -> Nothing
+    _ -> Nothing
+  _ -> Nothing
+  where
+    digit_to_int :: Char -> Int
+    digit_to_int c = ord c - ord '0'
+#elif MIN_VERSION_base(4,19,0)
 isTupleTyCon :: TyCon -> Maybe Int
 isTupleTyCon tc
   | tyConPackage tc == "ghc-prim"
@@ -166,7 +197,11 @@ showbTypeable _ rep
     fromString "[]"
   | isListTyCon tc, [ty] <- tys =
     singleton '[' <> showb ty <> singleton ']'
-# if MIN_VERSION_base(4,19,0)
+# if MIN_VERSION_base(4,20,0)
+  | Just (boxed, n) <- isTupleTyCon tc,
+    Just sat <- plainOrSaturated boxed n =
+      tuple n boxed sat
+# elif MIN_VERSION_base(4,19,0)
   | Just _ <- isTupleTyCon tc,
     Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep =
     showbTuple tys
@@ -180,7 +215,28 @@ showbTypeable _ rep
 #  endif
   = showbTuple tys
 # endif
-  where (tc, tys) = splitApps rep
+  where
+    (tc, tys) = splitApps rep
+
+# if MIN_VERSION_base(4,20,0)
+    plainOrSaturated True _ | Just _ <- typeRep @Type `eqTypeRep` typeRepKind rep = Just True
+    plainOrSaturated False n | n == length tys = Just True
+    plainOrSaturated _ _ | [] <- tys = Just False
+    plainOrSaturated _ _ | otherwise = Nothing
+
+    tuple n boxed sat =
+      let
+        (lpar, rpar) = case boxed of
+          True -> ("(", ")")
+          False -> ("(#", "#)")
+        commas = fromString (replicate (n-1) ',')
+        args = showbArgs (fromString ",") tys
+        args' = case (boxed, sat) of
+          (True, True) -> args
+          (False, True) -> singleton ' ' <> args <> singleton ' '
+          (_, False) -> commas
+      in fromString lpar <> args' <> fromString rpar
+# endif
 showbTypeable p (Con' tycon [])
   = showbPrec p tycon
 showbTypeable p (Con' tycon args)

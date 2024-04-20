@@ -1,3 +1,10 @@
+### next [????.??.??]
+* Support building with GHC 9.10.
+* Ensure that the `TextShow` instance for `TypeRep` properly displays unboxed
+  tuple `TypeRep` values.
+* Add a `TextShow` instance for `HpcFlags` (in `TextShow.GHC.RTS.Flags`) when
+  building with GHC 9.10 or later.
+
 ### 3.10.4 [2023.08.06]
 * Support building with GHC 9.8.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays

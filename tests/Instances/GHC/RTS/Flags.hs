@@ -101,6 +101,11 @@ instance Arbitrary ParFlags where
     arbitrary = genericArbitrary
 # endif
 
+# if MIN_VERSION_base(4,20,0)
+instance Arbitrary HpcFlags where
+    arbitrary = genericArbitrary
+# endif
+
 type GiveGCStats'   = $(conT giveGCStatsTypeName)
 type DoCostCentres' = $(conT doCostCentresTypeName)
 type DoHeapProfile' = $(conT doHeapProfileTypeName)

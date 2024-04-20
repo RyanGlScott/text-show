@@ -67,6 +67,12 @@ $(deriveTextShow ''TickyFlags)
 -- /Since: 3.3/
 $(deriveTextShow ''ParFlags)
 # endif
+# if MIN_VERSION_base(4,20,0)
+-- | Only available with @base-4.20.0.0@ or later.
+--
+-- /Since: 3.10.5/
+$(deriveTextShow ''HpcFlags)
+# endif
 -- | /Since: 2/
 $(deriveTextShow ''RTSFlags)
 #endif

@@ -18,7 +18,7 @@ import           Control.DeepSeq (NFData)
 
 import           Criterion.Main (Benchmark, bench, bgroup, defaultMain, nf)
 
-import           Data.List (foldl')
+import qualified Data.Foldable as F
 import qualified Data.Text as T
 
 import           GHC.Generics (Generic)
@@ -121,12 +121,12 @@ smallSample (leaf, branch, _, showFun) =
 
 mediumSample :: Sample
 mediumSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 1000 $ sampleTree leaf branch
+    showFun . F.foldl' branch empty . replicate 1000 $ sampleTree leaf branch
 {-# NOINLINE mediumSample #-}
 
 largeSample :: Sample
 largeSample (leaf, branch, empty, showFun) =
-    showFun . foldl' branch empty . replicate 100000 $ sampleTree leaf branch
+    showFun . F.foldl' branch empty . replicate 100000 $ sampleTree leaf branch
 {-# NOINLINE largeSample #-}
 
 sampleTree :: (Int -> a) -> (a -> a -> a) -> a
