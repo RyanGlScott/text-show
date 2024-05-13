@@ -49,7 +49,7 @@ $(deriveTextShow ''ConcFlags)
 -- | /Since: 3.9/
 $(deriveTextShow ''IoSubSystem)
 # endif
-# if MIN_VERSION_base(4,20,0)
+# if MIN_VERSION_GLASGOW_HASKELL(9,11,0,0)
 $(deriveTextShow ''IoManagerFlag)
 # endif
 -- | /Since: 2/
