@@ -49,6 +49,9 @@ $(deriveTextShow ''ConcFlags)
 -- | /Since: 3.9/
 $(deriveTextShow ''IoSubSystem)
 # endif
+# if MIN_VERSION_base(4,20,0)
+$(deriveTextShow ''IoManagerFlag)
+# endif
 -- | /Since: 2/
 $(deriveTextShow ''MiscFlags)
 -- | /Since: 2/
