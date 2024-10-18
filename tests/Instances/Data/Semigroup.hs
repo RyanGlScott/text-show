@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.Data.Semigroup
@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Instances.Data.Semigroup () where
 
-import Data.Semigroup.Compat (Arg(..))
+import Data.Semigroup (Arg(..))
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..))
 

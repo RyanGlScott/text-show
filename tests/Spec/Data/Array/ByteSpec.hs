@@ -20,7 +20,7 @@ import Test.QuickCheck.Instances ()
 
 #if MIN_VERSION_base(4,17,0)
 import Data.Array.Byte (ByteArray)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Fixed
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -16,7 +16,7 @@ module TextShow.Data.Fixed (showbFixed) where
 
 import Data.Fixed (Fixed(..), HasResolution(..))
 import Data.Int (Int64)
-import Data.Semigroup.Compat (mtimesDefault)
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 
 import Prelude ()
@@ -44,12 +44,8 @@ showbFixed chopTrailingZeroes fa@(MkFixed a)
     (i, d)  = divMod (fromInteger a) res
     digits  = ceiling (logBase 10 (fromInteger $ resolution fa) :: Double)
     maxnum  = 10 ^ digits
-#if MIN_VERSION_base(4,8,0)
     fracNum = divCeil (d * maxnum) res
     divCeil x y = (x + y - 1) `div` y
-#else
-    fracNum = div (d * maxnum) res
-#endif
 
 -- | Only works for positive 'Integer's.
 showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder

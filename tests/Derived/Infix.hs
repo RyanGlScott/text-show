@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs             #-}
@@ -23,12 +21,6 @@ module Derived.Infix (
     , TyFamilyGADT(..)
     ) where
 
-#include "generic.h"
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-import qualified Generics.Deriving.TH as Generics
-#endif
-
 import           GHC.Generics (Generic, Generic1)
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
@@ -38,10 +30,7 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
-import           Text.Show.Deriving (deriveShow1)
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Text.Show.Deriving (deriveShow2)
-#endif
+import           Text.Show.Deriving (deriveShow1, deriveShow2)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -87,9 +76,7 @@ data instance TyFamilyPlain a b = (:#:) a b
                                 | TyFamilyFakeInfix a b
   deriving ( Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -104,9 +91,7 @@ data instance TyFamilyGADT a b where
     (:****) :: { tfg1 :: i, tfg2 :: j }      -> TyFamilyGADT i j
   deriving ( Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -126,11 +111,10 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (TyFamilyGADT a b) where
 -------------------------------------------------------------------------------
 
 $(deriveShow1 ''TyConPlain)
-$(deriveShow1 ''TyConGADT)
-#if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''TyConPlain)
+
+$(deriveShow1 ''TyConGADT)
 $(deriveShow2 ''TyConGADT)
-#endif
 
 $(deriveTextShow  ''TyConPlain)
 $(deriveTextShow1 ''TyConPlain)
@@ -140,17 +124,11 @@ $(deriveTextShow  ''TyConGADT)
 $(deriveTextShow1 ''TyConGADT)
 $(deriveTextShow2 ''TyConGADT)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 '(:#:))
-
-$(deriveShow1 '(:*))
-#else
 $(deriveShow1 '(:#:))
 $(deriveShow2 '(:$:))
 
 $(deriveShow1 '(:*))
 $(deriveShow2 '(:***))
-#endif
 
 $(deriveTextShow  '(:#:))
 $(deriveTextShow1 '(:$:))
@@ -159,10 +137,3 @@ $(deriveTextShow2 'TyFamilyPlain)
 $(deriveTextShow  '(:*))
 $(deriveTextShow1 '(:***))
 $(deriveTextShow2 '(:****))
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           '(:#:))
-$(Generics.deriveRepresentable1 '(:$:))
-$(Generics.deriveMeta           '(:*))
-$(Generics.deriveRepresentable1 '(:**))
-#endif

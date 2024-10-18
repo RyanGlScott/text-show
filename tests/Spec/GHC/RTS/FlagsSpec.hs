@@ -12,35 +12,34 @@ Portability: GHC
 -}
 module Spec.GHC.RTS.FlagsSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
+import GHC.RTS.Flags
+
+import Instances.GHC.RTS.Flags
+
 import Prelude ()
 import Prelude.Compat
 
-import Test.Hspec (Spec, hspec, parallel)
-
-#if MIN_VERSION_base(4,8,0)
-import Data.Proxy.Compat (Proxy(..))
-import GHC.RTS.Flags
-import Instances.GHC.RTS.Flags
 import Spec.Utils (matchesTextShowSpec)
-import Test.Hspec (describe)
-#endif
+
+import Test.Hspec (Spec, describe, hspec, parallel)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if MIN_VERSION_base(4,8,0)
     describe "RTSFlags" $
         matchesTextShowSpec (Proxy :: Proxy RTSFlags)
     describe "GCFlags" $
         matchesTextShowSpec (Proxy :: Proxy GCFlags)
     describe "ConcFlags" $
         matchesTextShowSpec (Proxy :: Proxy ConcFlags)
-# if MIN_VERSION_base(4,15,0)
+#if MIN_VERSION_base(4,15,0)
     describe "IoSubSystem" $
         matchesTextShowSpec (Proxy :: Proxy IoSubSystem)
-# endif
+#endif
     describe "MiscFlags" $
         matchesTextShowSpec (Proxy :: Proxy MiscFlags)
     describe "DebugFlags" $
@@ -61,10 +60,7 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy DoHeapProfile')
     describe "DoTrace" $
         matchesTextShowSpec (Proxy :: Proxy DoTrace')
-# if MIN_VERSION_base(4,10,0)
+#if MIN_VERSION_base(4,10,0)
     describe "ParFlags" $
         matchesTextShowSpec (Proxy :: Proxy ParFlags)
-# endif
-#else
-    pure ()
 #endif

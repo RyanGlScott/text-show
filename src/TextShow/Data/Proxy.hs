@@ -3,7 +3,7 @@
 {-# LANGUAGE PolyKinds         #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Data.Proxy
@@ -19,7 +19,7 @@ Portability: GHC
 -}
 module TextShow.Data.Proxy () where
 
-import Data.Proxy.Compat (Proxy)
+import Data.Proxy (Proxy)
 
 import TextShow.Classes (TextShow(..))
 import TextShow.TH.Internal (deriveTextShow1, makeShowbPrec,

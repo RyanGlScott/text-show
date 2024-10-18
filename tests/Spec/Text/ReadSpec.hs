@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Text.ReadSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Instances.Text.Read ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)

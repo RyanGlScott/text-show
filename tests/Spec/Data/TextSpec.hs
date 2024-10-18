@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.Data.TextSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.TextSpec (main, spec) where
 
-import           Data.Proxy.Compat (Proxy(..))
+import           Data.Proxy (Proxy(..))
 
 import           Instances.Data.Text ()
 
@@ -22,13 +20,9 @@ import           Test.Hspec (Spec, describe, hspec, parallel)
 
 import qualified Data.Text as TS
 import qualified Data.Text as TL
-#if MIN_VERSION_text(1,0,0)
 import           Data.Text.Encoding (Decoding)
-#endif
 import           Data.Text.Encoding.Error (UnicodeException)
-#if MIN_VERSION_text(1,1,0)
 import           Data.Text.Internal.Fusion.Size (Size)
-#endif
 import           Data.Text.Lazy.Builder (Builder)
 
 main :: IO ()
@@ -44,11 +38,7 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy TL.Text)
     describe "UnicodeException" $
         matchesTextShowSpec (Proxy :: Proxy UnicodeException)
-#if MIN_VERSION_text(1,0,0)
     describe "Decoding" $
         matchesTextShowSpec (Proxy :: Proxy Decoding)
-#endif
-#if MIN_VERSION_text(1,1,0)
     describe "Size" $
         matchesTextShowSpec (Proxy :: Proxy Size)
-#endif

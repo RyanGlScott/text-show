@@ -14,9 +14,7 @@ import Control.Applicative (Const, ZipList)
 import Control.Monad.Trans.Instances ()
 
 import Data.Orphans ()
-import Data.Proxy.Compat (Proxy(..))
-
-import Generics.Deriving.Instances ()
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec,
                    genericTextShowSpec, genericTextShow1Spec)

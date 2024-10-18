@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Void
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -13,7 +13,7 @@ Portability: GHC
 -}
 module TextShow.Data.Void () where
 
-import Data.Void.Compat (Void, absurd)
+import Data.Void (Void, absurd)
 import Prelude ()
 import TextShow.Classes (TextShow(..))
 

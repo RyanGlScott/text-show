@@ -1,16 +1,13 @@
 {-# LANGUAGE CPP                  #-}
-
-#if MIN_VERSION_base(4,8,0)
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-# if __GLASGOW_HASKELL__ == 802
+{-# OPTIONS_GHC -Wno-orphans #-}
+#if __GLASGOW_HASKELL__ == 802
 -- See Note [Increased simpl-tick-factor on old GHCs] in TextShow.Data.Complex
 {-# OPTIONS_GHC -fsimpl-tick-factor=200 #-}
-# endif
 #endif
 
 {-|
@@ -23,11 +20,8 @@ Portability: GHC
 
 'Arbitrary' instances for data types in the "GHC.RTS.Flags" module.
 -}
-module Instances.GHC.RTS.Flags (
-#if !(MIN_VERSION_base(4,8,0))
-    ) where
-#else
-      GiveGCStats'
+module Instances.GHC.RTS.Flags
+    ( GiveGCStats'
     , DoCostCentres'
     , DoHeapProfile'
     , DoTrace'
@@ -96,15 +90,15 @@ instance Arbitrary TraceFlags where
 instance Arbitrary TickyFlags where
     arbitrary = genericArbitrary
 
-# if MIN_VERSION_base(4,10,0)
+#if MIN_VERSION_base(4,10,0)
 instance Arbitrary ParFlags where
     arbitrary = genericArbitrary
-# endif
+#endif
 
-# if MIN_VERSION_base(4,20,0)
+#if MIN_VERSION_base(4,20,0)
 instance Arbitrary HpcFlags where
     arbitrary = genericArbitrary
-# endif
+#endif
 
 type GiveGCStats'   = $(conT giveGCStatsTypeName)
 type DoCostCentres' = $(conT doCostCentresTypeName)
@@ -122,4 +116,3 @@ instance Arbitrary DoHeapProfile' where
 
 instance Arbitrary DoTrace' where
     arbitrary = genericArbitrary
-#endif

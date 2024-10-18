@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 #if __GLASGOW_HASKELL__ == 800
 -- See Note [Increased simpl-tick-factor on old GHCs]
 {-# OPTIONS_GHC -fsimpl-tick-factor=200 #-}

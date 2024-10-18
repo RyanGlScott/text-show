@@ -19,7 +19,7 @@ module TextShow.Debug.Trace.Generic (
     , genericTraceTextShowM
     ) where
 
-import Generics.Deriving.Base (Generic, Rep)
+import GHC.Generics (Generic, Rep)
 
 import Prelude ()
 import Prelude.Compat

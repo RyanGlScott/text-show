@@ -6,7 +6,7 @@
 #if __GLASGOW_HASKELL__ >= 806
 {-# LANGUAGE DerivingVia        #-}
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.Generic

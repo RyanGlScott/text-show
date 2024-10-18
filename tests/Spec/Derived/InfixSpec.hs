@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Derived.InfixSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Derived.Infix
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

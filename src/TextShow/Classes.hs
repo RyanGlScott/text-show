@@ -1,10 +1,8 @@
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DeriveDataTypeable         #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 #if __GLASGOW_HASKELL__ >= 806
-{-# LANGUAGE QuantifiedConstraints      #-}
+{-# LANGUAGE QuantifiedConstraints #-}
 #endif
 
 {-|
@@ -19,7 +17,6 @@ The 'TextShow', 'TextShow1', and 'TextShow2' typeclasses.
 -}
 module TextShow.Classes where
 
-import           Data.Data (Typeable)
 import qualified Data.Text         as TS (Text, singleton)
 import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, singleton)
@@ -176,8 +173,6 @@ class TextShow a where
     showtlList = toLazyText . showbList
 
     {-# MINIMAL showbPrec | showb #-}
-
-deriving instance Typeable TextShow
 
 -- | Surrounds 'Builder' output with parentheses if the 'Bool' parameter is 'True'.
 --
@@ -421,8 +416,6 @@ class
 
     {-# MINIMAL liftShowbPrec #-}
 
-deriving instance Typeable TextShow1
-
 -- | Lift the standard 'showbPrec' and 'showbList' functions through the
 -- type constructor.
 --
@@ -502,8 +495,6 @@ class
         showbListWith (liftShowbPrec2 sp1 sl1 sp2 sl2 0)
 
     {-# MINIMAL liftShowbPrec2 #-}
-
-deriving instance Typeable TextShow2
 
 -- | Lift two 'showbPrec' functions through the type constructor.
 --

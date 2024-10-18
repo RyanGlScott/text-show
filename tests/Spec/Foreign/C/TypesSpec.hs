@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Foreign.C.TypesSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Foreign.C.Types
 import Instances.Foreign.C.Types ()
 import Spec.Utils (matchesTextShowSpec)

@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP           #-}
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -15,18 +14,14 @@ Portability: GHC
 module Spec.GHC.GenericsSpec (main, spec) where
 
 import Data.Orphans ()
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
-import Generics.Deriving.Base ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
-                              , UChar, UDouble, UFloat, UInt, UWord
-                              , Fixity, Associativity
-#if MIN_VERSION_base(4,9,0)
-                              , Meta(MetaData), SourceUnpackedness
-                              , SourceStrictness, DecidedStrictness
-#else
-                              , Arity
-#endif
-                              )
+import GHC.Generics ( U1, Par1, Rec1, K1, M1, (:+:), (:*:), (:.:)
+                    , UChar, UDouble, UFloat, UInt, UWord
+                    , Fixity, Associativity
+                    , Meta(MetaData), SourceUnpackedness
+                    , SourceStrictness, DecidedStrictness
+                    )
 
 import Instances.GHC.Generics ()
 
@@ -37,17 +32,10 @@ import Test.Hspec (Spec, describe, hspec, parallel)
 main :: IO ()
 main = hspec spec
 
-#if MIN_VERSION_base(4,9,0)
 type MD = 'MetaData "Example" "Module" "package" 'False
 
 m1Description :: String
 m1Description = "M1 () ('MetaData \"Example\" \"Module\" \"package\" 'False) Maybe Int"
-#else
-type MD = ()
-
-m1Description :: String
-m1Description = "M1 () () Maybe Int"
-#endif
 
 spec :: Spec
 spec = parallel $ do
@@ -61,7 +49,6 @@ spec = parallel $ do
             p = Proxy
         matchesTextShowSpec p
         genericTextShowSpec p
-#if MIN_VERSION_base(4,9,0)
     describe "SourceUnpackedness" $ do
         let p :: Proxy SourceUnpackedness
             p = Proxy
@@ -77,13 +64,6 @@ spec = parallel $ do
             p = Proxy
         matchesTextShowSpec p
         genericTextShowSpec p
-#else
-    describe "Arity" $ do
-        let p :: Proxy Arity
-            p = Proxy
-        matchesTextShowSpec p
-        genericTextShowSpec p
-#endif
     describe "U1 Int" $ do
         let p :: Proxy (U1 Int)
             p = Proxy

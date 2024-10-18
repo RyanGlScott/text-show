@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.FunctionsSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Text.Show.Functions ()

@@ -1,10 +1,7 @@
-{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
-#if MIN_VERSION_text(0,9,0)
 {-# LANGUAGE TemplateHaskell   #-}
-#endif
-{-# OPTIONS_GHC -fno-warn-deprecations #-} -- TODO: Remove this later
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-deprecations #-} -- TODO: Remove this later
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Text
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -26,29 +23,23 @@ for more details. If this is a problem for you, please file an issue.
 module TextShow.Data.Text () where
 
 import qualified Data.Text as TS
+import           Data.Text.Encoding (Decoding(..))
 import           Data.Text.Encoding.Error (UnicodeException(..))
+import           Data.Text.Internal.Fusion.Size (Size)
 import qualified Data.Text.Lazy as TL
-import           Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
+import           Data.Text.Lazy.Builder (Builder, fromString, singleton,
+                                         toLazyText)
+
+import           GHC.Show (appPrec)
 
 import           Prelude ()
 import           Prelude.Compat
 
-import           TextShow.Classes (TextShow(..))
+import           TextShow.Classes (TextShow(..), showbParen)
+import           TextShow.Data.ByteString ()
 import           TextShow.Data.Char (showbString)
 import           TextShow.Data.Integral (showbHex)
 import           TextShow.TH.Internal (deriveTextShow)
-
-#if MIN_VERSION_text(1,0,0)
-import           Data.Text.Encoding (Decoding(..))
-import           Data.Text.Lazy.Builder (singleton)
-import           GHC.Show (appPrec)
-import           TextShow.Classes (showbParen)
-import           TextShow.Data.ByteString ()
-#endif
-
-#if MIN_VERSION_text(1,1,0)
-import           Data.Text.Internal.Fusion.Size (Size)
-#endif
 
 -- | /Since: 2/
 instance TextShow TS.Text where
@@ -76,21 +67,13 @@ instance TextShow UnicodeException where
     showb (EncodeError desc Nothing)
         = "Cannot encode input: " <> fromString desc
 
-#if MIN_VERSION_text(1,0,0)
--- | Only available with @text-1.0.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 instance TextShow Decoding where
     showbPrec p (Some t bs _) = showbParen (p > appPrec) $
         "Some " <> showb t <>
         singleton ' ' <> showb bs <>
         " _"
     {-# INLINE showbPrec #-}
-#endif
 
-#if MIN_VERSION_text(1,1,0)
--- | Only available with @text-1.1.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 $(deriveTextShow ''Size)
-#endif

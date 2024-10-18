@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.FromStringTextShowSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,17 +10,14 @@ Portability: GHC
 -}
 module Spec.FromStringTextShowSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Instances.FromStringTextShow ()
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (matchesTextShowSpec, matchesTextShow1Spec,
+                   matchesTextShow2Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
-import TextShow (FromStringShow(..), FromTextShow(..))
-
-#if defined(NEW_FUNCTOR_CLASSES)
-import Spec.Utils (matchesTextShow1Spec, matchesTextShow2Spec)
-import TextShow (FromStringShow1(..), FromStringShow2(..),
+import TextShow (FromStringShow(..), FromTextShow(..),
+                 FromStringShow1(..), FromStringShow2(..),
                  FromTextShow1(..), FromTextShow2(..))
-#endif
 
 main :: IO ()
 main = hspec spec
@@ -45,7 +40,6 @@ spec = parallel $ do
         let p :: Proxy (FromTextShow String)
             p = Proxy
         matchesTextShowSpec  p
-#if defined(NEW_FUNCTOR_CLASSES)
     describe "FromStringShow1 Maybe Int" $ do
         let p :: Proxy (FromStringShow1 Maybe Int)
             p = Proxy
@@ -62,4 +56,3 @@ spec = parallel $ do
         let p :: Proxy (FromTextShow2 Either Char Int)
             p = Proxy
         matchesTextShow2Spec p
-#endif

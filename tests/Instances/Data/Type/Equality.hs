@@ -1,8 +1,7 @@
-{-# LANGUAGE CPP           #-}
 {-# LANGUAGE PolyKinds     #-}
 {-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE TypeOperators #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.Data.Type.Equality
@@ -23,7 +22,5 @@ import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 instance a ~ b => Arbitrary (a :~: b) where
     arbitrary = arbitraryBoundedEnum
 
-#if MIN_VERSION_base(4,9,0)
 instance a ~~ b => Arbitrary (a :~~: b) where
     arbitrary = arbitraryBoundedEnum
-#endif

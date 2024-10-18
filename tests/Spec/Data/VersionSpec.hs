@@ -1,6 +1,6 @@
 module Spec.Data.VersionSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Version (Version, showVersion)
 
 import Spec.Utils (matchesTextShowSpec)

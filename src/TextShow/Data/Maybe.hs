@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Maybe
 Copyright:   (C) 2014-2017 Ryan Scott

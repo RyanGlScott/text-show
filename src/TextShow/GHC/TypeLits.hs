@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.GHC.TypeLits
 Copyright:   (C) 2014-2017 Ryan Scott

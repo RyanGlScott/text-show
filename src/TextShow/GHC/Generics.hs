@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                  #-}
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE KindSignatures       #-}
@@ -7,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.GHC.Generics
@@ -23,7 +22,7 @@ Portability: GHC
 -}
 module TextShow.GHC.Generics () where
 
-import Generics.Deriving.Base
+import GHC.Generics
 
 import TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.Data.Char     ()
@@ -118,22 +117,9 @@ $(deriveTextShow1 'UWord)
 $(deriveTextShow ''Associativity)
 -- | /Since: 2/
 $(deriveTextShow ''Fixity)
-#if MIN_VERSION_base(4,9,0)
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 $(deriveTextShow ''SourceUnpackedness)
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 $(deriveTextShow ''SourceStrictness)
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 $(deriveTextShow ''DecidedStrictness)
-#else
--- | Only available with @base-4.8@ or earlier.
---
--- /Since: 2/
-$(deriveTextShow ''Arity)
-#endif

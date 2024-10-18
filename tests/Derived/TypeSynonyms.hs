@@ -1,10 +1,8 @@
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Derived.TypeSynonyms
@@ -22,18 +20,13 @@ import           Control.Monad.Trans.Instances ()
 
 import           Data.Orphans ()
 
-import qualified Generics.Deriving.TH as Generics
-
-import           GHC.Generics (Generic)
+import           GHC.Generics (Generic, Generic1)
 
 import           Prelude
 
 import           Test.QuickCheck (Arbitrary)
 
-import           Text.Show.Deriving (deriveShow1)
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Text.Show.Deriving (deriveShow2)
-#endif
+import           Text.Show.Deriving (deriveShow1, deriveShow2)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -54,6 +47,7 @@ newtype TyCon a b = TyCon
   deriving ( Arbitrary
            , Show
            , Generic
+           , Generic1
            )
 
 -------------------------------------------------------------------------------
@@ -69,43 +63,21 @@ newtype instance TyFamily a b = TyFamily
   deriving ( Arbitrary
            , Show
            , Generic
+           , Generic1
            )
 
 -------------------------------------------------------------------------------
 
-#if !(MIN_VERSION_base(4,9,0))
--- TODO: Delete this code once we depend on transformers-compat-0.7.1 as the
--- minimum
-# if !(MIN_VERSION_transformers_compat(0,7,1))
-$(deriveShow1 ''(,,,))
-#  if defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow2 ''(,,,))
-#  endif
-# endif
-#endif
-
 $(deriveShow1 ''TyCon)
-#if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''TyCon)
-#endif
 
 $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-$(Generics.deriveMeta           ''TyCon)
-$(Generics.deriveRepresentable1 ''TyCon)
-
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 'TyFamily)
-#else
 $(deriveShow1 'TyFamily)
 $(deriveShow2 'TyFamily)
-#endif
 
 $(deriveTextShow  'TyFamily)
 $(deriveTextShow1 'TyFamily)
 $(deriveTextShow2 'TyFamily)
-
-$(Generics.deriveMeta           'TyFamily)
-$(Generics.deriveRepresentable1 'TyFamily)

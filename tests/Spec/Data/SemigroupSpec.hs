@@ -10,8 +10,8 @@ Portability: GHC
 -}
 module Spec.Data.SemigroupSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
-import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Arg)
+import Data.Proxy (Proxy(..))
+import Data.Semigroup (Min, Max, First, Last, WrappedMonoid, Arg)
 
 import Instances.Data.Semigroup ()
 

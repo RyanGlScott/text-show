@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Foreign.PtrSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Foreign.ForeignPtr (newForeignPtr_)
 import Foreign.Ptr (FunPtr, IntPtr, Ptr, WordPtr)

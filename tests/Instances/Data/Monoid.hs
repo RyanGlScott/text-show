@@ -2,7 +2,7 @@
 #if MIN_VERSION_base(4,12,0)
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 #endif
 {-|
 Module:      Instances.Data.Monoid

@@ -13,12 +13,10 @@ Portability: GHC
 -}
 module Spec.Data.TypeableSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Typeable (TyCon)
 
-#if MIN_VERSION_base(4,9,0)
 import GHC.Types (TrName, Module)
-#endif
 
 #if MIN_VERSION_base(4,10,0)
 import Data.Kind (Type)
@@ -40,12 +38,10 @@ spec :: Spec
 spec = parallel $ do
     describe "TyCon" $
         matchesTextShowSpec (Proxy :: Proxy TyCon)
-#if MIN_VERSION_base(4,9,0)
     describe "TrName" $
         matchesTextShowSpec (Proxy :: Proxy TrName)
     describe "Module" $
         matchesTextShowSpec (Proxy :: Proxy Module)
-#endif
 #if MIN_VERSION_base(4,10,0)
     describe "SomeTypeRep" $
         matchesTextShowSpec (Proxy :: Proxy SomeTypeRep)

@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.Control.Exception
@@ -83,16 +83,12 @@ deriving instance Enum BlockedIndefinitelyOnSTM
 instance Arbitrary BlockedIndefinitelyOnSTM where
     arbitrary = arbitraryBoundedEnum
 
-#if MIN_VERSION_base(4,8,0)
 deriving instance Bounded AllocationLimitExceeded
 deriving instance Enum AllocationLimitExceeded
 instance Arbitrary AllocationLimitExceeded where
     arbitrary = arbitraryBoundedEnum
-#endif
 
-#if MIN_VERSION_base(4,9,0)
 deriving instance Arbitrary TypeError
-#endif
 
 #if MIN_VERSION_base(4,10,0)
 deriving instance Arbitrary CompactionFailed

@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.DynamicSpec (main, spec) where
 
 import Data.Dynamic (Dynamic)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Dynamic ()
 

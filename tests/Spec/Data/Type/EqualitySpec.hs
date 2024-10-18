@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP           #-}
 {-# LANGUAGE TypeOperators #-}
 
 {-|
@@ -13,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.Type.EqualitySpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Type.Equality.Compat
 
 import Instances.Data.Type.Equality ()
@@ -33,7 +32,5 @@ spec :: Spec
 spec = parallel $ do
     describe "Int :~: Int" $
         matchesTextShowSpec (Proxy :: Proxy (Int :~: Int))
-# if MIN_VERSION_base(4,9,0)
     describe "Int :~~: Int" $
         matchesTextShowSpec (Proxy :: Proxy (Int :~~: Int))
-# endif

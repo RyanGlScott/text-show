@@ -10,9 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.ProxySpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
-
-import Generics.Deriving.Base ()
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 

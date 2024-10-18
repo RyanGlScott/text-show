@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Text.Read
 Copyright:   (C) 2014-2017 Ryan Scott

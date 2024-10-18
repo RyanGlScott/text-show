@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Data.List.NonEmpty
@@ -15,7 +15,7 @@ Portability: GHC
 -}
 module TextShow.Data.List.NonEmpty () where
 
-import Data.List.NonEmpty.Compat (NonEmpty)
+import Data.List.NonEmpty (NonEmpty)
 
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1)

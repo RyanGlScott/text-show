@@ -13,7 +13,7 @@ module Spec.Data.Functor.ComposeSpec (main, spec) where
 import Control.Monad.Trans.Instances ()
 
 import Data.Functor.Compose (Compose)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShow1Spec)
 

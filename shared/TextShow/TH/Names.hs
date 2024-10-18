@@ -1,5 +1,5 @@
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 
 {-|
 Module:      TextShow.TH.Names
@@ -17,19 +17,14 @@ module TextShow.TH.Names (
     fdKeyTypeName,
     uniqueTypeName,
     asInt64ValName,
-#if MIN_VERSION_base(4,8,0)
     giveGCStatsTypeName,
     doCostCentresTypeName,
     doHeapProfileTypeName,
     doTraceTypeName,
-#endif
     ) where
 
-import Language.Haskell.TH.Syntax
-
-#if MIN_VERSION_base(4,8,2)
 import GHC.RTS.Flags (GiveGCStats, DoCostCentres, DoHeapProfile, DoTrace)
-#endif
+import Language.Haskell.TH.Syntax
 
 -------------------------------------------------------------------------------
 
@@ -79,42 +74,18 @@ asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt"
 asInt64ValName = mkNameG_v "base" "GHC.Event.Unique" "asInt64"
 #endif
 
-#if MIN_VERSION_base(4,8,0)
 -- | The 'Name' of 'GiveGCStats'.
 giveGCStatsTypeName :: Name
-# if MIN_VERSION_base(4,8,2)
 giveGCStatsTypeName = ''GiveGCStats
-# else
-giveGCStatsTypeName = mkFlagsName_tc "GiveGCStats"
-# endif
 
 -- | The 'Name' of 'DoCostCentres'.
 doCostCentresTypeName :: Name
-# if MIN_VERSION_base(4,8,2)
 doCostCentresTypeName = ''DoCostCentres
-# else
-doCostCentresTypeName = mkFlagsName_tc "DoCostCentres"
-# endif
 
 -- | The 'Name' of 'DoHeapProfile'.
 doHeapProfileTypeName :: Name
-# if MIN_VERSION_base(4,8,2)
 doHeapProfileTypeName = ''DoHeapProfile
-# else
-doHeapProfileTypeName = mkFlagsName_tc "DoHeapProfile"
-# endif
 
 -- | The 'Name' of 'DoTrace'.
 doTraceTypeName :: Name
-# if MIN_VERSION_base(4,8,2)
 doTraceTypeName = ''DoTrace
-# else
-doTraceTypeName = mkFlagsName_tc "DoTrace"
-# endif
-
--- | Creates a 'Name' for a type from the "GHC.RTS.Flags" module.
-# if !(MIN_VERSION_base(4,8,2))
-mkFlagsName_tc :: String -> Name
-mkFlagsName_tc = mkNameG_tc "base" "GHC.RTS.Flags"
-# endif
-#endif

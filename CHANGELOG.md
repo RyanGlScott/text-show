@@ -1,3 +1,8 @@
+## next [????.??.??]
+* Drop support for pre-8.0 versions of GHC.
+* Remove `TextShow.Data.OldTypeable`. The code in this module only worked with
+  old versions of GHC that are no longer supported.
+
 ### 3.10.5 [2024.04.20]
 * Support building with GHC 9.10.
 * Ensure that the `TextShow` instance for `TypeRep` properly displays unboxed

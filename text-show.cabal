@@ -52,9 +52,7 @@ stability:           Provisional
 copyright:           (C) 2014-2017 Ryan Scott
 category:            Text
 build-type:          Simple
-tested-with:         GHC == 7.8.4
-                   , GHC == 7.10.3
-                   , GHC == 8.0.2
+tested-with:         GHC == 8.0.2
                    , GHC == 8.2.2
                    , GHC == 8.4.4
                    , GHC == 8.6.5
@@ -63,30 +61,15 @@ tested-with:         GHC == 7.8.4
                    , GHC == 9.0.2
                    , GHC == 9.2.8
                    , GHC == 9.4.8
-                   , GHC == 9.6.5
+                   , GHC == 9.6.6
                    , GHC == 9.8.2
                    , GHC == 9.10.1
-extra-source-files:  CHANGELOG.md, README.md, include/*.h
+extra-source-files:  CHANGELOG.md, README.md
 cabal-version:       >=1.10
 
 source-repository head
   type:                git
   location:            https://github.com/RyanGlScott/text-show
-
-flag base-4-9
-  description:         Use base-4.9 or later.
-  default:             True
-
-flag template-haskell-2-11
-  description:         Use template-haskell-2.11.0.0 or later.
-  default:             True
-
-flag new-functor-classes
-  description:         Use a version of transformers or transformers-compat with a
-                       modern-style Data.Functor.Classes module. This flag cannot be
-                       used when building with transformers-0.4, since it comes with
-                       a different version of Data.Functor.Classes.
-  default:             True
 
 flag integer-gmp
   description:         When building with a version of GHC older than 9.0,
@@ -131,6 +114,8 @@ library
                        TextShow.Data.Semigroup
                        TextShow.Data.Text
                        TextShow.Data.Tuple
+                       TextShow.Data.Type.Coercion
+                       TextShow.Data.Type.Equality
                        TextShow.Data.Typeable
                        TextShow.Data.Version
                        TextShow.Data.Void
@@ -139,7 +124,11 @@ library
                        TextShow.Functions
                        TextShow.GHC.Fingerprint
                        TextShow.GHC.Generics
+                       TextShow.GHC.RTS.Flags
+                       TextShow.GHC.Stack
+                       TextShow.GHC.StaticPtr
                        TextShow.GHC.Stats
+                       TextShow.GHC.TypeLits
                        TextShow.Numeric.Natural
                        TextShow.System.Exit
                        TextShow.System.IO
@@ -151,22 +140,6 @@ library
                        TextShow.GHC.Conc.Windows
                        -- Only exports functions if not using Windows
                        TextShow.GHC.Event
-
-                       -- Only exports functions if base >= 4.6
-                       TextShow.GHC.TypeLits
-
-                       -- Only exports functions if base >= 4.7
-                       TextShow.Data.Type.Coercion
-                       TextShow.Data.Type.Equality
-                       -- Only exports functions if base >= 4.7 && < 4.8
-                       TextShow.Data.OldTypeable
-
-                       -- Only exports functions if base >= 4.8
-                       TextShow.GHC.RTS.Flags
-                       TextShow.GHC.StaticPtr
-
-                       -- Only exports functions if base >= 4.8.1
-                       TextShow.GHC.Stack
   other-modules:       TextShow.Classes
                        TextShow.Data.Typeable.Utils
                        TextShow.FromStringTextShow
@@ -175,36 +148,19 @@ library
                        TextShow.TH.Internal
                        TextShow.TH.Names
                        TextShow.Utils
-  build-depends:       array                 >= 0.3    && < 0.6
-                     , base-compat-batteries >= 0.11   && < 0.15
-                     , bifunctors            >= 5.1    && < 6
-                     , bytestring            >= 0.9    && < 0.13
-                     , bytestring-builder
-                     , containers            >= 0.1    && < 0.8
-                     , generic-deriving      >= 1.14.1 && < 2
+  build-depends:       array                 >= 0.3      && < 0.6
+                     , base                  >= 4.9      && < 4.21
+                     , base-compat-batteries >= 0.11     && < 0.15
+                     , bifunctors            >= 5.1      && < 6
+                     , bytestring            >= 0.10.8.1 && < 0.13
+                     , containers            >= 0.1      && < 0.8
+                     , ghc-boot-th           >= 8.0      && < 9.11
                      , ghc-prim
-                     , text                  >= 0.11.1 && < 2.2
-                     , th-abstraction        >= 0.4    && < 0.8
-                     , th-lift               >= 0.7.6  && < 1
-
-  if flag(base-4-9)
-    build-depends:     base                  >= 4.9 && < 4.21
-    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
-  else
-    build-depends:     base                  >= 4.7 && < 4.9
-
-  if flag(template-haskell-2-11)
-    build-depends:     template-haskell      >= 2.11 && < 2.23
-                     , ghc-boot-th           >= 8.0  && < 9.11
-  else
-    build-depends:     template-haskell      >= 2.9  && < 2.11
-
-  if flag(new-functor-classes)
-    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.7)
-                     , transformers-compat   >= 0.5 && < 1
-    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
-  else
-    build-depends:     transformers          == 0.4.*
+                     , template-haskell      >= 2.11     && < 2.23
+                     , text                  >= 1.1      && < 2.2
+                     , th-abstraction        >= 0.5      && < 0.8
+                     , transformers          >= 0.5      && < 0.7
+                     , transformers-compat   >= 0.5      && < 1
 
   -- integer-gmp is only needed on pre-9.0 versions of GHC, as GHC 9.0+ add
   -- enough functionality to base to avoid the use of integer-gmp entirely.
@@ -218,8 +174,6 @@ library
     ghc-options:       -Wno-star-is-type
   if impl(ghc >= 9.0)
     ghc-options:       -fenable-th-splice-warnings
-  include-dirs:        include
-  includes:            generic.h
 
 test-suite spec
   type:                exitcode-stdio-1.0
@@ -247,13 +201,19 @@ test-suite spec
                        Instances.Data.Text
                        Instances.Data.Tuple
                        Instances.Data.Typeable
+                       Instances.Data.Type.Coercion
+                       Instances.Data.Type.Equality
                        Instances.Foreign.C.Types
                        Instances.Foreign.Ptr
                        Instances.FromStringTextShow
                        Instances.Generic
                        Instances.GHC.Fingerprint
                        Instances.GHC.Generics
+                       Instances.GHC.RTS.Flags
+                       Instances.GHC.Stack
+                       Instances.GHC.StaticPtr
                        Instances.GHC.Stats
+                       Instances.GHC.TypeLits
                        Instances.Options
                        Instances.System.IO
                        Instances.System.Posix.Types
@@ -265,22 +225,6 @@ test-suite spec
                        Instances.GHC.Conc.Windows
                        -- Only exports instances if not using Windows
                        Instances.GHC.Event
-
-                       -- Only exports instances if base >= 4.6
-                       Instances.GHC.TypeLits
-
-                       -- Only exports instances if base >= 4.7
-                       Instances.Data.Type.Coercion
-                       Instances.Data.Type.Equality
-                       -- Only exports instances if base >= 4.7 && < 4.8
-                       Instances.Data.OldTypeable
-
-                       -- Only exports instances if base >= 4.8
-                       Instances.GHC.RTS.Flags
-                       Instances.GHC.StaticPtr
-
-                       -- Only exports instances if base >= 4.9
-                       Instances.GHC.Stack
 
                        -- Only exports instances if base >= 4.12
                        Instances.Data.Monoid
@@ -316,6 +260,8 @@ test-suite spec
                        Spec.Data.SemigroupSpec
                        Spec.Data.TextSpec
                        Spec.Data.TupleSpec
+                       Spec.Data.Type.CoercionSpec
+                       Spec.Data.Type.EqualitySpec
                        Spec.Data.TypeableSpec
                        Spec.Data.VersionSpec
                        Spec.Derived.DataFamiliesSpec
@@ -335,7 +281,11 @@ test-suite spec
                        Spec.GenericSpec
                        Spec.GHC.FingerprintSpec
                        Spec.GHC.GenericsSpec
+                       Spec.GHC.RTS.FlagsSpec
+                       Spec.GHC.StackSpec
+                       Spec.GHC.StaticPtrSpec
                        Spec.GHC.StatsSpec
+                       Spec.GHC.TypeLitsSpec
                        Spec.Numeric.NaturalSpec
                        Spec.OptionsSpec
                        Spec.System.ExitSpec
@@ -349,51 +299,24 @@ test-suite spec
                        -- Only exports tests if not using Windows
                        Spec.GHC.EventSpec
 
-                       -- Only exports tests if base >= 4.6
-                       Spec.GHC.TypeLitsSpec
-
-                       -- Only exports tests if base >= 4.7
-                       Spec.Data.Type.CoercionSpec
-                       Spec.Data.Type.EqualitySpec
-                       -- Only exports tests if base >= 4.7 && < 4.8
-                       Spec.Data.OldTypeableSpec
-
-                       -- Only exports tests if base >= 4.8
-                       Spec.GHC.RTS.FlagsSpec
-                       Spec.GHC.StaticPtrSpec
-
-                       -- Only exports tests if base >= 4.9
-                       Spec.GHC.StackSpec
-
                        TextShow.TH.Names
-  build-depends:       array                 >= 0.3    && < 0.6
-                     , base-compat-batteries >= 0.11   && < 0.15
-                     , base-orphans          >= 0.8.5  && < 0.10
-                     , bytestring            >= 0.9    && < 0.13
-                     , bytestring-builder
-                     , deriving-compat       >= 0.6.5  && < 1
-                     , generic-deriving      >= 1.14.1 && < 2
+  build-depends:       array                 >= 0.3      && < 0.6
+                     , base                  >= 4.9      && < 4.21
+                     , base-compat-batteries >= 0.11     && < 0.15
+                     , base-orphans          >= 0.8.5    && < 0.10
+                     , bytestring            >= 0.10.8.1 && < 0.13
+                     , deriving-compat       >= 0.6.5    && < 1
+                     , generic-deriving      >= 1.14.1   && < 2
                      , ghc-prim
-                     , hspec                 >= 2      && < 3
-                     , QuickCheck            >= 2.14.3 && < 2.16
-                     , quickcheck-instances  >= 0.3.28 && < 0.4
-                     , template-haskell      >= 2.9    && < 2.23
-                     , text                  >= 0.11.1 && < 2.2
+                     , hspec                 >= 2        && < 3
+                     , QuickCheck            >= 2.14.3   && < 2.16
+                     , quickcheck-instances  >= 0.3.28   && < 0.4
+                     , template-haskell      >= 2.11     && < 2.23
+                     , text                  >= 1.1      && < 2.2
                      , text-show
-                     , transformers-compat   >= 0.5    && < 1
+                     , transformers          >= 0.5      && < 0.7
+                     , transformers-compat   >= 0.5      && < 1
   build-tool-depends:  hspec-discover:hspec-discover
-
-  if flag(base-4-9)
-    build-depends:     base                  >= 4.9 && < 4.21
-    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
-  else
-    build-depends:     base                  >= 4.7 && < 4.9
-
-  if flag(new-functor-classes)
-    build-depends:     transformers          (>= 0.2.1 && < 0.4) || (>= 0.5 && < 0.7)
-    cpp-options:       "-DNEW_FUNCTOR_CLASSES"
-  else
-    build-depends:     transformers          == 0.4.*
 
   hs-source-dirs:      tests, shared
   default-language:    Haskell2010
@@ -402,19 +325,16 @@ test-suite spec
     ghc-options:       -Wno-star-is-type
   if impl(ghc >= 9.0)
     ghc-options:       -fenable-th-splice-warnings
-  include-dirs:        include
-  includes:            generic.h
-                     , overlap.h
 
 benchmark bench
   type:                exitcode-stdio-1.0
   main-is:             Bench.hs
-  build-depends:       base      >= 4.5    && < 4.21
+  build-depends:       base      >= 4.9    && < 4.21
                      , criterion >= 1.1.4  && < 2
                      , deepseq   >= 1.3    && < 2
                      , ghc-prim
                      , text-show
-                     , text      >= 0.11.1 && < 2.2
+                     , text      >= 1.1    && < 2.2
 
   hs-source-dirs:      benchmarks
   default-language:    Haskell2010

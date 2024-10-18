@@ -1,10 +1,6 @@
 {-# LANGUAGE BangPatterns    #-}
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE MagicHash       #-}
-#if !(MIN_VERSION_bytestring(0,10,0))
-{-# LANGUAGE TemplateHaskell #-}
-#endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Data.ByteString
@@ -31,16 +27,6 @@ import           TextShow.Classes (TextShow(..))
 import           TextShow.Data.Char ()
 import           TextShow.Data.List ()
 
-#if !(MIN_VERSION_bytestring(0,10,0))
-import           Data.Word (Word8)
-
-import           Foreign.ForeignPtr (withForeignPtr)
-import           Foreign.Ptr (plusPtr)
-import           Foreign.Storable (peek, peekByteOff)
-
-import           TextShow.TH.Internal (deriveTextShow)
-#endif
-
 ------------------------------------------------------------------------
 -- Primop wrappers
 
@@ -59,31 +45,12 @@ asBA (SBS ba#) = BA# ba#
 -- | /Since: 2/
 instance TextShow BS.ByteString where
     {-# INLINE showb #-}
-#if MIN_VERSION_bytestring(0,10,0)
     showb = showb . BS.unpackChars
-#else
-    showb = showb . unpackWith BS.w2c
 
--- | /O(n)/ Converts a 'ByteString' to a '[a]', using a conversion function.
-unpackWith :: (Word8 -> a) -> BS.ByteString -> [a]
-unpackWith _ (BS.PS _  _ 0) = []
-unpackWith k (BS.PS ps s l) = BS.inlinePerformIO $ withForeignPtr ps $ \p ->
-        go (p `plusPtr` s) (l - 1) []
-    where
-        go !p !0 !acc = peek p          >>= \e -> return (k e : acc)
-        go !p !n !acc = peekByteOff p n >>= \e -> go p (n-1) (k e : acc)
-{-# INLINE unpackWith #-}
-#endif
-
-#if MIN_VERSION_bytestring(0,10,0)
 -- | /Since: 2/
 instance TextShow BL.ByteString where
     showb = showb . BL.unpackChars
     {-# INLINE showb #-}
-#else
--- | /Since: 2/
-$(deriveTextShow ''BL.ByteString)
-#endif
 
 -- | /Since: 2/
 instance TextShow ShortByteString where

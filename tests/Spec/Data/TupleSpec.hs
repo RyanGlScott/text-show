@@ -12,8 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.TupleSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
-import Generics.Deriving.Instances ()
+import Data.Proxy (Proxy(..))
 #if MIN_VERSION_ghc_prim(0,7,0)
 import GHC.Tuple (Solo)
 #endif

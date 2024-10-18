@@ -6,7 +6,7 @@ Maintainer:  Ryan Scott
 Stability:   Provisional
 Portability: GHC
 
-Utility functions for showing data types in the @Typeable@ (or @OldTypeable@) module.
+Utility functions for showing data types in the @Typeable@ module.
 -}
 module TextShow.Data.Typeable.Utils (showbArgs, showbTuple) where
 

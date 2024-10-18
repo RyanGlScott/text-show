@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.System.IOSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress)

@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.ListSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 

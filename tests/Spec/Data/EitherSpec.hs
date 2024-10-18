@@ -10,8 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.EitherSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
-import Generics.Deriving.Instances ()
+import Data.Proxy (Proxy(..))
 import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 

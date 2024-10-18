@@ -5,7 +5,7 @@
 #if __GLASGOW_HASKELL__ >= 806
 {-# LANGUAGE DerivingVia        #-}
 #endif
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Control.Exception
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -22,10 +22,7 @@ module TextShow.Control.Exception () where
 
 import Control.Exception.Base
 
-import Data.Text.Lazy.Builder (fromString)
-#if MIN_VERSION_base(4,9,0)
-import Data.Text.Lazy.Builder (singleton)
-#endif
+import Data.Text.Lazy.Builder (fromString, singleton)
 
 import Prelude ()
 import Prelude.Compat
@@ -111,23 +108,15 @@ instance TextShow BlockedIndefinitelyOnSTM where
     showb BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
     {-# INLINE showb #-}
 
-#if MIN_VERSION_base(4,8,0)
--- | Only available with @base-4.8.0.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 instance TextShow AllocationLimitExceeded where
     showb AllocationLimitExceeded = "allocation limit exceeded"
     {-# INLINE showb #-}
-#endif
 
-#if MIN_VERSION_base(4,9,0)
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 instance TextShow TypeError where
     showb (TypeError err) = fromString err
     {-# INLINE showb #-}
-#endif
 
 #if MIN_VERSION_base(4,10,0)
 -- | Only available with @base-4.10.0.0@ or later.
@@ -177,13 +166,9 @@ instance TextShow RecUpdError where
 
 -- | /Since: 2/
 instance TextShow ErrorCall where
-#if MIN_VERSION_base(4,9,0)
     showb (ErrorCallWithLocation err "")  = fromString err
     showb (ErrorCallWithLocation err loc) =
       fromString err <> singleton '\n' <> fromString loc
-#else
-    showb (ErrorCall err) = fromString err
-#endif
 
 -- | /Since: 2/
 $(deriveTextShow ''MaskingState)

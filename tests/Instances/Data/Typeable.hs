@@ -3,7 +3,7 @@
 {-# LANGUAGE PolyKinds           #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving  #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.Data.Typeable
@@ -19,15 +19,11 @@ module Instances.Data.Typeable () where
 
 #include "MachDeps.h"
 
-#if MIN_VERSION_base(4,9,0)
 import GHC.Types (TyCon(..), TrName(..), Module(..))
-# if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
+#if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
 import GHC.Word (Word64(..))
-# else
-import GHC.Word (Word(..))
-# endif
 #else
-import Data.Typeable.Internal (TyCon(..))
+import GHC.Word (Word(..))
 #endif
 
 #if MIN_VERSION_base(4,10,0)
@@ -105,38 +101,28 @@ instance Arbitrary VecElem where
 instance Arbitrary TypeRep where
     arbitrary = TypeRep <$> arbitrary
                         <*> arbitrary
-# if MIN_VERSION_base(4,8,0)
                         <@> [] <@> []
-# else
-                        <@> []
-# endif
 #endif
 
 instance Arbitrary TyCon where
-#if MIN_VERSION_base(4,9,0)
     arbitrary = do
-# if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
+#if MIN_VERSION_base(4,17,0) || WORD_SIZE_IN_BITS < 64
         W64# w1# <- arbitrary
         W64# w2# <- arbitrary
-# else
+#else
         W#   w1# <- arbitrary
         W#   w2# <- arbitrary
-# endif
-# if MIN_VERSION_base(4,10,0)
+#endif
+#if MIN_VERSION_base(4,10,0)
         I# i# <- arbitrary
         (\a1 a2 a3 -> TyCon w1# w2# a1 a2 i# a3)
             <$> arbitrary <*> arbitrary <*> arbitrary
-# else
-        TyCon w1# w2# <$> arbitrary <*> arbitrary
-# endif
 #else
-    arbitrary = TyCon <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+        TyCon w1# w2# <$> arbitrary <*> arbitrary
 #endif
 
-#if MIN_VERSION_base(4,9,0)
 instance Arbitrary TrName where
     arbitrary = oneof [pure (TrNameS "wat"#), TrNameD <$> arbitrary]
 
 instance Arbitrary Module where
     arbitrary = Module <$> arbitrary <*> arbitrary
-#endif

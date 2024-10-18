@@ -13,7 +13,7 @@ Portability: GHC
 module Spec.Data.Type.CoercionSpec (main, spec) where
 
 import Data.Monoid (All(..))
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Type.Coercion (Coercion)
 
 import Instances.Data.Type.Coercion ()

@@ -3,7 +3,7 @@
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 #endif
 {-|
 Module:      TextShow.GHC.Event
@@ -25,7 +25,7 @@ import Data.List (intersperse)
 import Data.Maybe (catMaybes)
 import Data.Text.Lazy.Builder (Builder, singleton)
 
-import GHC.Event (Event, evtRead, evtWrite)
+import GHC.Event (Event, Lifetime, evtRead, evtWrite)
 
 import Language.Haskell.TH.Lib (conT, varE)
 
@@ -38,10 +38,6 @@ import TextShow.System.Posix.Types ()
 import TextShow.TH.Internal (deriveTextShow)
 import TextShow.TH.Names (evtCloseValName, eventIsValName,
                           fdKeyTypeName, uniqueTypeName, asInt64ValName)
-
-# if MIN_VERSION_base(4,8,1)
-import GHC.Event (Lifetime)
-# endif
 
 -- | /Since: 2/
 instance TextShow Event where
@@ -62,10 +58,6 @@ instance TextShow $(conT uniqueTypeName) where
     showb = showb . $(varE asInt64ValName)
     {-# INLINE showb #-}
 
-# if MIN_VERSION_base(4,8,1)
--- | Only available with @base-4.8.1.0@ or later.
---
--- /Since: 2/
+-- | /Since: 2/
 $(deriveTextShow ''Lifetime)
-# endif
 #endif

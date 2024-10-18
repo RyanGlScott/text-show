@@ -13,7 +13,7 @@ module Spec.Data.ByteStringSpec (main, spec) where
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString)
 import           Data.ByteString.Short (ShortByteString)
-import           Data.Proxy.Compat (Proxy(..))
+import           Data.Proxy (Proxy(..))
 
 import           Spec.Utils (matchesTextShowSpec)
 

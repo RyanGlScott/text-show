@@ -1,6 +1,6 @@
-distribution:           bionic
+distribution:           jammy
 no-tests-no-benchmarks: False
 unconstrained:          False
 local-ghc-options:      -Werror
 -- Work around https://github.com/haskell/haddock/issues/574
-haddock:                <8.0 || >=8.4
+haddock:                >=8.4

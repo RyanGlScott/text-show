@@ -13,7 +13,7 @@ Portability: GHC
 module Spec.Data.IntegralSpec (main, spec) where
 
 import Data.Int (Int8, Int16, Int32, Int64)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Word (Word8, Word16, Word32, Word64)
 
 import Prelude ()
@@ -23,7 +23,7 @@ import Spec.Utils (matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 
-#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
+#if !defined(mingw32_HOST_OS)
 import Data.Char (intToDigit)
 
 import Numeric (showIntAtBase)
@@ -63,14 +63,14 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy Word32)
     describe "Word64" $
         matchesTextShowSpec (Proxy :: Proxy Word64)
-#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
+#if !defined(mingw32_HOST_OS)
 -- TODO: Figure out why this diverges on Windows
     describe "showbIntAtBase" $
         prop "has the same output as showIntAtBase" prop_showIntAtBase
 #endif
 
 -- | Verifies 'showIntAtBase' and 'showbIntAtBase' generate the same output.
-#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
+#if !defined(mingw32_HOST_OS)
 prop_showIntAtBase :: Gen Expectation
 prop_showIntAtBase = do
     base <- arbitrary `suchThat` \b -> 1 < b && b <= 16

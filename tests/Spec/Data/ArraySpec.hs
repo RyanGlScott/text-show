@@ -18,10 +18,10 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 import Test.QuickCheck.Instances ()
 
-#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
+#if !defined(mingw32_HOST_OS)
 import Data.Array (Array)
 import Data.Array.Unboxed (UArray)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShowSpec)
 
@@ -33,7 +33,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $ do
-#if !defined(mingw32_HOST_OS) && MIN_VERSION_text(1,0,0)
+#if !defined(mingw32_HOST_OS)
 -- TODO: Figure out why these tests diverge on Windows
     describe "Array Int Int" $
         matchesTextShowSpec (Proxy :: Proxy (Array Int Int))

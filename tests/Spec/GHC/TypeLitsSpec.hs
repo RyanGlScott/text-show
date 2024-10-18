@@ -13,7 +13,7 @@ Portability: GHC
 -}
 module Spec.GHC.TypeLitsSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import GHC.TypeLits
 

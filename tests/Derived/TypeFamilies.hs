@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
@@ -20,10 +19,7 @@ module Derived.TypeFamilies (
 
 import Test.QuickCheck (Arbitrary)
 
-import Text.Show.Deriving (deriveShow1)
-#if defined(NEW_FUNCTOR_CLASSES)
-import Text.Show.Deriving (deriveShow2)
-#endif
+import Text.Show.Deriving (deriveShow1, deriveShow2)
 
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -42,11 +38,10 @@ newtype instance TyFamilyOverSat a b = TyFamilyOverSat (F a b)
 -------------------------------------------------------------------------------
 
 $(deriveShow1 ''TyConOverSat)
-$(deriveShow1 'TyFamilyOverSat)
-#if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''TyConOverSat)
+
+$(deriveShow1 'TyFamilyOverSat)
 $(deriveShow2 'TyFamilyOverSat)
-#endif
 
 $(deriveTextShow  ''TyConOverSat)
 $(deriveTextShow1 ''TyConOverSat)

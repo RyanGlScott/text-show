@@ -22,9 +22,8 @@ merged yet. Until then, we'll have to define it ourselves.
 -}
 module Instances.Utils.GenericArbitrary (genericArbitrary) where
 
-import Generics.Deriving.Base
-
 import GHC.Exts (Char(..), Double(..), Float(..), Int(..), Word(..))
+import GHC.Generics
 
 import Prelude ()
 import Prelude.Compat

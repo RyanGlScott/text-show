@@ -16,7 +16,7 @@ import Control.Exception
 #if MIN_VERSION_base(4,11,0)
 import Control.Exception.Base (FixIOException)
 #endif
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Instances.Control.Exception ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
@@ -48,14 +48,10 @@ spec = parallel . describe "TextShow.Control.Exception" $ do
         matchesTextShowSpec (Proxy :: Proxy BlockedIndefinitelyOnMVar)
     describe "BlockedIndefinitelyOnSTM" $
         matchesTextShowSpec (Proxy :: Proxy BlockedIndefinitelyOnSTM)
-#if MIN_VERSION_base(4,8,0)
     describe "AllocationLimitExceeded" $
         matchesTextShowSpec (Proxy :: Proxy AllocationLimitExceeded)
-#endif
-#if MIN_VERSION_base(4,9,0)
     describe "TypeError" $
         matchesTextShowSpec (Proxy :: Proxy TypeError)
-#endif
 #if MIN_VERSION_base(4,10,0)
     describe "CompactionFailed" $
         matchesTextShowSpec (Proxy :: Proxy CompactionFailed)

@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.MaybeSpec (main, spec) where
 
 import Data.Orphans ()
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Spec.Utils (matchesTextShow1Spec, genericTextShowSpec, genericTextShow1Spec)
 

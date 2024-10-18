@@ -1,9 +1,8 @@
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveFoldable             #-}
 {-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DeriveLift                 #-}
 {-# LANGUAGE DeriveTraversable          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -12,13 +11,8 @@
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
 
-#if __GLASGOW_HASKELL__ >= 800
-{-# LANGUAGE DeriveLift                 #-}
-#endif
-
-{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 {-|
 Module:      TextShow.FromStringTextShow
@@ -39,21 +33,16 @@ module TextShow.FromStringTextShow (
     , FromTextShow2(..)
     ) where
 
-#include "generic.h"
-
 import           Data.Bifunctor.TH (deriveBifunctor, deriveBifoldable,
                                     deriveBitraversable)
 import           Data.Coerce (coerce)
-import           Data.Data (Data, Typeable)
-import           Data.Functor.Classes (Show1(..), showsPrec1)
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-import qualified Generics.Deriving.TH as Generics
-#endif
+import           Data.Data (Data)
+import           Data.Functor.Classes (Show1(..), Show2(..),
+                                       showsPrec1, showsPrec2)
 
 import           GHC.Generics (Generic, Generic1)
 
-import           Language.Haskell.TH.Lift
+import           Language.Haskell.TH.Syntax (Lift)
 
 import           Prelude ()
 import           Prelude.Compat
@@ -65,12 +54,6 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showbPrec1, showbPrec2,
                                    showbPrecToShowsPrec, showsPrecToShowbPrec,
                                    showbToShows, showsToShowb)
-
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Data.Functor.Classes (Show2(..), showsPrec2)
-#else
-import           Text.Show (showListWith)
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -90,12 +73,9 @@ newtype FromStringShow a = FromStringShow { fromStringShow :: a }
            , Functor
            , Generic
            , Generic1
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            , Ord
            , Traversable
-           , Typeable
            )
 
 instance Read a => Read (FromStringShow a) where
@@ -132,13 +112,10 @@ newtype FromTextShow a = FromTextShow { fromTextShow :: a }
            , Functor
            , Generic
            , Generic1
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            , Ord
            , TextShow
            , Traversable
-           , Typeable
            )
 
 instance Read a => Read (FromTextShow a) where
@@ -168,32 +145,17 @@ instance TextShow a => Show (FromTextShow a) where
 -- /Since: 3/
 newtype FromStringShow1 f a = FromStringShow1 { fromStringShow1 :: f a }
   deriving ( Eq
-           , Ord
-           , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-#endif
-#if __GLASGOW_HASKELL__ >= 800
            , Data
            , Foldable
            , Functor
+           , Generic
+           , Generic1
            , Lift
+           , Ord
            , Show1 -- TODO: Manually implement this when you
                    -- can derive Show1 (someday)
            , Traversable
-#endif
            )
-
-#if __GLASGOW_HASKELL__ < 800
--- TODO: Manually implement this when you can derive Show1 (someday)
-deriving instance Show1       f => Show1       (FromStringShow1 f)
-deriving instance Functor     f => Functor     (FromStringShow1 f)
-deriving instance Foldable    f => Foldable    (FromStringShow1 f)
-deriving instance Traversable f => Traversable (FromStringShow1 f)
-deriving instance Typeable FromStringShow1
-deriving instance ( Data (f a), Typeable f, Typeable a
-                  ) => Data (FromStringShow1 f (a :: *))
-#endif
 
 instance Read (f a) => Read (FromStringShow1 f a) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a))
@@ -201,10 +163,7 @@ instance Read (f a) => Read (FromStringShow1 f a) where
     readList     = coerce (readList     :: ReadS [f a])
     readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
-#if defined(NEW_FUNCTOR_CLASSES)
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'Show1' constraint with a 'TextShow' constraint. This is done for
 -- consistency with the 'Show' instance for 'FromTextShow1', which mixes
 -- constraints in a similar way to satisfy superclass constraints. See the
@@ -212,7 +171,6 @@ instance Read (f a) => Read (FromStringShow1 f a) where
 instance (Show1 f, TextShow a) => TextShow (FromStringShow1 f a) where
     showbPrec = showbPrec1
 
--- | Not available if using @transformers-0.4@
 instance Show1 f => TextShow1 (FromStringShow1 f) where
     liftShowbPrec sp sl p =
         showsPrecToShowbPrec (liftShowsPrec (showbPrecToShowsPrec sp)
@@ -225,7 +183,6 @@ instance Show1 f => TextShow1 (FromStringShow1 f) where
       where
         coerceList :: [FromStringShow1 f a] -> [f a]
         coerceList = coerce
-#endif
 
 instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
     showsPrec = showsPrec1
@@ -247,30 +204,16 @@ instance (Show1 f, Show a) => Show (FromStringShow1 f a) where
 -- /Since: 3/
 newtype FromTextShow1 f a = FromTextShow1 { fromTextShow1 :: f a }
   deriving ( Eq
-           , Ord
-           , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-#endif
-#if __GLASGOW_HASKELL__ >= 800
            , Data
            , Foldable
            , Functor
+           , Generic
+           , Generic1
            , Lift
+           , Ord
            , TextShow1
            , Traversable
-#endif
            )
-
-#if __GLASGOW_HASKELL__ < 800
-deriving instance TextShow1   f => TextShow1   (FromTextShow1 f)
-deriving instance Functor     f => Functor     (FromTextShow1 f)
-deriving instance Foldable    f => Foldable    (FromTextShow1 f)
-deriving instance Traversable f => Traversable (FromTextShow1 f)
-deriving instance Typeable FromTextShow1
-deriving instance ( Data (f a), Typeable f, Typeable a
-                  ) => Data (FromTextShow1 f (a :: *))
-#endif
 
 instance Read (f a) => Read (FromTextShow1 f a) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a))
@@ -278,10 +221,7 @@ instance Read (f a) => Read (FromTextShow1 f a) where
     readList     = coerce (readList     :: ReadS [f a])
     readListPrec = coerce (readListPrec :: ReadPrec [f a])
 
-#if defined(NEW_FUNCTOR_CLASSES)
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'TextShow1' constraint with a 'Show' constraint. The 'Show' constraint is
 -- necessary to satisfy the quantified 'Show' superclass in 'Show1'. Really,
 -- the 'Show' constraint ought to be a 'TextShow' constraint instead, but GHC
@@ -293,10 +233,8 @@ instance Read (f a) => Read (FromTextShow1 f a) where
 -- classes. If you wish to do this, derive via 'FromTextShow' instead.
 instance (TextShow1 f, Show a) => Show (FromTextShow1 f a) where
   showsPrec = showsPrec1
-#endif
 
 instance TextShow1 f => Show1 (FromTextShow1 f) where
-#if defined(NEW_FUNCTOR_CLASSES)
     liftShowList sp sl =
         showbToShows (liftShowbList (showsPrecToShowbPrec sp)
                                     (showsToShowb         sl))
@@ -304,11 +242,8 @@ instance TextShow1 f => Show1 (FromTextShow1 f) where
       where
         coerceList :: [FromTextShow1 f a] -> [f a]
         coerceList = coerce
-    liftShowsPrec sp sl p
-#else
-    showsPrec1 p
-#endif
-      = showbPrecToShowsPrec (liftShowbPrec (showsPrecToShowbPrec sp)
+    liftShowsPrec sp sl p =
+        showbPrecToShowsPrec (liftShowbPrec (showsPrecToShowbPrec sp)
                                             (showsToShowb         sl))
                              p . fromTextShow1
 
@@ -334,28 +269,15 @@ instance (TextShow1 f, TextShow a) => TextShow (FromTextShow1 f a) where
 -- /Since: 3/
 newtype FromStringShow2 f a b = FromStringShow2 { fromStringShow2 :: f a b }
   deriving ( Eq
-           , Ord
-           , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-#endif
-#if __GLASGOW_HASKELL__ >= 800
            , Data
            , Foldable
            , Functor
+           , Generic
+           , Generic1
            , Lift
+           , Ord
            , Traversable
-#endif
            )
-
-#if __GLASGOW_HASKELL__ < 800
-deriving instance Functor     (f a) => Functor     (FromStringShow2 f a)
-deriving instance Foldable    (f a) => Foldable    (FromStringShow2 f a)
-deriving instance Traversable (f a) => Traversable (FromStringShow2 f a)
-deriving instance Typeable FromStringShow2
-deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
-                  ) => Data (FromStringShow2 f (a :: *) (b :: *))
-#endif
 
 instance Read (f a b) => Read (FromStringShow2 f a b) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a b))
@@ -363,14 +285,10 @@ instance Read (f a b) => Read (FromStringShow2 f a b) where
     readList     = coerce (readList     :: ReadS [f a b])
     readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
-#if defined(NEW_FUNCTOR_CLASSES)
 -- TODO: Manually implement this when you can derive Show2 (someday)
--- | Not available if using @transformers-0.4@
 deriving instance Show2 f => Show2 (FromStringShow2 f)
 
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'Show2' constraint with 'TextShow' constraints. This is done for consistency
 -- with the 'Show' instance for 'FromTextShow2', which mixes constraints in a
 -- similar way to satisfy superclass constraints. See the Haddocks on the
@@ -378,9 +296,7 @@ deriving instance Show2 f => Show2 (FromStringShow2 f)
 instance (Show2 f, TextShow a, TextShow b) => TextShow (FromStringShow2 f a b) where
     showbPrec = showbPrec2
 
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'Show2' constraint with a 'TextShow' constraint. This is done for
 -- consistency with the 'Show1' instance for 'FromTextShow2', which mixes
 -- constraints in a similar way to satisfy superclass constraints. See the
@@ -389,7 +305,6 @@ instance (Show2 f, TextShow a) => TextShow1 (FromStringShow2 f a) where
     liftShowbPrec = liftShowbPrec2 showbPrec showbList
     liftShowbList = liftShowbList2 showbPrec showbList
 
--- | Not available if using @transformers-0.4@
 instance Show2 f => TextShow2 (FromStringShow2 f) where
     liftShowbPrec2 sp1 sl1 sp2 sl2 p =
         showsPrecToShowbPrec (liftShowsPrec2 (showbPrecToShowsPrec sp1)
@@ -407,16 +322,13 @@ instance Show2 f => TextShow2 (FromStringShow2 f) where
         coerceList :: [FromStringShow2 f a b] -> [f a b]
         coerceList = coerce
 
--- | Not available if using @transformers-0.4@
 instance (Show2 f, Show a, Show b) => Show (FromStringShow2 f a b) where
     showsPrec = showsPrec2
     showList  = liftShowList2 showsPrec showList showsPrec showList
 
--- | Not available if using @transformers-0.4@
 instance (Show2 f, Show a) => Show1 (FromStringShow2 f a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
     liftShowList  = liftShowList2  showsPrec showList
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -436,30 +348,16 @@ instance (Show2 f, Show a) => Show1 (FromStringShow2 f a) where
 -- /Since: 3/
 newtype FromTextShow2 f a b = FromTextShow2 { fromTextShow2 :: f a b }
   deriving ( Eq
-           , Ord
-           , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
-           , Generic1
-#endif
-#if __GLASGOW_HASKELL__ >= 800
            , Data
+           , Ord
            , Foldable
            , Functor
+           , Generic
+           , Generic1
            , Lift
            , TextShow2
            , Traversable
-#endif
            )
-
-#if __GLASGOW_HASKELL__ < 800
-deriving instance TextShow2    f    => TextShow2   (FromTextShow2 f)
-deriving instance Functor     (f a) => Functor     (FromTextShow2 f a)
-deriving instance Foldable    (f a) => Foldable    (FromTextShow2 f a)
-deriving instance Traversable (f a) => Traversable (FromTextShow2 f a)
-deriving instance Typeable FromTextShow2
-deriving instance ( Data (f a b), Typeable f, Typeable a, Typeable b
-                  ) => Data (FromTextShow2 f (a :: *) (b :: *))
-#endif
 
 instance Read (f a b) => Read (FromTextShow2 f a b) where
     readPrec     = coerce (readPrec     :: ReadPrec (f a b))
@@ -467,10 +365,7 @@ instance Read (f a b) => Read (FromTextShow2 f a b) where
     readList     = coerce (readList     :: ReadS [f a b])
     readListPrec = coerce (readListPrec :: ReadPrec [f a b])
 
-#if defined(NEW_FUNCTOR_CLASSES)
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'TextShow2' constraint with 'Show' constraints. The 'Show' constraints are
 -- necessary to satisfy the quantified 'Show' superclass in 'Show2'. Really,
 -- the 'Show' constraints ought to be 'TextShow' constraints instead, but GHC
@@ -483,9 +378,7 @@ instance Read (f a b) => Read (FromTextShow2 f a b) where
 instance (TextShow2 f, Show a, Show b) => Show (FromTextShow2 f a b) where
   showsPrec = showsPrec2
 
--- | Not available if using @transformers-0.4@
---
--- This instance is somewhat strange, as its instance context mixes a
+-- | This instance is somewhat strange, as its instance context mixes a
 -- 'TextShow2' constraint with a 'Show' constraint. The 'Show' constraint is
 -- necessary to satisfy the quantified 'Show' superclass in 'Show2'. Really,
 -- the 'Show' constraint ought to be a 'TextShow' constraint instead, but GHC
@@ -499,7 +392,6 @@ instance (TextShow2 f, Show a) => Show1 (FromTextShow2 f a) where
     liftShowsPrec = liftShowsPrec2 showsPrec showList
     liftShowList = liftShowList2 showsPrec showList
 
--- | Not available if using @transformers-0.4@
 instance TextShow2 f => Show2 (FromTextShow2 f) where
     liftShowsPrec2 sp1 sl1 sp2 sl2 p =
         showbPrecToShowsPrec (liftShowbPrec2 (showsPrecToShowbPrec sp1)
@@ -516,7 +408,6 @@ instance TextShow2 f => Show2 (FromTextShow2 f) where
       where
         coerceList :: [FromTextShow2 f a b] -> [f a b]
         coerceList = coerce
-#endif
 
 instance (TextShow2 f, TextShow a, TextShow b) => TextShow (FromTextShow2 f a b) where
     showbPrec = showbPrec2
@@ -528,53 +419,9 @@ instance (TextShow2 f, TextShow a) => TextShow1 (FromTextShow2 f a) where
 
 -------------------------------------------------------------------------------
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-liftShowsPrec :: (Show1 f, Show a) => (Int -> a -> ShowS) -> ([a] -> ShowS)
-              -> Int -> f a -> ShowS
-liftShowsPrec _ _ = showsPrec1
-
-liftShowList :: (Show1 f, Show a) => (Int -> a -> ShowS) -> ([a] -> ShowS)
-              -> [f a] -> ShowS
-liftShowList sp' sl' = showListWith (liftShowsPrec sp' sl' 0)
-
-sp :: Int -> a -> ShowS
-sp  = undefined
-
-sl :: [a] -> ShowS
-sl  = undefined
-#endif
-
--------------------------------------------------------------------------------
-
 $(deriveBifunctor     ''FromStringShow2)
 $(deriveBifunctor     ''FromTextShow2)
 $(deriveBifoldable    ''FromStringShow2)
 $(deriveBifoldable    ''FromTextShow2)
 $(deriveBitraversable ''FromStringShow2)
 $(deriveBitraversable ''FromTextShow2)
-
-#if __GLASGOW_HASKELL__ < 800
-$(deriveLift ''FromStringShow)
-$(deriveLift ''FromTextShow)
-
-instance Lift (f a) => Lift (FromStringShow1 f a) where
-    lift = $(makeLift ''FromStringShow1)
-instance Lift (f a) => Lift (FromTextShow1 f a) where
-    lift = $(makeLift ''FromTextShow1)
-
-instance Lift (f a b) => Lift (FromStringShow2 f a b) where
-    lift = $(makeLift ''FromStringShow2)
-instance Lift (f a b) => Lift (FromTextShow2 f a b) where
-    lift = $(makeLift ''FromTextShow2)
-#endif
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           ''FromStringShow1)
-$(Generics.deriveRepresentable1 ''FromStringShow1)
-$(Generics.deriveMeta           ''FromTextShow1)
-$(Generics.deriveRepresentable1 ''FromTextShow1)
-$(Generics.deriveMeta           ''FromStringShow2)
-$(Generics.deriveRepresentable1 ''FromStringShow2)
-$(Generics.deriveMeta           ''FromTextShow2)
-$(Generics.deriveRepresentable1 ''FromTextShow2)
-#endif

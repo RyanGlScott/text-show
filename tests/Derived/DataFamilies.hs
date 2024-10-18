@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
@@ -8,12 +7,6 @@
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-
-#if __GLASGOW_HASKELL__ < 710
--- Starting with GHC 7.10, NullaryTypeClasses was deprecated in favor of
--- MultiParamTypeClasses, which is already enabled
-{-# LANGUAGE NullaryTypeClasses         #-}
-#endif
 
 {-|
 Module:      Derived.DataFamilies
@@ -32,16 +25,7 @@ module Derived.DataFamilies (
     , NullaryData(..)
     ) where
 
-#include "generic.h"
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-import qualified Generics.Deriving.TH as Generics
-#endif
-
-import           GHC.Generics (Generic)
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
-import           GHC.Generics (Generic1)
-#endif
+import           GHC.Generics (Generic, Generic1)
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
@@ -50,10 +34,7 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
-import           Text.Show.Deriving (deriveShow1)
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Text.Show.Deriving (deriveShow2)
-#endif
+import           Text.Show.Deriving (deriveShow1, deriveShow2)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 
@@ -66,29 +47,18 @@ data instance NotAllShow Int b   c  d = NASShow1 c b
                                       | NASShow2 d
   deriving ( Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 instance (Arbitrary b, Arbitrary c, Arbitrary d) => Arbitrary (NotAllShow Int b c d) where
     arbitrary = genericArbitrary
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 'NASShow1)
-#else
 $(deriveShow1 'NASShow1)
 $(deriveShow2 'NASShow2)
-#endif
 
 $(deriveTextShow  'NASShow1)
 $(deriveTextShow1 'NASShow2)
 $(deriveTextShow2 'NASShow1)
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           'NASShow1)
-$(Generics.deriveRepresentable1 'NASShow2)
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -97,17 +67,13 @@ data family KindDistinguished (x :: k) (y :: *) (z :: *) :: *
 data instance KindDistinguished (a :: ()) b c = KindDistinguishedUnit b c
   deriving ( Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 data instance KindDistinguished (a :: Bool) b c = KindDistinguishedBool b c
   deriving ( Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 instance (Arbitrary b, Arbitrary c)
@@ -118,17 +84,11 @@ instance (Arbitrary b, Arbitrary c)
       => Arbitrary (KindDistinguished (a :: Bool) b c) where
     arbitrary = genericArbitrary
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 'KindDistinguishedUnit)
-
-$(deriveShow1 'KindDistinguishedBool)
-#else
 $(deriveShow1 'KindDistinguishedUnit)
 $(deriveShow2 'KindDistinguishedUnit)
 
 $(deriveShow1 'KindDistinguishedBool)
 $(deriveShow2 'KindDistinguishedBool)
-#endif
 
 $(deriveTextShow  'KindDistinguishedUnit)
 $(deriveTextShow1 'KindDistinguishedUnit)
@@ -137,11 +97,6 @@ $(deriveTextShow2 'KindDistinguishedUnit)
 $(deriveTextShow  'KindDistinguishedBool)
 $(deriveTextShow1 'KindDistinguishedBool)
 $(deriveTextShow2 'KindDistinguishedBool)
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveAll1 'KindDistinguishedUnit)
-$(Generics.deriveAll1 'KindDistinguishedBool)
-#endif
 
 -------------------------------------------------------------------------------
 

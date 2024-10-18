@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Derived.TypeFamiliesSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Derived.TypeFamilies
 

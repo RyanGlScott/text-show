@@ -12,7 +12,7 @@ Portability: GHC
 -}
 module Spec.Data.BoolSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)
 

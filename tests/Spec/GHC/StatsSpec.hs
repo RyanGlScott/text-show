@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 
 {-|
 Module:      Spec.GHC.StatsSpec
@@ -21,7 +21,7 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !(MIN_VERSION_base(4,11,0))
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import GHC.Stats (GCStats)
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (describe)

@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -11,7 +9,7 @@
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE UndecidableInstances       #-}
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Derived.PolyKinds
@@ -32,29 +30,18 @@ module Derived.PolyKinds (
     , TyFamilyReallyHighKinds(..)
     ) where
 
-#include "generic.h"
-
-import           Data.Functor.Classes (Show1(..))
+import           Data.Functor.Classes (Show1(..), Show2(..))
 import           Data.Orphans ()
 
-import           Generics.Deriving.Base
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-import qualified Generics.Deriving.TH as Generics
-#endif
+import           GHC.Generics
 
 import           Test.QuickCheck (Arbitrary)
 
-import           Text.Show.Deriving (deriveShow1)
+import           Text.Show.Deriving (deriveShow1, deriveShow2,
+                                     makeLiftShowsPrec, makeLiftShowsPrec2)
 import           TextShow (TextShow(..), TextShow1(..), TextShow2(..))
 import           TextShow.TH (deriveTextShow2, makeShowbPrec,
                               makeLiftShowbPrec, makeLiftShowbPrec2)
-
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Data.Functor.Classes (Show2(..))
-import           Text.Show.Deriving (deriveShow2, makeLiftShowsPrec, makeLiftShowsPrec2)
-#else
-import           Text.Show.Deriving (makeShowsPrec1)
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -66,11 +53,9 @@ newtype TyConCompose f g h j p a b =
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyConCompose f g h j k a b)
 
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
                   ) => Generic1 (TyConCompose f g h j k a)
-#endif
 
 deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   Show (TyConCompose f g h j k a b)
@@ -82,9 +67,7 @@ newtype TyConProxy a b where
   deriving ( Arbitrary
            , Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -93,9 +76,7 @@ newtype TyConReallyHighKinds f a b c d e = TyConReallyHighKinds (f a b c d e)
   deriving ( Arbitrary
            , Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -116,11 +97,9 @@ newtype instance TyFamilyCompose f g h j k a b =
 deriving instance Arbitrary (f (g (j a) (k a)) (h (j a) (k b))) =>
   Arbitrary (TyFamilyCompose f g h j k a b)
 
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
 deriving instance ( Functor (f (g (j a) (k a)))
                   , Functor (h (j a))
                   ) => Generic1 (TyFamilyCompose f g h j k a)
-#endif
 
 deriving instance Show (f (g (j a) (k a)) (h (j a) (k b))) =>
   Show (TyFamilyCompose f g h j k a b)
@@ -134,9 +113,7 @@ newtype instance TyFamilyProxy a b where
   deriving ( Arbitrary
            , Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -154,9 +131,7 @@ newtype instance TyFamilyReallyHighKinds f a b c d e =
   deriving ( Arbitrary
            , Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
            )
 
 -------------------------------------------------------------------------------
@@ -165,11 +140,8 @@ $(return [])
 
 -- TODO: Replace these with non-orphan instances
 $(deriveShow1 ''(,,,,))
-#if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''(,,,,))
-#endif
 
-#if defined(NEW_FUNCTOR_CLASSES)
 instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
   Show1 (TyConCompose f g h j k a) where
     liftShowsPrec = $(makeLiftShowsPrec ''TyConCompose)
@@ -186,18 +158,6 @@ instance Show1 (f a b c d) => Show1 (TyConReallyHighKinds f a b c d) where
     liftShowsPrec = $(makeLiftShowsPrec ''TyConReallyHighKinds)
 instance Show2 (f a b c) => Show2 (TyConReallyHighKinds f a b c) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 ''TyConReallyHighKinds)
-#else
-instance (Functor (f (g (j a) (k a))), Functor (h (j a)),
-          Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
-  Show1 (TyConCompose f g h j k a) where
-    showsPrec1 = $(makeShowsPrec1 ''TyConCompose)
-
-instance Show1 (TyConProxy (a :: *)) where
-    showsPrec1 = $(makeShowsPrec1 ''TyConProxy)
-
-instance Show1 (f a b c d) => Show1 (TyConReallyHighKinds f a b c d) where
-    showsPrec1 = $(makeShowsPrec1 ''TyConReallyHighKinds)
-#endif
 
 instance TextShow (f (g (j a) (k a)) (h (j a) (k b))) =>
   TextShow (TyConCompose f g h j k a b) where
@@ -220,33 +180,6 @@ instance TextShow1 (f a b c d) => TextShow1 (TyConReallyHighKinds f a b c d) whe
 instance TextShow2 (f a b c) => TextShow2 (TyConReallyHighKinds f a b c) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyConReallyHighKinds)
 
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta              ''TyConCompose)
-$(Generics.deriveRep1Options False ''TyConCompose)
-
-instance ( Functor (f (g (j a) (k a)))
-         , Functor (h (j a))
-         ) => Generic1 (TyConCompose f g h j k a) where
-    type Rep1 (TyConCompose f g h j k a) = $(Generics.makeRep1 ''TyConCompose) f g h j k a
-    from1 = $(Generics.makeFrom1 ''TyConCompose)
-    to1   = $(Generics.makeTo1   ''TyConCompose)
-
-$(Generics.deriveMeta           ''TyConProxy)
-$(Generics.deriveRepresentable1 ''TyConProxy)
-$(Generics.deriveMeta           ''TyConReallyHighKinds)
-$(Generics.deriveRepresentable1 ''TyConReallyHighKinds)
-#endif
-
-#if !defined(NEW_FUNCTOR_CLASSES)
-instance (Functor (f (g (j a) (k a))), Functor (h (j a)),
-          Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
-  Show1 (TyFamilyCompose f g h j k a) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyCompose)
-instance Show1 (TyFamilyProxy (a :: *)) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyProxy)
-instance Show1 (f a b c d) => Show1 (TyFamilyReallyHighKinds f a b c d) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamilyReallyHighKinds)
-#else
 instance (Show1 (f (g (j a) (k a))), Show1 (h (j a)), Show1 k) =>
   Show1 (TyFamilyCompose f g h j k a) where
     liftShowsPrec = $(makeLiftShowsPrec 'TyFamilyCompose)
@@ -262,7 +195,6 @@ instance Show2 TyFamilyProxy where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyProxy)
 instance Show2 (f a b c) => Show2 (TyFamilyReallyHighKinds f a b c) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamilyReallyHighKinds)
-#endif
 
 instance TextShow (f (g (j a) (k a)) (h (j a) (k b))) =>
   TextShow (TyFamilyCompose f g h j k a b) where
@@ -284,20 +216,3 @@ instance TextShow1 (f a b c d) => TextShow1 (TyFamilyReallyHighKinds f a b c d) 
     liftShowbPrec = $(makeLiftShowbPrec 'TyFamilyReallyHighKinds)
 instance TextShow2 (f a b c) => TextShow2 (TyFamilyReallyHighKinds f a b c) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 'TyFamilyReallyHighKinds)
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta              'TyFamilyCompose)
-$(Generics.deriveRep1Options False 'TyFamilyCompose)
-
-instance ( Functor (f (g (j a) (k a)))
-         , Functor (h (j a))
-         ) => Generic1 (TyFamilyCompose f g h j k a) where
-    type Rep1 (TyFamilyCompose f g h j k a) = $(Generics.makeRep1 'TyFamilyCompose) f g h j k a
-    from1 = $(Generics.makeFrom1 'TyFamilyCompose)
-    to1   = $(Generics.makeTo1   'TyFamilyCompose)
-
-$(Generics.deriveMeta           'TyFamilyProxy)
-$(Generics.deriveRepresentable1 'TyFamilyProxy)
-$(Generics.deriveMeta           'TyFamilyReallyHighKinds)
-$(Generics.deriveRepresentable1 'TyFamilyReallyHighKinds)
-#endif

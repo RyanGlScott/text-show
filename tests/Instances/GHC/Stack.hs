@@ -1,11 +1,7 @@
-{-# LANGUAGE CPP             #-}
-
-#if MIN_VERSION_base(4,8,1)
-{-# LANGUAGE DataKinds       #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies    #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-#endif
+{-# LANGUAGE CPP                #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.GHC.Stack
@@ -19,41 +15,27 @@ Portability: GHC
 -}
 module Instances.GHC.Stack () where
 
-#if MIN_VERSION_base(4,8,1)
-# if MIN_VERSION_base(4,9,0)
 import           GHC.Stack.Types (CallStack(..), SrcLoc(..))
 import           Instances.Utils ((<@>))
 import           Test.QuickCheck (oneof)
-# else
-import           GHC.SrcLoc (SrcLoc)
-import           GHC.Stack (CallStack)
-# endif
 
-# if !(MIN_VERSION_base(4,15,0))
-import qualified Generics.Deriving.TH as Generics (deriveAll0)
-# endif
+#if !(MIN_VERSION_base(4,15,0))
+import           GHC.Generics (Generic)
+#endif
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import           Test.QuickCheck (Arbitrary(..))
 
-# if !(MIN_VERSION_base(4,9,0))
-$(Generics.deriveAll0 ''CallStack)
-# endif
-# if !(MIN_VERSION_base(4,15,0))
-$(Generics.deriveAll0 ''SrcLoc)
-# endif
+#if !(MIN_VERSION_base(4,15,0))
+deriving instance Generic SrcLoc
+#endif
 
 instance Arbitrary CallStack where
-# if MIN_VERSION_base(4,9,0)
     arbitrary = oneof [ pure EmptyCallStack
                       , PushCallStack <$> arbitrary <*> arbitrary <@> EmptyCallStack
                       , pure $ FreezeCallStack EmptyCallStack
                       ]
-# else
-    arbitrary = genericArbitrary
-# endif
 
 instance Arbitrary SrcLoc where
     arbitrary = genericArbitrary
-#endif

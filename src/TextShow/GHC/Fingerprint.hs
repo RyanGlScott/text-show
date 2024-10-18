@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.GHC.Fingerprint
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -14,7 +14,7 @@ Portability: GHC
 -}
 module TextShow.GHC.Fingerprint () where
 
-import Data.Semigroup.Compat (mtimesDefault)
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 import Data.Word (Word64)
 

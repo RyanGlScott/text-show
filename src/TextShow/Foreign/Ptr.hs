@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP       #-}
 {-# LANGUAGE MagicHash #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Foreign.Ptr
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -16,7 +16,7 @@ Foreign Function Interface (FFI).
 -}
 module TextShow.Foreign.Ptr () where
 
-import Data.Semigroup.Compat (mtimesDefault)
+import Data.Semigroup (mtimesDefault)
 import Data.Text.Lazy.Builder (Builder, singleton)
 
 import Foreign.ForeignPtr (ForeignPtr)

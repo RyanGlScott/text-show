@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Data.Semigroup
@@ -15,7 +15,7 @@ Portability: GHC
 -}
 module TextShow.Data.Semigroup () where
 
-import Data.Semigroup.Compat (Min, Max, First, Last, WrappedMonoid, Arg)
+import Data.Semigroup (Min, Max, First, Last, WrappedMonoid, Arg)
 
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow, deriveTextShow1, deriveTextShow2)

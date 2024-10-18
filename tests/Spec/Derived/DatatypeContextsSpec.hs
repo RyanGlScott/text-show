@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Derived.DatatypeContextsSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Derived.DatatypeContexts
 import Spec.Utils (matchesTextShow1Spec)
 import Test.Hspec (Spec, describe, hspec, parallel)

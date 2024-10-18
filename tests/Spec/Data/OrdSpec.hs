@@ -11,9 +11,7 @@ Portability: GHC
 module Spec.Data.OrdSpec (main, spec) where
 
 import Data.Orphans ()
-import Data.Proxy.Compat (Proxy(..))
-
-import Generics.Deriving.Instances ()
+import Data.Proxy (Proxy(..))
 
 import GHC.Exts (Down)
 

@@ -1,12 +1,6 @@
-{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE TemplateHaskell    #-}
-{-# LANGUAGE TypeFamilies       #-}
-
-#if __GLASGOW_HASKELL__ >= 800
 {-# LANGUAGE DeriveLift         #-}
-#endif
 
 {-|
 Module:      TextShow.Options
@@ -22,12 +16,12 @@ Portability: GHC
 -}
 module TextShow.Options (Options(..), GenTextMethods(..), defaultOptions) where
 
-import Data.Data (Data, Typeable)
+import Data.Data (Data)
 import Data.Ix (Ix)
 
 import GHC.Generics (Generic)
 
-import Language.Haskell.TH.Lift
+import Language.Haskell.TH.Syntax (Lift)
 
 -- | Options that specify how to derive 'TextShow' instances using Template Haskell.
 --
@@ -50,10 +44,7 @@ data Options = Options
              , Ord
              , Read
              , Show
-             , Typeable
-#if __GLASGOW_HASKELL__ >= 800
              , Lift
-#endif
              )
 
 -- | When should Template Haskell generate implementations for the methods of
@@ -73,10 +64,7 @@ data GenTextMethods
            , Ord
            , Read
            , Show
-           , Typeable
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            )
 
 -- | Sensible default 'Options'.
@@ -87,10 +75,3 @@ defaultOptions =
   Options { genTextMethods    = SometimesTextMethods
           , emptyCaseBehavior = False
           }
-
--------------------------------------------------------------------------------
-
-#if __GLASGOW_HASKELL__ < 800
-$(deriveLift ''Options)
-$(deriveLift ''GenTextMethods)
-#endif

@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.OptionsSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Instances.Options ()
 import Spec.Utils (matchesTextShowSpec, genericTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)

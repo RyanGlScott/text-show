@@ -1,7 +1,7 @@
 module Spec.Control.Monad.STSpec (main, spec) where
 
 import Control.Monad.ST
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Instances.Control.Monad.ST ()
 import Spec.Utils (matchesTextShowSpec)
 import Test.Hspec (Spec, describe, hspec, parallel)

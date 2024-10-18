@@ -22,14 +22,8 @@ module Derived.MagicHash (
 #endif
   ) where
 
-#if __GLASGOW_HASKELL__ < 711
-import qualified Generics.Deriving.TH as Generics
-#endif
-
 import           GHC.Exts
-#if __GLASGOW_HASKELL__ >= 711
 import           GHC.Generics (Generic, Generic1)
-#endif
 
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 
@@ -38,10 +32,8 @@ import           Prelude.Compat
 
 import           Test.QuickCheck (Arbitrary(..))
 
-import           Text.Show.Deriving (deriveShow1Options, legacyShowOptions)
-#if defined(NEW_FUNCTOR_CLASSES)
-import           Text.Show.Deriving (deriveShow2Options)
-#endif
+import           Text.Show.Deriving (deriveShow1Options, deriveShow2Options,
+                                     legacyShowOptions)
 
 import           TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
 -------------------------------------------------------------------------------
@@ -55,10 +47,8 @@ data TyCon# a b = TyCon# {
   , tcChar#   :: Char#
   , tcWord#   :: Word#
 } deriving ( Show
-#if __GLASGOW_HASKELL__ >= 711
            , Generic
            , Generic1
-#endif
            )
 
 #if MIN_VERSION_base(4,13,0)
@@ -89,10 +79,8 @@ data instance TyFamily# a b = TyFamily# {
   , tfChar#   :: Char#
   , tfWord#   :: Word#
 } deriving ( Show
-#if __GLASGOW_HASKELL__ >= 711
            , Generic
            , Generic1
-#endif
            )
 
 #if MIN_VERSION_base(4,13,0)
@@ -187,32 +175,17 @@ wordToWord16Compat# = narrowWord16#
 -------------------------------------------------------------------------------
 
 $(deriveShow1Options legacyShowOptions ''TyCon#)
-#if defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow2Options legacyShowOptions ''TyCon#)
-#endif
 
 $(deriveTextShow  ''TyCon#)
 $(deriveTextShow1 ''TyCon#)
 $(deriveTextShow2 ''TyCon#)
 
-#if __GLASGOW_HASKELL__ < 711
-$(Generics.deriveAll0And1 ''TyCon#)
-#endif
-
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1Options legacyShowOptions 'TyFamily#)
-#else
 $(deriveShow1Options legacyShowOptions 'TyFamily#)
 $(deriveShow2Options legacyShowOptions 'TyFamily#)
-#endif
 
 $(deriveTextShow  'TyFamily#)
 $(deriveTextShow1 'TyFamily#)
 $(deriveTextShow2 'TyFamily#)
-
-#if __GLASGOW_HASKELL__ < 711
-$(Generics.deriveAll0And1 'TyFamily#)
-#endif
 
 #if MIN_VERSION_base(4,13,0)
 $(deriveShow1Options legacyShowOptions ''TyCon'#)

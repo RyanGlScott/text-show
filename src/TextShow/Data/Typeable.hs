@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeApplications  #-}
 #endif
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Data.Typeable
@@ -47,27 +47,15 @@ import           Type.Reflection (pattern App, pattern Con, pattern Con', patter
                                   SomeTypeRep(..), TypeRep,
                                   eqTypeRep, tyConName, typeRep, typeRepTyCon)
 #else /* !(MIN_VERSION_base(4,10,0) */
-import           Data.Text.Lazy.Builder (fromString, singleton)
+import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
-import           Data.Typeable.Internal (tyConName)
-# if MIN_VERSION_base(4,8,0)
-import           Data.Typeable.Internal (typeRepKinds)
-# endif
-# if MIN_VERSION_base(4,9,0)
-import           Data.Text.Lazy.Builder (Builder)
 import           Data.Typeable.Internal (Proxy(..), Typeable,
-                                         TypeRep(TypeRep), typeRep)
-import           GHC.Exts (RuntimeRep(..), TYPE)
-# else
-import           Data.Typeable.Internal (funTc, listTc)
-# endif
+                                         TypeRep(TypeRep), tyConName, typeRep,
+                                         typeRepKinds)
 
-# if MIN_VERSION_base(4,9,0)
-import           GHC.Exts (Addr#, Char(..), (+#), eqChar#, indexCharOffAddr#)
+import           GHC.Exts (Addr#, Char(..), RuntimeRep(..), TYPE,
+                           (+#), eqChar#, indexCharOffAddr#)
 import           GHC.Types (TyCon(..), TrName(..), Module(..), isTrue#)
-# else
-import           Data.Typeable.Internal (TyCon)
-# endif
 
 import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
@@ -86,7 +74,6 @@ import           TextShow.Utils (isTupleString)
 #endif
 
 #if !(MIN_VERSION_base(4,10,0))
-# if MIN_VERSION_base(4,9,0)
 tyConOf :: Typeable a => Proxy a -> TyCon
 tyConOf = typeRepTyCon . typeRep
 
@@ -104,15 +91,6 @@ tc'Lifted = tyConOf (Proxy :: Proxy 'PtrRepLifted)
 
 tc'Unlifted :: TyCon
 tc'Unlifted = tyConOf (Proxy :: Proxy 'PtrRepUnlifted)
-# else
--- | The list 'TyCon'.
-tcList :: TyCon
-tcList = listTc
-
--- | The function (@->@) 'TyCon'.
-tcFun :: TyCon
-tcFun = funTc
-# endif
 #endif
 
 -- | Does the 'TyCon' represent a tuple type constructor?
@@ -269,23 +247,17 @@ funTyCon = typeRepTyCon (typeRep @(->))
 isListTyCon :: TyCon -> Bool
 isListTyCon tc = tc == typeRepTyCon (typeRep :: TypeRep [Int])
 #else
--- | Only available with @base-4.9@ or earlier.
+-- | Only available with @base-4.9@.
 --
 -- /Since: 2/
 instance TextShow TypeRep where
     showbPrec p tyrep =
         case tys of
           [] -> showb tycon
-# if MIN_VERSION_base(4,9,0)
           [x@(TypeRep _ argCon _ _)]
-# else
-          [x]
-# endif
             | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
-# if MIN_VERSION_base(4,9,0)
             | tycon == tcTYPE && argCon == tc'Lifted   -> singleton '*'
             | tycon == tcTYPE && argCon == tc'Unlifted -> singleton '#'
-# endif
           [a,r] | tycon == tcFun  -> showbParen (p > 8) $
                                         showbPrec 9 a
                                      <> " -> "
@@ -294,34 +266,22 @@ instance TextShow TypeRep where
              | otherwise          -> showbParen (p > 9) $
                                         showbPrec p tycon
                                      <> showbSpace
-                                     <> showbArgs showbSpace
-# if MIN_VERSION_base(4,8,0)
-                                                             (kinds ++ tys)
-# else
-                                                             tys
-# endif
+                                     <> showbArgs showbSpace (kinds ++ tys)
       where
         tycon = typeRepTyCon tyrep
         tys   = typeRepArgs tyrep
-# if MIN_VERSION_base(4,8,0)
         kinds = typeRepKinds tyrep
-# endif
 #endif
 
 -- | /Since: 2/
 instance TextShow TyCon where
 #if MIN_VERSION_base(4,10,0)
     showbPrec p (TyCon _ _ _ tc_name _ _) = showbPrec p tc_name
-#elif MIN_VERSION_base(4,9,0)
-    showb (TyCon _ _ _ tc_name) = showb tc_name
 #else
-    showb = fromString . tyConName
+    showb (TyCon _ _ _ tc_name) = showb tc_name
 #endif
 
-#if MIN_VERSION_base(4,9,0)
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 instance TextShow TrName where
     showb (TrNameS s) = unpackCStringToBuilder# s
     showb (TrNameD s) = fromString s
@@ -341,10 +301,7 @@ unpackCStringToBuilder# addr
         !ch = indexCharOffAddr# addr nh
 {-# NOINLINE unpackCStringToBuilder# #-}
 
--- | Only available with @base-4.9.0.0@ or later.
---
--- /Since: 3/
+-- | /Since: 3/
 instance TextShow Module where
     showb (Module p m) = showb p <> singleton ':' <> showb m
     {-# INLINE showb #-}
-#endif

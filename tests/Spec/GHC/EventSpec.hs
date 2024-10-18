@@ -20,12 +20,9 @@ import Prelude.Compat
 import Test.Hspec (Spec, hspec, parallel)
 
 #if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
-import GHC.Event (Event)
-# if MIN_VERSION_base(4,8,1)
-import GHC.Event (Lifetime)
-#endif
+import GHC.Event (Event, Lifetime)
 
 import Spec.Utils (matchesTextShowSpec)
 
@@ -43,10 +40,8 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy Event)
 --     describe "FdKey" $
 --         matchesTextShowSpec (Proxy :: Proxy FdKey)
-# if MIN_VERSION_base(4,8,1)
     describe "Lifetime" $
         matchesTextShowSpec (Proxy :: Proxy Lifetime)
-# endif
 #else
     pure ()
 #endif

@@ -1,7 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE CPP          #-}
 {-# LANGUAGE MagicHash    #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Array.Byte
 Copyright:   (C) 2022 Ryan Scott

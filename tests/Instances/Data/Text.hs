@@ -1,8 +1,7 @@
-{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
-{-# OPTIONS_GHC -fno-warn-orphans      #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
+{-# OPTIONS_GHC -Wno-orphans      #-}
 
 {-|
 Module:      Instances.Data.Text
@@ -16,27 +15,20 @@ Portability: GHC
 -}
 module Instances.Data.Text () where
 
-import Data.Text.Encoding.Error (UnicodeException(..))
-import Data.Text.Lazy.Builder (Builder, fromString)
-
-#if MIN_VERSION_text(1,0,0)
 import Data.Text.Encoding (Decoding(..))
-import Instances.Utils ((<@>))
-#endif
-
-#if MIN_VERSION_text(1,1,0)
+import Data.Text.Encoding.Error (UnicodeException(..))
 import Data.Text.Internal.Fusion.Size (Size, exactSize)
-import Test.QuickCheck (getNonNegative)
-#endif
+import Data.Text.Lazy.Builder (Builder, fromString)
 
 import GHC.Generics (Generic)
 
+import Instances.Utils ((<@>))
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.QuickCheck (Arbitrary(..))
+import Test.QuickCheck (Arbitrary(..), getNonNegative)
 import Test.QuickCheck.Instances ()
 
 instance Arbitrary Builder where
@@ -45,14 +37,10 @@ instance Arbitrary Builder where
 instance Arbitrary UnicodeException where
     arbitrary = genericArbitrary
 
-#if MIN_VERSION_text(1,0,0)
 instance Arbitrary Decoding where
     arbitrary = Some <$> arbitrary <*> arbitrary <@> undefined
-#endif
 
-#if MIN_VERSION_text(1,1,0)
 instance Arbitrary Size where
     arbitrary = exactSize . getNonNegative <$> arbitrary
-#endif
 
 deriving instance Generic UnicodeException

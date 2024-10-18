@@ -2,8 +2,8 @@
 
 #if !(MIN_VERSION_base(4,11,0))
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -fno-warn-deprecations #-}
-{-# OPTIONS_GHC -fno-warn-orphans      #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
+{-# OPTIONS_GHC -Wno-orphans      #-}
 # if __GLASGOW_HASKELL__ == 800
 -- See Note [Increased simpl-tick-factor on old GHCs] in TextShow.Data.Complex
 {-# OPTIONS_GHC -fsimpl-tick-factor=200 #-}

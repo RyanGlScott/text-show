@@ -1,8 +1,8 @@
-{-# LANGUAGE BangPatterns       #-}
-{-# LANGUAGE CPP                #-}
-{-# LANGUAGE MagicHash          #-}
-{-# LANGUAGE NamedFieldPuns     #-}
-{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE BangPatterns    #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE MagicHash       #-}
+{-# LANGUAGE NamedFieldPuns  #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-|
 Module:      TextShow.TH.Internal
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -58,9 +58,9 @@ module TextShow.TH.Internal (
 
 import           Control.Monad (unless, when)
 import qualified Control.Monad as Monad (fail)
-import           Data.Foldable.Compat
-import qualified Data.List.Compat as List
-import           Data.List.NonEmpty.Compat (NonEmpty(..), (<|))
+import           Data.Foldable
+import qualified Data.List as List
+import           Data.List.NonEmpty (NonEmpty(..), (<|))
 import qualified Data.Map as Map (fromList, keys, lookup, singleton)
 import           Data.Map (Map)
 import           Data.Maybe
@@ -718,19 +718,11 @@ makeTextShowForArg p _ tsFun _ _ (ConT tyName) tyExpName =
         Nothing -> showPrecE `appE` integerE p `appE` tyVarE
 
     showPrimE :: PrimShow -> Q Exp
-    showPrimE PrimShow{ primShowBoxer
-#if __GLASGOW_HASKELL__ >= 800
-                      , primShowPostfixMod, primShowConv
-#endif
-                      }
-#if __GLASGOW_HASKELL__ >= 800
+    showPrimE PrimShow{ primShowBoxer, primShowPostfixMod, primShowConv }
         -- Starting with GHC 8.0, data types containing unlifted types with
         -- derived Show instances show hashed literals with actual hash signs,
         -- and negative hashed literals are not surrounded with parentheses.
       = primShowConv tsFun $ infixApp (primE 0) [| (<>) |] (primShowPostfixMod tsFun)
-#else
-      = primE p
-#endif
       where
         primE :: Int -> Q Exp
         primE prec = showPrecE `appE` integerE prec `appE` primShowBoxer tyVarE
@@ -888,9 +880,7 @@ buildTypeInstance tsClass tyConName dataCxt varTysOrig variant = do
         Newtype         -> return False
         DataInstance    -> return True
         NewtypeInstance -> return True
-#if MIN_VERSION_th_abstraction(0,5,0)
         Datatype.TypeData -> typeDataError tyConName
-#endif
 
     let remainingTysOrigSubst' :: [Type]
         -- See Note [Kind signatures in derived instances] for an explanation
@@ -909,7 +899,7 @@ buildTypeInstance tsClass tyConName dataCxt varTysOrig variant = do
 
     -- If the datatype context mentions any of the dropped type variables,
     -- we can't derive an instance, so throw an error.
-    when (any (`predMentionsName` droppedTyVarNames) dataCxt) $
+    when (any (`mentionsName` droppedTyVarNames) dataCxt) $
       datatypeContextError tyConName instanceType
     -- Also ensure the dropped types can be safely eta-reduced. Otherwise,
     -- throw an error.
@@ -1073,7 +1063,6 @@ outOfPlaceTyVarError tsClass conName = Monad.fail
     n :: Int
     n = fromEnum tsClass
 
-#if MIN_VERSION_th_abstraction(0,5,0)
 -- | We cannot implement class methods at the term level for @type data@
 -- declarations, which only exist at the type level.
 typeDataError :: Name -> Q a
@@ -1082,7 +1071,6 @@ typeDataError dataName = Monad.fail
   . showString (nameBase dataName)
   . showString "‘, which is a ‘type data‘ declaration"
   $ ""
-#endif
 
 -------------------------------------------------------------------------------
 -- Expanding type synonyms
@@ -1493,11 +1481,7 @@ parenInfixConName conName =
 
 -- | Applies a typeclass constraint to a type.
 applyClass :: Name -> Name -> Pred
-#if MIN_VERSION_template_haskell(2,10,0)
 applyClass con t = AppT (ConT con) (VarT t)
-#else
-applyClass con t = ClassP con [VarT t]
-#endif
 
 -- | Checks to see if the last types in a data family instance can be safely eta-
 -- reduced (i.e., dropped), given the other types. This checks for three conditions:
@@ -1558,22 +1542,10 @@ isInTypeFamilyApp names tyFun tyArgs =
     go tcName = do
       info <- reify tcName
       case info of
-#if MIN_VERSION_template_haskell(2,11,0)
         FamilyI (OpenTypeFamilyD (TypeFamilyHead _ bndrs _ _)) _
           -> withinFirstArgs bndrs
-#else
-        FamilyI (FamilyD TypeFam _ bndrs _) _
-          -> withinFirstArgs bndrs
-#endif
-
-#if MIN_VERSION_template_haskell(2,11,0)
         FamilyI (ClosedTypeFamilyD (TypeFamilyHead _ bndrs _ _) _) _
           -> withinFirstArgs bndrs
-#else
-        FamilyI (ClosedTypeFamilyD _ bndrs _ _) _
-          -> withinFirstArgs bndrs
-#endif
-
         _ -> return False
       where
         withinFirstArgs :: [a] -> Q Bool
@@ -1604,15 +1576,6 @@ mentionsName = go
     go (VarT n)     names = n `elem` names
     go _            _     = False
 
--- | Does an instance predicate mention any of the Names in the list?
-predMentionsName :: Pred -> [Name] -> Bool
-#if MIN_VERSION_template_haskell(2,10,0)
-predMentionsName = mentionsName
-#else
-predMentionsName (ClassP n tys) names = n `elem` names || any (`mentionsName` names) tys
-predMentionsName (EqualP t1 t2) names = mentionsName t1 names || mentionsName t2 names
-#endif
-
 -- | Construct a type via curried application.
 applyTy :: Type -> [Type] -> Type
 applyTy = foldl' AppT
@@ -1638,10 +1601,8 @@ unapplyTy ty = go ty ty []
     go :: Type -> Type -> [Type] -> NonEmpty Type
     go _      (AppT ty1 ty2)     args = go ty1 ty1 (ty2:args)
     go origTy (SigT ty' _)       args = go origTy ty' args
-#if MIN_VERSION_template_haskell(2,11,0)
     go origTy (InfixT ty1 n ty2) args = go origTy (ConT n `AppT` ty1 `AppT` ty2) args
     go origTy (ParensT ty')      args = go origTy ty' args
-#endif
     go origTy _                  args = origTy :| args
 
 -- | Split a type signature by the arrows on its spine. For example, this:

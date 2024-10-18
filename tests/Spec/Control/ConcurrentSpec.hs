@@ -12,7 +12,7 @@ module Spec.Control.ConcurrentSpec (main, spec) where
 
 import Control.Concurrent (myThreadId)
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import GHC.Conc (BlockReason, ThreadStatus)
 

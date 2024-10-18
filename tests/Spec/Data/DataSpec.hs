@@ -11,7 +11,7 @@ Portability: GHC
 module Spec.Data.DataSpec (main, spec) where
 
 import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 
 import Instances.Data.Data ()
 

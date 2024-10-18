@@ -10,7 +10,7 @@ Portability: GHC
 -}
 module Spec.Data.RatioSpec (main, spec) where
 
-import Data.Proxy.Compat (Proxy(..))
+import Data.Proxy (Proxy(..))
 import Data.Ratio (Ratio)
 
 import Spec.Utils (matchesTextShowSpec)

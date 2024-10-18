@@ -23,9 +23,7 @@ module Spec.Utils (
       matchesTextShowSpec
     , prop_matchesTextShow
     , matchesTextShow1Spec
-#if defined(NEW_FUNCTOR_CLASSES)
     , matchesTextShow2Spec
-#endif
     , genericTextShowSpec
     , genericTextShow1Spec
 
@@ -33,22 +31,18 @@ module Spec.Utils (
     , GArbitrary(..)
     ) where
 
-import Data.Functor.Classes (Show1, showsPrec1)
-import Data.Proxy.Compat (Proxy(..))
+import Data.Functor.Classes (Show1, Show2, showsPrec1, showsPrec2)
+import Data.Proxy (Proxy(..))
 
-import Generics.Deriving.Base
+import GHC.Generics
 
 import Test.Hspec (Expectation, Spec, shouldBe)
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck (Arbitrary(..), Gen)
 
-import TextShow (TextShow(..), TextShow1(..), showbPrec1, fromString)
+import TextShow (TextShow(..), TextShow1(..), TextShow2(..),
+                 showbPrec1, showbPrec2, fromString)
 import TextShow.Generic
-
-#if defined(NEW_FUNCTOR_CLASSES)
-import Data.Functor.Classes (Show2, showsPrec2)
-import TextShow (TextShow2(..), showbPrec2)
-#endif
 
 #if __GLASGOW_HASKELL__ >= 806
 import GHC.Show (appPrec, appPrec1)
@@ -78,7 +72,6 @@ matchesTextShow1Spec _ = prop "TextShow1 instance" (prop_matchesTextShow1 :: Int
 prop_matchesTextShow1 :: (Show1 f, Show a, TextShow1 f, TextShow a) => Int -> f a -> Expectation
 prop_matchesTextShow1 p x = showbPrec1 p x `shouldBe` fromString (showsPrec1 p x "")
 
-#if defined(NEW_FUNCTOR_CLASSES)
 -- | Expect a type's 'Show2' instances to coincide for both 'String's and 'Text',
 -- irrespective of precedence.
 matchesTextShow2Spec :: forall f a b.
@@ -92,7 +85,6 @@ matchesTextShow2Spec _ = prop "TextShow2 instance" (prop_matchesTextShow2 :: Int
 prop_matchesTextShow2 :: (Show2 f, Show a, Show b, TextShow2 f, TextShow a, TextShow b)
                       => Int -> f a b -> Expectation
 prop_matchesTextShow2 p x = showbPrec2 p x `shouldBe` fromString (showsPrec2 p x "")
-#endif
 
 -- | Expect a type's 'TextShow' instance to coincide with the output produced
 -- by the equivalent 'Generic' functions.

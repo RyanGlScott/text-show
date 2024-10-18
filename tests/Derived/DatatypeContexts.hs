@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP              #-}
 {-# LANGUAGE DatatypeContexts #-}
 {-# LANGUAGE TemplateHaskell  #-}
 {-# LANGUAGE TypeFamilies     #-}
@@ -17,22 +16,17 @@ Defines data types with DatatypeContexts (which are gross, but still possible).
 -}
 module Derived.DatatypeContexts (TyCon(..), TyFamily(..)) where
 
-import Data.Functor.Classes (Show1(..))
+import Data.Functor.Classes (Show1(..), Show2(..))
 
 import Prelude ()
 import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..))
 
+import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
+
 import TextShow (TextShow(..), TextShow1(..), TextShow2(..))
 import TextShow.TH (makeShowbPrec, makeLiftShowbPrec, makeLiftShowbPrec2)
-
-#if defined(NEW_FUNCTOR_CLASSES)
-import Data.Functor.Classes (Show2(..))
-import Text.Show.Deriving (makeLiftShowsPrec, makeLiftShowsPrec2)
-#else
-import Text.Show.Deriving (makeShowsPrec1)
-#endif
 
 -------------------------------------------------------------------------------
 
@@ -59,15 +53,9 @@ instance (Ord a, Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (TyFamily a
 $(return [])
 
 instance (Ord a, Show a, Show b) => Show1 (TyCon a b) where
-#if defined(NEW_FUNCTOR_CLASSES)
     liftShowsPrec = $(makeLiftShowsPrec ''TyCon)
-#else
-    showsPrec1 = $(makeShowsPrec1 ''TyCon)
-#endif
-#if defined(NEW_FUNCTOR_CLASSES)
 instance (Ord a, Show a) => Show2 (TyCon a) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 ''TyCon)
-#endif
 
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyCon a b c) where
     showbPrec = $(makeShowbPrec ''TyCon)
@@ -76,16 +64,11 @@ instance (Ord a, TextShow a, TextShow b) => TextShow1 (TyCon a b) where
 instance (Ord a, TextShow a) => TextShow2 (TyCon a) where
     liftShowbPrec2 = $(makeLiftShowbPrec2 ''TyCon)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
-    showsPrec1 = $(makeShowsPrec1 'TyFamily)
-#else
 instance (Ord a, Show a, Show b) => Show1 (TyFamily a b) where
     liftShowsPrec = $(makeLiftShowsPrec 'TyFamily)
 
 instance (Ord a, Show a) => Show2 (TyFamily a) where
     liftShowsPrec2 = $(makeLiftShowsPrec2 'TyFamily)
-#endif
 
 instance (Ord a, TextShow a, TextShow b, TextShow c) => TextShow (TyFamily a b c) where
     showbPrec = $(makeShowbPrec 'TyFamily)

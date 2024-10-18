@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 {-|
 Module:      Spec.GHC.StaticPtrSpec
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -12,28 +10,23 @@ Portability: GHC
 -}
 module Spec.GHC.StaticPtrSpec (main, spec) where
 
+import Data.Proxy (Proxy(..))
+
+import GHC.StaticPtr (StaticPtrInfo)
+
 import Instances.GHC.StaticPtr ()
 
 import Prelude ()
 import Prelude.Compat
 
-import Test.Hspec (Spec, hspec, parallel)
-
-#if MIN_VERSION_base(4,8,0)
-import Data.Proxy.Compat (Proxy(..))
-import GHC.StaticPtr (StaticPtrInfo)
 import Spec.Utils (matchesTextShowSpec)
-import Test.Hspec (describe)
-#endif
+
+import Test.Hspec (Spec, describe, hspec, parallel)
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = parallel $
-#if MIN_VERSION_base(4,8,0)
     describe "StaticPtrInfo" $
         matchesTextShowSpec (Proxy :: Proxy StaticPtrInfo)
-#else
-    pure ()
-#endif

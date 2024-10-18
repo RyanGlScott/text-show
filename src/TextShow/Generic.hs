@@ -5,6 +5,7 @@
 {-# LANGUAGE DeriveFoldable        #-}
 {-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DeriveLift            #-}
 {-# LANGUAGE DeriveTraversable     #-}
 {-# LANGUAGE EmptyCase             #-}
 {-# LANGUAGE EmptyDataDecls        #-}
@@ -22,10 +23,6 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE UndecidableInstances  #-}
-
-#if __GLASGOW_HASKELL__ >= 800
-{-# LANGUAGE DeriveLift            #-}
-#endif
 
 #if __GLASGOW_HASKELL__ >= 806
 {-# LANGUAGE QuantifiedConstraints #-}
@@ -99,15 +96,12 @@ import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy.Builder as TB (fromString, singleton)
 import           Data.Text.Lazy.Builder (Builder)
 
-import           Generics.Deriving.Base
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-import qualified Generics.Deriving.TH as Generics
-#endif
+import           GHC.Generics
 
 import           GHC.Exts (Char(C#), Double(D#), Float(F#), Int(I#), Word(W#))
 import           GHC.Show (appPrec, appPrec1)
 
-import           Language.Haskell.TH.Lift
+import           Language.Haskell.TH.Syntax (Lift)
 
 import           Prelude ()
 import           Prelude.Compat
@@ -173,10 +167,7 @@ newtype FromGeneric a = FromGeneric { fromGeneric :: a }
            , Read
            , Show
            , Traversable
-           , Typeable
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            )
 
 -- | /Since: 3.7.4/
@@ -198,18 +189,13 @@ newtype FromGeneric1 f a = FromGeneric1 { fromGeneric1 :: f a }
            , Read
            , Show
            , Generic
-#if defined(__LANGUAGE_DERIVE_GENERIC1__)
            , Generic1
-#endif
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            )
 
 deriving instance Foldable    f => Foldable    (FromGeneric1 f)
 deriving instance Functor     f => Functor     (FromGeneric1 f)
 deriving instance Traversable f => Traversable (FromGeneric1 f)
-deriving instance Typeable FromGeneric1
 deriving instance ( Data (f a), Typeable f, Typeable a
                   ) => Data (FromGeneric1 f (a :: *))
 
@@ -346,10 +332,7 @@ data ConType = Rec | Tup | Pref | Inf String
            , Ord
            , Read
            , Show
-           , Typeable
-#if __GLASGOW_HASKELL__ >= 800
            , Lift
-#endif
            )
 
 {-
@@ -369,23 +352,12 @@ See #33.
 -}
 
 hashPrec :: Int -> Int
-#if __GLASGOW_HASKELL__ >= 711
 hashPrec = const 0
-#else
-hashPrec = id
-#endif
 
-#if __GLASGOW_HASKELL__ >= 711
 #define HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string) \
 one_hash, two_hash :: text_type; \
 one_hash  = from_char '#';       \
 two_hash  = from_string "##";
-#else
-#define HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string) \
-one_hash, two_hash :: text_type; \
-one_hash  = mempty;              \
-two_hash  = mempty;
-#endif
 
 -- For some mysterious reason, attaching INLINE pragmas to things in this
 -- module causes GHC 8.10's simplifier to absolutely explode in terms of
@@ -418,7 +390,6 @@ two_hash  = mempty;
 class gtext_show a where {                                                              \
   ; gshow_prec :: Int -> a -> text_type                                                 \
 };                                                                                      \
-deriving instance Typeable gtext_show;                                                  \
                                                                                         \
 instance gtext_show (f p) => gtext_show (D1 d f p) where {                              \
   ; gshow_prec p (M1 x) = gshow_prec p x                                                \
@@ -447,7 +418,6 @@ determined.                                                                     
 class gtext_show_con a where {                                                          \
   ; gshow_prec_con :: ConType -> Int -> a -> text_type                                  \
 };                                                                                      \
-deriving instance Typeable gtext_show_con;                                              \
                                                                                         \
 instance gtext_show_con (U1 p) where {                                                  \
   ; gshow_prec_con _ _ U1 = mempty                                                      \
@@ -510,7 +480,6 @@ class QUANTIFIED_SUPERCLASS(gtext_show,f)                                       
   ; glift_show_prec :: (Int -> a -> text_type) -> ([a] -> text_type)                    \
                     -> Int -> f a -> text_type                                          \
 };                                                                                      \
-deriving instance Typeable gtext_show1;                                                 \
                                                                                         \
 instance gtext_show1 f => gtext_show1 (D1 d f) where {                                  \
   ; glift_show_prec sp sl p (M1 x) = glift_show_prec sp sl p x                          \
@@ -540,7 +509,6 @@ class QUANTIFIED_SUPERCLASS(gtext_show_con,f)                                   
   ; glift_show_prec_con :: (Int -> a -> text_type) -> ([a] -> text_type)                \
                         -> ConType -> Int -> f a -> text_type                           \
 };                                                                                      \
-deriving instance Typeable gtext_show_con1;                                             \
                                                                                         \
 instance gtext_show_con1 U1 where {                                                     \
   ; glift_show_prec_con _ _ _ _ U1 = mempty                                             \
@@ -758,16 +726,3 @@ instance IsNullary UWord where
 -------------------------------------------------------------------------------
 
 $(deriveTextShow ''ConType)
-
-#if __GLASGOW_HASKELL__ < 800
-$(deriveLift ''ConType)
-$(deriveLift ''FromGeneric)
-
-instance Lift (f a) => Lift (FromGeneric1 f a) where
-    lift = $(makeLift ''FromGeneric1)
-#endif
-
-#if !defined(__LANGUAGE_DERIVE_GENERIC1__)
-$(Generics.deriveMeta           ''FromGeneric1)
-$(Generics.deriveRepresentable1 ''FromGeneric1)
-#endif

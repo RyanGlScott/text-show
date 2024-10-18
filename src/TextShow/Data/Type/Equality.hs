@@ -1,9 +1,8 @@
-{-# LANGUAGE CPP             #-}
 {-# LANGUAGE GADTs           #-}
 {-# LANGUAGE PolyKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-|
 Module:      TextShow.Data.Type.Equality
 Copyright:   (C) 2014-2017 Ryan Scott
@@ -33,7 +32,6 @@ instance TextShow1 ((:~:) a) where
 -- | /Since: 2/
 $(deriveTextShow2 ''(:~:))
 
-#if MIN_VERSION_base(4,9,0)
 -- | /Since: 3.6/
 $(deriveTextShow ''(:~~:))
 
@@ -43,4 +41,3 @@ instance TextShow1 ((:~~:) a) where
 
 -- | /Since: 3.6/
 $(deriveTextShow2 ''(:~~:))
-#endif

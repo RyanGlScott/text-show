@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP                       #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE StandaloneDeriving        #-}
@@ -23,10 +22,7 @@ import Prelude.Compat
 
 import Test.QuickCheck (Arbitrary(..), Gen, oneof)
 
-import Text.Show.Deriving (deriveShow1)
-#if defined(NEW_FUNCTOR_CLASSES)
-import Text.Show.Deriving (deriveShow2)
-#endif
+import Text.Show.Deriving (deriveShow1, deriveShow2)
 
 import TextShow (TextShow)
 import TextShow.TH (deriveTextShow, deriveTextShow1, deriveTextShow2)
@@ -102,20 +98,14 @@ instance (a ~ Int, b ~ Int, c ~ Int, d ~ Int) => Arbitrary (TyFamily a b c d) wh
 -------------------------------------------------------------------------------
 
 $(deriveShow1 ''TyCon)
-#if defined(NEW_FUNCTOR_CLASSES)
 $(deriveShow2 ''TyCon)
-#endif
 
 $(deriveTextShow  ''TyCon)
 $(deriveTextShow1 ''TyCon)
 $(deriveTextShow2 ''TyCon)
 
-#if !defined(NEW_FUNCTOR_CLASSES)
-$(deriveShow1 'TyFamilyClassConstraints)
-#else
 $(deriveShow1 'TyFamilyTypeRefinement1)
 $(deriveShow2 'TyFamilyTypeRefinement1)
-#endif
 
 $(deriveTextShow  'TyFamilyClassConstraints)
 $(deriveTextShow1 'TyFamilyTypeRefinement1)

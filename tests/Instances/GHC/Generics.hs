@@ -1,11 +1,10 @@
-{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# LANGUAGE TypeOperators              #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      Instances.GHC.Generics
@@ -20,7 +19,7 @@ Portability: GHC
 module Instances.GHC.Generics () where
 
 import Data.Orphans ()
-import Generics.Deriving.Base
+import GHC.Generics
 import Instances.Utils.GenericArbitrary (genericArbitrary)
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
@@ -45,7 +44,6 @@ instance Arbitrary Fixity where
 instance Arbitrary Associativity where
     arbitrary = arbitraryBoundedEnum
 
-#if MIN_VERSION_base(4,9,0)
 instance Arbitrary SourceUnpackedness where
     arbitrary = arbitraryBoundedEnum
 
@@ -54,10 +52,6 @@ instance Arbitrary SourceStrictness where
 
 instance Arbitrary DecidedStrictness where
     arbitrary = arbitraryBoundedEnum
-#else
-instance Arbitrary Arity where
-    arbitrary = genericArbitrary
-#endif
 
 instance Arbitrary (UChar p) where
     arbitrary = genericArbitrary
