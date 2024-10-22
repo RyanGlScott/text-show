@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                  #-}
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
@@ -29,9 +30,17 @@ module Instances.GHC.RTS.Flags
 
 import qualified Generics.Deriving.TH as Generics (deriveAll0)
 import           GHC.RTS.Flags
+#if MIN_VERSION_base(4,21,0)
+import qualified GHC.IO.SubSystem as SubSystem
+#elif MIN_VERSION_base(4,15,0)
+import qualified GHC.RTS.Flags as SubSystem
+#endif
 import           Instances.Utils.GenericArbitrary (genericArbitrary)
 import           Language.Haskell.TH.Lib (conT)
 import           Test.QuickCheck (Arbitrary(..))
+#if MIN_VERSION_base(4,21,0)
+import           Test.QuickCheck (arbitraryBoundedEnum)
+#endif
 import           TextShow.TH.Names
 
 #if !(MIN_VERSION_base(4,15,0))
@@ -55,7 +64,7 @@ $(Generics.deriveAll0 doTraceTypeName)
 #endif
 
 #if MIN_VERSION_base(4,15,0)
-$(Generics.deriveAll0 ''IoSubSystem)
+$(Generics.deriveAll0 ''SubSystem.IoSubSystem)
 #endif
 
 instance Arbitrary RTSFlags where
@@ -68,8 +77,14 @@ instance Arbitrary ConcFlags where
     arbitrary = genericArbitrary
 
 #if MIN_VERSION_base(4,15,0)
-instance Arbitrary IoSubSystem where
+instance Arbitrary SubSystem.IoSubSystem where
     arbitrary = genericArbitrary
+#endif
+
+#if MIN_VERSION_base(4,21,0)
+deriving instance Bounded IoManagerFlag
+instance Arbitrary IoManagerFlag where
+    arbitrary = arbitraryBoundedEnum
 #endif
 
 instance Arbitrary MiscFlags where

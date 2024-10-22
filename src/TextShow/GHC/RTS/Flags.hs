@@ -16,6 +16,11 @@ Portability: GHC
 module TextShow.GHC.RTS.Flags () where
 
 import GHC.RTS.Flags
+#if MIN_VERSION_base(4,21,0)
+import qualified GHC.IO.SubSystem as SubSystem
+#elif MIN_VERSION_base(4,15,0)
+import qualified GHC.RTS.Flags as SubSystem
+#endif
 
 import TextShow.Data.Bool     ()
 import TextShow.Data.Char     ()
@@ -42,7 +47,11 @@ $(deriveTextShow ''GCFlags)
 $(deriveTextShow ''ConcFlags)
 #if MIN_VERSION_base(4,15,0)
 -- | /Since: 3.9/
-$(deriveTextShow ''IoSubSystem)
+$(deriveTextShow ''SubSystem.IoSubSystem)
+#endif
+#if MIN_VERSION_base(4,21,0)
+-- | /Since: 3.11/
+$(deriveTextShow ''IoManagerFlag)
 #endif
 -- | /Since: 2/
 $(deriveTextShow ''MiscFlags)
