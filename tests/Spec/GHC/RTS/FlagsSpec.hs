@@ -36,7 +36,10 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy GCFlags)
     describe "ConcFlags" $
         matchesTextShowSpec (Proxy :: Proxy ConcFlags)
-#if MIN_VERSION_base(4,15,0)
+#if MIN_VERSION_base(4,21,0)
+    describe "IoManagerFlag" $
+        matchesTextShowSpec (Proxy :: Proxy IoManagerFlag)
+#elif MIN_VERSION_base(4,15,0)
     describe "IoSubSystem" $
         matchesTextShowSpec (Proxy :: Proxy IoSubSystem)
 #endif

@@ -1,4 +1,7 @@
 ## 3.11 [????.??.??]
+* Support building with GHC 9.12.
+* Add a `TextShow` instance for `IoManagerFlag` in `TextShow.GHC.RTS.Flags`
+  (if building with `base-4.21`/GHC 9.12 or later).
 * Drop support for pre-8.0 versions of GHC.
 * Remove `TextShow.Data.OldTypeable`. The code in this module only worked with
   old versions of GHC that are no longer supported.

@@ -64,6 +64,7 @@ tested-with:         GHC == 8.0.2
                    , GHC == 9.6.6
                    , GHC == 9.8.2
                    , GHC == 9.10.1
+                   , GHC == 9.12.1
 extra-source-files:  CHANGELOG.md, README.md
 cabal-version:       >=1.10
 
@@ -149,12 +150,12 @@ library
                        TextShow.TH.Names
                        TextShow.Utils
   build-depends:       array                 >= 0.3      && < 0.6
-                     , base                  >= 4.9      && < 4.21
+                     , base                  >= 4.9      && < 4.22
                      , base-compat-batteries >= 0.11     && < 0.15
                      , bifunctors            >= 5.1      && < 6
                      , bytestring            >= 0.10.8.1 && < 0.13
                      , containers            >= 0.1      && < 0.8
-                     , ghc-boot-th           >= 8.0      && < 9.11
+                     , ghc-boot-th           >= 8.0      && < 9.13
                      , ghc-prim
                      , template-haskell      >= 2.11     && < 2.23
                      , text                  >= 1.1      && < 2.2
@@ -301,7 +302,7 @@ test-suite spec
 
                        TextShow.TH.Names
   build-depends:       array                 >= 0.3      && < 0.6
-                     , base                  >= 4.9      && < 4.21
+                     , base                  >= 4.9      && < 4.22
                      , base-compat-batteries >= 0.11     && < 0.15
                      , base-orphans          >= 0.8.5    && < 0.10
                      , bytestring            >= 0.10.8.1 && < 0.13
@@ -329,7 +330,7 @@ test-suite spec
 benchmark bench
   type:                exitcode-stdio-1.0
   main-is:             Bench.hs
-  build-depends:       base      >= 4.9    && < 4.21
+  build-depends:       base      >= 4.9    && < 4.22
                      , criterion >= 1.1.4  && < 2
                      , deepseq   >= 1.3    && < 2
                      , ghc-prim
