@@ -1,4 +1,4 @@
-## next [????.??.??]
+## 3.11 [????.??.??]
 * Drop support for pre-8.0 versions of GHC.
 * Remove `TextShow.Data.OldTypeable`. The code in this module only worked with
   old versions of GHC that are no longer supported.
