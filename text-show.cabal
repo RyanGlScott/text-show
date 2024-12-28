@@ -157,7 +157,7 @@ library
                      , containers            >= 0.1      && < 0.8
                      , ghc-boot-th           >= 8.0      && < 9.13
                      , ghc-prim
-                     , template-haskell      >= 2.11     && < 2.23
+                     , template-haskell      >= 2.11     && < 2.24
                      , text                  >= 1.1      && < 2.2
                      , th-abstraction        >= 0.5      && < 0.8
                      , transformers          >= 0.5      && < 0.7
@@ -312,7 +312,7 @@ test-suite spec
                      , hspec                 >= 2        && < 3
                      , QuickCheck            >= 2.14.3   && < 2.16
                      , quickcheck-instances  >= 0.3.28   && < 0.4
-                     , template-haskell      >= 2.11     && < 2.23
+                     , template-haskell      >= 2.11     && < 2.24
                      , text                  >= 1.1      && < 2.2
                      , text-show
                      , transformers          >= 0.5      && < 0.7
