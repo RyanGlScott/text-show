@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Make the test suite pass with `base-4.21.*` (GHC 9.12).
+
 ## 3.11 [2024.10.23]
 * Support building with GHC 9.12.
 * Add a `TextShow` instance for `IoManagerFlag` in `TextShow.GHC.RTS.Flags`

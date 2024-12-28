@@ -22,7 +22,10 @@ module TextShow.Control.Exception () where
 
 import Control.Exception.Base
 
-import Data.Text.Lazy.Builder (fromString, singleton)
+import Data.Text.Lazy.Builder (fromString)
+#if !MIN_VERSION_base(4,21,0)
+import Data.Text.Lazy.Builder (singleton)
+#endif
 
 import Prelude ()
 import Prelude.Compat
@@ -166,9 +169,13 @@ instance TextShow RecUpdError where
 
 -- | /Since: 2/
 instance TextShow ErrorCall where
+#if MIN_VERSION_base(4,21,0)
+    showb (ErrorCall err) = fromString err
+#else
     showb (ErrorCallWithLocation err "")  = fromString err
     showb (ErrorCallWithLocation err loc) =
       fromString err <> singleton '\n' <> fromString loc
+#endif
 
 -- | /Since: 2/
 $(deriveTextShow ''MaskingState)
