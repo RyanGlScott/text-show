@@ -1,15 +1,1 @@
 packages: .
-
--- TODO: Remove this once the ecosystem has caught up with GHC 9.12
-allow-newer:
-  aeson:ghc-prim,
-  aeson:template-haskell,
-  binary-orphans:base,
-  indexed-traversable:base,
-  indexed-traversable-instances:base,
-  integer-conversion:base,
-  microstache:base,
-  quickcheck-instances:base,
-  semialign:base,
-  these:base,
-  uuid-types:template-haskell
