@@ -154,7 +154,7 @@ library
                      , base-compat-batteries >= 0.11     && < 0.15
                      , bifunctors            >= 5.1      && < 6
                      , bytestring            >= 0.10.8.1 && < 0.13
-                     , containers            >= 0.1      && < 0.8
+                     , containers            >= 0.1      && < 0.9
                      , ghc-boot-th           >= 8.0      && < 9.13
                      , ghc-prim
                      , template-haskell      >= 2.11     && < 2.24
