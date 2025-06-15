@@ -19,7 +19,7 @@ import Prelude.Compat
 
 import Test.Hspec (Spec, hspec, parallel)
 
-#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && defined(mingw32_HOST_OS)
 import Data.Proxy (Proxy(..))
 import GHC.Conc.Windows (ConsoleEvent)
 import Spec.Utils (matchesTextShowSpec)
@@ -31,7 +31,7 @@ main = hspec spec
 
 spec :: Spec
 spec = parallel $
-#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && defined(mingw32_HOST_OS)
     describe "ConsoleEvent" $
         matchesTextShowSpec (Proxy :: Proxy ConsoleEvent)
 #else

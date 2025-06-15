@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP             #-}
 
-#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && defined(mingw32_HOST_OS)
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 #endif
@@ -19,7 +19,7 @@ Only provided if using Windows, and not using GHCJS.
 -}
 module TextShow.GHC.Conc.Windows () where
 
-#if !defined(__GHCJS__) && defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && defined(mingw32_HOST_OS)
 import GHC.Conc.Windows (ConsoleEvent)
 import TextShow.TH.Internal (deriveTextShow)
 

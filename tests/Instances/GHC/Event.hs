@@ -14,7 +14,7 @@ Portability: GHC
 -}
 module Instances.GHC.Event () where
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && !defined(mingw32_HOST_OS)
 import GHC.Event (Event, Lifetime(..), evtRead, evtWrite)
 
 import Prelude ()
