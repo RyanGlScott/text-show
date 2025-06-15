@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP             #-}
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && !defined(mingw32_HOST_OS)
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -20,7 +20,7 @@ Only provided if using a platform other than Windows or GHCJS.
 -}
 module TextShow.GHC.Event () where
 
-#if !defined(__GHCJS__) && !defined(mingw32_HOST_OS)
+#if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && !defined(mingw32_HOST_OS)
 import Data.List (intersperse)
 import Data.Maybe (catMaybes)
 import Data.Text.Lazy.Builder (Builder, singleton)
