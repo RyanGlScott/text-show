@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.11.2 [2025.06.17]
 * Support building with the GHC JavaScript backend.
 
 ### 3.11.1 [2024.12.28]
