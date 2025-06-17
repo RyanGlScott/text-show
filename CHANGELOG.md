@@ -1,3 +1,6 @@
+### next [????.??.??]
+* Support building with the GHC JavaScript backend.
+
 ### 3.11.1 [2024.12.28]
 * Make the test suite pass with `base-4.21.*` (GHC 9.12).
 
