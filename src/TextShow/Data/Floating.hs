@@ -71,15 +71,12 @@ showbRealFloatPrec p x
     | otherwise                 = showbGFloat Nothing x
 {-# INLINE showbRealFloatPrec #-}
 
-{-# SPECIALIZE showbEFloat ::
-        Maybe Int -> Float  -> Builder,
-        Maybe Int -> Double -> Builder #-}
-{-# SPECIALIZE showbFFloat ::
-        Maybe Int -> Float  -> Builder,
-        Maybe Int -> Double -> Builder #-}
-{-# SPECIALIZE showbGFloat ::
-        Maybe Int -> Float  -> Builder,
-        Maybe Int -> Double -> Builder #-}
+{-# SPECIALIZE showbEFloat :: Maybe Int -> Float  -> Builder #-}
+{-# SPECIALIZE showbEFloat :: Maybe Int -> Double -> Builder #-}
+{-# SPECIALIZE showbFFloat :: Maybe Int -> Float  -> Builder #-}
+{-# SPECIALIZE showbFFloat :: Maybe Int -> Double -> Builder #-}
+{-# SPECIALIZE showbGFloat :: Maybe Int -> Float  -> Builder #-}
+{-# SPECIALIZE showbGFloat :: Maybe Int -> Double -> Builder #-}
 
 -- | Show a signed 'RealFloat' value
 -- using scientific (exponential) notation (e.g. @2.45e2@, @1.5e-3@).
