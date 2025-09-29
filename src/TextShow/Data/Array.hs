@@ -34,10 +34,6 @@ import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Tuple ()
 
-{-# SPECIALIZE
-    showbIArrayPrec :: (IArray UArray e, Ix i, TextShow i, TextShow e) =>
-                        Int -> UArray i e -> Builder
-  #-}
 -- | Convert an 'IArray' instance to a 'Builder' with the given precedence.
 --
 -- /Since: 2/
