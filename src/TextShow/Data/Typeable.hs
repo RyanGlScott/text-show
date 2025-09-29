@@ -97,8 +97,13 @@ tc'Unlifted = tyConOf (Proxy :: Proxy 'PtrRepUnlifted)
 #if MIN_VERSION_base(4,20,0)
 isTupleTyCon :: TyCon -> Maybe (Bool, Int)
 isTupleTyCon tc
+# if MIN_VERSION_base(4,22,0)
+  | tyConPackage tc == "ghc-internal"
+  , tyConModule  tc == "GHC.Internal.Tuple" || tyConModule tc == "GHC.Internal.Types"
+# else
   | tyConPackage tc == "ghc-prim"
   , tyConModule  tc == "GHC.Tuple" || tyConModule tc == "GHC.Types"
+# endif
   = case tyConName tc of
       "Unit" -> Just (True, 0)
       "Unit#" -> Just (False, 0)
