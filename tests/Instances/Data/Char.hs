@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
@@ -12,8 +13,10 @@ Portability: GHC
 -}
 module Instances.Data.Char () where
 
+#if !MIN_VERSION_QuickCheck(2,17,0)
 import Data.Char (GeneralCategory)
 import Test.QuickCheck (Arbitrary(..), arbitraryBoundedEnum)
 
 instance Arbitrary GeneralCategory where
     arbitrary = arbitraryBoundedEnum
+#endif

@@ -1,5 +1,6 @@
 ### next [????.??.??]
 * Make the test suite pass with `base-4.22.*` (GHC 9.14).
+* Support building the test suite with `QuickCheck-2.17.*`.
 
 ### 3.11.2 [2025.06.17]
 * Support building with the GHC JavaScript backend.

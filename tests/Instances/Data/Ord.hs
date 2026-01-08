@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving         #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -14,7 +15,9 @@ Portability: GHC
 -}
 module Instances.Data.Ord () where
 
+#if !MIN_VERSION_QuickCheck(2,17,0)
 import GHC.Exts (Down(..))
 import Test.QuickCheck (Arbitrary)
 
 deriving instance Arbitrary a => Arbitrary (Down a)
+#endif

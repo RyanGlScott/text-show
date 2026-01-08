@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -36,15 +37,21 @@ instance Arbitrary HandlePosn where
     arbitrary = genericArbitrary
 
 deriving instance Bounded IOMode
+#if !MIN_VERSION_QuickCheck(2,17,0)
 instance Arbitrary IOMode where
     arbitrary = arbitraryBoundedEnum
+#endif
 
+#if !MIN_VERSION_QuickCheck(2,17,0)
 instance Arbitrary BufferMode where
     arbitrary = genericArbitrary
+#endif
 
 deriving instance Bounded SeekMode
+#if !MIN_VERSION_QuickCheck(2,17,0)
 instance Arbitrary SeekMode where
     arbitrary = arbitraryBoundedEnum
+#endif
 
 deriving instance Bounded CodingProgress
 deriving instance Enum CodingProgress
