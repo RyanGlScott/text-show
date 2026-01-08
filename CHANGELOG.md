@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.11.3 [2026.01.08]
 * Make the test suite pass with `base-4.22.*` (GHC 9.14).
 * Support building the test suite with `QuickCheck-2.17.*`.
 
