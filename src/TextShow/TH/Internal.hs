@@ -58,6 +58,7 @@ module TextShow.TH.Internal (
 
 import           Control.Monad (unless, when)
 import qualified Control.Monad as Monad (fail)
+import qualified Data.ByteString as BS
 import           Data.Foldable
 import qualified Data.List as List
 import           Data.List.NonEmpty (NonEmpty(..), (<|))
@@ -69,6 +70,7 @@ import           Data.Set (Set)
 import qualified Data.Text    as TS
 import qualified Data.Text.Builder.Linear as TB
 import           Data.Text.Builder.Linear (Builder)
+import qualified Data.Text.Encoding as TE
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
 import qualified Data.Text.Lazy    as TL
@@ -114,7 +116,6 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showtParen,  showtCommaSpace,  showtSpace,
                                    showtlParen, showtlCommaSpace, showtlSpace)
 import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
-import qualified TextShow.Utils as TB (fromString)
 import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
 -------------------------------------------------------------------------------
@@ -583,7 +584,7 @@ makeTextShowForCon _ _ tsFun _
   (ConstructorInfo { constructorName = conName, constructorFields = [] }) =
     match
       (conP conName [])
-      (normalB  $ varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName ""))
+      (normalB $ fromStringE tsFun (parenInfixConName conName ""))
       []
 makeTextShowForCon p tsClass tsFun tvMap
   (ConstructorInfo { constructorName    = conName
@@ -593,7 +594,7 @@ makeTextShowForCon p tsClass tsFun tvMap
     arg <- newName "arg"
 
     let showArg  = makeTextShowForArg appPrec1 tsClass tsFun conName tvMap argTy' arg
-        namedArg = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+        namedArg = infixApp (fromStringE tsFun (parenInfixConName conName " "))
                             [| (<>) |]
                             showArg
 
@@ -629,7 +630,7 @@ makeTextShowForCon p tsClass tsFun tvMap
                                                     (infixApp (varE $ showSpaceName tsFun)
                                                               [| (<>) |]
                                                               q)) showArgs
-             namedArgs   = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+             namedArgs   = infixApp (fromStringE tsFun (parenInfixConName conName " "))
                                     [| (<>) |]
                                     mappendArgs
 
@@ -649,7 +650,7 @@ makeTextShowForCon p tsClass tsFun tvMap
                                       -> let argNameBase = nameBase argName
                                              infixRec    = showParen (isSymVar argNameBase)
                                                                      (showString argNameBase) ""
-                                         in [ varE (fromStringName tsFun) `appE` stringE (infixRec ++ " = ")
+                                         in [ fromStringE tsFun (infixRec ++ " = ")
                                             , makeTextShowForArg 0 tsClass tsFun conName tvMap argTy arg
                                             , varE (showCommaSpaceName tsFun)
                                             ]
@@ -659,7 +660,7 @@ makeTextShowForCon p tsClass tsFun tvMap
         mappendArgs    = foldr' (`infixApp` [| (<>) |])
                                 (varE (singletonName tsFun) `appE` charE '}')
                                 braceCommaArgs
-        namedArgs      = infixApp (varE (fromStringName tsFun) `appE` stringE (parenInfixConName conName " "))
+        namedArgs      = infixApp (fromStringE tsFun (parenInfixConName conName " "))
                                   [| (<>) |]
                                   mappendArgs
 
@@ -679,7 +680,7 @@ makeTextShowForCon p tsClass tsFun tvMap
     fi <- fromMaybe defaultFixity <$> reifyFixityCompat conName
     let conPrec  = case fi of Fixity prec _ -> prec
         opName   = nameBase conName
-        infixOpE = appE (varE $ fromStringName tsFun) . stringE $
+        infixOpE = fromStringE tsFun $
                      if isInfixDataCon opName
                         then " "  ++ opName ++ " "
                         else " `" ++ opName ++ "` "
@@ -1095,11 +1096,12 @@ data TextShowClass = TextShow | TextShow1 | TextShow2
 -- implement something.
 data TextShowFun = ShowbPrec | ShowtPrec | ShowtlPrec
 
--- TODO RGS: Should we optimize this to use fromAddr# more?
-fromStringName :: TextShowFun -> Name
-fromStringName ShowbPrec  = 'TB.fromString
-fromStringName ShowtPrec  = 'TS.pack
-fromStringName ShowtlPrec = 'TL.pack
+fromStringE :: TextShowFun -> String -> Q Exp
+fromStringE ShowbPrec s =
+  let addr = LitE $ StringPrimL $ BS.unpack $ TE.encodeUtf8 $ TS.pack s in
+  [| TB.fromAddr $(pure addr) |]
+fromStringE ShowtPrec s = [| TS.pack s |]
+fromStringE ShowtlPrec s = [| TL.pack s |]
 
 singletonName :: TextShowFun -> Name
 singletonName ShowbPrec  = 'TB.fromChar
@@ -1345,7 +1347,7 @@ mkNarrowE :: Name -> TextShowFun -> Q Exp -> Q Exp
 mkNarrowE narrowName tsFun e =
   foldr (`infixApp` [| (<>) |])
         (varE (singletonName tsFun) `appE` charE ')')
-        [ varE (fromStringName tsFun) `appE` stringE ('(':nameBase narrowName ++ " ")
+        [ fromStringE tsFun ('(':nameBase narrowName ++ " ")
         , e
         ]
 
@@ -1415,12 +1417,12 @@ wordToWord16HashValName =
 #endif
 
 oneHashE, twoHashE :: TextShowFun -> Q Exp
-oneHashE tsFun = varE (singletonName tsFun)  `appE` charE '#'
-twoHashE tsFun = varE (fromStringName tsFun) `appE` stringE "##"
+oneHashE tsFun = varE (singletonName tsFun) `appE` charE '#'
+twoHashE tsFun = fromStringE tsFun "##"
 
 #if MIN_VERSION_base(4,19,0)
 extendedLitE :: String -> TextShowFun -> Q Exp
-extendedLitE suffix tsFun = varE (fromStringName tsFun) `appE` stringE ("#" ++ suffix)
+extendedLitE suffix tsFun = fromStringE tsFun ("#" ++ suffix)
 #endif
 
 -------------------------------------------------------------------------------
