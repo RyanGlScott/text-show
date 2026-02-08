@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP                #-}
+{-# LANGUAGE MagicHash          #-}
 {-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell    #-}
@@ -22,9 +23,9 @@ module TextShow.Control.Exception () where
 
 import Control.Exception.Base
 
-import Data.Text.Lazy.Builder (fromString)
+import Data.Text.Builder.Linear (fromAddr)
 #if !MIN_VERSION_base(4,21,0)
-import Data.Text.Lazy.Builder (singleton)
+import Data.Text.Builder.Linear (fromChar)
 #endif
 
 import Prelude ()
@@ -33,6 +34,7 @@ import Prelude.Compat
 import TextShow.Classes (TextShow(..))
 import TextShow.FromStringTextShow (FromStringShow(..))
 import TextShow.TH.Internal (deriveTextShow)
+import TextShow.Utils (fromString)
 
 -- | /Since: 2/
 #if __GLASGOW_HASKELL__ >= 806
@@ -54,22 +56,22 @@ instance TextShow IOException where
 
 -- | /Since: 2/
 instance TextShow ArithException where
-    showb Overflow             = "arithmetic overflow"
-    showb Underflow            = "arithmetic underflow"
-    showb LossOfPrecision      = "loss of precision"
-    showb DivideByZero         = "divide by zero"
-    showb Denormal             = "denormal"
-    showb RatioZeroDenominator = "Ratio has zero denominator"
+    showb Overflow             = fromAddr "arithmetic overflow"#
+    showb Underflow            = fromAddr "arithmetic underflow"#
+    showb LossOfPrecision      = fromAddr "loss of precision"#
+    showb DivideByZero         = fromAddr "divide by zero"#
+    showb Denormal             = fromAddr "denormal"#
+    showb RatioZeroDenominator = fromAddr "Ratio has zero denominator"#
 
 -- | /Since: 2/
 instance TextShow ArrayException where
     showb (IndexOutOfBounds s)
-        =  "array index out of range"
-        <> (if not $ null s then ": " <> fromString s
+        =  fromAddr "array index out of range"#
+        <> (if not $ null s then fromAddr ": "# <> fromString s
                             else mempty)
     showb (UndefinedElement s)
-        =  "undefined array element"
-        <> (if not $ null s then ": " <> fromString s
+        =  fromAddr "undefined array element"#
+        <> (if not $ null s then fromAddr ": "# <> fromString s
                             else mempty)
     {-# INLINE showb #-}
 
@@ -85,35 +87,39 @@ instance TextShow SomeAsyncException where
 
 -- | /Since: 2/
 instance TextShow AsyncException where
-    showb StackOverflow = "stack overflow"
-    showb HeapOverflow  = "heap overflow"
-    showb ThreadKilled  = "thread killed"
-    showb UserInterrupt = "user interrupt"
+    showb StackOverflow = fromAddr "stack overflow"#
+    showb HeapOverflow  = fromAddr "heap overflow"#
+    showb ThreadKilled  = fromAddr "thread killed"#
+    showb UserInterrupt = fromAddr "user interrupt"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow NonTermination where
-    showb NonTermination = "<<loop>>"
+    showb NonTermination = fromAddr "<<loop>>"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow NestedAtomically where
-    showb NestedAtomically = "Control.Concurrent.STM.atomically was nested"
+    showb NestedAtomically =
+      fromAddr "Control.Concurrent.STM.atomically was nested"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnMVar where
-    showb BlockedIndefinitelyOnMVar = "thread blocked indefinitely in an MVar operation"
+    showb BlockedIndefinitelyOnMVar =
+      fromAddr "thread blocked indefinitely in an MVar operation"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow BlockedIndefinitelyOnSTM where
-    showb BlockedIndefinitelyOnSTM = "thread blocked indefinitely in an STM transaction"
+    showb BlockedIndefinitelyOnSTM =
+      fromAddr "thread blocked indefinitely in an STM transaction"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow AllocationLimitExceeded where
-    showb AllocationLimitExceeded = "allocation limit exceeded"
+    showb AllocationLimitExceeded =
+      fromAddr "allocation limit exceeded"#
     {-# INLINE showb #-}
 
 -- | /Since: 3/
@@ -134,12 +140,12 @@ instance TextShow CompactionFailed where
 --
 -- /Since: 3.7.3/
 instance TextShow FixIOException where
-    showbPrec _ FixIOException = fromString "cyclic evaluation in fixIO"
+    showbPrec _ FixIOException = fromAddr "cyclic evaluation in fixIO"#
 #endif
 
 -- | /Since: 2/
 instance TextShow Deadlock where
-    showb Deadlock = "<<deadlock>>"
+    showb Deadlock = fromAddr "<<deadlock>>"#
     {-# INLINE showb #-}
 
 -- | /Since: 2/
@@ -174,7 +180,7 @@ instance TextShow ErrorCall where
 #else
     showb (ErrorCallWithLocation err "")  = fromString err
     showb (ErrorCallWithLocation err loc) =
-      fromString err <> singleton '\n' <> fromString loc
+      fromString err <> fromChar '\n' <> fromString loc
 #endif
 
 -- | /Since: 2/

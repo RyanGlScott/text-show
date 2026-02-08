@@ -67,10 +67,10 @@ import           Data.Maybe
 import qualified Data.Set as Set
 import           Data.Set (Set)
 import qualified Data.Text    as TS
+import qualified Data.Text.Builder.Linear as TB
+import           Data.Text.Builder.Linear (Builder)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import qualified Data.Text.Lazy.Builder as TB
-import           Data.Text.Lazy.Builder (Builder, toLazyText)
 import qualified Data.Text.Lazy    as TL
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 
@@ -114,6 +114,7 @@ import           TextShow.Classes (TextShow(..), TextShow1(..), TextShow2(..),
                                    showtParen,  showtCommaSpace,  showtSpace,
                                    showtlParen, showtlCommaSpace, showtlSpace)
 import           TextShow.Options (Options(..), GenTextMethods(..), defaultOptions)
+import qualified TextShow.Utils as TB (fromString)
 import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
 -------------------------------------------------------------------------------
@@ -1094,13 +1095,14 @@ data TextShowClass = TextShow | TextShow1 | TextShow2
 -- implement something.
 data TextShowFun = ShowbPrec | ShowtPrec | ShowtlPrec
 
+-- TODO RGS: Should we optimize this to use fromAddr# more?
 fromStringName :: TextShowFun -> Name
 fromStringName ShowbPrec  = 'TB.fromString
 fromStringName ShowtPrec  = 'TS.pack
 fromStringName ShowtlPrec = 'TL.pack
 
 singletonName :: TextShowFun -> Name
-singletonName ShowbPrec  = 'TB.singleton
+singletonName ShowbPrec  = 'TB.fromChar
 singletonName ShowtPrec  = 'TS.singleton
 singletonName ShowtlPrec = 'TL.singleton
 

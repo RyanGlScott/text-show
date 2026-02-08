@@ -21,7 +21,7 @@ module TextShow.Data.Array.Byte () where
 import           Data.Array.Byte (ByteArray(..))
 import           Data.Bits (Bits(..))
 import           Data.Char (intToDigit)
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import           Data.Text.Builder.Linear (Builder, fromAddr, fromChar)
 
 import           GHC.Exts (Int(..), indexWord8Array#, sizeofByteArray#)
 import           GHC.Word (Word8(..))
@@ -34,20 +34,20 @@ import           TextShow.Classes (TextShow(..))
 -- | /Since: 3.10/
 instance TextShow ByteArray where
   showbPrec _ ba =
-      fromString "[" <> go 0
+      fromChar '[' <> go 0
     where
       showW8 :: Word8 -> Builder
       showW8 !w =
-           singleton '0'
-        <> singleton 'x'
-        <> singleton (intToDigit (fromIntegral (unsafeShiftR w 4)))
-        <> singleton (intToDigit (fromIntegral (w .&. 0x0F)))
+           fromChar '0'
+        <> fromChar 'x'
+        <> fromChar (intToDigit (fromIntegral (unsafeShiftR w 4)))
+        <> fromChar (intToDigit (fromIntegral (w .&. 0x0F)))
       go i
         | i < sizeofByteArray ba = comma <> showW8 (indexByteArray ba i :: Word8) <> go (i+1)
-        | otherwise              = singleton ']'
+        | otherwise              = fromChar ']'
         where
           comma | i == 0    = mempty
-                | otherwise = fromString ", "
+                | otherwise = fromAddr ", "#
 
 -- | Read byte at specific index.
 indexByteArray :: ByteArray -> Int -> Word8

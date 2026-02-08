@@ -15,7 +15,7 @@ Portability: GHC
 module TextShow.GHC.Fingerprint () where
 
 import Data.Semigroup (mtimesDefault)
-import Data.Text.Lazy.Builder (Builder, singleton)
+import Data.Text.Builder.Linear (Builder, fromChar)
 import Data.Word (Word64)
 
 import GHC.Fingerprint.Type (Fingerprint(..))
@@ -33,4 +33,4 @@ instance TextShow Fingerprint where
       where
         hex16 :: Word64 -> Builder
         hex16 i = let hex = showbHex i
-                  in mtimesDefault (max 0 $ 16 - lengthB hex) (singleton '0') <> hex
+                  in mtimesDefault (max 0 $ 16 - lengthB hex) (fromChar '0') <> hex

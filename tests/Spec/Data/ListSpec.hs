@@ -12,9 +12,9 @@ module Spec.Data.ListSpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (builderShouldBe, matchesTextShowSpec)
 
-import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import Text.Show (showListWith)
@@ -37,4 +37,4 @@ spec = parallel $ do
 
 -- | Verifies 'showListWith' and 'showbListWith' generate the same output.
 prop_showListWith :: String -> Expectation
-prop_showListWith str = fromString (showListWith shows str "") `shouldBe` showbListWith showb str
+prop_showListWith str = fromString (showListWith shows str "") `builderShouldBe` showbListWith showb str

@@ -13,9 +13,9 @@ module Spec.Data.FixedSpec (main, spec) where
 import Data.Fixed (Fixed, E0, E1, E2, E3, E6, E9, E12, showFixed)
 import Data.Proxy (Proxy(..))
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (builderShouldBe, matchesTextShowSpec)
 
-import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
@@ -45,4 +45,4 @@ spec = parallel $ do
 
 -- | Verifies 'showFixed' and 'showbFixed' generate the same output.
 prop_showFixed :: Bool -> Fixed E12 -> Expectation
-prop_showFixed b f = fromString (showFixed b f) `shouldBe` showbFixed b f
+prop_showFixed b f = fromString (showFixed b f) `builderShouldBe` showbFixed b f

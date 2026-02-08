@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP               #-}
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds         #-}
 {-# LANGUAGE TemplateHaskell   #-}
@@ -20,7 +21,7 @@ module TextShow.Control.Applicative () where
 
 import Control.Applicative (Const(..), ZipList)
 
-import Data.Text.Lazy.Builder (Builder)
+import Data.Text.Builder.Linear (Builder, fromAddr)
 
 import TextShow.Classes (TextShow(..), TextShow1(..),
                          TextShow2(..), showbUnaryWith)
@@ -40,7 +41,7 @@ instance TextShow2 Const where
     liftShowbPrec2 sp _ _ _  = liftShowbConstPrec sp
 
 liftShowbConstPrec :: (Int -> a -> Builder) -> Int -> Const a b -> Builder
-liftShowbConstPrec sp p (Const x) = showbUnaryWith sp "Const" p x
+liftShowbConstPrec sp p (Const x) = showbUnaryWith sp (fromAddr "Const"#) p x
 {-# INLINE liftShowbConstPrec #-}
 
 -- | /Since: 2/

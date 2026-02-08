@@ -24,8 +24,8 @@ module TextShow.Data.Integral (
 
 import           Data.Char (intToDigit)
 import           Data.Int (Int8, Int16, Int32, Int64)
-import           Data.Text.Lazy.Builder (Builder, singleton)
-import           Data.Text.Lazy.Builder.Int (decimal)
+import           Data.Text.Builder.Linear (Builder,
+                                           fromChar, fromDec, fromUnboundedDec)
 import           Data.Word (Word8, Word16, Word32, Word64)
 
 import           GHC.Exts (Int(I#), (<#), (>#), isTrue#)
@@ -34,7 +34,7 @@ import           Prelude ()
 import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..))
-import           TextShow.Utils (toString)
+import           TextShow.Utils (runBuilderString)
 
 -- | Convert an 'Integral' type to a 'Builder' with the given precedence.
 --
@@ -60,8 +60,8 @@ showbIntAtBase :: (Integral a, TextShow a) => a -> (Int -> Char) -> a -> Builder
 {-# SPECIALIZE showbIntAtBase :: Word32  -> (Int -> Char) -> Word32  -> Builder #-}
 {-# SPECIALIZE showbIntAtBase :: Word64  -> (Int -> Char) -> Word64  -> Builder #-}
 showbIntAtBase base toChr n0
-    | base <= 1 = error . toString $ "TextShow.Int.showbIntAtBase: applied to unsupported base" <> showb base
-    | n0 < 0    = error . toString $ "TextShow.Int.showbIntAtBase: applied to negative number " <> showb n0
+    | base <= 1 = error . runBuilderString $ "TextShow.Int.showbIntAtBase: applied to unsupported base" <> showb base
+    | n0 < 0    = error . runBuilderString $ "TextShow.Int.showbIntAtBase: applied to negative number " <> showb n0
     | otherwise = showbIt (quotRem n0 base) mempty
   where
     showbIt (n, d) b = seq c $ -- stricter than necessary
@@ -73,7 +73,7 @@ showbIntAtBase base toChr n0
         c = toChr $ fromIntegral d
 
         b' :: Builder
-        b' = singleton c <> b
+        b' = fromChar c <> b
 
 -- | Show /non-negative/ 'Integral' numbers in base 2.
 --
@@ -100,9 +100,9 @@ showbOct = showbIntAtBase 8 intToDigit
 instance TextShow Int where
     showbPrec (I# p) n'@(I# n)
         | isTrue# (n <# 0#) && isTrue# (p ># 6#)
-        = singleton '(' <> decimal n' <> singleton ')'
+        = fromChar '(' <> fromDec n' <> fromChar ')'
         | otherwise
-        = decimal n'
+        = fromDec n'
 
 -- | /Since: 2/
 instance TextShow Int8 where
@@ -131,31 +131,31 @@ instance TextShow Int64 where
 -- | /Since: 2/
 instance TextShow Integer where
     showbPrec p n
-        | p > 6 && n < 0 = singleton '(' <> decimal n <> singleton ')'
-        | otherwise      = decimal n
+        | p > 6 && n < 0 = fromChar '(' <> fromUnboundedDec n <> fromChar ')'
+        | otherwise      = fromUnboundedDec n
     {-# INLINE showbPrec #-}
 
 -- | /Since: 2/
 instance TextShow Word where
-    showb = decimal
+    showb = fromDec
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word8 where
-    showb = decimal
+    showb = fromDec
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word16 where
-    showb = decimal
+    showb = fromDec
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word32 where
-    showb = decimal
+    showb = fromDec
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow Word64 where
-    showb = decimal
+    showb = fromDec
     {-# INLINE showb #-}

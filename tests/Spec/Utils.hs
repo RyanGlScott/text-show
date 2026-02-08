@@ -1,9 +1,11 @@
-{-# LANGUAGE CPP                   #-}
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE GADTs                 #-}
-{-# LANGUAGE PolyKinds             #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
-{-# LANGUAGE StandaloneDeriving    #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE PolyKinds                  #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 
 #if __GLASGOW_HASKELL__ >= 806
 {-# LANGUAGE QuantifiedConstraints #-}
@@ -27,12 +29,15 @@ module Spec.Utils (
     , genericTextShowSpec
     , genericTextShow1Spec
 
+    , builderShouldBe
+    , BuilderEq(..)
     , Some(..)
     , GArbitrary(..)
     ) where
 
 import Data.Functor.Classes (Show1, Show2, showsPrec1, showsPrec2)
 import Data.Proxy (Proxy(..))
+import Data.Text.Builder.Linear (Builder, runBuilder)
 
 import GHC.Generics
 import GHC.Stack (HasCallStack)
@@ -60,7 +65,7 @@ matchesTextShowSpec _ = prop "TextShow instance" (prop_matchesTextShow :: Int ->
 -- irrespective of precedence.
 prop_matchesTextShow :: (HasCallStack, Show a, TextShow a)
                      => Int -> a -> Expectation
-prop_matchesTextShow p x = showbPrec p x `shouldBe` fromString (showsPrec p x "")
+prop_matchesTextShow p x = showbPrec p x `builderShouldBe` fromString (showsPrec p x "")
 
 -- | Expect a type's 'Show1' instances to coincide for both 'String's and 'Text',
 -- irrespective of precedence.
@@ -73,7 +78,7 @@ matchesTextShow1Spec _ = prop "TextShow1 instance" (prop_matchesTextShow1 :: Int
 -- irrespective of precedence.
 prop_matchesTextShow1 :: (HasCallStack, Show1 f, Show a, TextShow1 f, TextShow a)
                       => Int -> f a -> Expectation
-prop_matchesTextShow1 p x = showbPrec1 p x `shouldBe` fromString (showsPrec1 p x "")
+prop_matchesTextShow1 p x = showbPrec1 p x `builderShouldBe` fromString (showsPrec1 p x "")
 
 -- | Expect a type's 'Show2' instances to coincide for both 'String's and 'Text',
 -- irrespective of precedence.
@@ -88,7 +93,7 @@ matchesTextShow2Spec _ = prop "TextShow2 instance" (prop_matchesTextShow2 :: Int
 -- irrespective of precedence.
 prop_matchesTextShow2 :: (HasCallStack, Show2 f, Show a, Show b, TextShow2 f, TextShow a, TextShow b)
                       => Int -> f a b -> Expectation
-prop_matchesTextShow2 p x = showbPrec2 p x `shouldBe` fromString (showsPrec2 p x "")
+prop_matchesTextShow2 p x = showbPrec2 p x `builderShouldBe` fromString (showsPrec2 p x "")
 
 -- | Expect a type's 'TextShow' instance to coincide with the output produced
 -- by the equivalent 'Generic' functions.
@@ -103,7 +108,7 @@ genericTextShowSpec _ = prop "generic TextShow" (prop_genericTextShow  :: Int ->
 -- by the equivalent 'Generic' functions.
 prop_genericTextShow :: (HasCallStack, TextShow a, Generic a, GTextShowB (Rep a ()))
                      => Int -> a -> Expectation
-prop_genericTextShow p x = showbPrec p x `shouldBe` genericShowbPrec p x
+prop_genericTextShow p x = showbPrec p x `builderShouldBe` genericShowbPrec p x
 
 -- | Expect a type's 'TextShow1' instance to coincide with the output produced
 -- by the equivalent 'Generic1' functions.
@@ -122,7 +127,19 @@ prop_genericTextShow1 :: ( HasCallStack
                          )
                       => Int -> f a -> Expectation
 prop_genericTextShow1 p x =
-    showbPrec1 p x `shouldBe` genericLiftShowbPrec showbPrec showbList p x
+    showbPrec1 p x `builderShouldBe` genericLiftShowbPrec showbPrec showbList p x
+
+-- | Asserts that the specified actual 'Builder' value is equal to the expected
+-- value (with the _actual_ value on the left-hand side).
+builderShouldBe :: HasCallStack => Builder -> Builder -> Expectation
+builderShouldBe b1 b2 = BuilderEq b1 `shouldBe` BuilderEq b2
+
+-- | A newtype around 'Builder' that includes an 'Eq' instance.
+newtype BuilderEq = BuilderEq Builder
+  deriving newtype Show
+
+instance Eq BuilderEq where
+  BuilderEq b1 == BuilderEq b2 = runBuilder b1 == runBuilder b2
 
 -- | A data type that existentially closes over something.
 data Some t where

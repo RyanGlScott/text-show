@@ -1,5 +1,6 @@
-{-# LANGUAGE CPP       #-}
-{-# LANGUAGE MagicHash #-}
+{-# LANGUAGE CPP           #-}
+{-# LANGUAGE MagicHash     #-}
+{-# LANGUAGE UnboxedTuples #-}
 
 {-|
 Module:      TextShow.Utils
@@ -12,21 +13,23 @@ Portability: GHC
 Miscellaneous utility functions.
 -}
 module TextShow.Utils (
-      i2d
+      fromLazyText
+    , fromString
+    , i2d
     , isInfixDataCon
     , isSymVar
     , isTupleString
     , lengthB
-    , toString
-    , toText
+    , runBuilderLazy
+    , runBuilderString
     , unlinesB
     , unwordsB
     ) where
 
-import           Data.Int (Int64)
-import           Data.Text (Text)
-import           Data.Text.Lazy (length, toStrict, unpack)
-import           Data.Text.Lazy.Builder (Builder, singleton, toLazyText)
+import           Data.Text.Builder.Linear (Builder)
+import qualified Data.Text.Builder.Linear as TB
+import qualified Data.Text as TS
+import qualified Data.Text.Lazy as TL
 
 import           GHC.Exts (Char(C#), Int(I#), (+#), chr#, ord#)
 
@@ -38,6 +41,16 @@ import           GHC.Lexeme (startsVarSym)
 #else
 import           Data.Char (isSymbol, ord)
 #endif
+
+-- | Create a 'Builder' containing a given lazy 'TL.Text' value.
+fromLazyText :: TL.Text -> Builder
+fromLazyText = foldMap TB.fromText . TL.toChunks
+{-# INLINE fromLazyText #-}
+
+-- | Create a 'Builder' containing a given 'String' value.
+fromString :: String -> Builder
+fromString = TB.fromText . TS.pack
+{-# INLINE fromString #-}
 
 -- | Unsafe conversion for decimal digits.
 i2d :: Int -> Char
@@ -73,36 +86,36 @@ isTupleString _           = False
 -- | Computes the length of a 'Builder'.
 --
 -- /Since: 2/
-lengthB :: Builder -> Int64
-lengthB = length . toLazyText
+lengthB :: Builder -> Int
+lengthB = TS.length . TB.runBuilder
 {-# INLINE lengthB #-}
 
--- | Convert a 'Builder' to a 'String' (without surrounding it with double quotes,
--- as 'show' would).
+-- | Convert a 'Builder' to a lazy 'Text'.
 --
 -- /Since: 2/
-toString :: Builder -> String
-toString = unpack . toLazyText
-{-# INLINE toString #-}
+runBuilderLazy :: Builder -> TL.Text
+runBuilderLazy = TL.fromStrict . TB.runBuilder
+{-# INLINE runBuilderLazy #-}
 
--- | Convert a 'Builder' to a strict 'Text'.
+-- | Convert a 'Builder' to a 'String' (without surrounding it with double
+-- quotes, as 'show' would).
 --
 -- /Since: 2/
-toText :: Builder -> Text
-toText = toStrict . toLazyText
-{-# INLINE toText #-}
+runBuilderString :: Builder -> String
+runBuilderString = TS.unpack . TB.runBuilder
+{-# INLINE runBuilderString #-}
 
 -- | Merges several 'Builder's, separating them by newlines.
 --
 -- /Since: 2/
 unlinesB :: [Builder] -> Builder
-unlinesB (b:bs) = b <> singleton '\n' <> unlinesB bs
+unlinesB (b:bs) = b <> TB.fromChar '\n' <> unlinesB bs
 unlinesB []     = mempty
 
 -- | Merges several 'Builder's, separating them by spaces.
 --
 -- /Since: 2/
 unwordsB :: [Builder] -> Builder
-unwordsB (b:bs@(_:_)) = b <> singleton ' ' <> unwordsB bs
+unwordsB (b:bs@(_:_)) = b <> TB.fromChar ' ' <> unwordsB bs
 unwordsB [b]          = b
 unwordsB []           = mempty

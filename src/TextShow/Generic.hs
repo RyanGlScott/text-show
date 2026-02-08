@@ -90,11 +90,11 @@ module TextShow.Generic (
 
 import           Data.Data (Data, Typeable)
 import qualified Data.Text    as TS (Text, pack, singleton)
+import qualified Data.Text.Builder.Linear as TB (fromChar)
+import           Data.Text.Builder.Linear (Builder)
 import qualified Data.Text.IO as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, pack, singleton)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
-import qualified Data.Text.Lazy.Builder as TB (fromString, singleton)
-import           Data.Text.Lazy.Builder (Builder)
 
 import           GHC.Generics
 
@@ -115,6 +115,7 @@ import           TextShow.Classes (TextShow(..), TextShow1(..),
                                    liftShowtPrec, liftShowtlPrec)
 import           TextShow.Instances ()
 import           TextShow.TH.Internal (deriveTextShow)
+import qualified TextShow.Utils as TB (fromString) -- TODO RGS: Can we optimize this further?
 import           TextShow.Utils (isInfixDataCon, isSymVar, isTupleString)
 
 {- $generics
@@ -677,7 +678,7 @@ INLINE_GE_902(u_word_show_prec)                                                 
                                                                                         \
 HASH_FUNS(text_type,one_hash,two_hash,from_char,from_string);
 
-GTEXT_SHOW(Builder,ShowFunsB,oneHashB,twoHashB,GTextShowB,GTextShowB1,gShowbPrec,gLiftShowbPrec,GTextShowConB,GTextShowConB1,gShowbPrecCon,gLiftShowbPrecCon,showbPrec,liftShowbPrec,showbSpace,showbParen,showbList,showbListWith,TB.singleton,TB.fromString,c1ShowbPrec,s1ShowbPrec,productShowbPrec,uCharShowbPrec,uDoubleShowbPrec,uFloatShowbPrec,uIntShowbPrec,uWordShowbPrec)
+GTEXT_SHOW(Builder,ShowFunsB,oneHashB,twoHashB,GTextShowB,GTextShowB1,gShowbPrec,gLiftShowbPrec,GTextShowConB,GTextShowConB1,gShowbPrecCon,gLiftShowbPrecCon,showbPrec,liftShowbPrec,showbSpace,showbParen,showbList,showbListWith,TB.fromChar,TB.fromString,c1ShowbPrec,s1ShowbPrec,productShowbPrec,uCharShowbPrec,uDoubleShowbPrec,uFloatShowbPrec,uIntShowbPrec,uWordShowbPrec)
 GTEXT_SHOW(TS.Text,ShowFunsT,oneHashT,twoHashT,GTextShowT,GTextShowT1,gShowtPrec,gLiftShowtPrec,GTextShowConT,GTextShowConT1,gShowtPrecCon,gLiftShowtPrecCon,showtPrec,liftShowtPrec,showtSpace,showtParen,showtList,showtListWith,TS.singleton,TS.pack,c1ShowtPrec,s1ShowtPrec,productShowtPrec,uCharShowtPrec,uDoubleShowtPrec,uFloatShowtPrec,uIntShowtPrec,uWordShowtPrec)
 GTEXT_SHOW(TL.Text,ShowFunsTL,oneHashTL,twoHashTL,GTextShowTL,GTextShowTL1,gShowtlPrec,gLiftShowtlPrec,GTextShowConTL,GTextShowConTL1,gShowtlPrecCon,gLiftShowtlPrecCon,showtlPrec,liftShowtlPrec,showtlSpace,showtlParen,showtlList,showtlListWith,TL.singleton,TL.pack,c1ShowtlPrec,s1ShowtlPrec,productShowtlPrec,uCharShowtlPrec,uDoubleShowtlPrec,uFloatShowtlPrec,uIntShowtlPrec,uWordShowtlPrec)
 

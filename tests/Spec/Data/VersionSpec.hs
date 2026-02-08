@@ -3,9 +3,9 @@ module Spec.Data.VersionSpec (main, spec) where
 import Data.Proxy (Proxy(..))
 import Data.Version (Version, showVersion)
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (builderShouldBe, matchesTextShowSpec)
 
-import Test.Hspec (Expectation, Spec, describe, hspec, parallel, shouldBe)
+import Test.Hspec (Expectation, Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
 
 import TextShow (fromString)
@@ -23,4 +23,4 @@ spec = parallel $ do
 
 -- | Verifies 'showVersion' and 'showbVersion' generate the same output.
 prop_showVersion :: Version -> Expectation
-prop_showVersion v = fromString (showVersion v) `shouldBe` showbVersion v
+prop_showVersion v = fromString (showVersion v) `builderShouldBe` showbVersion v

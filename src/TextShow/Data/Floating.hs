@@ -30,8 +30,7 @@ module TextShow.Data.Floating (
 import           Data.Array.Base (unsafeAt)
 import           Data.Array.IArray (Array, array)
 import qualified Data.Text as T (replicate)
-import           Data.Text.Lazy.Builder (Builder, fromString, fromText, singleton)
-import           Data.Text.Lazy.Builder.Int (decimal)
+import           Data.Text.Builder.Linear (Builder, fromChar, fromDec, fromText)
 import           Data.Text.Lazy.Builder.RealFloat (FPFormat(..))
 
 import           Prelude ()
@@ -39,7 +38,7 @@ import           Prelude.Compat
 
 import           TextShow.Classes (TextShow(..), showbParen)
 import           TextShow.TH.Internal (deriveTextShow)
-import           TextShow.Utils (i2d)
+import           TextShow.Utils (fromString, i2d)
 
 -------------------------------------------------------------------------------
 -- TextShow instances
@@ -67,7 +66,7 @@ instance TextShow Double where
 -- /Since: 2/
 showbRealFloatPrec :: RealFloat a => Int -> a -> Builder
 showbRealFloatPrec p x
-    | x < 0 || isNegativeZero x = showbParen (p > 6) $ singleton '-' <> showbGFloat Nothing (-x)
+    | x < 0 || isNegativeZero x = showbParen (p > 6) $ fromChar '-' <> showbGFloat Nothing (-x)
     | otherwise                 = showbGFloat Nothing x
 {-# INLINE showbRealFloatPrec #-}
 
@@ -173,7 +172,7 @@ formatRealFloatAltB :: RealFloat a
 formatRealFloatAltB fmt decs alt x
    | isNaN x                   = "NaN"
    | isInfinite x              = if x < 0 then "-Infinity" else "Infinity"
-   | x < 0 || isNegativeZero x = singleton '-' <> doFmt fmt (floatToDigits (-x))
+   | x < 0 || isNegativeZero x = fromChar '-' <> doFmt fmt (floatToDigits (-x))
    | otherwise                 = doFmt fmt (floatToDigits x)
  where
   doFmt format (is, e) =
@@ -185,11 +184,11 @@ formatRealFloatAltB fmt decs alt x
      Exponent ->
       case decs of
        Nothing ->
-        let show_e' = decimal (e-1) in
+        let show_e' = fromDec (e-1) in
         case ds of
           "0"     -> "0.0e0"
-          [d]     -> singleton d <> ".0e" <> show_e'
-          (d:ds') -> singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> show_e'
+          [d]     -> fromChar d <> ".0e" <> show_e'
+          (d:ds') -> fromChar d <> fromChar '.' <> fromString ds' <> fromChar 'e' <> show_e'
           []      -> error "formatRealFloat/doFmt/Exponent: []"
        Just d | d <= 0 ->
         -- handle this case specifically since we need to omit the
@@ -204,7 +203,7 @@ formatRealFloatAltB fmt decs alt x
              n = case map i2d (if ei > 0 then init is' else is') of
                    n':_ -> n'
                    []   -> error "formatRealFloatAltB (Exponent, negative decs): Unexpected empty list"
-           in singleton n <> singleton 'e' <> decimal (e-1+ei)
+           in fromChar n <> fromChar 'e' <> fromDec (e-1+ei)
        Just dec ->
         let dec' = max dec 1 in
         case is of
@@ -216,7 +215,7 @@ formatRealFloatAltB fmt decs alt x
                        (d':ds'') -> (d',ds'')
                        []        -> error "formatRealFloatAltB (Exponent, non-negative decs): Unexpected empty list"
           in
-          singleton d <> singleton '.' <> fromString ds' <> singleton 'e' <> decimal (e-1+ei)
+          fromChar d <> fromChar '.' <> fromString ds' <> fromChar 'e' <> fromDec (e-1+ei)
      Fixed ->
       let
        mk0 ls = case ls of { "" -> "0" ; _ -> fromString ls}
@@ -226,7 +225,7 @@ formatRealFloatAltB fmt decs alt x
           | e <= 0    -> "0." <> fromText (T.replicate (-e) "0") <> fromString ds
           | otherwise ->
              let
-                f 0 str    rs  = mk0 (reverse str) <> singleton '.' <> mk0 rs
+                f 0 str    rs  = mk0 (reverse str) <> fromChar '.' <> mk0 rs
                 f n str    ""  = f (n-1) ('0':str) ""
                 f n str (r:rs) = f (n-1) (r:str) rs
              in
@@ -238,7 +237,7 @@ formatRealFloatAltB fmt decs alt x
           (ei,is') = roundTo (dec' + e) is
           (ls,rs)  = splitAt (e+ei) (map i2d is')
          in
-         mk0 ls <> (if null rs && not alt then "" else singleton '.' <> fromString rs)
+         mk0 ls <> (if null rs && not alt then "" else fromChar '.' <> fromString rs)
         else
          let
           (ei,is') = roundTo dec' (replicate (-e) 0 ++ is)
@@ -246,7 +245,7 @@ formatRealFloatAltB fmt decs alt x
                       (d':ds'') -> (d',ds'')
                       []        -> error "formatRealFloatAltB (Fixed): Unexpected empty list"
          in
-         singleton d <> (if null ds' && not alt then "" else singleton '.' <> fromString ds')
+         fromChar d <> (if null ds' && not alt then "" else fromChar '.' <> fromString ds')
 
 -- Based on "Printing Floating-Point Numbers Quickly and Accurately"
 -- by R.G. Burger and R.K. Dybvig in PLDI 96.

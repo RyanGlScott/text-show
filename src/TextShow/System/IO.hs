@@ -1,3 +1,4 @@
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -15,7 +16,7 @@ Portability: GHC
 -}
 module TextShow.System.IO () where
 
-import Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import Data.Text.Builder.Linear (Builder, fromAddr, fromChar)
 
 import GHC.IO.Encoding.Failure (CodingFailureMode)
 import GHC.IO.Encoding.Types (CodingProgress, TextEncoding(textEncodingName))
@@ -31,6 +32,7 @@ import TextShow.Classes (TextShow(..))
 import TextShow.Data.Integral ()
 import TextShow.Data.Maybe ()
 import TextShow.TH.Internal (deriveTextShow)
+import TextShow.Utils (fromString)
 
 -- | /Since: 2/
 instance TextShow Handle where
@@ -40,7 +42,7 @@ instance TextShow Handle where
 
 -- | Convert a 'Handle`'s 'FilePath' to a 'Builder'.
 showbHandleFilePath :: FilePath -> Builder
-showbHandleFilePath file = "{handle: " <> fromString file <> singleton '}'
+showbHandleFilePath file = fromAddr "{handle: "# <> fromString file <> fromChar '}'
 {-# INLINE showbHandleFilePath #-}
 
 -- | /Since: 2/
@@ -50,7 +52,7 @@ $(deriveTextShow ''BufferMode)
 
 -- | /Since: 2/
 instance TextShow HandlePosn where
-    showb (HandlePosn h pos) = showb h <> " at position " <> showbPrec 0 pos
+    showb (HandlePosn h pos) = showb h <> fromAddr " at position "# <> showbPrec 0 pos
     {-# INLINE showb #-}
 
 -- | /Since: 2/

@@ -18,7 +18,7 @@ import GHC.Show (asciiTab)
 
 import Instances.Data.Char ()
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (BuilderEq(..), matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, it, parallel, shouldBe)
 
@@ -35,4 +35,6 @@ spec = parallel $ do
     describe "GeneralCategory" $
         matchesTextShowSpec (Proxy :: Proxy GeneralCategory)
     describe "asciiTabB" $
-        it "equals asciiTab" $ map fromString asciiTab `shouldBe` elems asciiTabB
+        it "equals asciiTab" $
+          map (BuilderEq . fromString) asciiTab `shouldBe`
+          map BuilderEq (elems asciiTabB)

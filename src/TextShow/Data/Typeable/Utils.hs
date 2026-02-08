@@ -10,7 +10,7 @@ Utility functions for showing data types in the @Typeable@ module.
 -}
 module TextShow.Data.Typeable.Utils (showbArgs, showbTuple) where
 
-import Data.Text.Lazy.Builder (Builder, singleton)
+import Data.Text.Builder.Linear (Builder, fromChar)
 
 import Prelude ()
 import Prelude.Compat
@@ -26,5 +26,5 @@ showbArgs sep (a:as) = showbPrec 10 a <> sep <> showbArgs sep as
 
 -- | Helper function for showing a list of 'Show' instances in a tuple.
 showbTuple :: TextShow a => [a] -> Builder
-showbTuple args = singleton '(' <> showbArgs (singleton ',') args <> singleton ')'
+showbTuple args = fromChar '(' <> showbArgs (fromChar ',') args <> fromChar ')'
 {-# INLINE showbTuple #-}

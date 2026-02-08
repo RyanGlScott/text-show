@@ -15,9 +15,9 @@ Provides 'TextShow' instance for 'Fixed', as well as the 'showbFixed' function.
 module TextShow.Data.Fixed (showbFixed) where
 
 import Data.Fixed (Fixed(..), HasResolution(..))
-import Data.Int (Int64)
 import Data.Semigroup (mtimesDefault)
-import Data.Text.Lazy.Builder (Builder, singleton)
+import qualified Data.Text as TS (null)
+import Data.Text.Builder.Linear (Builder, fromChar, runBuilder)
 
 import Prelude ()
 import Prelude.Compat
@@ -36,7 +36,7 @@ import TextShow.Classes (showbParen)
 -- /Since: 2/
 showbFixed :: HasResolution a => Bool -> Fixed a -> Builder
 showbFixed chopTrailingZeroes fa@(MkFixed a) | a < 0
-    = singleton '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
+    = fromChar '-' <> showbFixed chopTrailingZeroes (asTypeOf (MkFixed (negate a)) fa)
 showbFixed chopTrailingZeroes fa@(MkFixed a)
     = showb i <> withDotB (showbIntegerZeroes chopTrailingZeroes digits fracNum)
   where
@@ -48,10 +48,10 @@ showbFixed chopTrailingZeroes fa@(MkFixed a)
     divCeil x y = (x + y - 1) `div` y
 
 -- | Only works for positive 'Integer's.
-showbIntegerZeroes :: Bool -> Int64 -> Integer -> Builder
+showbIntegerZeroes :: Bool -> Int -> Integer -> Builder
 showbIntegerZeroes True _ 0 = mempty
 showbIntegerZeroes chopTrailingZeroes digits a
-    = mtimesDefault (max 0 $ digits - lengthB sh) (singleton '0') <> sh'
+    = mtimesDefault (max 0 $ digits - lengthB sh) (fromChar '0') <> sh'
   where
     sh, sh' :: Builder
     sh  = showb a
@@ -65,8 +65,8 @@ chopZeroesB a = showb a
 
 -- | Prepends a dot to a non-empty 'Builder'.
 withDotB :: Builder -> Builder
-withDotB b | b == mempty = mempty
-           | otherwise   = singleton '.' <> b
+withDotB b | TS.null (runBuilder b) = mempty
+           | otherwise   = fromChar '.' <> b
 {-# INLINE withDotB #-}
 
 -- | /Since: 2/

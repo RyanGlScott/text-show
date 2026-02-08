@@ -15,7 +15,7 @@ Provides a 'TextShow' instance for 'Version' and the 'showbVersion' function.
 module TextShow.Data.Version (showbVersion) where
 
 import Data.List (intersperse)
-import Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import Data.Text.Builder.Linear (Builder, fromChar)
 import Data.Version (Version(..))
 
 import Prelude ()
@@ -26,6 +26,7 @@ import TextShow.Data.Char ()
 import TextShow.Data.Integral ()
 import TextShow.Data.List ()
 import TextShow.TH.Internal (deriveTextShow)
+import TextShow.Utils (fromString)
 
 -- | Provides one possible concrete representation for 'Version'.  For
 -- a version with 'versionBranch' @= [1,2,3]@ and 'versionTags'
@@ -34,8 +35,8 @@ import TextShow.TH.Internal (deriveTextShow)
 -- /Since: 3.6/
 showbVersion :: Version -> Builder
 showbVersion (Version branch tags)
-    = mconcat (intersperse (singleton '.') $ map showb branch) <>
-        mconcat (map ((singleton '-' <>) . fromString) tags)
+    = mconcat (intersperse (fromChar '.') $ map showb branch) <>
+        mconcat (map ((fromChar '-' <>) . fromString) tags)
 {-# INLINE showbVersion #-}
 
 -- | /Since: 2/

@@ -1,3 +1,4 @@
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-deprecations #-} -- TODO: Remove this later
@@ -23,12 +24,12 @@ for more details. If this is a problem for you, please file an issue.
 module TextShow.Data.Text () where
 
 import qualified Data.Text as TS
+import           Data.Text.Builder.Linear (fromAddr, fromChar)
 import           Data.Text.Encoding (Decoding(..))
 import           Data.Text.Encoding.Error (UnicodeException(..))
 import           Data.Text.Internal.Fusion.Size (Size)
 import qualified Data.Text.Lazy as TL
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton,
-                                         toLazyText)
+import qualified Data.Text.Lazy.Builder as TLB
 
 import           GHC.Show (appPrec)
 
@@ -40,6 +41,7 @@ import           TextShow.Data.ByteString ()
 import           TextShow.Data.Char (showbString)
 import           TextShow.Data.Integral (showbHex)
 import           TextShow.TH.Internal (deriveTextShow)
+import           TextShow.Utils (fromString)
 
 -- | /Since: 2/
 instance TextShow TS.Text where
@@ -52,26 +54,28 @@ instance TextShow TL.Text where
     {-# INLINE showb #-}
 
 -- | /Since: 2/
-instance TextShow Builder where
-    showb = showb . toLazyText
+instance TextShow TLB.Builder where
+    showb = showb . TLB.toLazyText
     {-# INLINE showb #-}
 
 -- | /Since: 2/
 instance TextShow UnicodeException where
     showb (DecodeError desc (Just w))
-        = "Cannot decode byte '\\x" <> showbHex w <> "': " <> fromString desc
+        = fromAddr "Cannot decode byte '\\x"# <> showbHex w <>
+          fromAddr "': "# <> fromString desc
     showb (DecodeError desc Nothing)
-        = "Cannot decode input: " <> fromString desc
+        = fromAddr "Cannot decode input: "# <> fromString desc
     showb (EncodeError desc (Just c))
-        = "Cannot encode character '\\x" <> showbHex (fromEnum c) <> "': " <> fromString desc
+        = fromAddr "Cannot encode character '\\x"# <> showbHex (fromEnum c) <>
+          fromAddr "': "# <> fromString desc
     showb (EncodeError desc Nothing)
-        = "Cannot encode input: " <> fromString desc
+        = fromAddr "Cannot encode input: "# <> fromString desc
 
 -- | /Since: 2/
 instance TextShow Decoding where
     showbPrec p (Some t bs _) = showbParen (p > appPrec) $
         "Some " <> showb t <>
-        singleton ' ' <> showb bs <>
+        fromChar ' ' <> showb bs <>
         " _"
     {-# INLINE showbPrec #-}
 

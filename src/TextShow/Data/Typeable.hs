@@ -31,7 +31,7 @@ import           Prelude.Compat
 
 #if MIN_VERSION_base(4,10,0)
 import           Data.Kind (Type)
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import           Data.Text.Builder.Linear (Builder, fromChar)
 import           Data.Type.Equality ((:~~:)(..))
 
 import           GHC.Exts (Addr#, Char(..), (+#), eqChar#, indexCharOffAddr#)
@@ -39,6 +39,7 @@ import           GHC.Types (Module(..), TrName(..), TyCon(..), isTrue#)
 
 import           TextShow.Classes (TextShow(..), TextShow1(..), showbParen, showbSpace)
 import           TextShow.Data.Typeable.Utils (showbArgs)
+import           TextShow.Utils (fromString)
 # if !(MIN_VERSION_base(4,20,0))
 import           TextShow.Data.Typeable.Utils (showbTuple)
 #endif
@@ -47,7 +48,7 @@ import           Type.Reflection (pattern App, pattern Con, pattern Con', patter
                                   SomeTypeRep(..), TypeRep,
                                   eqTypeRep, tyConName, typeRep, typeRepTyCon)
 #else /* !(MIN_VERSION_base(4,10,0) */
-import           Data.Text.Lazy.Builder (Builder, fromString, singleton)
+import           Data.Text.Builder.Linear (Builder, fromChar)
 import           Data.Typeable (TypeRep, typeRepArgs, typeRepTyCon)
 import           Data.Typeable.Internal (Proxy(..), Typeable,
                                          TypeRep(TypeRep), tyConName, typeRep,
@@ -60,6 +61,7 @@ import           GHC.Types (TyCon(..), TrName(..), Module(..), isTrue#)
 import           TextShow.Classes (TextShow(..), showbParen, showbSpace)
 import           TextShow.Data.List ()
 import           TextShow.Data.Typeable.Utils (showbArgs, showbTuple)
+import           TextShow.Utils (fromString)
 #endif
 
 #if MIN_VERSION_base(4,13,0)
@@ -175,11 +177,11 @@ instance TextShow1 TypeRep where
 showbTypeable :: Int -> TypeRep (a :: k) -> Builder
 showbTypeable _ rep
   | Just HRefl <- rep `eqTypeRep` (typeRep :: TypeRep Type) =
-    singleton '*'
+    fromChar '*'
   | isListTyCon tc, [] <- tys =
     fromString "[]"
   | isListTyCon tc, [ty] <- tys =
-    singleton '[' <> showb ty <> singleton ']'
+    fromChar '[' <> showb ty <> fromChar ']'
 # if MIN_VERSION_base(4,20,0)
   | Just (boxed, n) <- isTupleTyCon tc,
     Just sat <- plainOrSaturated boxed n =
@@ -190,7 +192,7 @@ showbTypeable _ rep
     showbTuple tys
     -- Print (,,,) instead of Tuple4
   | Just n <- isTupleTyCon tc, [] <- tys =
-      singleton '(' <> fromString (replicate (n-1) ',') <> singleton ')'
+      fromChar '(' <> fromString (replicate (n-1) ',') <> fromChar ')'
 # else
   | isTupleTyCon tc
 #  if MIN_VERSION_base(4,13,0)
@@ -216,7 +218,7 @@ showbTypeable _ rep
         args = showbArgs (fromString ",") tys
         args' = case (boxed, sat) of
           (True, True) -> args
-          (False, True) -> singleton ' ' <> args <> singleton ' '
+          (False, True) -> fromChar ' ' <> args <> fromChar ' '
           (_, False) -> commas
       in fromString lpar <> args' <> fromString rpar
 # endif
@@ -260,9 +262,9 @@ instance TextShow TypeRep where
         case tys of
           [] -> showb tycon
           [x@(TypeRep _ argCon _ _)]
-            | tycon == tcList -> singleton '[' <> showb x <> singleton ']'
-            | tycon == tcTYPE && argCon == tc'Lifted   -> singleton '*'
-            | tycon == tcTYPE && argCon == tc'Unlifted -> singleton '#'
+            | tycon == tcList -> fromChar '[' <> showb x <> fromChar ']'
+            | tycon == tcTYPE && argCon == tc'Lifted   -> fromChar '*'
+            | tycon == tcTYPE && argCon == tc'Unlifted -> fromChar '#'
           [a,r] | tycon == tcFun  -> showbParen (p > 8) $
                                         showbPrec 9 a
                                      <> " -> "
@@ -301,12 +303,12 @@ unpackCStringToBuilder# addr
   where
     unpack nh
       | isTrue# (ch `eqChar#` '\0'#) = mempty
-      | True                         = singleton (C# ch) <> unpack (nh +# 1#)
+      | True                         = fromChar (C# ch) <> unpack (nh +# 1#)
       where
         !ch = indexCharOffAddr# addr nh
 {-# NOINLINE unpackCStringToBuilder# #-}
 
 -- | /Since: 3/
 instance TextShow Module where
-    showb (Module p m) = showb p <> singleton ':' <> showb m
+    showb (Module p m) = showb p <> fromChar ':' <> showb m
     {-# INLINE showb #-}

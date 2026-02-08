@@ -18,7 +18,7 @@ Portability: GHC
 -}
 module TextShow.Control.Concurrent () where
 
-import Data.Text.Lazy.Builder (fromString)
+import Data.Text.Builder.Linear (fromAddr)
 
 import Foreign.C.Types
 
@@ -44,7 +44,7 @@ instance TextShow ThreadId where
 #if MIN_VERSION_base(4,14,0)
       showbParen (p > appPrec) $
 #endif
-      fromString "ThreadId " <> showbPrec p (getThreadId t)
+      fromAddr "ThreadId "# <> showbPrec p (getThreadId t)
     {-# INLINE showbPrec #-}
 
 -- Temporary workaround until Trac #8281 is fixed

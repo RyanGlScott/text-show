@@ -38,17 +38,15 @@ module TextShow (
       -- * 'Builder's
       -- ** The 'Builder' type
     , Builder
-    , toText
-    , toLazyText
-    , toLazyTextWith
-    , toString
+    , runBuilder
+    , runBuilderLazy
+    , runBuilderString
       -- ** Constructing 'Builder's
-    , singleton
+    , fromAddr
+    , fromChar
     , fromText
     , fromLazyText
     , fromString
-      -- ** Flushing the buffer state
-    , flush
       -- ** 'Builder' utility functions
     , lengthB
     , unlinesB
@@ -83,11 +81,15 @@ module TextShow (
 
 import qualified Data.Text as TS ()
 import qualified Data.Text.Lazy as TL ()
-import           Data.Text.Lazy.Builder
+-- TODO RGS: Is it really worth it to re-export all this stuff?
+import           Data.Text.Builder.Linear (Builder, fromAddr, fromChar,
+                                           fromText, runBuilder)
 
 import           Prelude ()
 
 import           TextShow.Classes
 import           TextShow.FromStringTextShow
 import           TextShow.Instances ()
-import           TextShow.Utils (toString, toText, lengthB, unlinesB, unwordsB)
+import           TextShow.Utils (fromLazyText, fromString, lengthB,
+                                 runBuilderLazy, runBuilderString,
+                                 unlinesB, unwordsB)

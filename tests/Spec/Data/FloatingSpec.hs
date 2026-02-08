@@ -23,7 +23,7 @@ import Numeric (showEFloat, showFFloat, showGFloat,
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (BuilderEq(..), matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 import Test.Hspec.QuickCheck (prop)
@@ -62,7 +62,7 @@ prop_showXFloat :: (Maybe Int -> Double -> ShowS)
                 -> Double -> Property
 prop_showXFloat f1 f2 val = property $ do
   mb_digs <- arbitrary `suchThat` cond
-  pure $ fromString (f1 mb_digs val "") == f2 mb_digs val
+  pure $ BuilderEq (fromString (f1 mb_digs val "")) == BuilderEq (f2 mb_digs val)
   where
     cond :: Maybe Int -> Bool
     cond mb_digs =

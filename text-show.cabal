@@ -115,6 +115,7 @@ library
                        TextShow.Data.Ratio
                        TextShow.Data.Semigroup
                        TextShow.Data.Text
+                       TextShow.Data.Text.Builder.Linear
                        TextShow.Data.Tuple
                        TextShow.Data.Type.Coercion
                        TextShow.Data.Type.Equality
@@ -160,6 +161,7 @@ library
                      , ghc-prim
                      , template-haskell      >= 2.11     && < 2.25
                      , text                  >= 1.1      && < 2.2
+                     , text-builder-linear   >= 0.1      && < 0.2
                      , th-abstraction        >= 0.5      && < 0.8
 
   -- integer-gmp is only needed on pre-9.0 versions of GHC, as GHC 9.0+ add
@@ -199,6 +201,7 @@ test-suite spec
                        Instances.Data.Ord
                        Instances.Data.Semigroup
                        Instances.Data.Text
+                       Instances.Data.Text.Builder.Linear
                        Instances.Data.Tuple
                        Instances.Data.Typeable
                        Instances.Data.Type.Coercion
@@ -259,6 +262,7 @@ test-suite spec
                        Spec.Data.RatioSpec
                        Spec.Data.SemigroupSpec
                        Spec.Data.TextSpec
+                       Spec.Data.Text.Builder.LinearSpec
                        Spec.Data.TupleSpec
                        Spec.Data.Type.CoercionSpec
                        Spec.Data.Type.EqualitySpec
@@ -313,6 +317,7 @@ test-suite spec
                      , quickcheck-instances  >= 0.3.28   && < 0.5
                      , template-haskell      >= 2.11     && < 2.25
                      , text                  >= 1.1      && < 2.2
+                     , text-builder-linear
                      , text-show
                      , transformers-compat   >= 0.5      && < 1
   build-tool-depends:  hspec-discover:hspec-discover

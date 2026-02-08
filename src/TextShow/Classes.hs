@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP                   #-}
+{-# LANGUAGE MagicHash             #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
 #if __GLASGOW_HASKELL__ >= 806
@@ -22,8 +23,8 @@ import qualified Data.Text.IO      as TS (putStrLn, hPutStrLn)
 import qualified Data.Text.Lazy    as TL (Text, singleton)
 import qualified Data.Text.Lazy.IO as TL (putStrLn, hPutStrLn)
 import           Data.Text.Lazy (toStrict)
-import           Data.Text.Lazy.Builder (Builder, fromLazyText, fromString,
-                                         fromText, singleton, toLazyText)
+import           Data.Text.Builder.Linear (Builder)
+import qualified Data.Text.Builder.Linear as TB
 
 import           GHC.Show (appPrec, appPrec1)
 
@@ -32,7 +33,8 @@ import           Prelude.Compat
 
 import           System.IO (Handle)
 
-import           TextShow.Utils (toString, toText)
+import           TextShow.Utils (fromLazyText, fromString,
+                                 runBuilderLazy, runBuilderString)
 
 -------------------------------------------------------------------------------
 
@@ -143,7 +145,7 @@ class TextShow a where
                       -- from @0@ to @11@). Function application has precedence @10@.
                -> a   -- ^ The value to be converted to a lazy 'TL.Text'.
                -> TL.Text
-    showtlPrec p = toLazyText . showbPrec p
+    showtlPrec p = runBuilderLazy . showbPrec p
 
     -- | Converts a value to a lazy 'TL.Text'. This can be overridden for
     -- efficiency, but it should satisfy:
@@ -170,7 +172,7 @@ class TextShow a where
     -- /Since: 3/
     showtlList :: [a] -- ^ The list of values to be converted to a lazy 'TL.Text'.
                -> TL.Text
-    showtlList = toLazyText . showbList
+    showtlList = runBuilderLazy . showbList
 
     {-# MINIMAL showbPrec | showb #-}
 
@@ -178,20 +180,20 @@ class TextShow a where
 --
 -- /Since: 2/
 showbParen :: Bool -> Builder -> Builder
-showbParen p builder | p         = singleton '(' <> builder <> singleton ')'
+showbParen p builder | p         = TB.fromChar '(' <> builder <> TB.fromChar ')'
                      | otherwise = builder
 
 -- | Construct a 'Builder' containing a comma followed by a space.
 --
 -- /Since: 3.6/
 showbCommaSpace :: Builder
-showbCommaSpace = ", "
+showbCommaSpace = TB.fromAddr ", "#
 
 -- | Construct a 'Builder' containing a single space character.
 --
 -- /Since: 2/
 showbSpace :: Builder
-showbSpace = singleton ' '
+showbSpace = TB.fromChar ' '
 
 -- | Converts a list of values into a 'Builder' in which the values are surrounded
 -- by square brackets and each value is separated by a comma. The function argument
@@ -203,10 +205,10 @@ showbSpace = singleton ' '
 -- /Since: 2/
 showbListWith :: (a -> Builder) -> [a] -> Builder
 showbListWith _      []     = "[]"
-showbListWith showbx (x:xs) = singleton '[' <> showbx x <> go xs -- "[..
+showbListWith showbx (x:xs) = TB.fromChar '[' <> showbx x <> go xs -- "[..
   where
-    go (y:ys) = singleton ',' <> showbx y <> go ys               -- ..,..
-    go []     = singleton ']'                                    -- ..]"
+    go (y:ys) = TB.fromChar ',' <> showbx y <> go ys               -- ..,..
+    go []     = TB.fromChar ']'                                    -- ..]"
 
 -- | Surrounds strict 'TS.Text' output with parentheses if the 'Bool' parameter is 'True'.
 --
@@ -314,7 +316,7 @@ showsPrecToShowbPrec sp p x = fromString $ sp p x ""
 --
 -- /Since: 3.4/
 showtPrecToShowbPrec :: (Int -> a -> TS.Text) -> Int -> a -> Builder
-showtPrecToShowbPrec sp p = fromText . sp p
+showtPrecToShowbPrec sp p = TB.fromText . sp p
 {-# INLINE showtPrecToShowbPrec #-}
 
 -- | Convert a precedence-aware, lazy 'TL.Text'-based show function to a 'Builder'-based one.
@@ -335,7 +337,7 @@ showsToShowb sf x = fromString $ sf x ""
 --
 -- /Since: 3.4/
 showtToShowb :: (a -> TS.Text) -> a -> Builder
-showtToShowb sf = fromText . sf
+showtToShowb sf = TB.fromText . sf
 {-# INLINE showtToShowb #-}
 
 -- | Convert a lazy 'TL.Text'-based show function to a 'Builder'-based one.
@@ -349,42 +351,42 @@ showtlToShowb sf = fromLazyText . sf
 --
 -- /Since: 3/
 showbPrecToShowsPrec :: (Int -> a -> Builder) -> Int -> a -> ShowS
-showbPrecToShowsPrec sp p = showString . toString . sp p
+showbPrecToShowsPrec sp p = showString . runBuilderString . sp p
 {-# INLINE showbPrecToShowsPrec #-}
 
 -- | Convert a precedence-aware 'Builder'-based show function to a strict 'TS.Text'-based one.
 --
 -- /Since: 3.4/
 showbPrecToShowtPrec :: (Int -> a -> Builder) -> Int -> a -> TS.Text
-showbPrecToShowtPrec sp p = toText . sp p
+showbPrecToShowtPrec sp p = TB.runBuilder . sp p
 {-# INLINE showbPrecToShowtPrec #-}
 
 -- | Convert a precedence-aware 'Builder'-based show function to a lazy 'TL.Text'-based one.
 --
 -- /Since: 3.4/
 showbPrecToShowtlPrec :: (Int -> a -> Builder) -> Int -> a -> TL.Text
-showbPrecToShowtlPrec sp p = toLazyText . sp p
+showbPrecToShowtlPrec sp p = runBuilderLazy . sp p
 {-# INLINE showbPrecToShowtlPrec #-}
 
 -- | Convert a 'Builder'-based show function to a 'ShowS'-based one.
 --
 -- /Since: 3/
 showbToShows :: (a -> Builder) -> a -> ShowS
-showbToShows sf = showString . toString . sf
+showbToShows sf = showString . runBuilderString . sf
 {-# INLINE showbToShows #-}
 
 -- | Convert a 'Builder'-based show function to a strict 'TS.Text'-based one.
 --
 -- /Since: 3/
 showbToShowt :: (a -> Builder) -> a -> TS.Text
-showbToShowt sf = toText . sf
+showbToShowt sf = TB.runBuilder . sf
 {-# INLINE showbToShowt #-}
 
 -- | Convert a 'Builder'-based show function to a lazy 'TL.Text'-based one.
 --
 -- /Since: 3/
 showbToShowtl :: (a -> Builder) -> a -> TL.Text
-showbToShowtl sf = toLazyText . sf
+showbToShowtl sf = runBuilderLazy . sf
 {-# INLINE showbToShowtl #-}
 
 -------------------------------------------------------------------------------

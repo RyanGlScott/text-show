@@ -15,12 +15,12 @@ Portability: GHC
 module TextShow.Data.Data () where
 
 import Data.Data (Constr, ConstrRep, DataRep, DataType, Fixity, showConstr)
-import Data.Text.Lazy.Builder (fromString)
 
 import TextShow.Classes (TextShow(..))
 import TextShow.Data.List ()
 import TextShow.Data.Ratio ()
 import TextShow.TH.Internal (deriveTextShow)
+import TextShow.Utils (fromString)
 
 -- | /Since: 2/
 instance TextShow Constr where

@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP             #-}
 
 #if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && !defined(mingw32_HOST_OS)
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -23,7 +24,7 @@ module TextShow.GHC.Event () where
 #if !defined(__GHCJS__) && !defined(ghcjs_HOST_OS) && !defined(mingw32_HOST_OS)
 import Data.List (intersperse)
 import Data.Maybe (catMaybes)
-import Data.Text.Lazy.Builder (Builder, singleton)
+import Data.Text.Builder.Linear (Builder, fromAddr, fromChar)
 
 import GHC.Event (Event, Lifetime, evtRead, evtWrite)
 
@@ -41,11 +42,11 @@ import TextShow.TH.Names (evtCloseValName, eventIsValName,
 
 -- | /Since: 2/
 instance TextShow Event where
-    showb e = singleton '[' <> mconcat (intersperse "," $ catMaybes
-        [ evtRead                 `so` "evtRead"
-        , evtWrite                `so` "evtWrite"
-        , $(varE evtCloseValName) `so` "evtClose"
-        ]) <> singleton ']'
+    showb e = fromChar '[' <> mconcat (intersperse "," $ catMaybes
+        [ evtRead                 `so` fromAddr "evtRead"#
+        , evtWrite                `so` fromAddr "evtWrite"#
+        , $(varE evtCloseValName) `so` fromAddr "evtClose"#
+        ]) <> fromChar ']'
       where
         so :: Event -> Builder -> Maybe Builder
         ev `so` disp | $(varE eventIsValName) e ev = Just disp

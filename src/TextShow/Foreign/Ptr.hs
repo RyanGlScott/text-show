@@ -17,7 +17,7 @@ Foreign Function Interface (FFI).
 module TextShow.Foreign.Ptr () where
 
 import Data.Semigroup (mtimesDefault)
-import Data.Text.Lazy.Builder (Builder, singleton)
+import Data.Text.Builder.Linear (Builder, fromChar)
 
 import Foreign.ForeignPtr (ForeignPtr)
 import Foreign.Ptr (FunPtr, IntPtr, WordPtr, castFunPtrToPtr)
@@ -50,8 +50,8 @@ instance TextShow1 Ptr where
       where
         padOut :: Builder -> Builder
         padOut ls =
-             singleton '0' <> singleton 'x'
-          <> mtimesDefault (max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (singleton '0')
+             fromChar '0' <> fromChar 'x'
+          <> mtimesDefault (max 0 $ 2*SIZEOF_HSPTR - lengthB ls) (fromChar '0')
           <> ls
 
 #if !(MIN_VERSION_base(4,15,0))

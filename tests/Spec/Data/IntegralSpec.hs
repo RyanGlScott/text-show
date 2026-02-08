@@ -19,7 +19,7 @@ import Data.Word (Word8, Word16, Word32, Word64)
 import Prelude ()
 import Prelude.Compat
 
-import Spec.Utils (matchesTextShowSpec)
+import Spec.Utils (BuilderEq(..), matchesTextShowSpec)
 
 import Test.Hspec (Spec, describe, hspec, parallel)
 
@@ -75,5 +75,5 @@ prop_showIntAtBase :: Gen Expectation
 prop_showIntAtBase = do
     base <- arbitrary `suchThat` \b -> 1 < b && b <= 16
     i    <- getNonNegative <$> arbitrary :: Gen Int
-    pure $ fromString (showIntAtBase base intToDigit i "") `shouldBe` showbIntAtBase base intToDigit i
+    pure $ BuilderEq (fromString (showIntAtBase base intToDigit i "")) `shouldBe` BuilderEq (showbIntAtBase base intToDigit i)
 #endif

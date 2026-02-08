@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-|
@@ -23,7 +24,7 @@ import qualified Data.Array.Base as IArray (assocs, bounds)
 import           Data.Array.Base (IArray)
 import           Data.Array.Unboxed (UArray)
 import           Data.Ix (Ix)
-import           Data.Text.Lazy.Builder (Builder)
+import           Data.Text.Builder.Linear (Builder, fromAddr)
 
 import           GHC.Show (appPrec)
 
@@ -39,7 +40,7 @@ import           TextShow.Data.Tuple ()
 -- /Since: 2/
 showbIArrayPrec :: (IArray a e, Ix i, TextShow i, TextShow e) => Int -> a i e -> Builder
 showbIArrayPrec p a = showbParen (p > arrayPrec) $
-       "array "
+       fromAddr "array "#
     <> showb (IArray.bounds a)
     <> showbSpace
     <> showb (IArray.assocs a)
@@ -54,7 +55,7 @@ showbIArrayPrec p a = showbParen (p > arrayPrec) $
 -- | /Since: 2/
 instance (TextShow i, TextShow e, Ix i) => TextShow (Array i e) where
     showbPrec p a = showbParen (p > appPrec) $
-           "array "
+           fromAddr "array "#
         <> showb (Array.bounds a)
         <> showbSpace
         <> showb (Array.assocs a)

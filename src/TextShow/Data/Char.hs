@@ -1,3 +1,4 @@
+{-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -24,7 +25,7 @@ module TextShow.Data.Char (
 
 import           Data.Array (Array, (!), listArray)
 import           Data.Char (GeneralCategory, isDigit, ord)
-import           Data.Text.Lazy.Builder (Builder, singleton)
+import           Data.Text.Builder.Linear (Builder, fromAddr, fromChar)
 
 import           Prelude ()
 import           Prelude.Compat
@@ -48,43 +49,50 @@ instance TextShow Char where
 --
 -- /Since: 2/
 asciiTabB :: Array Int Builder
-asciiTabB = listArray (0, 32) ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
-                               "BS" , "HT" , "LF" , "VT" , "FF" , "CR" , "SO" , "SI" ,
-                               "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
-                               "CAN", "EM" , "SUB", "ESC", "FS" , "GS" , "RS" , "US" ,
-                               "SP"]
+asciiTabB =
+  listArray
+    (0, 32)
+    [fromAddr "NUL"#, fromAddr "SOH"#, fromAddr "STX"#, fromAddr "ETX"#,
+     fromAddr "EOT"#, fromAddr "ENQ"#, fromAddr "ACK"#, fromAddr "BEL"#,
+     fromAddr "BS"# , fromAddr "HT"# , fromAddr "LF"# , fromAddr "VT"# ,
+     fromAddr "FF"# , fromAddr "CR"# , fromAddr "SO"# , fromAddr "SI"# ,
+     fromAddr "DLE"#, fromAddr "DC1"#, fromAddr "DC2"#, fromAddr "DC3"#,
+     fromAddr "DC4"#, fromAddr "NAK"#, fromAddr "SYN"#, fromAddr "ETB"#,
+     fromAddr "CAN"#, fromAddr "EM"# , fromAddr "SUB"#, fromAddr "ESC"#,
+     fromAddr "FS"# , fromAddr "GS"# , fromAddr "RS"# , fromAddr "US"# ,
+     fromAddr "SP"#]
 
 -- | Convert a 'Char' to a 'Builder' (surrounded by single quotes).
 --
 -- /Since: 2/
 showbChar :: Char -> Builder
 showbChar '\'' = "'\\''"
-showbChar c    = singleton '\'' <> showbLitChar c <> singleton '\''
+showbChar c    = fromChar '\'' <> showbLitChar c <> fromChar '\''
 {-# INLINE showbChar #-}
 
 -- | Convert a 'Char' to a 'Builder' (without single quotes).
 --
 -- /Since: 2/
 showbLitChar :: Char -> Builder
-showbLitChar c | c > '\DEL' = singleton '\\' <> showb (ord c)
+showbLitChar c | c > '\DEL' = fromChar '\\' <> showb (ord c)
 showbLitChar '\DEL'         = "\\DEL"
 showbLitChar '\\'           = "\\\\"
-showbLitChar c | c >= ' '   = singleton c
-showbLitChar '\a'           = "\\a"
-showbLitChar '\b'           = "\\b"
-showbLitChar '\f'           = "\\f"
-showbLitChar '\n'           = "\\n"
-showbLitChar '\r'           = "\\r"
-showbLitChar '\t'           = "\\t"
-showbLitChar '\v'           = "\\v"
-showbLitChar '\SO'          = "\\SO"
-showbLitChar c              = singleton '\\' <> (asciiTabB ! ord c)
+showbLitChar c | c >= ' '   = fromChar c
+showbLitChar '\a'           = fromAddr "\\a"#
+showbLitChar '\b'           = fromAddr "\\b"#
+showbLitChar '\f'           = fromAddr "\\f"#
+showbLitChar '\n'           = fromAddr "\\n"#
+showbLitChar '\r'           = fromAddr "\\r"#
+showbLitChar '\t'           = fromAddr "\\t"#
+showbLitChar '\v'           = fromAddr "\\v"#
+showbLitChar '\SO'          = fromAddr "\\SO"#
+showbLitChar c              = fromChar '\\' <> (asciiTabB ! ord c)
 
 -- | Convert a 'String' to a 'Builder' (surrounded by double quotes).
 --
 -- /Since: 2/
 showbString :: String -> Builder
-showbString cs = singleton '"' <> showbLitString cs <> singleton '"'
+showbString cs = fromChar '"' <> showbLitString cs <> fromChar '"'
 {-# INLINE showbString #-}
 
 -- | Convert a 'String' to a 'Builder' (without double quotes).
@@ -92,11 +100,11 @@ showbString cs = singleton '"' <> showbLitString cs <> singleton '"'
 -- /Since: 2/
 showbLitString :: String -> Builder
 showbLitString []             = mempty
-showbLitString ('\SO':'H':cs) = "\\SO\\&H" <> showbLitString cs
+showbLitString ('\SO':'H':cs) = fromAddr "\\SO\\&H"# <> showbLitString cs
 showbLitString ('"':cs)       = "\\\"" <> showbLitString cs
 showbLitString (c:d:cs)
-    | c > '\DEL' && isDigit d = singleton '\\' <> showb (ord c) <> "\\&"
-                             <> singleton d    <> showbLitString cs
+    | c > '\DEL' && isDigit d = fromChar '\\' <> showb (ord c) <> fromAddr "\\&"#
+                             <> fromChar d    <> showbLitString cs
 showbLitString (c:cs)         = showbLitChar c <> showbLitString cs
 
 -- | Convert a 'GeneralCategory' to a 'Builder'.
