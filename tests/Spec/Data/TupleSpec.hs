@@ -13,7 +13,7 @@ Portability: GHC
 module Spec.Data.TupleSpec (main, spec) where
 
 import Data.Proxy (Proxy(..))
-#if MIN_VERSION_ghc_prim(0,7,0)
+#if MIN_VERSION_ghc_prim(0,7,0) && MIN_VERSION_base(4,16,0)
 import GHC.Tuple (Solo)
 #endif
 import Instances.Data.Tuple ()
@@ -84,7 +84,7 @@ spec = parallel $ do
         matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
     describe "(Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int)" $ do
         matchesTextShowSpec (Proxy :: Proxy (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int))
-#if MIN_VERSION_ghc_prim(0,7,0)
+#if MIN_VERSION_ghc_prim(0,7,0) && MIN_VERSION_base(4,16,0)
     describe "Solo Int" $ do
         let p :: Proxy (Solo Int)
             p = Proxy
