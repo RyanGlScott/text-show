@@ -1,6 +1,5 @@
 # `text-show`
 [![Hackage](https://img.shields.io/hackage/v/text-show.svg)][Hackage: text-show]
-[![Hackage Dependencies](https://img.shields.io/hackage-deps/v/text-show.svg)](http://packdeps.haskellers.com/reverse/text-show)
 [![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)][Haskell.org]
 [![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)][tl;dr Legal: BSD3]
 [![Build Status](https://github.com/RyanGlScott/text-show/workflows/Haskell-CI/badge.svg)](https://github.com/RyanGlScott/text-show/actions?query=workflow%3AHaskell-CI)
