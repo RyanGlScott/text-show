@@ -1,4 +1,4 @@
-### next [????.??.??]
+### 3.11.4 [2026.06.19]
 * Make the test suite report source locations for test failures accurately.
 
 ### 3.11.3 [2026.01.08]
