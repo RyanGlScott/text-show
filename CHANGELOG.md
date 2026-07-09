@@ -1,3 +1,6 @@
+### 3.11.5
+* Support `Generically` and `Generically1` from `base-4.17` (GHC 9.4) or later in addition to `FromGeneric` and `FromGeneric1`.
+
 ### 3.11.4 [2026.06.19]
 * Make the test suite report source locations for test failures accurately.
 
