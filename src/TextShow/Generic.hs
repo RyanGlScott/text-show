@@ -25,8 +25,11 @@
 {-# LANGUAGE UndecidableInstances  #-}
 
 #if __GLASGOW_HASKELL__ >= 806
+{-# LANGUAGE DerivingVia           #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 #endif
+
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 {-|
 Module:      TextShow.Generic
@@ -218,6 +221,23 @@ instance ( Generic1 f
 #endif
          ) => TextShow1 (FromGeneric1 f) where
   liftShowbPrec sp sl p = genericLiftShowbPrec sp sl p . fromGeneric1
+
+#if MIN_VERSION_base(4,17,0)
+-- | The 'TextShow' instance for 'Generically' behaves exactly like the instance for 'FromGeneric'.
+--
+-- /Since: 3.11.5/
+deriving via FromGeneric a instance (Generic a, GTextShowB (Rep a ())) => TextShow (Generically a)
+
+-- | The 'TextShow' instance for 'Generically1' behaves exactly like the instance for 'FromGeneric1'.
+--
+-- /Since: 3.11.5/
+deriving via FromGeneric1 f a instance (Generic1 f, GTextShowB (Rep1 f a)) => TextShow (Generically1 f a)
+
+-- | The 'TextShow1' instance for 'Generically1' behaves exactly like the instance for 'FromGeneric1'.
+--
+-- /Since: 3.11.5/
+deriving via FromGeneric1 (f :: * -> *) instance (Generic1 f, GTextShowB1 (Rep1 f)) => TextShow1 (Generically1 f)
+#endif
 
 -- | A 'Generic' implementation of 'showt'.
 --

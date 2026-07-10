@@ -89,5 +89,6 @@ import           Prelude ()
 
 import           TextShow.Classes
 import           TextShow.FromStringTextShow
+import           TextShow.Generic ()
 import           TextShow.Instances ()
 import           TextShow.Utils (toString, toText, lengthB, unlinesB, unwordsB)
